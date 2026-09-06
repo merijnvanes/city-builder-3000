@@ -251,6 +251,7 @@ export class CityRenderer {
     const { x, y } = t, n = random(x, y), water = t.terrain === "water";
     let color = water ? ["#477e92", "#4b8396", "#528b9a", "#4c8390"][Math.floor(n * 4)]
       : t.terrain === "sand" ? ["#b3b17b", "#bdba88", "#aeb07d"][Math.floor(n * 3)]
+      : t.terrain === "rock" ? ["#5e5650", "#66605a", "#575049", "#6b625b"][Math.floor(n * 4)]
       : ["#78904d", "#7c9550", "#829950", "#7c914b", "#759049"][Math.floor(n * 5)];
     if (!water) {
       const k = this.slopeShade(x, y);
@@ -386,7 +387,7 @@ export class CityRenderer {
       this.poly([flatPts[a], flatPts[b], pb, pa], name === "south" || name === "west" ? "#6f6a58" : "#8a836c");
     }
     this.platform = top;
-    this.poly(flatPts, t.terrain === "sand" ? "#b7b487" : "#7c914b");
+    this.poly(flatPts, t.terrain === "sand" ? "#b7b487" : t.terrain === "rock" ? "#615a53" : "#7c914b");
   }
 
   // ── Static layer ──────────────────────────────────────────────
@@ -468,12 +469,31 @@ export class CityRenderer {
   }
 
   // ── Frame ─────────────────────────────────────────────────────
-  render(city, time) {
+  shakeOffset(city, now) {
+    if (this.shakeCity !== city) {
+      this.shakeCity = city; this.seenQuakes = new WeakSet(); this.shakeUntil = 0;
+    }
+    for (const effect of city.effects || []) {
+      if (effect.type !== "earthquake" || this.seenQuakes.has(effect)) continue;
+      this.seenQuakes.add(effect); this.shakeUntil = now + 900;
+    }
+    const k = Math.max(0, (this.shakeUntil - now) / 900);
+    return { x: Math.sin(now * 0.09) * 6 * k, y: Math.cos(now * 0.11) * 4 * k };
+  }
+
+  render(city, time, now = performance.now()) {
     if (this.dirty || city.revision !== this.lastRevision || this.size !== city.size || this.tiles !== city.tiles) this.paint(city);
     const ctx = this.ctx;
+    // Shake the whole scene once, using real time even when the city is paused.
+    const shake = this.shakeOffset(city, now);
+    const dx = shake.x * this.dpr, dy = shake.y * this.dpr;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.drawImage(this.ground, 0, 0);
-    ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+    if (dx || dy) {
+      ctx.fillStyle = this.night ? "#233640" : "#526c60";
+      ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+    ctx.drawImage(this.ground, dx, dy);
+    ctx.setTransform(this.dpr, 0, 0, this.dpr, dx, dy);
 
     // Water sparkle.
     for (let i = 0; i < city.tiles.length; i += 7) {
@@ -592,7 +612,7 @@ export class CityRenderer {
       this.platform = null;
     }
 
-    // Flood water, tornado funnels, earthquake shake.
+    // Flood water, tornado funnels, saucers, lava, toxic clouds.
     for (const t of city.tiles) {
       if (!t.flooded) continue;
       const p = this.project(t.x + 0.5, t.y + 0.5, 0.6);
@@ -610,16 +630,47 @@ export class CityRenderer {
           ctx.fillStyle = `rgba(90,95,100,${0.55 - i * 0.05})`;
           ctx.beginPath(); ctx.ellipse(base.x + wob, y, w, w * 0.45, 0, 0, Math.PI * 2); ctx.fill();
         }
-      } else if (e.type === "earthquake") {
-        this.shakeUntil = Math.max(this.shakeUntil || 0, time + 900);
+      } else if (e.type === "ufo") {
+        const z = this.zoom, f = (time * 0.0004) % 1;
+        const idx = Math.min(e.path.length - 1, Math.floor(f * e.path.length));
+        const at = e.path[idx];
+        const p = this.project(at.x + 0.5, at.y + 0.5, 72 + Math.sin(time * 0.004) * 4), g = this.project(at.x + 0.5, at.y + 0.5, 0);
+        if (idx % 3 === 2) {
+          ctx.fillStyle = `rgba(170,255,200,${0.22 + 0.1 * Math.sin(time * 0.03)})`;
+          ctx.beginPath(); ctx.moveTo(p.x - 5 * z, p.y); ctx.lineTo(p.x + 5 * z, p.y); ctx.lineTo(g.x + 18 * z, g.y + 4 * z); ctx.lineTo(g.x - 18 * z, g.y + 4 * z); ctx.closePath(); ctx.fill();
+        }
+        ctx.fillStyle = "#00000022"; ctx.beginPath(); ctx.ellipse(g.x, g.y + 2 * z, 18 * z, 6 * z, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#59616d"; ctx.beginPath(); ctx.ellipse(p.x, p.y + 2 * z, 28 * z, 8 * z, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#7d8794"; ctx.beginPath(); ctx.ellipse(p.x, p.y, 28 * z, 8 * z, 0, Math.PI, 0); ctx.fill();
+        ctx.fillStyle = "#b7cad9"; ctx.beginPath(); ctx.ellipse(p.x, p.y - 5 * z, 11 * z, 7.5 * z, 0, Math.PI, 0); ctx.fill();
+        for (let i = 0; i < 8; i++) {
+          const a = i * 0.785 + time * 0.003;
+          ctx.fillStyle = Math.floor(time / 180 + i) % 3 ? "#f2d36b" : "#ff6b6b";
+          ctx.beginPath(); ctx.arc(p.x + Math.cos(a) * 22 * z, p.y + Math.sin(a) * 6 * z + 2 * z, 1.8 * z, 0, Math.PI * 2); ctx.fill();
+        }
+      } else if (e.type === "lava") {
+        const z = this.zoom;
+        for (let dy = -e.radius; dy <= e.radius; dy++) for (let dx = -e.radius; dx <= e.radius; dx++) {
+          const x = e.x + dx, y = e.y + dy;
+          if (x < 0 || y < 0 || x >= city.size || y >= city.size) continue;
+          const d = Math.max(Math.abs(dx), Math.abs(dy));
+          const a = (0.75 - d * 0.18) * (0.8 + 0.2 * Math.sin(time * 0.004 + dx * 1.7 + dy * 2.3));
+          this.flat(x, y, 1, 1, 0.6, `rgba(255,${110 - d * 20},30,${Math.max(0.1, a)})`, null, ctx);
+        }
+        const top = this.project(e.x + 0.5, e.y + 0.5, 4);
+        for (let i = 0; i < 6; i++) {
+          const rise = ((time * 0.03 + i * 17) % 90);
+          ctx.fillStyle = `rgba(70,60,55,${0.5 - rise / 200})`;
+          ctx.beginPath(); ctx.ellipse(top.x + Math.sin(i * 2 + time * 0.002) * 6 * z, top.y - rise * z * 0.8, (8 + rise * 0.25) * z, (5 + rise * 0.15) * z, 0, 0, Math.PI * 2); ctx.fill();
+        }
+      } else if (e.type === "toxic") {
+        const z = this.zoom, c = this.project(e.x + 0.5, e.y + 0.5, 16);
+        for (let i = 0; i < 16; i++) {
+          const a = i * 0.39 + time * 0.0006, r = (20 + (i % 5) * 16) * z;
+          ctx.fillStyle = `rgba(${150 + (i % 2) * 30},${190 + (i % 3) * 20},60,${0.42 + 0.1 * Math.sin(time * 0.002 + i)})`;
+          ctx.beginPath(); ctx.ellipse(c.x + Math.cos(a) * r, c.y + Math.sin(a) * r * 0.45 - (i % 3) * 6 * z, (20 + (i % 5) * 5) * z, (11 + (i % 3) * 3) * z, 0, 0, Math.PI * 2); ctx.fill();
+        }
       }
-    }
-    if (this.shakeUntil && time < this.shakeUntil) {
-      const k = (this.shakeUntil - time) / 900;
-      ctx.setTransform(this.dpr, 0, 0, this.dpr, Math.sin(time * 0.09) * 6 * k * this.dpr, Math.cos(time * 0.11) * 4 * k * this.dpr);
-      ctx.drawImage(this.ground, 0, 0, this.w, this.h);
-      ctx.drawImage(this.cache, 0, 0, this.w, this.h);
-      ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     }
 
     // Construction preview or hover.

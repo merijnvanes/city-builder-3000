@@ -71,3 +71,18 @@ test('facade windows stay between floor bands and below the roof', () => {
     }
   }
 });
+
+test('earthquake shake expires while paused and does not mutate saved effects', () => {
+  const r = camera(), effect = { type: 'earthquake', ttl: 1 };
+  const city = { effects: [effect] };
+  assert.notDeepEqual(r.shakeOffset(city, 100), { x: 0, y: 0 });
+  const end = r.shakeOffset(city, 1001);
+  assert.equal(Math.abs(end.x) + Math.abs(end.y), 0);
+  assert.equal(r.shakeUntil, 1000, 'the same effect never restarts the shake');
+  assert.deepEqual(effect, { type: 'earthquake', ttl: 1 });
+  city.effects.push({ type: 'earthquake', ttl: 1 });
+  r.shakeOffset(city, 1100);
+  assert.equal(r.shakeUntil, 2000, 'a second earthquake shakes again');
+  r.shakeOffset({ effects: [] }, 1101);
+  assert.equal(r.shakeUntil, 0, 'loading another city clears camera shake');
+});

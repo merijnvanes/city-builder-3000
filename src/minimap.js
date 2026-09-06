@@ -41,7 +41,7 @@ export function createMinimap(renderer) {
       for (const tile of city.tiles) {
         let c = colors[tile.type];
         if (!c) {
-          if (tile.type === "empty") c = tile.terrain === "water" ? "#94bfbe" : tile.terrain === "sand" ? "#ccc9a8" : tile.trees ? "#a3b58c" : "#bdc9a3";
+          if (tile.type === "empty") c = tile.terrain === "water" ? "#94bfbe" : tile.terrain === "sand" ? "#ccc9a8" : tile.terrain === "rock" ? "#7a736c" : tile.trees ? "#a3b58c" : "#bdc9a3";
           else c = UTILITIES.has(tile.type) ? utilityColor : civicColor;
         }
         if (tile.abandoned) c = "#6c6a5e";

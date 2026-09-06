@@ -1,8 +1,10 @@
-// Disasters: fire, earthquake, tornado, flood, riot. Fires spread month by
-// month unless fire coverage is strong. Burned lots are cleared.
+// Disasters: fire, earthquake, tornado, flood, riot, toxic cloud, flying
+// saucer, volcano. Fires spread month by month unless fire coverage is
+// strong. Burned lots are cleared.
 import { tileAt, forRadius, NEIGHBORS4 } from "./grid.js";
 import { ZONE_TYPES, BUILDINGS } from "./catalog.js";
 import { isAnchor, anchorOf, clearLot, lotTiles } from "./lots.js";
+import { MAX_ELEVATION } from "./terrain.js";
 
 export const DISASTERS = {
   fire:       { label: "Fire",       description: "A building catches fire. Spreads without fire coverage." },
@@ -10,6 +12,9 @@ export const DISASTERS = {
   tornado:    { label: "Tornado",    description: "Carves a path of destruction across the map." },
   flood:      { label: "Flood",      description: "Rivers and coasts overflow into nearby lots." },
   riot:       { label: "Riot",       description: "Unrest in high-crime districts. Fires break out." },
+  toxic:      { label: "Toxic Cloud", description: "A leak at a factory or plant. The cloud poisons the air for months and empties nearby homes." },
+  ufo:        { label: "Flying Saucer", description: "Visitors from elsewhere vaporize whatever they hover over." },
+  volcano:    { label: "Volcano",    description: "A new mountain erupts in the middle of town. Lava clears everything on its slopes." },
 };
 
 function developedTiles(city) {
@@ -113,6 +118,61 @@ export function triggerDisaster(city, id, rng) {
     city.revision++;
     return `A tornado tore through the city, wrecking ${hit} buildings.`;
   }
+  if (id === "ufo") {
+    let x = center.x, y = center.y, hit = 0;
+    const path = [];
+    for (let step = 0; step < 14; step++) {
+      const t = tileAt(city, x, y);
+      if (!t) break;
+      path.push({ x, y });
+      // Every third stop the saucer fires its beam.
+      if (step % 3 === 2) forRadius(city, x, y, 1, (n) => {
+        if (n.lot) { const a = anchorOf(city, n); if (a && !a._zap) { a._zap = true; damageLot(city, a, rng, true); hit++; } }
+        else if (n.trees) n.trees = 0;
+      });
+      const r = rng();
+      if (r < 0.3) x++; else if (r < 0.6) x--; else if (r < 0.8) y++; else y--;
+    }
+    for (const t of city.tiles) delete t._zap;
+    addEffect(city, { type: "ufo", path, ttl: 2 });
+    city.revision++;
+    return `A flying saucer strafed the city and vaporized ${hit} buildings.`;
+  }
+  if (id === "toxic") {
+    const sources = targets.filter((t) => t.type === "industrial" || (BUILDINGS[t.type]?.pollution || BUILDINGS[t.type]?.effects?.pollution || 0) >= 18);
+    const origin = sources.length ? sources[Math.floor(rng() * sources.length)] : center;
+    let hit = 0;
+    forRadius(city, origin.x, origin.y, 6, (n, d) => {
+      if (n.trees && rng() < 0.6) n.trees = 0;
+      if (!n.lot || n.type !== "residential" || rng() > 0.3 * (1 - d / 7)) return;
+      const a = anchorOf(city, n);
+      if (a && a.level && !a.abandoned) { a.abandoned = true; hit++; }
+    });
+    addEffect(city, { type: "toxic", x: origin.x, y: origin.y, ttl: 3 });
+    city.revision++;
+    return `A toxic cloud leaked near (${origin.x}, ${origin.y}). ${hit} homes were evacuated.`;
+  }
+  if (id === "volcano") {
+    const peak = Math.min(MAX_ELEVATION, (center.elev || 0) + 6), R = peak - 1;
+    let hit = 0;
+    for (let dy = -R - 2; dy <= R + 2; dy++) for (let dx = -R - 2; dx <= R + 2; dx++) {
+      const t = tileAt(city, center.x + dx, center.y + dy);
+      if (!t) continue;
+      const d = Math.max(Math.abs(dx), Math.abs(dy));
+      if (d > R) { if (rng() < 0.4) ignite(city, t, 2); continue; }
+      // The cone rises one step per tile toward the crater and buries everything on it.
+      t.terrain = "rock";
+      // The maximum of two gentle height fields remains gentle at the rim.
+      t.elev = Math.max(t.elev || 0, peak - d);
+      if (t.lot) { const a = anchorOf(city, t); if (a) { clearLot(city, a, { keepZone: false }); hit++; } }
+      else if (t.type !== "empty") { t.type = "empty"; hit++; }
+      t.density = 0; t.level = 0; t.abandoned = false; t.trees = 0; t.powerline = false; t.pipe = false; t.subway = false; t.fire = 0;
+    }
+    addEffect(city, { type: "lava", x: center.x, y: center.y, radius: 3, ttl: 6 });
+    addEffect(city, { type: "earthquake", x: center.x, y: center.y, ttl: 1 });
+    city.revision++;
+    return `A volcano erupted at (${center.x}, ${center.y}) and buried ${hit} buildings under lava.`;
+  }
   if (id === "riot") {
     const hot = targets.filter((t) => ZONE_TYPES.has(t.type) && t.crime > 40);
     const pool = hot.length ? hot : targets;
@@ -169,7 +229,10 @@ export function randomDisaster(city, stats, rng) {
   if (roll < fireRisk) return triggerDisaster(city, "fire", rng);
   if (roll < fireRisk + 0.0008) return triggerDisaster(city, "earthquake", rng);
   if (roll < fireRisk + 0.0016) return triggerDisaster(city, "tornado", rng);
-  if (roll < fireRisk + 0.0022 && city.tiles.some((t) => t.terrain === "water")) return triggerDisaster(city, "flood", rng);
+  if (roll < fireRisk + 0.0022) return city.tiles.some((t) => t.terrain === "water") ? triggerDisaster(city, "flood", rng) : null;
+  if (roll < fireRisk + 0.0028) return (stats.pollution || 0) > 20 ? triggerDisaster(city, "toxic", rng) : null;
+  if (roll < fireRisk + 0.0031) return triggerDisaster(city, "ufo", rng);
+  if (roll < fireRisk + 0.0033) return triggerDisaster(city, "volcano", rng);
   if (stats.crime > 55 && stats.happiness < 35 && roll < fireRisk + 0.02) return triggerDisaster(city, "riot", rng);
   return null;
 }

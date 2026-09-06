@@ -23,7 +23,7 @@ pnpm build         # outputs to dist/
 pnpm test          # node:test unit tests for the simulation, construction and camera
 ```
 
-With Chrome installed, run `pnpm dev --port 4173` in one terminal and `pnpm test:browser` in another for a scripted gameplay check. Screenshots land in `artifacts/`.
+With Chrome installed, run `pnpm dev --port 4173` in one terminal and `pnpm test:browser` in another for a scripted gameplay check. Screenshots land in `artifacts/`. Run `pnpm test:visuals` against the same server for Canvas pixel checks of courtyard occlusion and earthquake layering, in all camera orientations and day/night lighting. Set `CIVIC_TEST_URL` to use another server port.
 
 ## The game
 
@@ -37,7 +37,7 @@ With Chrome installed, run `pnpm dev --port 4173` in one terminal and `pnpm test
 - **Budget**: separate R/C/I taxes, six funded departments, eighteen ordinances, amortised loans, a monthly ledger and an annual review every January.
 - **Neighbors**: roads, rails, power lines and pipes to the map edge connect you to a named neighboring city for trade, outside jobs and power/water/garbage deals.
 - **Rewards** unlock at population milestones (Mayor's House, City Hall, Courthouse, Stadium, Statue). **Petitioners** offer business deals with strings attached. **Landmarks** can be bought outright.
-- **Disasters**: fire, earthquake, tornado, flood and riot, triggered or random, with fire crews to dispatch.
+- **Disasters**: fire, earthquake, tornado, flood, riot, toxic cloud, flying saucer and volcano, triggered or random, with fire crews to dispatch. Active hazards and their remaining duration survive saves.
 - **Data maps** for power, water, land value, pollution, crime, traffic, transit and service coverage; a report with eight history graphs; seven advisors with portraits; a news ticker.
 - **Scenarios**: open play, grow to 20,000, Boomtown, rescue a failing town, clear the air of a factory town, rebuild after a quake. Start years from 1900 gate technology.
 - **Saves**: three browser slots, an autosave every January, plus export and import as a file.

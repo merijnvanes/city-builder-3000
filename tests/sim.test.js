@@ -376,7 +376,9 @@ describe("disasters and inspection", () => {
   });
   test("every disaster runs without throwing", () => {
     const c = createCity(44, true);
-    for (const id of ["fire", "earthquake", "tornado", "flood", "riot"]) assert.equal(typeof disaster(c, id), "string");
+    for (const id of ["fire", "earthquake", "tornado", "flood", "riot", "toxic", "ufo", "volcano"]) assert.equal(typeof disaster(c, id), "string");
+    assert.ok(c.tiles.some((t) => t.elev >= 5), "the volcano raised a cone");
+    assert.doesNotThrow(() => deserialize(serialize(c)));
     for (let i = 0; i < 3; i++) tick(c);
     assert.ok(Number.isFinite(getStats(c).population));
   });

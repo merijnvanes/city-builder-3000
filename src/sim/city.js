@@ -1,3 +1,4 @@
+import { effectState, parseEffects } from "./effects-state.js";
 // City state: tile schema, creation, save format (version 3).
 import { generateTerrain, LAYOUTS, MAX_ELEVATION } from "./terrain.js";
 import { BUILDINGS, ZONE_TYPES, ROAD_TYPES, FUNDED_DEPARTMENTS } from "./catalog.js";
@@ -80,8 +81,8 @@ export function blankCity({ seed = 42, size = DEFAULT_SIZE, layout, name = "New 
 }
 
 // ── save / load ───────────────────────────────────────────────
-const TERRAIN_CODE = { grass: 0, water: 1, sand: 2 };
-const TERRAIN_NAME = ["grass", "water", "sand"];
+const TERRAIN_CODE = { grass: 0, water: 1, sand: 2, rock: 3 };
+const TERRAIN_NAME = ["grass", "water", "sand", "rock"];
 
 export function serialize(city) {
   const types = [];
@@ -95,7 +96,7 @@ export function serialize(city) {
     TERRAIN_CODE[t.terrain], t.trees | 0, code(t.type), t.density | 0,
     t.lot ? t.lot.x : -1, t.lot ? t.lot.y : -1, t.lot ? t.lot.w : 0, t.lot ? t.lot.h : 0,
     t.level | 0, Math.round(t.variant * 1000) / 1000, t.abandoned ? 1 : 0, t.age | 0, t.fire | 0,
-    t.powerline ? 1 : 0, t.pipe ? 1 : 0, t.elev | 0, t.subway ? 1 : 0,
+    t.powerline ? 1 : 0, t.pipe ? 1 : 0, t.elev | 0, t.subway ? 1 : 0, t.flooded | 0,
   ]);
   return JSON.stringify({
     version: SAVE_VERSION,
@@ -108,6 +109,7 @@ export function serialize(city) {
     scenario: city.scenario ?? null,
     prev: city._prev ?? null,
     disasters: city.disasters !== false,
+    effects: effectState(city.effects),
     unlocked: city.unlocked ?? {},
     petitions: city.petitions ?? [],
     settings: city.settings ?? { yearEndBudget: true },
@@ -153,9 +155,10 @@ export function deserialize(raw) {
   for (let i = 0; i < d.tiles.length; i++) {
     const r = d.tiles[i];
     const x = i % size, y = (i - x) / size;
-    if (!Array.isArray(r) || r.length < 15 || r.length > 17) throw new Error(`Invalid save: tile ${i} malformed.`);
-    const [terrainCode, trees, typeCode, density, lotX, lotY, lotW, lotH, level, variant, abandoned, age, fire, powerline, pipe, elev = 0, subway = 0] = r;
+    if (!Array.isArray(r) || r.length < 15 || r.length > 18) throw new Error(`Invalid save: tile ${i} malformed.`);
+    const [terrainCode, trees, typeCode, density, lotX, lotY, lotW, lotH, level, variant, abandoned, age, fire, powerline, pipe, elev = 0, subway = 0, flooded = 0] = r;
     if (!Number.isInteger(elev) || elev < 0 || elev > MAX_ELEVATION) throw new Error(`Invalid save: tile ${i} bad elevation.`);
+    if (!Number.isInteger(flooded) || flooded < 0 || flooded > 2) throw new Error(`Invalid save: tile ${i} bad flood duration.`);
     if (![0, 1].includes(subway)) throw new Error(`Invalid save: tile ${i} bad subway flag.`);
     if (!TERRAIN_NAME[terrainCode]) throw new Error(`Invalid save: tile ${i} bad terrain.`);
     if (![0, 1, 2, 3].includes(trees)) throw new Error(`Invalid save: tile ${i} bad trees.`);
@@ -170,7 +173,7 @@ export function deserialize(raw) {
     if (terrain === "water" && type !== "empty" && type !== "road") throw new Error(`Invalid save: tile ${i} built on water.`);
     const t = makeTile(x, y, terrain, trees, variant, elev);
     t.type = type; t.density = density; t.level = level; t.abandoned = !!abandoned; t.age = age; t.fire = fire;
-    t.powerline = !!powerline; t.pipe = !!pipe; t.subway = !!subway;
+    t.powerline = !!powerline; t.pipe = !!pipe; t.subway = !!subway; t.flooded = flooded;
     if (lotW > 0) {
       if (!Number.isInteger(lotX) || !Number.isInteger(lotY) || !Number.isInteger(lotH) || lotW > 8 || lotH > 8 ||
           lotX > x || lotY > y || lotX + lotW <= x || lotY + lotH <= y) throw new Error(`Invalid save: tile ${i} bad lot.`);
@@ -199,6 +202,7 @@ export function deserialize(raw) {
     _rng: d._rng,
     _prev: d.prev && typeof d.prev === "object" && Object.values(d.prev).every(Number.isFinite) ? { ...d.prev } : null,
     disasters: d.disasters !== false,
+    effects: parseEffects(d.effects, size),
     unlocked: Object.fromEntries(Object.entries(d.unlocked || {}).filter(([k, v]) => BUILDINGS[k] && Number.isInteger(v))),
     petitions: Array.isArray(d.petitions) ? d.petitions.filter((p) => p && typeof p.id === "string" && typeof p.status === "string" && Number.isInteger(p.since)).slice(0, 50).map((p) => ({ ...p })) : [],
     settings: { yearEndBudget: d.settings?.yearEndBudget !== false },

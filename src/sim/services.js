@@ -67,6 +67,8 @@ export function updateServices(city) {
     if ((t.type !== "road" && t.type !== "highway") || !t.traffic) continue;
     addSource(t.x, t.y, t.traffic * (t.type === "highway" ? 0.2 : 0.12), 2);
   }
+  // A toxic cloud poisons the air around its source while it lasts.
+  for (const e of city.effects || []) if (e.type === "toxic") addSource(e.x, e.y, 90, 7);
   // Special buildings with area effects (prisons, dumps, city hall...).
   const crimeBump = new Float32Array(tiles.length);
   const valueBump = new Float32Array(tiles.length);
