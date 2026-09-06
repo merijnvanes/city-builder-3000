@@ -186,6 +186,15 @@ export class CityRenderer {
     polys.sort((m, n) => m.p.reduce((s, q) => s + q.y, 0) / m.p.length - n.p.reduce((s, q) => s + q.y, 0) / n.p.length);
     for (const face of polys) this.poly(face.p, face.c);
   }
+  // Hip roof: four faces rising to a short ridge (or an apex when ridge is 0).
+  pyramid(x, y, w, d, z, h, color, ridge = 0) {
+    const p = (a, b, c) => this.project(a, b, c);
+    const a = p(x, y, z), b = p(x + w, y, z), c = p(x + w, y + d, z), e = p(x, y + d, z);
+    const r1 = p(x + w / 2 - ridge / 2, y + d / 2, z + h), r2 = p(x + w / 2 + ridge / 2, y + d / 2, z + h);
+    const faces = [{ p: [a, b, r2, r1], c: shade(color, 0.78) }, { p: [b, c, r2], c: shade(color, 1.1) }, { p: [c, e, r1, r2], c: shade(color, 0.95) }, { p: [e, a, r1], c: shade(color, 0.7) }];
+    faces.sort((m, n) => m.p.reduce((s, q) => s + q.y, 0) / m.p.length - n.p.reduce((s, q) => s + q.y, 0) / n.p.length);
+    for (const f of faces) this.poly(f.p, f.c);
+  }
   cylinder(x, y, radius, h, color, z = 0) {
     const p = this.project(x, y, z + h), b = this.project(x, y, z), rx = radius * 43 * this.zoom, ry = radius * 23 * this.zoom, ctx = this.base;
     ctx.beginPath(); ctx.ellipse(b.x, b.y, rx, ry, 0, 0, Math.PI); ctx.lineTo(p.x - rx, p.y); ctx.ellipse(p.x, p.y, rx, ry, 0, Math.PI, 0); ctx.closePath();

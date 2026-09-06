@@ -34,6 +34,7 @@ function scoped(r, lot, dim) {
     flat: (a, b, fw, fd, z, c, stroke) => r.flat(x + a * w, y + b * h, fw * w, fd * h, z, tone(c), stroke),
     box: (a, b, fw, fd, hh, c, z = 0) => r.box(x + a * w, y + b * h, fw * w, fd * h, hh, tone(c), z),
     roof: (a, b, fw, fd, z, hh, c) => r.roof(x + a * w, y + b * h, fw * w, fd * h, z, hh, tone(c)),
+    hip: (a, b, fw, fd, z, hh, c, ridge = 0) => r.pyramid(x + a * w, y + b * h, fw * w, fd * h, z, hh, tone(c), ridge * w),
     cyl: (a, b, radius, hh, c, z = 0) => r.cylinder(x + a * w, y + b * h, radius * Math.min(w, h), hh, tone(c), z),
     tree: (a, b, n = 0) => r.tree(x + a * w, y + b * h, n),
     fence: (a, b, fw, fd, c) => r.fence(x + a * w, y + b * h, fw * w, fd * h, tone(c)),
@@ -62,31 +63,57 @@ function residential(d, t, n, level, r) {
   const wall = pick(WALLS, n), brick = pick(BRICKS, n), roof = pick(ROOFS, n * 7);
   d.flat(0.03, 0.03, 0.94, 0.94, 0.2, "#6f8845");
   if (density === 1) {
-    // Detached homes: level grows the house and adds a garage, porch, pool.
+    // Detached homes in four styles; level grows the house and adds a
+    // garage, porch and pool.
     const fam = Math.floor(n * 4);
     const hw = 0.42 + level * 0.06, hd = 0.4 + level * 0.05;
     const hx = fam % 2 ? 0.12 : 0.5 - hw / 2, hy = 0.12;
     const stories = level >= 3 ? 2 : 1, hh = 9 * stories + 2;
-    d.box(hx, hy, hw, hd, hh, wall);
-    d.roof(hx - 0.03, hy - 0.03, hw + 0.06, hd + 0.06, hh, 6 + level, roof);
-    d.windows(hx, hy, hw, hd, hh, t.x + t.y);
-    if (level >= 2) { d.box(hx + hw + 0.02, hy + 0.1, 0.24, 0.3, 7, "#b4aa91"); d.roof(hx + hw, hy + 0.08, 0.28, 0.34, 7, 3, "#6d6b5a"); }
+    d.box(hx, hy, hw, hd, hh, fam === 3 ? pick(["#e6e2d6", "#c9d0cf", "#d9cfc0"], n) : wall);
+    if (fam === 0) d.roof(hx - 0.03, hy - 0.03, hw + 0.06, hd + 0.06, hh, 6 + level, roof);
+    else if (fam === 1) d.hip(hx - 0.03, hy - 0.03, hw + 0.06, hd + 0.06, hh, 5 + level, roof, 0.2);
+    else if (fam === 2) { d.roof(hx - 0.03, hy - 0.03, hw + 0.06, hd + 0.06, hh, 7 + level, roof); d.box(hx + hw * 0.35, hy - 0.02, hw * 0.3, 0.12, 4, wall, hh + 2); d.roof(hx + hw * 0.33, hy - 0.04, hw * 0.34, 0.16, hh + 6, 3, roof); }
+    else { d.box(hx - 0.02, hy - 0.02, hw + 0.04, hd + 0.04, 1.5, "#4f5a58", hh); d.flat(hx + 0.04, hy + 0.04, hw - 0.08, hd - 0.08, hh + 1.6, "#8a9a8c"); }
+    d.windows(hx, hy, hw, hd, hh, t.x + t.y, fam === 3);
+    if (fam === 2) d.box(hx, hy + hd, hw, 0.08, 4, "#d8d2c0");
+    if (level >= 2) { d.box(hx + hw + 0.02, hy + 0.1, 0.24, 0.3, 7, "#b4aa91"); if (fam === 3) d.flat(hx + hw + 0.02, hy + 0.1, 0.24, 0.3, 7.1, "#8a9a8c"); else d.roof(hx + hw, hy + 0.08, 0.28, 0.34, 7, 3, "#6d6b5a"); }
     if (level >= 4) { d.flat(0.15, 0.68, 0.32, 0.22, 0.4, "#5aa6c9"); d.flat(0.13, 0.66, 0.36, 0.26, 0.3, "#d8d3bb"); }
     d.flat(0.62, hy + hd + 0.06, 0.12, 0.9 - hy - hd, 0.3, "#b8b39c");
-    d.box(0.2, 0.2, 0.06, 0.06, hh + 5, "#94755a", 0);
-    d.fence(0.05, 0.94, 0.9, 0, "#ada894"); d.fence(0.94, 0.05, 0, 0.89, "#ada894");
+    if (fam !== 3) d.box(0.2, 0.2, 0.06, 0.06, hh + 5, "#94755a", 0);
+    d.fence(0.05, 0.94, 0.9, 0, fam === 3 ? "#6f7a72" : "#ada894"); d.fence(0.94, 0.05, 0, 0.89, fam === 3 ? "#6f7a72" : "#ada894");
     d.tree(0.12, 0.85, 1); if (fam >= 2) d.tree(0.88, 0.2, 2);
     return;
   }
   if (density === 2) {
-    // Townhouses and apartment blocks with balconies.
+    // Townhouses, brownstones and small apartment blocks with balconies.
     const stories = 2 + level, hh = stories * 8;
+    const fam = Math.floor(n * 3);
     if (d.w === 1) {
-      d.box(0.1, 0.12, 0.8, 0.72, hh, n > 0.5 ? brick : wall);
-      d.windows(0.1, 0.12, 0.8, 0.72, hh, t.x * 3 + t.y);
-      d.flat(0.11, 0.13, 0.78, 0.7, hh + 0.1, "#7b7e6c");
-      d.box(0.3, 0.3, 0.2, 0.2, 4, "#a39e88", hh);
+      if (fam === 0) {
+        d.box(0.1, 0.12, 0.8, 0.72, hh, n > 0.5 ? brick : wall);
+        d.windows(0.1, 0.12, 0.8, 0.72, hh, t.x * 3 + t.y);
+        d.flat(0.11, 0.13, 0.78, 0.7, hh + 0.1, "#7b7e6c");
+        d.box(0.3, 0.3, 0.2, 0.2, 4, "#a39e88", hh);
+      } else if (fam === 1) {
+        // Brownstone with a stoop and a cornice.
+        d.box(0.12, 0.1, 0.76, 0.66, hh, pick(["#8f5a44", "#a86f54", "#7a4e3e"], n));
+        d.windows(0.12, 0.1, 0.76, 0.66, hh, t.x + t.y * 3);
+        d.box(0.1, 0.08, 0.8, 0.7, 2.5, "#c9b89a", hh); d.flat(0.14, 0.12, 0.72, 0.62, hh + 2.6, "#5f5a52");
+        for (let s = 0; s < 4; s++) d.box(0.4, 0.78 + s * 0.04, 0.2, 0.04, 4 - s, "#b5ab96");
+      } else {
+        // Apartment with balconies on the street side.
+        d.box(0.1, 0.1, 0.8, 0.74, hh, wall); d.windows(0.1, 0.1, 0.8, 0.74, hh, t.x + t.y);
+        for (let s = 1; s < stories; s++) { d.box(0.18, 0.84, 0.64, 0.08, 1.2, "#c9c4b0", s * 8); d.line(0.18, 0.92, s * 8 + 1.2, 0.82, 0.92, s * 8 + 1.2, "#6f6f66", 0.8); }
+        d.flat(0.11, 0.11, 0.78, 0.72, hh + 0.1, "#7b7e6c");
+      }
       d.tree(0.85, 0.9, 1);
+    } else if (fam === 2) {
+      // Slab block with a lawn.
+      d.box(0.06, 0.1, 0.88, 0.42, hh + 8, wall); d.windows(0.06, 0.1, 0.88, 0.42, hh + 8, t.x + t.y);
+      d.bands(0.06, 0.1, 0.88, 0.42, 8, hh + 8, 8, "#c2baa1");
+      d.flat(0.07, 0.11, 0.86, 0.4, hh + 8.1, "#7b7e6c");
+      d.flat(0.08, 0.58, 0.84, 0.34, 0.3, "#8faa5c"); d.tree(0.2, 0.75, 1); d.tree(0.5, 0.8, 0); d.tree(0.8, 0.72, 2);
+      d.flat(0.46, 0.52, 0.08, 0.4, 0.4, "#bfb798");
     } else {
       // U-shaped block around a courtyard.
       d.box(0.06, 0.06, 0.88, 0.32, hh, wall); d.windows(0.06, 0.06, 0.88, 0.32, hh, t.x + t.y);
@@ -102,6 +129,25 @@ function residential(d, t, n, level, r) {
   const hh = 26 + level * 16 + Math.floor(n * 3) * 4;
   const glass = pick(GLASS, n);
   d.flat(0.04, 0.04, 0.92, 0.92, 0.3, "#aaa78d");
+  const style = Math.floor(n * 5) % 3;
+  if (style === 1 && d.w >= 2) {
+    // Stepped tower: three tiers.
+    d.box(0.08, 0.08, 0.84, 0.84, hh * 0.45, brick); d.windows(0.08, 0.08, 0.84, 0.84, hh * 0.45, t.x + t.y);
+    d.box(0.18, 0.18, 0.64, 0.64, hh * 0.35, wall, hh * 0.45); d.windows(0.18, 0.18, 0.64, 0.64, hh * 0.35, t.x * 2, false, hh * 0.45);
+    d.box(0.3, 0.3, 0.4, 0.4, hh * 0.3, glass, hh * 0.8); d.windows(0.3, 0.3, 0.4, 0.4, hh * 0.3, t.y * 2, true, hh * 0.8);
+    d.flat(0.31, 0.31, 0.38, 0.38, hh * 1.1 + 0.1, "#6f7368"); d.line(0.5, 0.5, hh * 1.1, 0.5, 0.5, hh * 1.1 + 12, "#c6c8b5", 1);
+    d.tree(0.1, 0.9, 0); d.tree(0.9, 0.1, 2);
+    return;
+  }
+  if (style === 2) {
+    // Slab with balconies on every floor.
+    const sw = d.w >= 2 ? 0.82 : 0.76;
+    d.box(0.09, 0.2, sw, 0.5, hh + 8, wall); d.windows(0.09, 0.2, sw, 0.5, hh + 8, t.x + t.y);
+    for (let z = 8; z < hh + 4; z += 8) { d.box(0.12, 0.7, sw - 0.06, 0.08, 1.2, "#cfcab6", z); d.line(0.12, 0.78, z + 1.2, 0.12 + sw - 0.06, 0.78, z + 1.2, "#6f6f66", 0.7); }
+    d.flat(0.1, 0.21, sw - 0.02, 0.48, hh + 8.1, "#6f7368"); d.box(0.4, 0.4, 0.2, 0.14, 5, "#a39e88", hh + 8);
+    d.flat(0.1, 0.78, 0.8, 0.14, 0.3, "#8faa5c"); d.tree(0.2, 0.86, 1); d.tree(0.8, 0.86, 2);
+    return;
+  }
   d.box(0.08, 0.08, 0.84, 0.84, 8, brick); d.windows(0.08, 0.08, 0.84, 0.84, 8, t.x + t.y);
   d.flat(0.09, 0.09, 0.82, 0.82, 8.1, "#858978");
   const tw = d.w >= 3 && level === 4 ? 0.34 : 0.56, tx = d.w >= 3 && level === 4 ? 0.12 : 0.22;
@@ -120,26 +166,56 @@ function commercial(d, t, n, level, r) {
   const stone = pick(STONE, n), glass = pick(GLASS, n * 3);
   d.flat(0.025, 0.025, 0.95, 0.95, 0.2, "#b1aea0");
   if (density === 1) {
-    // Shops with awnings and a parking strip.
+    // Corner shops, a diner or a filling station, with a parking strip.
     const hh = 10 + level * 2;
+    const fam = Math.floor(n * 5) % 3;
     d.flat(0.05, 0.62, 0.9, 0.33, 0.3, "#727b72");
     for (let a = 0.12; a < 0.9; a += 0.17) d.flat(a, 0.66, 0.018, 0.25, 0.5, "#ccc9ae");
-    d.box(0.08, 0.1, 0.84, 0.48, hh, stone); d.windows(0.08, 0.1, 0.84, 0.48, hh, t.x + t.y, true);
-    d.flat(0.07, 0.09, 0.86, 0.5, hh + 0.1, "#8b8e7d");
-    d.box(0.09, 0.55, 0.82, 0.07, 3, pick(["#a24d3e", "#3e7377", "#b28e48", "#617844", "#7b4f7d"], n), hh - 4);
-    d.box(0.3, 0.2, 0.19, 0.15, 3, "#bec0ad", hh);
-    if (level >= 3) d.box(0.62, 0.15, 0.2, 0.2, 8, "#c9c3a1", hh);
+    if (fam === 1) {
+      // Diner: rounded front, neon sign.
+      d.box(0.1, 0.16, 0.8, 0.4, 9, "#d9d6cc"); d.windows(0.1, 0.16, 0.8, 0.4, 9, t.x + t.y, true);
+      d.cyl(0.5, 0.56, 0.16, 9, "#c9c6bb"); d.flat(0.08, 0.14, 0.84, 0.44, 9.1, "#b34a3a");
+      d.box(0.36, 0.3, 0.28, 0.06, 6, pick(["#e0455a", "#39b8c9", "#f2c14e"], n), 9); d.line(0.5, 0.33, 15, 0.5, 0.33, 22, "#e0e0d8", 1);
+    } else if (fam === 2 && level <= 2) {
+      // Filling station: canopy on posts, kiosk at the back.
+      d.box(0.12, 0.08, 0.5, 0.3, 8, stone); d.windows(0.12, 0.08, 0.5, 0.3, 8, t.x + t.y, true); d.flat(0.11, 0.07, 0.52, 0.32, 8.1, "#8b8e7d");
+      for (const [a, b] of [[0.2, 0.5], [0.8, 0.5], [0.2, 0.9], [0.8, 0.9]]) d.line(a, b, 0.5, a, b, 9, "#c9c9c9", 1.2);
+      d.flat(0.12, 0.44, 0.76, 0.5, 9, pick(["#d94a3a", "#2f7fb3", "#3a9a5a"], n)); d.flat(0.14, 0.46, 0.72, 0.46, 9.2, "#e9e9e2");
+      for (const a of [0.35, 0.65]) d.box(a, 0.66, 0.06, 0.1, 4, "#e0453f");
+    } else {
+      d.box(0.08, 0.1, 0.84, 0.48, hh, stone); d.windows(0.08, 0.1, 0.84, 0.48, hh, t.x + t.y, true);
+      d.flat(0.07, 0.09, 0.86, 0.5, hh + 0.1, "#8b8e7d");
+      d.box(0.09, 0.55, 0.82, 0.07, 3, pick(["#a24d3e", "#3e7377", "#b28e48", "#617844", "#7b4f7d"], n), hh - 4);
+      d.box(0.3, 0.2, 0.19, 0.15, 3, "#bec0ad", hh);
+      if (level >= 3) d.box(0.62, 0.15, 0.2, 0.2, 8, "#c9c3a1", hh);
+    }
     for (let a = 0; a < 3; a++) d.box(0.14 + a * 0.25, 0.75, 0.095, 0.17, 3, pick(["#e3dbb9", "#698c9a", "#a66049", "#c9c3a1"], (n + a * 0.23) % 1));
     return;
   }
   if (density === 2) {
-    // Office blocks with banded floors.
+    // Office blocks, hotels and department stores.
     const hh = 16 + level * 7;
-    d.box(0.08, 0.08, 0.84, 0.84, hh, stone); d.windows(0.08, 0.08, 0.84, 0.84, hh, t.x + t.y, level >= 3);
-    d.bands(0.065, 0.065, 0.87, 0.87, 8, hh, 8, "#c9c5ad");
-    d.box(0.06, 0.06, 0.88, 0.88, 3, "#d3cbb2", hh); d.flat(0.13, 0.13, 0.74, 0.74, hh + 3.1, "#777e70");
-    d.box(0.3, 0.27, 0.18, 0.2, 4, "#b2b3a0", hh + 3);
-    if (d.w > 1) { d.box(0.6, 0.6, 0.25, 0.25, 6, "#c3b9a0", hh + 3); }
+    const fam = Math.floor(n * 7) % 3;
+    if (fam === 1) {
+      // Hotel: entrance canopy and a rooftop sign.
+      d.box(0.1, 0.08, 0.8, 0.7, hh + 6, pick(["#c9b9a0", "#d8cbb2", "#b9a68b"], n)); d.windows(0.1, 0.08, 0.8, 0.7, hh + 6, t.x + t.y);
+      d.bands(0.08, 0.06, 0.84, 0.74, 8, hh + 6, 8, "#d8d0ba");
+      d.flat(0.11, 0.09, 0.78, 0.68, hh + 6.1, "#777e70");
+      d.box(0.3, 0.78, 0.4, 0.14, 1, "#9a3a3a", 7); for (const a of [0.32, 0.66]) d.line(a, 0.9, 0, a, 0.9, 7, "#c9c9c9", 0.8);
+      d.box(0.25, 0.3, 0.5, 0.06, 5, "#e0a83a", hh + 6);
+    } else if (fam === 2) {
+      // Department store: wide, few windows, big awning.
+      d.box(0.06, 0.08, 0.88, 0.76, hh - 4, pick(["#d9d0bc", "#e2dccb", "#cbc3ae"], n)); d.windows(0.06, 0.08, 0.88, 0.76, hh - 4, t.x + t.y, true);
+      d.flat(0.07, 0.09, 0.86, 0.74, hh - 3.9, "#8b8e7d");
+      d.box(0.1, 0.84, 0.8, 0.08, 2, pick(["#a24d3e", "#3e7377", "#7b4f7d"], n), 9);
+      d.box(0.3, 0.3, 0.4, 0.3, 4, "#b2b3a0", hh - 4);
+    } else {
+      d.box(0.08, 0.08, 0.84, 0.84, hh, stone); d.windows(0.08, 0.08, 0.84, 0.84, hh, t.x + t.y, level >= 3);
+      d.bands(0.065, 0.065, 0.87, 0.87, 8, hh, 8, "#c9c5ad");
+      d.box(0.06, 0.06, 0.88, 0.88, 3, "#d3cbb2", hh); d.flat(0.13, 0.13, 0.74, 0.74, hh + 3.1, "#777e70");
+      d.box(0.3, 0.27, 0.18, 0.2, 4, "#b2b3a0", hh + 3);
+      if (d.w > 1) { d.box(0.6, 0.6, 0.25, 0.25, 6, "#c3b9a0", hh + 3); }
+    }
     return;
   }
   // Skyscrapers: setbacks, glass curtain walls, spire at level 4.
@@ -185,8 +261,16 @@ function industrial(d, t, n, level, r) {
     return;
   }
   if (density === 2) {
-    // Factories with smokestacks and loading bays.
     d.flat(0.06, 0.7, 0.88, 0.24, 0.4, "#818371");
+    if (Math.floor(n * 3) === 1) {
+      // Warehouse: long low shed, loading docks, container stack.
+      d.box(0.06, 0.1, 0.88, 0.5, 12, pick(["#9aa3a8", "#b6b1a0", "#8f9a8c"], n)); d.windows(0.06, 0.1, 0.88, 0.5, 12, t.x + t.y);
+      d.flat(0.07, 0.11, 0.86, 0.48, 12.1, "#6f7773");
+      for (let a = 0; a < 4; a++) d.box(0.1 + a * 0.22, 0.6, 0.14, 0.05, 6, "#5f6a66");
+      d.box(0.64, 0.74, 0.28, 0.16, 5, pick(["#b0473a", "#3a6fa0", "#c9a53a"], n)); d.box(0.64, 0.74, 0.28, 0.16, 4, "#5a8f5a", 5);
+      return;
+    }
+    // Factories with smokestacks and loading bays.
     d.box(0.08, 0.1, 0.84, 0.55, 15 + level * 2, brick); d.windows(0.08, 0.1, 0.84, 0.55, 15, t.x + t.y);
     for (let a = 0; a < 3; a++) d.roof(0.08 + a * 0.28, 0.1, 0.28, 0.55, 15 + level * 2, 5, "#8d9685");
     for (let a = 0; a < 2; a++) d.cyl(0.22 + a * 0.38, 0.34, 0.05, 26 + level * 4, "#ad9577", 14);
