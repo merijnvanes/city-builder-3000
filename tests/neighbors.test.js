@@ -7,7 +7,7 @@ import { findLot, assignLot } from "../src/sim/lots.js";
 import { computeDemand } from "../src/sim/growth.js";
 import { computeMetrics } from "../src/sim/metrics.js";
 
-const plains = () => createCity({ seed: 7, layout: "plains", starter: false });
+const plains = () => createCity({ seed: 7, layout: "plains", starter: false, hills: 0 });
 const at = (c, x, y) => c.tiles[y * c.size + x];
 const put = (c, x, y, tool, o) => place(c, x, y, tool, { ...o, deferRefresh: true });
 
@@ -123,7 +123,7 @@ describe("transport buildings", () => {
     assert.equal(getStats(c).employed, 0, "no station, no rail commute");
   });
   test("seaport needs water and boosts industrial demand; airport is unique", () => {
-    const c = createCity({ seed: 5, layout: "river", starter: false });
+    const c = createCity({ seed: 5, layout: "river", starter: false, hills: 0 });
     const inland = c.tiles.find((t) => t.terrain === "grass" && t.x > 4 && t.x < 20 && t.y > 4 && t.y < 20 && [0, 1, 2, 3].every((dx) => [0, 1, 2, 3].every((dy) => at(c, t.x + dx, t.y + dy).terrain === "grass")));
     assert.equal(place(c, inland.x, inland.y, "seaport").ok, false);
     const shore = c.tiles.find((t) => t.terrain !== "water" && t.type === "empty" && t.x > 4 && t.x < c.size - 6 && t.y > 4 && t.y < c.size - 6 &&

@@ -135,7 +135,7 @@ const actions = {
   newCity: (options = {}) => {
     const scenario = options?.scenario || "sandbox";
     const seed = Number.isFinite(options?.seed) ? options.seed : Math.floor(Math.random() * 100000);
-    city = sim.createCity({ seed, starter: scenario === "recovery" || options?.starter === true, layout: options?.layout, size: options?.size, name: options?.name, startYear: options?.startYear });
+    city = sim.createCity({ seed, starter: scenario === "recovery" || options?.starter === true, layout: options?.layout, size: options?.size, name: options?.name, startYear: options?.startYear, hills: options?.hills });
     if (Number.isFinite(options?.money) && scenario !== "recovery") city.money = options.money;
     startScenario(city, scenario);
     restore();

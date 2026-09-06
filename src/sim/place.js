@@ -1,8 +1,35 @@
 // Construction rules: evaluate() prices a single action without mutating;
 // place() applies it. Multi-tile buildings are placed by their top-left
 // anchor and every footprint tile must be free land.
-import { BUILDINGS, ZONE_COST, ZONE_TYPES, OVERLAY_TOOLS, TOOL_MAP, TECH_YEAR } from "./catalog.js";
+import { BUILDINGS, ZONE_COST, ZONE_TYPES, OVERLAY_TOOLS, TOOL_MAP, TECH_YEAR, LEVEL_FEE } from "./catalog.js";
 import { yearOf } from "./metrics.js";
+import { MAX_ELEVATION } from "./terrain.js";
+
+// Terrain changes cascade: every neighbour is dragged to within one level,
+// so a hill grows a gentle base. Nothing built may be in the way, and water
+// stays at its level.
+function terraformPlan(city, start, target) {
+  if (target < 0 || target > MAX_ELEVATION) return { error: "Terrain cannot go that far." };
+  const changes = new Map();
+  const queue = [[start, target]];
+  while (queue.length) {
+    const [t, elev] = queue.shift();
+    const key = t.y * city.size + t.x;
+    if (changes.has(key) && changes.get(key).elev === elev) continue;
+    if (t.type !== "empty" || t.lot || t.powerline || t.pipe) return { error: t === start ? "Clear the tile before changing the terrain." : "A building or road is in the way." };
+    if (t.terrain === "water") return { error: t === start ? "Fill the water first." : "Too close to the water." };
+    changes.set(key, { tile: t, elev });
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const n = tileAt(city, t.x + dx, t.y + dy);
+      if (!n) continue;
+      const current = changes.get(n.y * city.size + n.x)?.elev ?? n.elev;
+      if (current < elev - 1) queue.push([n, elev - 1]);
+      else if (current > elev + 1) queue.push([n, elev + 1]);
+    }
+    if (changes.size > 400) return { error: "That would move too much earth at once." };
+  }
+  return { changes: [...changes.values()].filter((c) => c.tile.elev !== c.elev) };
+}
 
 export const techAvailable = (city, type) => !(type in TECH_YEAR) || yearOf(city.month, city.startYear) >= TECH_YEAR[type];
 import { tileAt, inBounds, nextRandom } from "./grid.js";
@@ -57,6 +84,15 @@ export function evaluate(city, x, y, tool, options = {}) {
     if (t.type !== "empty" || t.powerline || t.pipe) return fail("Clear the tile before flooding it.");
     return { ok: true, noop: false, cost: BUILDINGS.makewater.cost, message: "", tiles: here };
   }
+  if (tool === "raise" || tool === "lower" || tool === "level") {
+    const target = tool === "level" ? (options.elev ?? t.elev) : t.elev + (tool === "raise" ? 1 : -1);
+    if (target < 0 || target > MAX_ELEVATION) return noop("Terrain cannot go that far.", here);
+    if (t.elev === target) return noop("Already at that level.", here);
+    const plan = terraformPlan(city, t, target);
+    if (plan.error) return fail(plan.error);
+    const tiles = plan.changes.map((c) => ({ x: c.tile.x, y: c.tile.y }));
+    return { ok: true, noop: false, cost: BUILDINGS[tool].cost * plan.changes.length, message: plan.changes.length > 1 ? `Moves ${plan.changes.length} tiles` : "", tiles, changes: plan.changes };
+  }
   if (tool === "makeland") {
     if (t.terrain !== "water") return noop("Already dry land.", here);
     if (t.type !== "empty") return fail("Remove the bridge first.");
@@ -102,6 +138,8 @@ export function evaluate(city, x, y, tool, options = {}) {
     if (!near) return fail(`${b.label} must be built at the water's edge.`);
   }
   const tiles = [];
+  const base = t.elev;
+  let levelled = 0;
   for (let yy = y; yy < y + b.h; yy++) {
     for (let xx = x; xx < x + b.w; xx++) {
       if (!inBounds(city.size, xx, yy)) return fail("Building does not fit on the map here.");
@@ -109,10 +147,12 @@ export function evaluate(city, x, y, tool, options = {}) {
       if (n.terrain === "water") return fail("Cannot build on water.");
       if (n.type === tool && n.lot && n.lot.x === x && n.lot.y === y) return noop("Already here.", [{ x, y }]);
       if (n.type !== "empty") return fail("Site is blocked. Bulldoze first.");
+      if (Math.abs(n.elev - base) > 1) return fail("Site is too steep. Level the terrain first.");
+      if (n.elev !== base) levelled++;
       tiles.push({ x: xx, y: yy });
     }
   }
-  return { ok: true, noop: false, cost: b.cost, message: "", tiles };
+  return { ok: true, noop: false, cost: b.cost + levelled * LEVEL_FEE, message: levelled ? `Levels ${levelled} tile${levelled === 1 ? "" : "s"}` : "", tiles, elev: base };
 }
 
 export function place(city, x, y, tool, options = {}) {
@@ -132,9 +172,11 @@ export function place(city, x, y, tool, options = {}) {
   } else if (tool === "tree") {
     t.trees = Math.min(3, (t.trees || 0) + 1);
   } else if (tool === "makewater") {
-    t.terrain = "water"; t.trees = 0;
+    t.terrain = "water"; t.trees = 0; t.elev = Math.max(0, Math.min(t.elev, ...[[1, 0], [-1, 0], [0, 1], [0, -1]].map(([dx, dy]) => tileAt(city, t.x + dx, t.y + dy)?.elev ?? t.elev)));
   } else if (tool === "makeland") {
     t.terrain = "sand";
+  } else if (tool === "raise" || tool === "lower" || tool === "level") {
+    for (const c of ev.changes) c.tile.elev = c.elev;
   } else if (tool === "road" || tool === "rail") {
     t.type = tool; t.trees = 0; t.density = 0; t.level = 0;
   } else if (tool === "bulldoze") {
@@ -147,7 +189,7 @@ export function place(city, x, y, tool, options = {}) {
   } else {
     const b = BUILDINGS[tool];
     const lot = { x, y, w: b.w, h: b.h };
-    for (const n of lotTiles(city, lot)) { n.type = tool; n.trees = 0; n.density = 0; }
+    for (const n of lotTiles(city, lot)) { n.type = tool; n.trees = 0; n.density = 0; n.elev = ev.elev ?? n.elev; }
     assignLot(city, lot, 1, nextRandom(city));
   }
 

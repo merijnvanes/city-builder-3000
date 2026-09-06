@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { createCity, BUILDINGS } from "../src/sim/index.js";
 import { planConstruction, applyConstruction, createUndoManager, anchorFor } from "../src/construction.js";
 
-const blank = () => createCity(1, false);
+const blank = () => createCity({ seed: 1, starter: false, hills: 0 });
 const at = (c, x, y) => c.tiles[y * c.size + x];
 const grassRect = (c, w, h) => c.tiles.find((t) => t.x > 4 && t.y > 4 && t.x + w < c.size - 4 && t.y + h < c.size - 4 &&
   Array.from({ length: h }, (_, dy) => Array.from({ length: w }, (_, dx) => at(c, t.x + dx, t.y + dy).terrain === "grass").every(Boolean)).every(Boolean));

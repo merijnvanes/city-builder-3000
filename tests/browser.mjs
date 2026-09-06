@@ -86,7 +86,7 @@ try {
   await page.getByRole("button", { name: "Civic", exact: true }).click();
   await page.locator('[data-tool="police"]').click();
   const site = await page.evaluate(() => civic.city.tiles.find((t) => {
-    const c = civic.city, ok = (x, y) => { const n = c.tiles[y * c.size + x]; return n && n.terrain === "grass" && n.type === "empty"; };
+    const c = civic.city, ok = (x, y) => { const n = c.tiles[y * c.size + x]; return n && n.terrain === "grass" && n.type === "empty" && n.elev === t.elev; };
     const p = civic.renderer.project(t.x + 0.5, t.y + 0.5);
     return p.x > 300 && p.x < 950 && p.y > 220 && p.y < 700 && [-1, 0, 1].every((dx) => [-1, 0, 1].every((dy) => ok(t.x + dx, t.y + dy))) && document.elementFromPoint(p.x, p.y)?.id === "city-canvas";
   }));

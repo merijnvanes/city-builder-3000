@@ -64,8 +64,10 @@ export function planConstruction(city, start, end, tool, options = {}) {
   const tiles = [], actions = [];
   let cost = 0;
   const b = footprint(tool);
+  // Level flattens the whole drag to the height of the tile it started on.
+  const elev = tool === "level" ? city.tiles[sy * city.size + sx]?.elev : undefined;
   for (const c of coords) {
-    const ev = evaluate(city, c.x, c.y, tool, { density });
+    const ev = evaluate(city, c.x, c.y, tool, { density, elev });
     if (ev.ok && ev.noop) {
       if (!seen.has(`${c.x},${c.y}`)) { seen.add(`${c.x},${c.y}`); tiles.push({ x: c.x, y: c.y, valid: true, noop: true, cost: 0, message: ev.message }); }
       continue;
@@ -99,7 +101,7 @@ export function planConstruction(city, start, end, tool, options = {}) {
     const blocked = tiles.filter((t) => !t.valid).length;
     if (blocked) message = `${blocked} tile${blocked === 1 ? "" : "s"} blocked`;
   }
-  return { tiles, actions, cost, count, valid, affordable, message, tool, density };
+  return { tiles, actions, cost, count, valid, affordable, message, tool, density, elev };
 }
 
 function restore(city, snapshot) {
@@ -125,7 +127,7 @@ export function applyConstruction(city, plan) {
     const key = `${a.x},${a.y}`;
     if (seen.has(key)) continue;
     seen.add(key);
-    const ev = evaluate(city, a.x, a.y, plan.tool, { density: plan.density });
+    const ev = evaluate(city, a.x, a.y, plan.tool, { density: plan.density, elev: plan.elev });
     if (!ev.ok || ev.noop) continue;
     actions.push({ x: a.x, y: a.y, cost: ev.cost, tiles: ev.tiles });
     cost += ev.cost;
@@ -136,11 +138,17 @@ export function applyConstruction(city, plan) {
   const snapshot = structuredClone(city);
   let changed = 0;
   try {
-    // Bulldozing a lot clears several planned tiles at once; skip those.
+    // Bulldozing a lot or dragging terrain changes several planned tiles at
+    // once; place() re-checks each, so skip ones already settled.
     const cleared = new Set();
     for (const a of actions) {
       if (cleared.has(`${a.x},${a.y}`)) continue;
-      const r = place(city, a.x, a.y, plan.tool, { density: plan.density, deferRefresh: true });
+      if (plan.tool === "raise" || plan.tool === "lower" || plan.tool === "level") {
+        const again = evaluate(city, a.x, a.y, plan.tool, { density: plan.density, elev: plan.elev });
+        if (!again.ok || again.noop) continue;
+        if (cost + 0 > city.money) break;
+      }
+      const r = place(city, a.x, a.y, plan.tool, { density: plan.density, elev: plan.elev, deferRefresh: true });
       if (!r.ok) throw new Error(r.message);
       if (!r.noop) { changed += r.changed || 1; for (const t of a.tiles) cleared.add(`${t.x},${t.y}`); }
     }

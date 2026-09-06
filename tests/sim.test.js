@@ -9,7 +9,8 @@ import { computeMetrics } from "../src/sim/metrics.js";
 import { sourceEfficiency } from "../src/sim/utilities.js";
 
 const at = (c, x, y) => c.tiles[y * c.size + x];
-const blank = (seed = 7) => createCity(seed, false);
+// Flat maps keep lot and footprint tests independent of the hills.
+const blank = (seed = 7) => createCity({ seed, starter: false, hills: 0 });
 const put = (c, x, y, tool, options) => place(c, x, y, tool, { ...options, deferRefresh: true });
 
 // Lay a simple powered, watered district and return the city.

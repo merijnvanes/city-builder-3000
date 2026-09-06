@@ -73,6 +73,9 @@ export const BUILDINGS = {
   tree:        { label: "Plant Trees",     group: "landscape", cost: 3,    w: 1, h: 1, upkeep: 0,   dept: "parks", rect: true, overlay: true },
   makewater:   { label: "Dig Water",       group: "landscape", cost: 120,  w: 1, h: 1, upkeep: 0,   dept: "parks", rect: true, terrain: "water" },
   makeland:    { label: "Fill Land",       group: "landscape", cost: 180,  w: 1, h: 1, upkeep: 0,   dept: "parks", rect: true, terrain: "land" },
+  raise:       { label: "Raise Terrain",   group: "landscape", cost: 25,   w: 1, h: 1, upkeep: 0,   dept: "parks", rect: true, terrain: "raise" },
+  lower:       { label: "Lower Terrain",   group: "landscape", cost: 25,   w: 1, h: 1, upkeep: 0,   dept: "parks", rect: true, terrain: "lower" },
+  level:       { label: "Level Terrain",   group: "landscape", cost: 20,   w: 1, h: 1, upkeep: 0,   dept: "parks", rect: true, terrain: "level" },
 
   // Rewards: unlocked once the city reaches a population milestone. One each.
   mayorhouse:  { label: "Mayor's House",   group: "special", cost: 0,    w: 2, h: 2, upkeep: 20,  dept: "parks", unique: true, reward: { population: 2000 },  service: { kind: "culture", radius: 6, strength: 40 }, effects: { landValue: 8, radius: 6 } },
@@ -109,6 +112,7 @@ export const TOOLS = [
 ];
 
 export const TOOL_MAP = Object.fromEntries(TOOLS.map((t) => [t.id, t]));
+export const LEVEL_FEE = 10; // per tile flattened under a new building
 
 export function isZone(type) { return ZONE_TYPES.has(type); }
 export function building(type) { return BUILDINGS[type] || null; }

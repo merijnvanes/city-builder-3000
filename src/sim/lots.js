@@ -31,7 +31,7 @@ function blockFits(city, ax, ay, s, seed) {
     for (let x = ax; x < ax + s; x++) {
       if (!inBounds(city.size, x, y)) return false;
       const t = city.tiles[y * city.size + x];
-      if (t.type !== seed.type || t.density !== seed.density || t.lot || t.terrain === "water") return false;
+      if (t.type !== seed.type || t.density !== seed.density || t.lot || t.terrain === "water" || t.elev !== seed.elev) return false;
     }
   }
   return true;

@@ -10,7 +10,7 @@ const site = (c, w, h) => c.tiles.find((t) => t.x > 4 && t.y > 4 && t.x + w < c.
 
 describe("rewards", () => {
   test("locked until the population milestone, then unique", () => {
-    const c = createCity({ seed: 7, layout: "plains", starter: false });
+    const c = createCity({ seed: 7, layout: "plains", starter: false, hills: 0 });
     const s = site(c, 2, 2);
     assert.equal(place(c, s.x, s.y, "mayorhouse").ok, false);
     const news = updateEvents(c, { population: 2500, money: 50000, balance: 100, happiness: 60, pollution: 0, crime: 0 }, lcg(1));
@@ -33,7 +33,7 @@ describe("rewards", () => {
 
 describe("petitions", () => {
   test("accepting a deal unlocks the building and pays monthly", () => {
-    const c = createCity({ seed: 7, layout: "plains", starter: false });
+    const c = createCity({ seed: 7, layout: "plains", starter: false, hills: 0 });
     c.petitions.push({ id: "prison", status: "open", since: c.month, expires: c.month + 6 });
     assert.ok(getStats(c).petition);
     assert.equal(getStats(c).petition.id, "prison");
@@ -46,7 +46,7 @@ describe("petitions", () => {
     assert.ok(c.tiles[(s.y + 1) * c.size + s.x + 5].crime >= 0);
   });
   test("declining leaves the building locked and the petition closed", () => {
-    const c = createCity({ seed: 7, layout: "plains", starter: false });
+    const c = createCity({ seed: 7, layout: "plains", starter: false, hills: 0 });
     c.petitions.push({ id: "casino", status: "open", since: 0, expires: 6 });
     assert.equal(respondPetition(c, "casino", false).ok, true);
     assert.equal(respondPetition(c, "casino", false).ok, false);
@@ -54,7 +54,7 @@ describe("petitions", () => {
     assert.equal(place(c, s.x, s.y, "casino").ok, false);
   });
   test("accepted deals expire when never built", () => {
-    const c = createCity({ seed: 7, layout: "plains", starter: false });
+    const c = createCity({ seed: 7, layout: "plains", starter: false, hills: 0 });
     c.petitions.push({ id: "toxicdump", status: "open", since: 0, expires: 6 });
     respondPetition(c, "toxicdump", true);
     assert.ok("toxicdump" in c.unlocked);
@@ -63,7 +63,7 @@ describe("petitions", () => {
     assert.ok(!("toxicdump" in c.unlocked));
   });
   test("policy petitions change taxes or ordinances", () => {
-    const c = createCity({ seed: 7, layout: "plains", starter: false });
+    const c = createCity({ seed: 7, layout: "plains", starter: false, hills: 0 });
     c.petitions.push({ id: "taxcut", status: "open", since: 0, expires: 6 });
     respondPetition(c, "taxcut", true);
     assert.equal(c.taxes.residential, 6);

@@ -53,9 +53,10 @@ export function buildStarterTown(city) {
     for (let y = y0; y < y0 + h; y++) for (let x = x0; x < x0 + w; x++) put(x, y, type, { density });
   };
   const siteFree = (x, y, w, h) => {
+    const base = tileAt(city, x, y)?.elev;
     for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) {
       const t = tileAt(city, xx, yy);
-      if (!t || t.terrain === "water" || t.type !== "empty") return false;
+      if (!t || t.terrain === "water" || t.type !== "empty" || Math.abs(t.elev - base) > 1) return false;
     }
     return true;
   };
@@ -77,10 +78,32 @@ export function buildStarterTown(city) {
   let ox = prefX, oy = prefY, bestScore = Infinity;
   for (let cy = 3; cy + span < size - 3; cy += 2) {
     for (let cx = 3; cx + span < size - 3; cx += 2) {
-      let wet = 0;
-      for (let y = cy; y <= cy + span; y++) for (let x = cx; x <= cx + span; x++) if (tileAt(city, x, y).terrain !== "grass") wet++;
-      const score = wet * 4 + Math.abs(cx - prefX) + Math.abs(cy - prefY);
+      let wet = 0, rough = 0;
+      const h0 = tileAt(city, cx + 14, cy + 14).elev;
+      for (let y = cy; y <= cy + span; y++) for (let x = cx; x <= cx + span; x++) { const t = tileAt(city, x, y); if (t.terrain !== "grass") wet++; rough += Math.abs(t.elev - h0); }
+      const score = wet * 4 + rough * 0.6 + Math.abs(cx - prefX) + Math.abs(cy - prefY);
       if (score < bestScore) { bestScore = score; ox = cx; oy = cy; }
+    }
+  }
+  // Grade the town site flat, easing the edges down to the surrounding land.
+  {
+    const counts = new Map();
+    for (let y = oy; y <= oy + span; y++) for (let x = ox; x <= ox + span; x++) { const t = tileAt(city, x, y); if (t.terrain !== "water") counts.set(t.elev, (counts.get(t.elev) || 0) + 1); }
+    const grade = [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? 0;
+    for (let y = oy - 1; y <= oy + span + 1; y++) for (let x = ox - 1; x <= ox + span + 1; x++) { const t = tileAt(city, x, y); if (t && t.terrain !== "water") t.elev = grade; }
+    let ring = 2;
+    let changed = true;
+    while (changed && ring < 12) {
+      changed = false;
+      for (let y = oy - ring; y <= oy + span + ring; y++) for (let x = ox - ring; x <= ox + span + ring; x++) {
+        const t = tileAt(city, x, y);
+        if (!t || t.terrain === "water") continue;
+        for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+          const n = tileAt(city, x + dx, y + dy);
+          if (n && Math.abs(n.elev - t.elev) > 1) { t.elev = n.elev + Math.sign(t.elev - n.elev); changed = true; }
+        }
+      }
+      ring++;
     }
   }
 
@@ -148,7 +171,7 @@ export function buildStarterTown(city) {
       if (!from || from.terrain === "water") continue;
       const path = landPath(city, from, tileAt(city, near.x, near.y));
       if (!path) continue;
-      put(plant.x, plant.y, plantType);
+      if (!put(plant.x, plant.y, plantType).ok) break;
       for (const t of path) put(t.x, t.y, "powerline");
       done = true;
       break;
@@ -193,7 +216,7 @@ export function buildStarterTown(city) {
   };
   if (pumps.length) {
     const p = pumps[0];
-    const rowY = [oy, oy + 12, oy + 24].sort((a, b) => Math.abs(a - p.y) - Math.abs(b - p.y))[0];
+    const rowY = [oy, oy + 8, oy + 16, oy + 24].sort((a, b) => Math.abs(a - p.y) - Math.abs(b - p.y))[0];
     const edgeX = p.x > cx ? ox + span : ox;
     const edge = dry(edgeX, rowY);
     if (edge) {
@@ -202,9 +225,9 @@ export function buildStarterTown(city) {
       if (block) route(edge, block, ["powerline"]);
     }
     for (const other of pumps.slice(1)) route(other, p, ["pipe", "powerline"]);
-    // Pipe mains under three streets and one avenue, detouring around water.
-    for (const y of [oy, oy + 12, oy + 24]) { const a = dry(ox, y), b = dry(ox + span, y); if (a && b) route(a, b, ["pipe"]); }
-    { const a = dry(ox + 16, oy), b = dry(ox + 16, oy + span); if (a && b) route(a, b, ["pipe"]); }
+    // Pipe mains under every other street and two avenues, detouring around water.
+    for (const y of [oy, oy + 8, oy + 16, oy + 24]) { const a = dry(ox, y), b = dry(ox + span, y); if (a && b) route(a, b, ["pipe"]); }
+    for (const x of [ox + 8, ox + 20]) { const a = dry(x, oy), b = dry(x, oy + span); if (a && b) route(a, b, ["pipe"]); }
   }
 
   // Develop lots.

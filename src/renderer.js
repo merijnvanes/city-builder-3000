@@ -11,6 +11,7 @@ const shade = (hex, k) => {
 };
 const ROAD = new Set(["road", "rail"]);
 const TILE_W = 32, TILE_H = 16;
+const ELEV_PX = 8; // screen pixels per terrain level at zoom 1
 
 export const OVERLAYS = ["none", "power", "water", "landvalue", "pollution", "crime", "traffic", "police", "fire", "health", "education", "garbage"];
 
@@ -25,6 +26,7 @@ export class CityRenderer {
     this.hover = null; this.preview = null; this.tool = "inspect"; this.overlay = "none"; this.night = false;
     this.dirty = true; this.lastRevision = -1; this.w = 0; this.h = 0; this.sorted = [];
     this.minZoom = 0.3; this.maxZoom = 2.8;
+    this.corners = null; this.platform = null; this.tiles = null;
     this.resizeObserver = new ResizeObserver(() => this.resize());
     this.resizeObserver.observe(canvas);
     this.resize();
@@ -63,15 +65,60 @@ export class CityRenderer {
       default: return { x, y };
     }
   }
+  // Terrain height in pixels (zoom 1) under map point (x, y). Ground is
+  // interpolated between corner heights; while a lot is being drawn the
+  // whole lot sits on a flat platform at its tile's level.
+  groundZ(x, y) {
+    if (this.platform != null) return this.platform;
+    const c = this.corners;
+    if (!c) return 0;
+    const n = this.size || 64;
+    const fx = Math.max(0, Math.min(n - 1e-6, x)), fy = Math.max(0, Math.min(n - 1e-6, y));
+    const ix = Math.floor(fx), iy = Math.floor(fy), u = fx - ix, v = fy - iy;
+    const w = n + 1;
+    const z00 = c[iy * w + ix], z10 = c[iy * w + ix + 1], z01 = c[(iy + 1) * w + ix], z11 = c[(iy + 1) * w + ix + 1];
+    return (z00 * (1 - u) + z10 * u) * (1 - v) + (z01 * (1 - u) + z11 * u) * v;
+  }
+  // Average the elevation of the tiles around every vertex.
+  buildCorners(city) {
+    const n = city.size, w = n + 1;
+    const c = new Float32Array(w * w);
+    for (let vy = 0; vy <= n; vy++) {
+      for (let vx = 0; vx <= n; vx++) {
+        let sum = 0, count = 0;
+        for (const [dx, dy] of [[-1, -1], [0, -1], [-1, 0], [0, 0]]) {
+          const tx = vx + dx, ty = vy + dy;
+          if (tx < 0 || ty < 0 || tx >= n || ty >= n) continue;
+          sum += city.tiles[ty * n + tx].elev || 0; count++;
+        }
+        c[vy * w + vx] = count ? (sum / count) * ELEV_PX : 0;
+      }
+    }
+    this.corners = c;
+    this.tiles = city.tiles;
+  }
   project(x, y, z = 0) {
     const p = this.orient(x, y);
-    return { x: this.w * 0.45 + this.panX + (p.x - p.y) * TILE_W * this.zoom, y: this.h * 0.47 + this.panY + (p.x + p.y - (this.size || 64)) * TILE_H * this.zoom - z * this.zoom };
+    return { x: this.w * 0.45 + this.panX + (p.x - p.y) * TILE_W * this.zoom, y: this.h * 0.47 + this.panY + (p.x + p.y - (this.size || 64)) * TILE_H * this.zoom - (z + this.groundZ(x, y)) * this.zoom };
   }
-  pick(sx, sy) {
+  pickFlat(sx, sy) {
     const dx = (sx - this.w * 0.45 - this.panX) / (TILE_W * this.zoom);
     const dy = (sy - this.h * 0.47 - this.panY) / (TILE_H * this.zoom) + (this.size || 64);
     const p = this.unorient((dx + dy) / 2, (dy - dx) / 2);
     return { x: Math.floor(p.x), y: Math.floor(p.y) };
+  }
+  // Hills lift tiles on screen, so refine the flat guess with the height
+  // under it a few times.
+  pick(sx, sy) {
+    let p = this.pickFlat(sx, sy);
+    if (!this.corners) return p;
+    for (let i = 0; i < 3; i++) {
+      const z = this.groundZ(p.x + 0.5, p.y + 0.5) * this.zoom;
+      const q = this.pickFlat(sx, sy + z);
+      if (q.x === p.x && q.y === p.y) break;
+      p = q;
+    }
+    return p;
   }
   zoomAt(delta, sx = this.w * 0.45, sy = this.h * 0.47) {
     const old = this.zoom;
@@ -182,11 +229,25 @@ export class CityRenderer {
   }
 
   // ── Ground ────────────────────────────────────────────────────
+  // Slope lighting: faces toward the north-west light are brighter.
+  slopeShade(x, y) {
+    const c = this.corners;
+    if (!c) return 1;
+    const w = (this.size || 64) + 1, i = y * w + x;
+    const ew = (c[i] + c[i + w]) - (c[i + 1] + c[i + w + 1]);
+    const ns = (c[i] + c[i + 1]) - (c[i + w] + c[i + w + 1]);
+    return clamp(1 + (ew * 0.5 + ns * 0.35) / ELEV_PX * 0.11, 0.8, 1.2);
+  }
   terrain(t, city) {
     const { x, y } = t, n = random(x, y), water = t.terrain === "water";
-    const color = water ? ["#477e92", "#4b8396", "#528b9a", "#4c8390"][Math.floor(n * 4)]
+    let color = water ? ["#477e92", "#4b8396", "#528b9a", "#4c8390"][Math.floor(n * 4)]
       : t.terrain === "sand" ? ["#b3b17b", "#bdba88", "#aeb07d"][Math.floor(n * 3)]
       : ["#78904d", "#7c9550", "#829950", "#7c914b", "#759049"][Math.floor(n * 5)];
+    if (!water) {
+      const k = this.slopeShade(x, y);
+      if (k !== 1) color = shade(color, k);
+      else if (t.elev >= 5) color = shade(color, 1 + (t.elev - 4) * 0.03);
+    }
     this.flat(x, y, 1, 1, 0, color);
     if (!water && t.type === "empty" && !t.trees) for (let i = 0; i < 3; i++) { const a = random(x, y, i + 1), b = random(y, x, i + 7); this.flat(x + a * 0.85, y + b * 0.85, 0.1, 0.045, 0.05, "#a8ae642b"); }
     if (this.tool !== "inspect" && !water && this.zoom > 0.55) this.flat(x, y, 1, 1, 0.1, null, "#344b2833");
@@ -271,9 +332,33 @@ export class CityRenderer {
     this.dirty = true;
   }
 
+  // Flat platform for a lot with retaining walls where the ground falls away.
+  platformFor(t) {
+    const { x, y, w, h } = t.lot;
+    const top = t.elev * ELEV_PX;
+    this.platform = null;
+    const corners = [[x, y], [x + w, y], [x + w, y + h], [x, y + h]];
+    const ground = corners.map(([cx, cy]) => this.groundZ(cx, cy));
+    this.platform = top;
+    const flatPts = corners.map(([cx, cy]) => this.project(cx, cy, 0));
+    this.platform = null;
+    // Walls on the two front edges, only where the ground is lower.
+    const front = [["south", 3, 2], ["east", 2, 1], ["north", 0, 1], ["west", 3, 0]];
+    const visible = [["south", "east"], ["east", "north"], ["north", "west"], ["west", "south"]][this.rotation || 0];
+    for (const [name, a, b] of front) {
+      if (!visible.includes(name)) continue;
+      if (ground[a] >= top - 0.5 && ground[b] >= top - 0.5) continue;
+      const pa = this.project(corners[a][0], corners[a][1], 0), pb = this.project(corners[b][0], corners[b][1], 0);
+      this.poly([flatPts[a], flatPts[b], pb, pa], name === "south" || name === "west" ? "#6f6a58" : "#8a836c");
+    }
+    this.platform = top;
+    this.poly(flatPts, t.terrain === "sand" ? "#b7b487" : "#7c914b");
+  }
+
   // ── Static layer ──────────────────────────────────────────────
   paint(city) {
     this.size = city.size;
+    if (!this.corners || this.tiles !== city.tiles || city.revision !== this.lastRevision) this.buildCorners(city);
     const ctx = this.base;
     ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     ctx.clearRect(0, 0, this.w, this.h);
@@ -286,15 +371,19 @@ export class CityRenderer {
 
     for (const t of this.sorted) if (visible(t.x + 0.5, t.y + 0.5)) this.terrain(t, city);
 
-    // Shadows for every lot.
+    // Platforms and shadows for every lot.
     for (const t of this.sorted) {
       if (!t.lot || t.lot.x !== t.x || t.lot.y !== t.y) continue;
+      if (!visible(t.x, t.y)) continue;
+      this.platformFor(t);
       const h = heightOf(t);
-      if (!h || !visible(t.x, t.y)) continue;
-      const { w, h: d } = t.lot;
-      const a = this.project(t.x + 0.15, t.y + 0.15), b = this.project(t.x + w - 0.15, t.y + 0.15), c = this.project(t.x + w - 0.15, t.y + d - 0.15), e = this.project(t.x + 0.15, t.y + d - 0.15);
-      const dx = -h * 0.3 * this.zoom, dy = h * 0.15 * this.zoom;
-      this.poly([a, b, c, { x: c.x + dx, y: c.y + dy }, { x: e.x + dx, y: e.y + dy }, e], "#26352539");
+      if (h) {
+        const { w, h: d } = t.lot;
+        const a = this.project(t.x + 0.15, t.y + 0.15), b = this.project(t.x + w - 0.15, t.y + 0.15), c = this.project(t.x + w - 0.15, t.y + d - 0.15), e = this.project(t.x + 0.15, t.y + d - 0.15);
+        const dx = -h * 0.3 * this.zoom, dy = h * 0.15 * this.zoom;
+        this.poly([a, b, c, { x: c.x + dx, y: c.y + dy }, { x: e.x + dx, y: e.y + dy }, e], "#26352539");
+      }
+      this.platform = null;
     }
 
     if (this.overlay !== "none") {
@@ -327,7 +416,8 @@ export class CityRenderer {
     for (const it of items) {
       const t = it.t;
       if (!visible(t.x + (t.lot?.w || 1) / 2, t.y + (t.lot?.h || 1) / 2)) continue;
-      if (it.kind === "lot" || it.kind === "zone") drawArchitecture(this, t);
+      if (it.kind === "lot") { this.platform = t.elev * ELEV_PX; drawArchitecture(this, t); this.platform = null; }
+      else if (it.kind === "zone") drawArchitecture(this, t);
       else if (it.kind === "trees") {
         const n = Math.floor(random(t.y, t.x) * 3);
         const jx = random(t.x, t.y, 11) * 0.4, jy = random(t.x, t.y, 12) * 0.4;
@@ -343,7 +433,7 @@ export class CityRenderer {
 
   // ── Frame ─────────────────────────────────────────────────────
   render(city, time) {
-    if (this.dirty || city.revision !== this.lastRevision || this.size !== city.size) this.paint(city);
+    if (this.dirty || city.revision !== this.lastRevision || this.size !== city.size || this.tiles !== city.tiles) this.paint(city);
     const ctx = this.ctx;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.drawImage(this.ground, 0, 0);
@@ -420,6 +510,7 @@ export class CityRenderer {
     for (const t of city.tiles) {
       if (!t.fire) continue;
       const w = t.lot?.w || 1, h = t.lot?.h || 1;
+      this.platform = t.lot ? t.elev * ELEV_PX : null;
       for (let i = 0; i < w * h; i++) {
         const p = this.project(t.x + 0.5 + (i % w), t.y + 0.5 + Math.floor(i / w), heightOf(t) * 0.5);
         ctx.fillStyle = i % 2 ? "#e79731" : "#f2c14e";
@@ -427,6 +518,7 @@ export class CityRenderer {
         ctx.fillStyle = "#5a5a5a66";
         ctx.beginPath(); ctx.ellipse(p.x + 3 * this.zoom, p.y - 18 * this.zoom - ((time * 0.02 + i * 7) % 20) * this.zoom, 7 * this.zoom, 5 * this.zoom, 0, 0, Math.PI * 2); ctx.fill();
       }
+      this.platform = null;
     }
 
     // Construction preview or hover.

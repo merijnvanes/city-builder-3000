@@ -1,5 +1,5 @@
 // City state: tile schema, creation, save format (version 3).
-import { generateTerrain, LAYOUTS } from "./terrain.js";
+import { generateTerrain, LAYOUTS, MAX_ELEVATION } from "./terrain.js";
 import { BUILDINGS, ZONE_TYPES, ROAD_TYPES, FUNDED_DEPARTMENTS } from "./catalog.js";
 import { tileAt } from "./grid.js";
 import { lotTiles } from "./lots.js";
@@ -25,9 +25,9 @@ export const ORDINANCES = {
   smokingBan:         { label: "Public Smoking Ban",       cost: 0.004, description: "Small health boost. Commerce grumbles a little." },
 };
 
-export function makeTile(x, y, terrain, trees, variant) {
+export function makeTile(x, y, terrain, trees, variant, elev = 0) {
   return {
-    x, y, terrain, trees,
+    x, y, terrain, trees, elev,
     type: "empty", density: 0, lot: null, level: 0, variant, abandoned: false, age: 0, fire: 0,
     powered: false, watered: false, roadAccess: false, powerline: false, pipe: false,
     pollution: 0, crime: 0, traffic: 0, landValue: 40, svc: null,
@@ -42,18 +42,18 @@ export function defaultPolicies() {
   };
 }
 
-export function blankCity({ seed = 42, size = DEFAULT_SIZE, layout, name = "New Riverton", startYear = START_YEAR } = {}) {
+export function blankCity({ seed = 42, size = DEFAULT_SIZE, layout, name = "New Riverton", startYear = START_YEAR, hills = 1 } = {}) {
   seed = Number.isFinite(seed) ? seed >>> 0 : 42;
   size = Math.max(16, Math.min(MAX_SIZE, size | 0));
   startYear = Number.isInteger(startYear) && startYear >= 1800 && startYear <= 2200 ? startYear : START_YEAR;
-  const gen = generateTerrain(size, seed, layout);
+  const gen = generateTerrain(size, seed, layout, hills);
   const tiles = [];
   let v = seed ^ 0x2545f491;
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
       v = (Math.imul(1664525, v) + 1013904223) >>> 0;
       const i = y * size + x;
-      tiles.push(makeTile(x, y, gen.terrain[i], gen.trees[i], v / 4294967296));
+      tiles.push(makeTile(x, y, gen.terrain[i], gen.trees[i], v / 4294967296, gen.heights[i]));
     }
   }
   return {
@@ -88,7 +88,7 @@ export function serialize(city) {
     TERRAIN_CODE[t.terrain], t.trees | 0, code(t.type), t.density | 0,
     t.lot ? t.lot.x : -1, t.lot ? t.lot.y : -1, t.lot ? t.lot.w : 0, t.lot ? t.lot.h : 0,
     t.level | 0, Math.round(t.variant * 1000) / 1000, t.abandoned ? 1 : 0, t.age | 0, t.fire | 0,
-    t.powerline ? 1 : 0, t.pipe ? 1 : 0,
+    t.powerline ? 1 : 0, t.pipe ? 1 : 0, t.elev | 0,
   ]);
   return JSON.stringify({
     version: SAVE_VERSION,
@@ -146,8 +146,9 @@ export function deserialize(raw) {
   for (let i = 0; i < d.tiles.length; i++) {
     const r = d.tiles[i];
     const x = i % size, y = (i - x) / size;
-    if (!Array.isArray(r) || r.length !== 15) throw new Error(`Invalid save: tile ${i} malformed.`);
-    const [terrainCode, trees, typeCode, density, lotX, lotY, lotW, lotH, level, variant, abandoned, age, fire, powerline, pipe] = r;
+    if (!Array.isArray(r) || (r.length !== 15 && r.length !== 16)) throw new Error(`Invalid save: tile ${i} malformed.`);
+    const [terrainCode, trees, typeCode, density, lotX, lotY, lotW, lotH, level, variant, abandoned, age, fire, powerline, pipe, elev = 0] = r;
+    if (!Number.isInteger(elev) || elev < 0 || elev > MAX_ELEVATION) throw new Error(`Invalid save: tile ${i} bad elevation.`);
     if (!TERRAIN_NAME[terrainCode]) throw new Error(`Invalid save: tile ${i} bad terrain.`);
     if (![0, 1, 2, 3].includes(trees)) throw new Error(`Invalid save: tile ${i} bad trees.`);
     const type = d.types[typeCode];
@@ -159,7 +160,7 @@ export function deserialize(raw) {
     if (!Number.isInteger(age) || age < 0 || !Number.isInteger(fire) || fire < 0 || fire > 6) throw new Error(`Invalid save: tile ${i} bad counters.`);
     const terrain = TERRAIN_NAME[terrainCode];
     if (terrain === "water" && type !== "empty" && type !== "road") throw new Error(`Invalid save: tile ${i} built on water.`);
-    const t = makeTile(x, y, terrain, trees, variant);
+    const t = makeTile(x, y, terrain, trees, variant, elev);
     t.type = type; t.density = density; t.level = level; t.abandoned = !!abandoned; t.age = age; t.fire = fire;
     t.powerline = !!powerline; t.pipe = !!pipe;
     if (lotW > 0) {

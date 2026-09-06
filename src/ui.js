@@ -31,7 +31,7 @@ const GROUP_DEFS = [
   { id: "water",     label: "Water",     tools: ["waterpump", "watertower", "treatment", "pipe"] },
   { id: "civic",     label: "Civic",     tools: ["police", "fire", "hospital", "school", "college", "library", "museum"] },
   { id: "sanitation", label: "Sanitation", tools: ["landfill", "incinerator", "recycling"] },
-  { id: "landscape", label: "Parks & Land", tools: ["park", "largepark", "zoo", "tree", "makewater", "makeland"] },
+  { id: "landscape", label: "Parks & Land", tools: ["park", "largepark", "zoo", "tree", "makewater", "makeland", "raise", "lower", "level"] },
   { id: "special",   label: "Rewards & Deals", tools: SPECIAL_TYPES },
 ];
 
@@ -45,7 +45,7 @@ function iconFor(id, label) {
 }
 
 const PATH_TOOLS = new Set(["road", "rail", "powerline", "pipe"]);
-const RECT_TOOLS = new Set(["residential", "commercial", "industrial", "park", "landfill", "tree", "bulldoze", "makewater", "makeland"]);
+const RECT_TOOLS = new Set(["residential", "commercial", "industrial", "park", "landfill", "tree", "bulldoze", "makewater", "makeland", "raise", "lower", "level"]);
 
 // ── Formatters ─────────────────────────────────────────────────────────────────
 function fmtMoney(v) {
@@ -1120,6 +1120,7 @@ export function mountUI(actions) {
   form.name = formRow("City name", nameInput);
   form.layout = formRow("Terrain", select("Terrain", [["random", "Surprise me"], ["river", "River"], ["coast", "Coast"], ["lakes", "Lakes"], ["delta", "River delta"], ["plains", "Plains"]], "random"));
   form.size = formRow("Map size", select("Map size", [["64", "Small (64×64)"], ["96", "Medium (96×96)"], ["128", "Large (128×128)"]], "64"));
+  form.hills = formRow("Hills", select("Hills", [["0", "Flat"], ["0.5", "Gentle"], ["1", "Rolling"], ["1.6", "Mountainous"]], "1"));
   form.money = formRow("Starting funds", select("Starting funds", [["50000", "$50,000 (easy)"], ["25000", "$25,000 (medium)"], ["10000", "$10,000 (hard)"]], "50000"));
   form.year = formRow("Start year", select("Start year", [["1900", "1900 — coal and rail"], ["1950", "1950 — oil, gas and airports"], ["2000", "2000 — everything"], ["2050", "2050"]], "2000"));
   form.start = formRow("Start with", select("Start with", [["blank", "Empty land"], ["town", "An established town"]], "blank"));
@@ -1136,6 +1137,7 @@ export function mountUI(actions) {
       size: Number(form.size.value),
       money: Number(form.money.value),
       startYear: Number(form.year.value),
+      hills: Number(form.hills.value),
       starter: form.start.value === "town",
       scenario: form.scenario.value,
     });

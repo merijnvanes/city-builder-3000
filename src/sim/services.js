@@ -120,7 +120,7 @@ export function updateServices(city) {
     const i = t.y * size + t.x;
     let v = 34 + waterNear[i] - industryNear[i];
     v += t.svc.park * 0.28 + t.svc.culture * 0.2 + t.svc.education * 0.08 + t.svc.health * 0.06;
-    v += t.trees * 2.5 + valueBump[i];
+    v += t.trees * 2.5 + valueBump[i] + (t.elev || 0) * 2;
     v -= t.pollution * 0.38 + (t.traffic || 0) * 0.08;
     if (t.powered) v += 5;
     if (t.watered) v += 5;

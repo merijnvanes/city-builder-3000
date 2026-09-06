@@ -46,6 +46,7 @@ export function createMinimap(renderer) {
         if (tile.abandoned) c = "#6c6a5e";
         ctx.fillStyle = c;
         ctx.fillRect(tile.x * s, tile.y * s, s, s);
+        if (tile.elev && tile.terrain !== "water") { ctx.fillStyle = `rgba(255,255,255,${Math.min(0.5, tile.elev * 0.06)})`; ctx.fillRect(tile.x * s, tile.y * s, s, s); }
       }
       ctx.beginPath();
       [[0, 40], [renderer.w - 200, 40], [renderer.w - 200, renderer.h - 78], [0, renderer.h - 78]].forEach(([x, y], i) => {

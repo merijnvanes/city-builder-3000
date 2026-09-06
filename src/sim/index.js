@@ -23,7 +23,7 @@ export { TOOLS, TOOL_MAP, BUILDINGS, ZONE_TYPES, ORDINANCES, ADVISORS, DISASTERS
 
 export function createCity(seed = 42, starter = true, options = {}) {
   if (seed && typeof seed === "object") { options = seed; seed = options.seed ?? 42; starter = options.starter ?? true; }
-  const city = blankCity({ seed, size: options.size ?? DEFAULT_SIZE, layout: options.layout, name: options.name, startYear: options.startYear });
+  const city = blankCity({ seed, size: options.size ?? DEFAULT_SIZE, layout: options.layout, name: options.name, startYear: options.startYear, hills: options.hills });
   if (starter) buildStarterTown(city);
   return settle(city);
 }

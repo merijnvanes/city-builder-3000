@@ -31,11 +31,35 @@ export function fbm(x, y, seed, scale = 12) {
 }
 
 export const LAYOUTS = ["river", "coast", "lakes", "delta", "plains"];
+export const MAX_ELEVATION = 8;
 
-// Returns { terrain: Array<'grass'|'water'|'sand'>, trees: Array<0..3>, layout }.
-export function generateTerrain(size, seed, layout) {
+// Relax a per-tile height field so neighbours never differ by more than one
+// level, lowering peaks toward their neighbours. Water stays at zero.
+export function relaxHeights(heights, size, water) {
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        const i = y * size + x;
+        if (water && water[i]) { if (heights[i] !== 0) { heights[i] = 0; changed = true; } continue; }
+        let limit = MAX_ELEVATION;
+        if (x > 0) limit = Math.min(limit, heights[i - 1] + 1);
+        if (x < size - 1) limit = Math.min(limit, heights[i + 1] + 1);
+        if (y > 0) limit = Math.min(limit, heights[i - size] + 1);
+        if (y < size - 1) limit = Math.min(limit, heights[i + size] + 1);
+        if (heights[i] > limit) { heights[i] = limit; changed = true; }
+      }
+    }
+  }
+  return heights;
+}
+
+// Returns { terrain: Array<'grass'|'water'|'sand'>, trees: Array<0..3>, heights: Array<0..8>, layout }.
+export function generateTerrain(size, seed, layout, hills = 1) {
   // Random maps never pick plains; it is the flat option for a deliberate choice.
   layout = LAYOUTS.includes(layout) ? layout : LAYOUTS[seed % 4];
+  hills = Number.isFinite(hills) ? Math.max(0, Math.min(2, hills)) : 1;
   const rng = lcg(seed ^ 0x9e3779b9);
   const water = new Uint8Array(size * size);
   const terrain = new Array(size * size).fill("grass");
@@ -90,6 +114,22 @@ export function generateTerrain(size, seed, layout) {
     }
   }
 
+  // Hills: broad noise quantised into levels, flat near water, relaxed so
+  // every slope is a single step.
+  const heights = new Uint8Array(size * size);
+  const relief = (layout === "plains" ? 2.5 : 6) * hills;
+  if (relief > 0) {
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        const i = y * size + x;
+        if (water[i]) continue;
+        const h = fbm(x, y, seed + 61, 22) - 0.42;
+        heights[i] = Math.max(0, Math.min(MAX_ELEVATION, Math.round(h * relief * 2.2)));
+      }
+    }
+    relaxHeights(heights, size, water);
+  }
+
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
       const i = y * size + x;
@@ -98,10 +138,10 @@ export function generateTerrain(size, seed, layout) {
         (x > 0 && water[i - 1]) || (x < size - 1 && water[i + 1]) ||
         (y > 0 && water[i - size]) || (y < size - 1 && water[i + size]);
       if (nearWater && noise(x, y, 5, seed + 31) > 0.35) { terrain[i] = "sand"; continue; }
-      const forest = fbm(x, y, seed + 41, 10);
+      const forest = fbm(x, y, seed + 41, 10) + heights[i] * 0.03;
       if (forest > 0.56) trees[i] = forest > 0.7 ? 3 : forest > 0.63 ? 2 : 1;
       else if (hash(x, y, seed + 51) > 0.93) trees[i] = 1;
     }
   }
-  return { terrain, trees: Array.from(trees), layout };
+  return { terrain, trees: Array.from(trees), heights: Array.from(heights), layout };
 }
