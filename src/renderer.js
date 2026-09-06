@@ -32,6 +32,10 @@ export class CityRenderer {
     this.resize();
   }
 
+  // Screen origin of the map: centred in the space right of the toolbar.
+  get cx() { return this.w * 0.5 + (this.w > 800 ? 100 : 0); }
+  get cy() { return this.h * 0.5; }
+
   resize() {
     const rect = this.canvas.getBoundingClientRect();
     this.w = rect.width; this.h = rect.height;
@@ -99,11 +103,11 @@ export class CityRenderer {
   }
   project(x, y, z = 0) {
     const p = this.orient(x, y);
-    return { x: this.w * 0.45 + this.panX + (p.x - p.y) * TILE_W * this.zoom, y: this.h * 0.47 + this.panY + (p.x + p.y - (this.size || 64)) * TILE_H * this.zoom - (z + this.groundZ(x, y)) * this.zoom };
+    return { x: this.cx + this.panX + (p.x - p.y) * TILE_W * this.zoom, y: this.cy + this.panY + (p.x + p.y - (this.size || 64)) * TILE_H * this.zoom - (z + this.groundZ(x, y)) * this.zoom };
   }
   pickFlat(sx, sy) {
-    const dx = (sx - this.w * 0.45 - this.panX) / (TILE_W * this.zoom);
-    const dy = (sy - this.h * 0.47 - this.panY) / (TILE_H * this.zoom) + (this.size || 64);
+    const dx = (sx - this.cx - this.panX) / (TILE_W * this.zoom);
+    const dy = (sy - this.cy - this.panY) / (TILE_H * this.zoom) + (this.size || 64);
     const p = this.unorient((dx + dy) / 2, (dy - dx) / 2);
     return { x: Math.floor(p.x), y: Math.floor(p.y) };
   }
@@ -120,19 +124,19 @@ export class CityRenderer {
     }
     return p;
   }
-  zoomAt(delta, sx = this.w * 0.45, sy = this.h * 0.47) {
+  zoomAt(delta, sx = this.cx, sy = this.cy) {
     const old = this.zoom;
     this.zoom = clamp(this.zoom * Math.exp(delta), this.minZoom, this.maxZoom);
     const k = this.zoom / old;
-    this.panX = sx - this.w * 0.45 - (sx - this.w * 0.45 - this.panX) * k;
-    this.panY = sy - this.h * 0.47 - (sy - this.h * 0.47 - this.panY) * k;
+    this.panX = sx - this.cx - (sx - this.cx - this.panX) * k;
+    this.panY = sy - this.cy - (sy - this.cy - this.panY) * k;
     this.dirty = true;
   }
   rotate(delta = 1) {
-    const p = this.pick(this.w * 0.45, this.h * 0.47);
+    const p = this.pick(this.cx, this.cy);
     this.rotation = ((this.rotation + delta) % 4 + 4) % 4;
     const target = this.project(p.x + 0.5, p.y + 0.5);
-    this.pan(this.w * 0.45 - target.x, this.h * 0.47 - target.y);
+    this.pan(this.cx - target.x, this.cy - target.y);
     this.dirty = true;
   }
   pan(dx, dy) { this.panX += dx; this.panY += dy; this.dirty = true; }
@@ -327,8 +331,8 @@ export class CityRenderer {
     if (zoom) this.zoom = clamp(zoom, this.minZoom, this.maxZoom);
     this.panX = 0; this.panY = 0;
     const p = this.project(x + 0.5, y + 0.5);
-    this.panX = this.w * 0.45 - p.x;
-    this.panY = this.h * 0.47 - p.y;
+    this.panX = this.cx - p.x;
+    this.panY = this.cy - p.y;
     this.dirty = true;
   }
 

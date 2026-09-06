@@ -115,7 +115,7 @@ try {
     assert.ok(box && box.x >= 0 && box.x + box.width <= 390, `${name} reachable on mobile`);
   }
   await page.getByRole("button", { name: "Toggle tools", exact: true }).click();
-  assert.ok(await page.locator("#right-dock").isVisible());
+  assert.ok(await page.locator("#toolbar").isVisible());
   await page.getByRole("button", { name: "Toggle tools", exact: true }).click();
   await page.screenshot({ path: "artifacts/mobile.png" });
 

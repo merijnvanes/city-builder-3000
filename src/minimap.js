@@ -28,7 +28,7 @@ export function createMinimap(renderer) {
     const x = ((event.clientX - rect.left) / rect.width) * city.size;
     const y = ((event.clientY - rect.top) / rect.height) * city.size;
     const p = renderer.project(x, y);
-    renderer.pan(renderer.w * 0.45 - p.x, renderer.h * 0.47 - p.y);
+    renderer.pan(renderer.cx - p.x, renderer.cy - p.y);
   });
   return {
     update(nextCity) {
@@ -49,7 +49,8 @@ export function createMinimap(renderer) {
         if (tile.elev && tile.terrain !== "water") { ctx.fillStyle = `rgba(255,255,255,${Math.min(0.5, tile.elev * 0.06)})`; ctx.fillRect(tile.x * s, tile.y * s, s, s); }
       }
       ctx.beginPath();
-      [[0, 40], [renderer.w - 200, 40], [renderer.w - 200, renderer.h - 78], [0, renderer.h - 78]].forEach(([x, y], i) => {
+      const left = renderer.w > 800 ? 200 : 0;
+      [[left, 32], [renderer.w, 32], [renderer.w, renderer.h - 30], [left, renderer.h - 30]].forEach(([x, y], i) => {
         const p = renderer.pick(x, y);
         if (i) ctx.lineTo(p.x * s, p.y * s); else ctx.moveTo(p.x * s, p.y * s);
       });

@@ -145,10 +145,7 @@ export function mountUI(actions) {
   logoMark.addEventListener("click", () => actions.home?.());
   topBar.appendChild(logoMark);
 
-  const topSep1 = el("div", "top-sep");
-  topBar.appendChild(topSep1);
-
-  // City name (editable)
+  // City name (editable) lives in the toolbar status panel below.
   const cityName = document.createElement("input");
   cityName.id = "city-name";
   cityName.type = "text";
@@ -157,33 +154,6 @@ export function mountUI(actions) {
   cityName.addEventListener("change", () => {
     actions.renameCity?.(cityName.value.trim() || "New Riverton");
   });
-  topBar.appendChild(cityName);
-
-  const topSep2 = el("div", "top-sep");
-  topBar.appendChild(topSep2);
-
-  // Top metrics strip
-  const topMetrics = el("div");
-  topMetrics.id = "top-metrics";
-  topBar.appendChild(topMetrics);
-
-  function topMetric(id, label) {
-    const m = el("div", "top-metric");
-    m.appendChild(el("span", "top-metric-label", label));
-    const v = el("span", "top-metric-val");
-    v.id = id;
-    v.textContent = "--";
-    m.appendChild(v);
-    topMetrics.appendChild(m);
-    return v;
-  }
-
-  const mPop   = topMetric("tm-pop", "Pop");
-  const mMoney = topMetric("tm-money", "Funds");
-  mMoney.classList.add("money");
-  const mHappy  = topMetric("tm-happy", "Happy");
-  mHappy.classList.add("happy");
-  const mDate   = topMetric("tm-date", "Date");
 
   // Top menu buttons
   const topMenuBtns = el("div");
@@ -216,26 +186,100 @@ export function mountUI(actions) {
   topMenuBtns.appendChild(soundBtn);
   topMenuBtns.appendChild(btn("btn btn-icon", "?", "Help", () => helpDialog.showModal()));
 
-  // Mobile dock toggle
+  // Mobile toolbar toggle
   const mobileDockBtn = btn("btn btn-icon", "☰", "Toggle tools", () => {
-    const open = rightDock.classList.toggle("mobile-open");
+    const open = toolbar.classList.toggle("mobile-open");
     mobileDockBtn.setAttribute("aria-expanded", String(open));
+    if (!open) closeFlyout();
   });
   mobileDockBtn.setAttribute("aria-expanded", "false");
   mobileDockBtn.style.cssText = "display:none";
   topMenuBtns.appendChild(mobileDockBtn);
 
-  // ── Right dock ─────────────────────────────────────────────────────────────
-  const rightDock = el("div");
-  rightDock.id = "right-dock";
-  app.appendChild(rightDock);
+  // ── Left toolbar: status panel, tool groups, data maps ─────────────────────
+  const toolbar = el("div");
+  toolbar.id = "toolbar";
+  app.appendChild(toolbar);
+
+  // Status panel: name, date, funds, population, approval, demand, speed.
+  const statusPanel = el("div");
+  statusPanel.id = "status-panel";
+  toolbar.appendChild(statusPanel);
+  const statusName = el("div", "status-row");
+  statusName.appendChild(cityName);
+  const mDate = el("span", "status-date", "--");
+  statusName.appendChild(mDate);
+  statusPanel.appendChild(statusName);
+
+  const statusFunds = el("div", "status-row status-funds");
+  const mMoney = el("span", "status-money", "--");
+  const moneyDisplay = mMoney;
+  const dateDisplay = mDate;
+  statusFunds.appendChild(mMoney);
+  const statusSmall = el("div", "status-small");
+  const popWrap = el("span", "status-stat");
+  popWrap.appendChild(el("span", "status-stat-label", "Pop"));
+  const mPop = el("span", "status-stat-val", "--");
+  popWrap.appendChild(mPop);
+  const happyWrap = el("span", "status-stat");
+  happyWrap.appendChild(el("span", "status-stat-label", "Approval"));
+  const mHappy = el("span", "status-stat-val happy", "--");
+  happyWrap.appendChild(mHappy);
+  statusSmall.appendChild(popWrap);
+  statusSmall.appendChild(happyWrap);
+  statusFunds.appendChild(statusSmall);
+  statusPanel.appendChild(statusFunds);
+
+  // RCI demand bars
+  const rciSection = el("div");
+  rciSection.id = "rci-section";
+  function rciRow(cls, labelText) {
+    const row = el("div", "rci-row");
+    row.appendChild(el("span", `rci-lbl ${cls}`, labelText));
+    const track = el("div", "rci-track");
+    const center = el("div", "rci-center");
+    track.appendChild(center);
+    const fill = el("div", `rci-fill pos`);
+    fill.style.color = cls === "r" ? "var(--res)" : cls === "c" ? "var(--com)" : "var(--ind)";
+    track.appendChild(fill);
+    row.appendChild(track);
+    const val = el("span", "rci-val", "--");
+    row.appendChild(val);
+    rciSection.appendChild(row);
+    return { fill, val };
+  }
+  const rciR = rciRow("r", "R");
+  const rciC = rciRow("c", "C");
+  const rciI = rciRow("i", "I");
+  statusPanel.appendChild(rciSection);
+
+  // Speed controls
+  const speedGroup = el("div");
+  speedGroup.id = "speed-group";
+  const speedRow = el("div", "speed-label-row");
+  [
+    { n: 0, label: "⏸", title: "Pause [0]" },
+    { n: 1, label: "▶", title: "Normal [1]" },
+    { n: 2, label: "▶▶", title: "Fast [2]" },
+    { n: 3, label: "▶▶▶", title: "Very fast [3]" },
+  ].forEach(({ n, label, title }) => {
+    const b = el("button", n === 0 ? "speed-btn active" : "speed-btn", label);
+    b.dataset.speed = String(n);
+    b.title = title;
+    b.setAttribute("aria-label", title);
+    b.setAttribute("aria-pressed", n === 0 ? "true" : "false");
+    b.addEventListener("click", () => actions.setSpeed(n));
+    speedRow.appendChild(b);
+  });
+  speedGroup.appendChild(speedRow);
+  statusPanel.appendChild(speedGroup);
 
   // Top tools (inspect + undo)
   const dockTopTools = el("div");
   dockTopTools.id = "dock-top-tools";
-  rightDock.appendChild(dockTopTools);
+  toolbar.appendChild(dockTopTools);
 
-  const inspectBtn = svgBtn("btn tool-btn", "inspect", "Inspect tile [I]", () => actions.selectTool("inspect"));
+  const inspectBtn = svgBtn("btn tool-btn", "inspect", "Inspect tile [I]", () => { closeFlyout(); actions.selectTool("inspect"); });
   inspectBtn.dataset.tool = "inspect";
   dockTopTools.appendChild(inspectBtn);
 
@@ -245,7 +289,24 @@ export function mountUI(actions) {
   // Scrollable body
   const dockScroll = el("div");
   dockScroll.id = "dock-scroll";
-  rightDock.appendChild(dockScroll);
+  toolbar.appendChild(dockScroll);
+
+  // Flyout: the open group's tools, beside the toolbar.
+  const flyout = el("div");
+  flyout.id = "flyout";
+  flyout.setAttribute("role", "region");
+  flyout.setAttribute("aria-label", "Tool palette");
+  app.appendChild(flyout);
+  const flyoutTitle = el("div", "flyout-title", "");
+  const flyoutBody = el("div", "flyout-body");
+  flyout.appendChild(flyoutTitle);
+  flyout.appendChild(flyoutBody);
+  let openGroupId = null;
+  function closeFlyout() {
+    flyout.classList.remove("open");
+    openGroupId = null;
+    Object.values(groupEls).forEach((g) => { g.header.classList.remove("open"); g.header.setAttribute("aria-expanded", "false"); });
+  }
 
   // Inspector panel (inside scroll)
   const inspPanel = el("div");
@@ -265,24 +326,21 @@ export function mountUI(actions) {
   const toolBtns = {}; // id -> button element
   const groupEls = {}; // groupId -> { header, body, el }
 
+  const groupIcons = { zone: "residential", transport: "road", power: "power", water: "water", civic: "police", sanitation: "landfill", landscape: "park", special: "school" };
   groups.forEach((g) => {
     const groupEl = el("div", "tool-group");
-    const header = el("div", "group-header");
-    header.setAttribute("role", "button");
+    const header = el("button", "group-header");
     header.setAttribute("aria-label", g.label);
-    header.tabIndex = 0;
-    header.addEventListener("keydown", event => {
-      if (event.key === "Enter" || event.key === " ") { event.preventDefault(); header.click(); }
-    });
     header.setAttribute("aria-expanded", "false");
-    const arrow = el("span", "group-arrow", "▶");
-    header.appendChild(arrow);
+    const icon = el("span", "group-icon");
+    icon.innerHTML = ICONS[groupIcons[g.id]] || iconFor(g.id, g.label);
+    header.appendChild(icon);
     header.appendChild(el("span", "group-label", g.label));
+    header.appendChild(el("span", "group-arrow", "▸"));
     groupEl.appendChild(header);
 
     const body = el("div", "group-body");
-    const cols = g.tools.length <= 2 ? 2 : g.tools.length === 4 ? 4 : 3;
-    const grid = el("div", `tool-grid${cols === 2 ? " tool-grid-2" : cols === 4 ? " tool-grid-4" : ""}`);
+    const grid = el("div", "tool-grid");
 
     g.tools.forEach((toolId) => {
       const t = toolMap[toolId];
@@ -296,7 +354,7 @@ export function mountUI(actions) {
       iconWrap.innerHTML = iconFor(toolId, t.label);
       b.appendChild(iconWrap);
       b.appendChild(el("span", "tool-label", t.label));
-      b.addEventListener("click", () => { actions.selectTool(toolId); expandGroup(g.id); });
+      b.addEventListener("click", () => { actions.selectTool(toolId); });
       grid.appendChild(b);
       toolBtns[toolId] = b;
     });
@@ -326,54 +384,60 @@ export function mountUI(actions) {
       body.appendChild(densityStrip);
     }
 
-    groupEl.appendChild(body);
     dockScroll.appendChild(groupEl);
 
     header.addEventListener("click", () => toggleGroup(g.id));
-    groupEls[g.id] = { el: groupEl, header, body };
+    groupEls[g.id] = { el: groupEl, header, body, label: g.label };
   });
 
   // Bulldoze standalone
-  const bulldozeGroup = el("div", "tool-group");
-  const bulldozeGrid = el("div", "tool-grid");
   if (toolMap["bulldoze"]) {
     const t = toolMap["bulldoze"];
-    const b = el("button", "tool-btn");
+    const b = el("button", "group-header bulldoze-btn");
     b.dataset.tool = "bulldoze";
     b.title = `Bulldoze\nDemolish tiles\nCost: ${fmtMoney(t.cost)}${t.shortcut ? ` [${t.shortcut.toUpperCase()}]` : ""}`;
     b.setAttribute("aria-label", "Bulldoze");
-    const iconWrap = el("span");
+    const iconWrap = el("span", "group-icon");
     iconWrap.innerHTML = ICONS["bulldoze"] || "";
     b.appendChild(iconWrap);
-    b.appendChild(el("span", "tool-label", "Bulldoze"));
-    b.addEventListener("click", () => actions.selectTool("bulldoze"));
-    bulldozeGrid.appendChild(b);
+    b.appendChild(el("span", "group-label", "Bulldoze"));
+    b.addEventListener("click", () => { closeFlyout(); actions.selectTool("bulldoze"); });
+    dockScroll.appendChild(b);
     toolBtns["bulldoze"] = b;
   }
-  bulldozeGroup.appendChild(bulldozeGrid);
-  dockScroll.appendChild(bulldozeGroup);
-
-  // Cost strip (shows during drag preview)
-  const costStrip = el("div");
-  costStrip.id = "cost-strip";
-  dockScroll.appendChild(costStrip);
 
   function toggleGroup(id) {
-    const g = groupEls[id];
-    if (!g) return;
-    const open = g.el.classList.toggle("open");
-    g.header.setAttribute("aria-expanded", String(open));
+    if (openGroupId === id) { closeFlyout(); return; }
+    expandGroup(id);
   }
 
+  // Open a group's flyout beside its button.
   function expandGroup(id) {
     const g = groupEls[id];
     if (!g) return;
-    g.el.classList.add("open");
+    closeFlyout();
+    openGroupId = id;
+    g.header.classList.add("open");
     g.header.setAttribute("aria-expanded", "true");
+    flyoutTitle.textContent = g.label;
+    flyoutBody.innerHTML = "";
+    flyoutBody.appendChild(g.body);
+    const rect = g.header.getBoundingClientRect();
+    const appRect = app.getBoundingClientRect();
+    flyout.style.top = `${Math.max(40, Math.min(rect.top - appRect.top, appRect.height - 260))}px`;
+    flyout.classList.add("open");
   }
 
-  // Open zone group by default
-  if (groupEls["zone"]) expandGroup("zone");
+  // Keep the group of the active tool marked even when the flyout is closed.
+  function markGroup(toolId) {
+    for (const [id, g] of Object.entries(groupEls)) {
+      const has = groups.find((x) => x.id === id)?.tools.includes(toolId);
+      g.header.classList.toggle("active", !!has);
+    }
+    toolBtns.bulldoze?.classList.toggle("active", toolId === "bulldoze");
+  }
+
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && openGroupId) closeFlyout(); });
 
   // Overlay section (pinned at bottom of dock)
   const overlaySection = el("div");
@@ -382,7 +446,7 @@ export function mountUI(actions) {
   overlaySection.appendChild(overlayLbl);
   const overlayGrid = el("div", "overlay-grid");
   overlaySection.appendChild(overlayGrid);
-  rightDock.appendChild(overlaySection);
+  toolbar.appendChild(overlaySection);
 
   [
     { id: "none",      label: "None" },
@@ -404,59 +468,11 @@ export function mountUI(actions) {
     overlayGrid.appendChild(b);
   });
 
-  // ── Bottom bar ─────────────────────────────────────────────────────────────
+  // ── Bottom bar: hint, news ticker, zoom ───────────────────────────────────
   const bottomBar = el("div");
   bottomBar.id = "bottom-bar";
   app.appendChild(bottomBar);
 
-  // Speed group
-  const speedGroup = el("div");
-  speedGroup.id = "speed-group";
-  const speedRow = el("div", "speed-label-row");
-  [
-    { n: 0, label: "⏸", title: "Pause [0]" },
-    { n: 1, label: "1×", title: "Normal [1]" },
-    { n: 2, label: "2×", title: "Fast [2]" },
-    { n: 3, label: "3×", title: "Very fast [3]" },
-  ].forEach(({ n, label, title }) => {
-    const b = el("button", n === 0 ? "speed-btn active" : "speed-btn", label);
-    b.dataset.speed = String(n);
-    b.title = title;
-    b.setAttribute("aria-pressed", n === 0 ? "true" : "false");
-    b.addEventListener("click", () => actions.setSpeed(n));
-    speedRow.appendChild(b);
-  });
-  speedGroup.appendChild(speedRow);
-  bottomBar.appendChild(speedGroup);
-
-  // RCI demand section
-  const rciSection = el("div");
-  rciSection.id = "rci-section";
-  const rciTitle = el("div", "rci-section-title", "Demand");
-  rciSection.appendChild(rciTitle);
-
-  function rciRow(cls, labelText) {
-    const row = el("div", "rci-row");
-    row.appendChild(el("span", `rci-lbl ${cls}`, labelText));
-    const track = el("div", "rci-track");
-    const center = el("div", "rci-center");
-    track.appendChild(center);
-    const fill = el("div", `rci-fill pos`);
-    fill.style.color = cls === "r" ? "var(--res)" : cls === "c" ? "var(--com)" : "var(--ind)";
-    track.appendChild(fill);
-    row.appendChild(track);
-    const val = el("span", "rci-val", "--");
-    row.appendChild(val);
-    rciSection.appendChild(row);
-    return { fill, val };
-  }
-
-  const rciR = rciRow("r", "R");
-  const rciC = rciRow("c", "C");
-  const rciI = rciRow("i", "I");
-  bottomBar.appendChild(rciSection);
-
-  // News + hint
   const newsWrap = el("div");
   newsWrap.id = "news-wrap";
 
@@ -476,19 +492,6 @@ export function mountUI(actions) {
   newsTickerWrap.appendChild(newsScroll);
   newsWrap.appendChild(newsTickerWrap);
   bottomBar.appendChild(newsWrap);
-
-  // Money + date
-  const moneyDate = el("div");
-  moneyDate.id = "money-date";
-  const moneyDisplay = el("div");
-  moneyDisplay.id = "money-display";
-  moneyDisplay.textContent = "--";
-  const dateDisplay = el("div");
-  dateDisplay.id = "date-display";
-  dateDisplay.textContent = "--";
-  moneyDate.appendChild(moneyDisplay);
-  moneyDate.appendChild(dateDisplay);
-  bottomBar.appendChild(moneyDate);
 
   // Zoom buttons (right of bottom bar)
   const zoomGroup = el("div", "nav-row");
@@ -1167,14 +1170,10 @@ export function mountUI(actions) {
       // Top metrics
       mPop.textContent    = fmtPop(stats.population);
       const funds = stats.money ?? city.money;
-      mMoney.textContent  = fmtMoney(funds);
-      mMoney.className    = "top-metric-val money" + (funds < 0 ? " neg" : "");
       mHappy.textContent  = stats.happiness != null ? fmtPct(stats.happiness) : "--";
-      mDate.textContent   = stats.date || "--";
 
-      // Money + date in bottom bar
       moneyDisplay.textContent = fmtMoney(funds);
-      moneyDisplay.className   = funds < 0 ? "neg" : "";
+      moneyDisplay.className   = "status-money" + (funds < 0 ? " neg" : "");
       dateDisplay.textContent  = stats.date || "--";
 
       // City name
@@ -1356,10 +1355,7 @@ export function mountUI(actions) {
         inspPanel.classList.remove("visible");
       }
 
-      // Auto-expand the group containing this tool
-      for (const g of groups) {
-        if (g.tools.includes(id)) { expandGroup(g.id); break; }
-      }
+      markGroup(id);
     },
 
     setSelection(info) {

@@ -273,7 +273,7 @@ html, body {
 }
 
 /* ── Right Dock (180px) ──────────────────────────────────────────── */
-#right-dock {
+#toolbar {
   position: absolute;
   top: 40px;
   right: 0;
@@ -289,7 +289,7 @@ html, body {
   z-index: 15;
 }
 
-#right-dock::before {
+#toolbar::before {
   content: "";
   position: absolute;
   top: 0;
@@ -1294,6 +1294,134 @@ input[type="range"].chrome-slider::-moz-range-thumb {
   color: var(--text-dim);
 }
 
+/* ── Classic layout: left toolbar with status panel and flyouts ───── */
+#top-bar { height: 32px; padding: 0 8px; }
+#top-menu-btns .btn { padding: 3px 8px; font-size: 0.58rem; }
+#toolbar {
+  left: 0;
+  right: auto;
+  top: 32px;
+  bottom: 30px;
+  width: 200px;
+  border-left: none;
+  border-right: 2px solid var(--chrome-sh);
+  box-shadow: 2px 0 10px rgba(0,0,0,0.35);
+}
+#toolbar::before { left: auto; right: 0; }
+
+#status-panel {
+  padding: 6px 7px 5px;
+  border-bottom: 2px solid var(--chrome-sh);
+  background: linear-gradient(180deg, #34465a 0%, #26333f 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.status-row { display: flex; align-items: center; gap: 6px; }
+#status-panel #city-name { flex: 1; min-width: 0; max-width: none; font-size: 0.72rem; padding: 2px 4px; }
+.status-date {
+  font-family: "Courier New", monospace;
+  font-size: 0.6rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.status-funds { justify-content: space-between; }
+.status-money {
+  font-family: "Courier New", monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #40e890;
+  white-space: nowrap;
+}
+.status-money.neg { color: var(--text-neg); }
+.status-small { display: flex; gap: 8px; }
+.status-stat { display: flex; flex-direction: column; align-items: flex-end; }
+.status-stat-label { font-size: 0.44rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); line-height: 1; }
+.status-stat-val { font-family: "Courier New", monospace; font-size: 0.66rem; font-weight: 700; color: var(--text-bright); line-height: 1.2; }
+.status-stat-val.happy { color: #f0d040; }
+#status-panel #rci-section { width: auto; padding: 4px 6px; gap: 2px; }
+#status-panel #speed-group { flex-direction: row; }
+#status-panel .speed-label-row { width: 100%; }
+#status-panel .speed-btn { flex: 1; padding: 3px 0; font-size: 0.55rem; letter-spacing: -0.05em; }
+
+/* Group buttons */
+.tool-group { border-bottom: none; }
+.group-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 8px;
+  cursor: pointer;
+  color: var(--text-dim);
+  background: linear-gradient(180deg, #33455a 0%, #283748 100%);
+  border: 1px solid;
+  border-color: #4d6482 #16222f #16222f #4d6482;
+  border-radius: 0;
+  font: inherit;
+  text-align: left;
+}
+.group-header:hover { color: var(--text); background: linear-gradient(180deg, #3e5268 0%, #2f4152 100%); }
+.group-header.open, .group-header.active {
+  background: linear-gradient(180deg, #156050 0%, #1e8070 100%);
+  border-color: #0a3530 #2ab890 #2ab890 #0a3530;
+  color: #c0f0e8;
+}
+.group-header.bulldoze-btn.active { background: linear-gradient(145deg, #5a1515 0%, #8a2020 100%); border-color: #2a0a0a #cc4040 #cc4040 #2a0a0a; color: #ffb0b0; }
+.group-icon { width: 18px; height: 18px; flex-shrink: 0; display: inline-flex; }
+.group-icon svg { width: 18px; height: 18px; }
+.group-label { flex: 1; font-size: 0.58rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: inherit; }
+.group-arrow { font-size: 0.6rem; color: inherit; opacity: 0.6; width: auto; transform: none !important; }
+.group-body { display: block; padding: 0; background: none; }
+
+#flyout {
+  position: absolute;
+  left: 202px;
+  width: 268px;
+  display: none;
+  z-index: 18;
+  pointer-events: auto;
+  background: linear-gradient(180deg, #2e3e50 0%, #243040 100%);
+  border: 2px solid;
+  border-color: var(--chrome-hi) var(--chrome-sh) var(--chrome-sh) var(--chrome-hi);
+  box-shadow: 4px 4px 14px rgba(0,0,0,0.45);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+#flyout.open { display: block; }
+.flyout-title {
+  padding: 5px 9px 4px;
+  font-size: 0.56rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--teal-br);
+  border-bottom: 1px solid var(--chrome-sh);
+  background: linear-gradient(180deg, #35465a 0%, #2a3a4a 100%);
+}
+.flyout-body { padding: 6px; }
+.flyout-body .tool-grid { grid-template-columns: repeat(4, 1fr); }
+.flyout-body .tool-btn { padding: 6px 2px 5px; }
+.flyout-body #density-strip { display: flex; align-items: center; gap: 10px; margin-top: 8px; padding: 4px 2px 0; border-top: 1px solid rgba(82,104,127,0.25); }
+.flyout-body .density-label { width: auto; margin: 0; }
+.flyout-body .density-btns { display: flex; gap: 4px; }
+.flyout-body .density-btn { padding: 4px 12px; font-size: 0.6rem; }
+
+#bottom-bar { height: 30px; padding: 0 6px; gap: 6px; }
+#news-wrap { flex-direction: row; align-items: center; gap: 8px; }
+#hint-line { width: 260px; flex-shrink: 0; }
+#news-ticker-wrap { flex: 1; height: 20px; }
+#navigator { right: 8px; bottom: 34px; }
+#build-preview { bottom: 36px; }
+#notif { bottom: 70px; }
+#overlay-section .overlay-grid { grid-template-columns: repeat(3, 1fr); }
+
+@media (max-width: 800px) {
+  #toolbar { top: 112px; width: 100%; height: auto; bottom: 30px; border-right: none; }
+  #flyout { left: 0; right: 0; width: auto; }
+  #hint-line { width: 120px; }
+}
+
 /* ── Report graphs and help text ──────────────────────────────────── */
 .graph-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 .graph-card { background: rgba(0,0,0,0.18); border: 1px solid rgba(82,104,127,0.25); border-radius: var(--radius-sm); padding: 4px 6px; }
@@ -1351,7 +1479,7 @@ input[type="range"].chrome-slider::-moz-range-thumb {
   #top-metrics {
     display: none;
   }
-  #right-dock {
+  #toolbar {
     display: none;
     top: 112px;
     width: 100%;
@@ -1360,7 +1488,7 @@ input[type="range"].chrome-slider::-moz-range-thumb {
     border-left: none;
     border-bottom: 2px solid var(--chrome-sh);
   }
-  #right-dock.mobile-open {
+  #toolbar.mobile-open {
     display: flex;
   }
   #navigator {
