@@ -18,9 +18,17 @@ const undo = createUndoManager(20);
 const audio = new CityAudio();
 const canvas = document.querySelector("#city-canvas");
 const renderer = new CityRenderer(canvas);
-renderer.size = city.size;
-renderer.home();
 let ui, input;
+
+// Start the camera on the built-up centre of the city (or the map centre).
+function lookAtCity() {
+  renderer.size = city.size;
+  let sx = 0, sy = 0, n = 0;
+  for (const t of city.tiles) if (t.type !== "empty") { sx += t.x; sy += t.y; n++; }
+  if (n) renderer.focusOn(sx / n, sy / n, 0.85);
+  else renderer.focusOn(city.size / 2, city.size / 2, 0.7);
+}
+lookAtCity();
 
 function refresh() {
   const stats = sim.getStats(city);
@@ -93,7 +101,7 @@ const actions = {
       city = sim.deserialize(raw);
       if (!city.scenario) startScenario(city, "sandbox");
       restore();
-      renderer.home();
+      lookAtCity();
       ui.notify("Saved city restored. Simulation paused.");
     } catch (err) { ui.notify(`That save could not be loaded: ${err.message}`); }
   },
@@ -102,12 +110,12 @@ const actions = {
     const seed = Number.isFinite(options?.seed) ? options.seed : Math.floor(Math.random() * 100000);
     city = startScenario(sim.createCity({ seed, starter: scenario === "recovery" || options?.starter === true, layout: options?.layout, size: options?.size, name: options?.name }), scenario);
     restore();
-    renderer.home();
+    lookAtCity();
     ui.notify(scenario === "recovery" ? "Riverton needs you. Fix the budget and win back the residents." : "New city. Lay roads and power, then zone near the roads.");
   },
   setOverlay: (id) => { renderer.overlay = id; renderer.dirty = true; ui?.setOverlay(id); },
   zoom: (d) => renderer.zoomAt(d * 0.18),
-  home: () => renderer.home(),
+  home: () => lookAtCity(),
   rotate: (d) => { input?.cancel(); renderer.rotate(d); },
   toggleDay: () => { renderer.night = !renderer.night; renderer.dirty = true; },
   toggleSound: async () => {

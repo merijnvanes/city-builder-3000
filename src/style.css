@@ -484,16 +484,16 @@ html, body {
 }
 
 .tool-label {
-  font-size: 0.48rem;
+  font-size: 0.46rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
   text-align: center;
-  line-height: 1.15;
+  line-height: 1.1;
   max-width: 100%;
+  max-height: 2.3em;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 /* ── Density selector ────────────────────────────────────────────── */

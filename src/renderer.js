@@ -248,15 +248,27 @@ export class CityRenderer {
     if (!any) this.flat(x + 0.4, y + 0.4, 0.2, 0.2, 0.9, t.watered ? "#66d0ed" : "#7598a9");
   }
 
+  // Data maps: dim the world and tint only the tiles that carry a value.
   heatColor(t) {
     const o = this.overlay;
-    if (o === "power") return t.terrain === "water" ? null : t.powered ? "#dbe64488" : (t.lot || t.type !== "empty") ? "#db5b4088" : "#33333322";
-    if (o === "water") return t.watered ? "#469bdbaa" : "#bd704588";
-    if (o === "landvalue") return "hsla(" + (t.landValue * 1.2) + ",65%,48%,.65)";
-    if (["police", "fire", "health", "education"].includes(o)) { const v = t.svc?.[o] || 0; return v ? "hsla(" + (60 + v * 0.6) + ",70%,50%," + (0.15 + v / 160) + ")" : "#2a2a2a55"; }
-    if (o === "garbage") return null;
+    if (t.terrain === "water") return null;
+    if (o === "power") return t.powered ? "#dbe64488" : (t.lot || t.type !== "empty") ? "#db5b40aa" : null;
+    if (o === "water") return t.watered ? "#469bdbaa" : (t.lot || t.type !== "empty") ? "#bd7045aa" : null;
+    if (o === "landvalue") return "hsla(" + (t.landValue * 1.2) + ",65%,48%,.6)";
+    if (["police", "fire", "health", "education"].includes(o)) { const v = t.svc?.[o] || 0; return v ? "hsla(" + (60 + v * 0.6) + ",70%,50%," + (0.15 + v / 160) + ")" : null; }
     const value = t[o] || 0;
-    return "hsla(" + (120 - value * 1.2) + ",65%,48%,.65)";
+    if (value <= 0) return null;
+    return "hsla(" + (60 - value * 0.6) + ",80%,50%," + (0.25 + value / 160) + ")";
+  }
+
+  // Centre the camera on a tile, optionally at a zoom level.
+  focusOn(x, y, zoom) {
+    if (zoom) this.zoom = clamp(zoom, this.minZoom, this.maxZoom);
+    this.panX = 0; this.panY = 0;
+    const p = this.project(x + 0.5, y + 0.5);
+    this.panX = this.w * 0.45 - p.x;
+    this.panY = this.h * 0.47 - p.y;
+    this.dirty = true;
   }
 
   // ── Static layer ──────────────────────────────────────────────
@@ -285,7 +297,11 @@ export class CityRenderer {
       this.poly([a, b, c, { x: c.x + dx, y: c.y + dy }, { x: e.x + dx, y: e.y + dy }, e], "#26352539");
     }
 
-    if (this.overlay !== "none") for (const t of this.sorted) { const c = this.heatColor(t); if (c) this.flat(t.x, t.y, 1, 1, 0.5, c); }
+    if (this.overlay !== "none") {
+      ctx.fillStyle = "#1a222a55";
+      ctx.fillRect(0, 0, this.w, this.h);
+      for (const t of this.sorted) { const c = this.heatColor(t); if (c) this.flat(t.x, t.y, 1, 1, 0.5, c); }
+    }
     const showPipes = this.overlay === "water" || this.tool === "pipe";
     if (showPipes) for (const t of this.sorted) if (t.pipe) this.pipe(t, city);
 
