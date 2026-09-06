@@ -17,7 +17,7 @@ export function computeMetrics(city) {
   let wPoll = 0, wCrime = 0, wEdu = 0, wHealth = 0, wPark = 0, wPolice = 0, wFire = 0, wLand = 0, wTraffic = 0;
   const counts = {};
   const zones = { residential: { tiles: 0, developed: 0, abandoned: 0 }, commercial: { tiles: 0, developed: 0, abandoned: 0 }, industrial: { tiles: 0, developed: 0, abandoned: 0 } };
-  let abandonedLots = 0, landValueSum = 0, landTiles = 0;
+  let abandonedLots = 0, landValueSum = 0, landTiles = 0, specialJobs = 0, specialHappiness = 0;
 
   for (const t of tiles) {
     if (t.terrain !== "water") { landValueSum += t.landValue; landTiles++; }
@@ -47,11 +47,13 @@ export function computeMetrics(city) {
       const b = BUILDINGS[t.type];
       if (b?.powerUse) { needPower++; if (t.powered) havePower++; }
       if (b?.waterUse) { needWater++; if (t.watered) haveWater++; }
+      if (b?.effects?.jobs) specialJobs += b.effects.jobs;
+      if (b?.effects?.happiness) specialHappiness += b.effects.happiness;
     }
   }
 
   const per = (v) => (population ? v / population : 0);
-  const jobs = jobsCommercial + jobsIndustrial;
+  const jobs = jobsCommercial + jobsIndustrial + specialJobs;
   const traffic = city._traffic || { unemployment: 0, traffic: 0, congestion: 0, workers: 0, employed: 0 };
   const svc = city._svc || { garbage: 0 };
   const pollution = Math.round(per(wPoll));
@@ -75,11 +77,12 @@ export function computeMetrics(city) {
   if (ord.youthCurfew) happiness -= 2;
   if (ord.parkingFines) happiness -= 2;
   if (ord.gambling) happiness -= 1;
+  happiness += specialHappiness;
   if (!population) happiness = 50;
   happiness = Math.round(clamp(happiness, 5, 100));
 
   return {
-    population, jobs, jobsCommercial, jobsIndustrial,
+    population, jobs, jobsCommercial, jobsIndustrial, specialJobs,
     workers: traffic.workers, employed: traffic.employed, unemployment: traffic.unemployment,
     traffic: traffic.traffic, congestion: traffic.congestion,
     pollution, crime, education, health, parks, police, fireCover,

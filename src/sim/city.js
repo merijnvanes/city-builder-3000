@@ -100,6 +100,9 @@ export function serialize(city) {
     scenario: city.scenario ?? null,
     prev: city._prev ?? null,
     disasters: city.disasters !== false,
+    unlocked: city.unlocked ?? {},
+    petitions: city.petitions ?? [],
+    settings: city.settings ?? { yearEndBudget: true },
   });
 }
 
@@ -184,6 +187,9 @@ export function deserialize(raw) {
     _rng: d._rng,
     _prev: d.prev && typeof d.prev === "object" && Object.values(d.prev).every(Number.isFinite) ? { ...d.prev } : null,
     disasters: d.disasters !== false,
+    unlocked: Object.fromEntries(Object.entries(d.unlocked || {}).filter(([k, v]) => BUILDINGS[k] && Number.isInteger(v))),
+    petitions: Array.isArray(d.petitions) ? d.petitions.filter((p) => p && typeof p.id === "string" && typeof p.status === "string" && Number.isInteger(p.since)).slice(0, 50).map((p) => ({ ...p })) : [],
+    settings: { yearEndBudget: d.settings?.yearEndBudget !== false },
   };
   if (d.scenario && typeof d.scenario === "object") city.scenario = d.scenario;
   // Every lot must be consistent: all its tiles reference the same anchor and share a type.

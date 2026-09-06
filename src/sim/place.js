@@ -5,6 +5,7 @@ import { BUILDINGS, ZONE_COST, ZONE_TYPES, OVERLAY_TOOLS, TOOL_MAP } from "./cat
 import { tileAt, inBounds, nextRandom } from "./grid.js";
 import { lotTiles, assignLot, clearLot, anchorOf } from "./lots.js";
 import { refreshCity } from "./refresh.js";
+import { specialAvailable } from "./events.js";
 
 export const DEMOLISH_FEE = 5;
 export const BRIDGE_MULTIPLIER = 5;
@@ -76,6 +77,9 @@ export function evaluate(city, x, y, tool, options = {}) {
   // Catalog buildings with a footprint.
   const b = BUILDINGS[tool];
   if (!b) return fail("Unknown building.");
+  if ((b.reward || b.offer) && !specialAvailable(city, tool)) {
+    return fail(b.reward ? `${b.label} unlocks at ${b.reward.population.toLocaleString()} residents and can be built once.` : `${b.label} needs an accepted deal and can be built once.`);
+  }
   const tiles = [];
   for (let yy = y; yy < y + b.h; yy++) {
     for (let xx = x; xx < x + b.w; xx++) {

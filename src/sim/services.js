@@ -67,6 +67,21 @@ export function updateServices(city) {
     if (t.type !== "road" || !t.traffic) continue;
     addSource(t.x, t.y, t.traffic * 0.12, 2);
   }
+  // Special buildings with area effects (prisons, dumps, city hall...).
+  const crimeBump = new Float32Array(tiles.length);
+  const valueBump = new Float32Array(tiles.length);
+  for (const t of tiles) {
+    if (!isAnchor(t)) continue;
+    const e = BUILDINGS[t.type]?.effects;
+    if (!e || !e.radius) continue;
+    const cx = t.x + (t.lot.w >> 1), cy = t.y + (t.lot.h >> 1);
+    if (e.pollution) addSource(cx, cy, e.pollution, e.radius);
+    forRadius(city, cx, cy, e.radius, (n, d) => {
+      const f = 1 - d / (e.radius + 1);
+      if (e.crime) crimeBump[n.y * size + n.x] += e.crime * f;
+      if (e.landValue) valueBump[n.y * size + n.x] += e.landValue * f;
+    });
+  }
   const airScale = ord.cleanAir ? 0.7 : 1;
   for (const t of tiles) {
     let v = poll[t.y * size + t.x] * airScale;
@@ -102,7 +117,7 @@ export function updateServices(city) {
     const i = t.y * size + t.x;
     let v = 34 + waterNear[i] - industryNear[i];
     v += t.svc.park * 0.28 + t.svc.culture * 0.2 + t.svc.education * 0.08 + t.svc.health * 0.06;
-    v += t.trees * 2.5;
+    v += t.trees * 2.5 + valueBump[i];
     v -= t.pollution * 0.38 + (t.traffic || 0) * 0.08;
     if (t.powered) v += 5;
     if (t.watered) v += 5;
@@ -115,7 +130,7 @@ export function updateServices(city) {
   const watch = ord.neighborhoodWatch ? 0.85 : 1;
   for (const t of tiles) {
     if (!ZONE_TYPES.has(t.type) || !t.lot) { t.crime = 0; continue; }
-    let c = 4 + t.density * 5 + (100 - baseValue[t.y * size + t.x]) * 0.18 + unemployment * 0.35;
+    let c = 4 + t.density * 5 + (100 - baseValue[t.y * size + t.x]) * 0.18 + unemployment * 0.35 + crimeBump[t.y * size + t.x];
     if (t.abandoned) c += 20;
     c -= t.svc.police * 0.55;
     c *= watch;

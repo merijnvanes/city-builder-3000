@@ -16,7 +16,7 @@ const wealth = (t) => 0.7 + ((t.landValue ?? 40) / 100) * 0.6;
 
 export function computeBudget(city) {
   const { tiles, taxes, funding = {}, ordinances = {} } = city;
-  const income = { residential: 0, commercial: 0, industrial: 0, ordinances: 0, total: 0 };
+  const income = { residential: 0, commercial: 0, industrial: 0, ordinances: 0, deals: 0, total: 0 };
   const expenses = Object.fromEntries(DEPARTMENTS.map((d) => [d, 0]));
   expenses.ordinances = 0; expenses.loans = 0;
   let population = 0;
@@ -35,6 +35,7 @@ export function computeBudget(city) {
     }
     const b = BUILDINGS[t.type];
     if (b) expenses[b.dept] += b.upkeep;
+    if (b?.offer) income.deals += b.offer.income;
   }
   for (const d of FUNDED_DEPARTMENTS) expenses[d] = Math.round(expenses[d] * pct(d));
   for (const d of DEPARTMENTS) expenses[d] = Math.round(expenses[d]);
@@ -50,7 +51,7 @@ export function computeBudget(city) {
   expenses.loans = Math.round(expenses.loans);
 
   for (const k of ["residential", "commercial", "industrial"]) income[k] = Math.round(income[k]);
-  income.total = income.residential + income.commercial + income.industrial + income.ordinances;
+  income.total = income.residential + income.commercial + income.industrial + income.ordinances + income.deals;
   expenses.total = Object.entries(expenses).filter(([k]) => k !== "total").reduce((s, [, v]) => s + v, 0);
   return { income, expenses, balance: income.total - expenses.total };
 }

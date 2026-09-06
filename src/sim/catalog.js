@@ -60,7 +60,22 @@ export const BUILDINGS = {
   largepark:   { label: "Large Park",      group: "landscape", cost: 200,  w: 3, h: 3, upkeep: 10,  dept: "parks", service: { kind: "park", radius: 7, strength: 60 } },
   zoo:         { label: "Zoo",             group: "landscape", cost: 3000, w: 4, h: 4, upkeep: 100, dept: "parks", service: { kind: "park", radius: 10, strength: 90 }, powerUse: 3, waterUse: 3 },
   tree:        { label: "Plant Trees",     group: "landscape", cost: 3,    w: 1, h: 1, upkeep: 0,   dept: "parks", rect: true, overlay: true },
+
+  // Rewards: unlocked once the city reaches a population milestone. One each.
+  mayorhouse:  { label: "Mayor's House",   group: "special", cost: 0,    w: 2, h: 2, upkeep: 20,  dept: "parks", unique: true, reward: { population: 2000 },  service: { kind: "culture", radius: 6, strength: 40 }, effects: { landValue: 8, radius: 6 } },
+  cityhall:    { label: "City Hall",       group: "special", cost: 0,    w: 3, h: 3, upkeep: 80,  dept: "parks", unique: true, reward: { population: 10000 }, service: { kind: "culture", radius: 10, strength: 60 }, effects: { landValue: 10, radius: 8, happiness: 3 } },
+  courthouse:  { label: "Courthouse",      group: "special", cost: 0,    w: 3, h: 3, upkeep: 100, dept: "police", unique: true, reward: { population: 25000 }, service: { kind: "police", radius: 16, strength: 60 }, effects: { happiness: 2 } },
+  stadium:     { label: "Stadium",         group: "special", cost: 0,    w: 5, h: 5, upkeep: 200, dept: "parks", unique: true, reward: { population: 40000 }, service: { kind: "park", radius: 14, strength: 80 }, effects: { happiness: 5, jobs: 300, traffic: 30 }, powerUse: 10, waterUse: 6 },
+  statue:      { label: "Mayor's Statue",  group: "special", cost: 0,    w: 1, h: 1, upkeep: 5,   dept: "parks", unique: true, reward: { population: 60000 }, service: { kind: "park", radius: 5, strength: 50 }, effects: { happiness: 2 } },
+
+  // Business deals: offered by petitioners; pay monthly but cost the city otherwise.
+  prison:      { label: "Maximum Security Prison", group: "special", cost: 0, w: 4, h: 4, upkeep: 0, dept: "police", unique: true, offer: { income: 600 }, effects: { crime: 18, radius: 10, landValue: -12, jobs: 120 }, powerUse: 6, waterUse: 4 },
+  casino:      { label: "Casino",          group: "special", cost: 0,    w: 3, h: 3, upkeep: 0,   dept: "parks", unique: true, offer: { income: 450 }, effects: { crime: 10, radius: 8, jobs: 200, traffic: 20, happiness: -1 }, powerUse: 6, waterUse: 3 },
+  toxicdump:   { label: "Toxic Waste Dump", group: "special", cost: 0,   w: 3, h: 3, upkeep: 0,   dept: "sanitation", unique: true, offer: { income: 550 }, effects: { pollution: 55, radius: 9, landValue: -15, jobs: 30 }, garbage: 200 },
+  armybase:    { label: "Army Base",       group: "special", cost: 0,    w: 5, h: 5, upkeep: 0,   dept: "police", unique: true, offer: { income: 350 }, effects: { crime: 6, radius: 8, pollution: 12, jobs: 400, landValue: -5 }, powerUse: 8, waterUse: 6 },
 };
+
+export const SPECIAL_TYPES = Object.entries(BUILDINGS).filter(([, b]) => b.reward || b.offer).map(([id]) => id);
 
 export const DEPARTMENTS = ["police", "fire", "health", "education", "transport", "utilities", "sanitation", "parks"];
 export const FUNDED_DEPARTMENTS = ["police", "fire", "health", "education", "transport", "sanitation"];

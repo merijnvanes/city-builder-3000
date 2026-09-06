@@ -14,8 +14,10 @@ import { lcg } from "./terrain.js";
 import { nextRandom, tileAt, inBounds } from "./grid.js";
 import { anchorOf, capacityOf, drawOf } from "./lots.js";
 import { WATER_RADIUS } from "./utilities.js";
+import { updateEvents, respondPetition, openPetition, specialAvailable, ensureEvents, PETITIONS } from "./events.js";
+import { SPECIAL_TYPES } from "./catalog.js";
 
-export { TOOLS, TOOL_MAP, BUILDINGS, ZONE_TYPES, ORDINANCES, ADVISORS, DISASTERS, START_YEAR, DEFAULT_SIZE, FUNDED_DEPARTMENTS, serialize, place, evaluate, isZone };
+export { TOOLS, TOOL_MAP, BUILDINGS, ZONE_TYPES, ORDINANCES, ADVISORS, DISASTERS, START_YEAR, DEFAULT_SIZE, FUNDED_DEPARTMENTS, SPECIAL_TYPES, PETITIONS, serialize, place, evaluate, isZone };
 
 export function createCity(seed = 42, starter = true, options = {}) {
   if (seed && typeof seed === "object") { options = seed; seed = options.seed ?? 42; starter = options.starter ?? true; }
@@ -26,6 +28,7 @@ export function createCity(seed = 42, starter = true, options = {}) {
 
 // Recompute everything derived and cache stats on the city.
 function settle(city) {
+  ensureEvents(city);
   refreshCity(city);
   city._traffic = updateTraffic(city);
   refreshCity(city);
@@ -73,6 +76,7 @@ export function tick(city) {
   city._budget = budget;
 
   const news = generateNews(city, statsForNews, city._prev);
+  news.push(...updateEvents(city, statsForNews, rng));
   const disaster = randomDisaster(city, m, rng);
   if (disaster) news.push(disaster);
   if (fireMessage) news.push(fireMessage);
@@ -110,6 +114,11 @@ export function getStats(city) {
     ordinances: { ...city.ordinances },
     news: city.news.slice(),
     name: city.name,
+    history: city.history,
+    settings: { ...(city.settings || { yearEndBudget: true }) },
+    unlocked: { ...(city.unlocked || {}) },
+    available: Object.fromEntries(SPECIAL_TYPES.map((type) => [type, specialAvailable(city, type)])),
+    petition: (() => { const p = openPetition(city); return p ? { ...p, ...PETITIONS[p.id] } : null; })(),
     advice: "",
   };
   stats.advisors = generateAdvisors(city, stats);
@@ -144,6 +153,13 @@ export function setPolicy(city, key, value) {
     } else if (key === "disasters") {
       city.disasters = Boolean(value);
       result = { ok: true, message: `Random disasters ${city.disasters ? "enabled" : "disabled"}.` };
+    } else if (category === "setting") {
+      ensureEvents(city);
+      if (!["yearEndBudget"].includes(field)) return { ok: false, message: `Unknown setting: ${field}.` };
+      city.settings[field] = Boolean(value);
+      result = { ok: true, message: "" };
+    } else if (key === "petition") {
+      result = respondPetition(city, value?.id, !!value?.accept);
     } else if (key === "name") {
       const text = String(value ?? "").trim().slice(0, 40);
       if (!text) return { ok: false, message: "Name cannot be empty." };

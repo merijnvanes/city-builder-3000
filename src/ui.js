@@ -1,4 +1,4 @@
-import { TOOLS, BUILDINGS, ORDINANCES, DISASTERS, FUNDED_DEPARTMENTS } from "./sim.js";
+import { TOOLS, BUILDINGS, ORDINANCES, DISASTERS, FUNDED_DEPARTMENTS, SPECIAL_TYPES } from "./sim.js";
 
 // ── SVG Icons ─────────────────────────────────────────────────────────────────
 const ICONS = {
@@ -32,6 +32,7 @@ const GROUP_DEFS = [
   { id: "civic",     label: "Civic",     tools: ["police", "fire", "hospital", "school", "college", "library", "museum"] },
   { id: "sanitation", label: "Sanitation", tools: ["landfill", "incinerator", "recycling"] },
   { id: "landscape", label: "Parks",     tools: ["park", "largepark", "zoo", "tree"] },
+  { id: "special",   label: "Rewards & Deals", tools: SPECIAL_TYPES },
 ];
 
 // Icons fall back to a lettered badge so every catalog entry gets a button.
@@ -515,6 +516,12 @@ export function mountUI(actions) {
   notif.setAttribute("role", "status");
   app.appendChild(notif);
   let notifTimer = null;
+  function showNotice(message) {
+    notif.textContent = message;
+    notif.classList.add("show");
+    if (notifTimer) clearTimeout(notifTimer);
+    notifTimer = setTimeout(() => notif.classList.remove("show"), 3600);
+  }
 
   // ── Budget dialog ──────────────────────────────────────────────────────────
   const budgetDialog = document.createElement("dialog");
@@ -603,7 +610,7 @@ export function mountUI(actions) {
   const deptGrid = el("div", "stat-grid");
   const deptItems = {};
   [
-    ["income.residential", "Residential tax"], ["income.commercial", "Commercial tax"], ["income.industrial", "Industrial tax"], ["income.ordinances", "Ordinance income"],
+    ["income.residential", "Residential tax"], ["income.commercial", "Commercial tax"], ["income.industrial", "Industrial tax"], ["income.ordinances", "Ordinance income"], ["income.deals", "Business deals"],
     ["expenses.police", "Police"], ["expenses.fire", "Fire"], ["expenses.health", "Health"], ["expenses.education", "Education"],
     ["expenses.transport", "Transportation"], ["expenses.utilities", "Utilities"], ["expenses.sanitation", "Sanitation"], ["expenses.parks", "Parks"],
     ["expenses.ordinances", "Ordinance costs"], ["expenses.loans", "Loan payments"],
@@ -617,6 +624,33 @@ export function mountUI(actions) {
   });
   deptSection.appendChild(deptGrid);
   budBody.appendChild(deptSection);
+
+  // Annual review (shown every January unless switched off)
+  const yearSection = el("div", "modal-section");
+  const yearTitle = el("div", "modal-section-title", "Last Year");
+  yearSection.appendChild(yearTitle);
+  const yearGrid = el("div", "stat-grid");
+  const yearItems = {};
+  [["income", "Income"], ["expenses", "Expenses"], ["net", "Net"], ["growth", "Population change"]].forEach(([k, label]) => {
+    const item = el("div", "stat-item");
+    item.appendChild(el("span", "stat-item-label", label));
+    const v = el("span", "stat-item-val", "--");
+    item.appendChild(v);
+    yearGrid.appendChild(item);
+    yearItems[k] = v;
+  });
+  yearSection.appendChild(yearGrid);
+  const yearToggleRow = el("div", "ordinance-row");
+  yearToggleRow.appendChild(el("span", "ordinance-label", "Review the budget every January"));
+  const yearToggle = btn("toggle-btn on", "ON", "Toggle January budget review", () => {
+    const on = yearToggle.classList.toggle("on");
+    yearToggle.textContent = on ? "ON" : "OFF";
+    actions.setPolicy?.("setting.yearEndBudget", on);
+  });
+  yearToggleRow.appendChild(yearToggle);
+  yearSection.appendChild(yearToggleRow);
+  budBody.appendChild(yearSection);
+  let lastReviewYear = -1;
 
   // Budget summary
   const budSummary = el("div", "modal-section");
@@ -845,6 +879,33 @@ export function mountUI(actions) {
     if (e.target === disasterDialog) disasterDialog.close();
   });
 
+  // ── Petition dialog ────────────────────────────────────────────────────────
+  const petitionDialog = document.createElement("dialog");
+  petitionDialog.setAttribute("aria-label", "Petition");
+  app.appendChild(petitionDialog);
+  const petHdr = el("div", "modal-header");
+  const petTitle = el("span", "modal-title", "Petition");
+  petHdr.appendChild(petTitle);
+  petitionDialog.appendChild(petHdr);
+  const petBody = el("div", "modal-body");
+  const petText = el("p");
+  petText.style.cssText = "font-size:.66rem;color:var(--text);line-height:1.6";
+  petBody.appendChild(petText);
+  petitionDialog.appendChild(petBody);
+  const petFooter = el("div", "modal-footer");
+  const petDecline = btn("btn", "Decline", "Decline petition", () => { petitionDialog.close(); actions.setPolicy?.("petition", { id: petitionDialog.dataset.id, accept: false }); });
+  const petAccept = btn("btn btn-teal", "Accept", "Accept petition", () => { petitionDialog.close(); actions.setPolicy?.("petition", { id: petitionDialog.dataset.id, accept: true }); });
+  const petLater = btn("btn", "Decide later", "Decide later", () => petitionDialog.close());
+  petFooter.appendChild(petLater);
+  petFooter.appendChild(petDecline);
+  petFooter.appendChild(petAccept);
+  petitionDialog.appendChild(petFooter);
+  let shownPetition = "";
+  const petitionBtn = btn("btn", "Petition", "Open petition", () => { if (petitionDialog.dataset.id) petitionDialog.showModal(); });
+  petitionBtn.style.display = "none";
+  petitionBtn.classList.add("btn-danger");
+  topMenuBtns.insertBefore(petitionBtn, topMenuBtns.children[4]);
+
   // ── Help dialog ────────────────────────────────────────────────────────────
   const helpDialog = document.createElement("dialog");
   helpDialog.setAttribute("aria-label", "Help");
@@ -1064,6 +1125,65 @@ export function mountUI(actions) {
       updateRci(rciC, d?.commercial);
       updateRci(rciI, d?.industrial);
 
+      // Rewards and deals: only unlocked, unbuilt specials show in the dock.
+      if (stats.available) {
+        let any = false;
+        for (const type of SPECIAL_TYPES) {
+          const b = toolBtns[type];
+          if (!b) continue;
+          const show = !!stats.available[type];
+          b.style.display = show ? "" : "none";
+          any = any || show;
+        }
+        const g = groupEls.special;
+        if (g) g.el.style.display = any ? "" : "none";
+      }
+
+      // Petitions: announce once, pause, and keep a button while open.
+      const p = stats.petition;
+      if (p) {
+        petitionBtn.style.display = "";
+        petitionDialog.dataset.id = p.id;
+        petTitle.textContent = p.title;
+        petText.textContent = p.body;
+        petAccept.textContent = p.accept;
+        petDecline.textContent = p.decline;
+        const key = `${p.id}:${p.since}`;
+        if (shownPetition !== key && !document.querySelector("dialog[open]")) {
+          shownPetition = key;
+          actions.setSpeed?.(0);
+          petitionDialog.showModal();
+        }
+      } else {
+        petitionBtn.style.display = "none";
+        delete petitionDialog.dataset.id;
+      }
+
+      // January budget review.
+      const hist = stats.history || [];
+      if (hist.length >= 12) {
+        const year = hist.slice(-12);
+        const inc = year.reduce((s, h) => s + (h.income || 0), 0), exp = year.reduce((s, h) => s + (h.expenses || 0), 0);
+        yearItems.income.textContent = fmtMoney(inc);
+        yearItems.expenses.textContent = fmtMoney(exp);
+        yearItems.net.textContent = fmtMoney(inc - exp);
+        yearItems.net.className = "stat-item-val" + (inc - exp >= 0 ? " pos" : " neg");
+        const growth = year[year.length - 1].population - year[0].population;
+        yearItems.growth.textContent = (growth >= 0 ? "+" : "") + fmtPop(growth);
+      }
+      if (stats.settings) {
+        const on = stats.settings.yearEndBudget !== false;
+        yearToggle.classList.toggle("on", on);
+        yearToggle.textContent = on ? "ON" : "OFF";
+        const yearNow = Math.floor((stats.month || 0) / 12);
+        if (on && stats.month > 0 && stats.month % 12 === 0 && yearNow !== lastReviewYear && !document.querySelector("dialog[open]")) {
+          lastReviewYear = yearNow;
+          actions.setSpeed?.(0);
+          budgetDialog.showModal();
+          showNotice(`${stats.year}: annual budget review. Adjust taxes and funding, then continue.`);
+        }
+      }
+
       // News ticker
       if (Array.isArray(stats.news) && stats.news.length) {
         const text = stats.news.join("   ·   ");
@@ -1073,10 +1193,7 @@ export function mountUI(actions) {
     },
 
     notify(message) {
-      notif.textContent = message;
-      notif.classList.add("show");
-      if (notifTimer) clearTimeout(notifTimer);
-      notifTimer = setTimeout(() => notif.classList.remove("show"), 3600);
+      showNotice(message);
     },
 
     setTool(id) {
