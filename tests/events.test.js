@@ -31,6 +31,21 @@ describe("rewards", () => {
   });
 });
 
+describe("landmarks", () => {
+  test("landmarks are unique, cost money and lift nearby land value", () => {
+    const c = createCity({ seed: 7, layout: "plains", starter: false, hills: 0 });
+    const s = site(c, 3, 3);
+    const before = c.tiles[(s.y + 4) * c.size + s.x].landValue;
+    const money = c.money;
+    assert.equal(place(c, s.x, s.y, "operahouse").ok, true);
+    assert.equal(money - c.money, BUILDINGS.operahouse.cost);
+    assert.ok(c.tiles[(s.y + 4) * c.size + s.x].landValue > before);
+    const s2 = site(c, 3, 3);
+    assert.equal(place(c, s2.x, s2.y, "operahouse").ok, false, "only one opera house");
+    assert.equal(place(c, s2.x, s2.y, "aquarium").ok, false, "aquarium needs water");
+  });
+});
+
 describe("petitions", () => {
   test("accepting a deal unlocks the building and pays monthly", () => {
     const c = createCity({ seed: 7, layout: "plains", starter: false, hills: 0 });

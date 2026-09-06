@@ -19,7 +19,8 @@ export function heightOf(t) {
   return { coal: 46, oil: 34, gas: 30, nuclear: 60, wind: 42, solar: 6, waterpump: 10, watertower: 47, treatment: 14,
     police: 24, fire: 21, hospital: 40, school: 22, college: 30, library: 18, museum: 26, landfill: 6, incinerator: 40, recycling: 16,
     park: 14, largepark: 16, zoo: 14, bus: 9, railstation: 16, airport: 18, seaport: 16, substation: 8,
-    mayorhouse: 24, cityhall: 46, courthouse: 27, stadium: 30, statue: 25, prison: 20, casino: 36, toxicdump: 10, armybase: 14 }[t.type] || 12;
+    mayorhouse: 24, cityhall: 46, courthouse: 27, stadium: 30, statue: 25, prison: 20, casino: 36, toxicdump: 10, armybase: 14,
+    clocktower: 61, operahouse: 38, observatory: 34, cathedral: 60, aquarium: 22 }[t.type] || 12;
 }
 
 // Scaled drawing helpers for one lot.
@@ -355,6 +356,42 @@ const RECIPES = {
     d.box(0.56, 0.54, 0.38, 0.1, 8, "#c9b58c"); d.roof(0.54, 0.52, 0.42, 0.14, 8, 4, "#6c7666");
     d.tree(0.2, 0.2, 1); d.tree(0.7, 0.24, 2); d.tree(0.24, 0.7, 0); d.tree(0.9, 0.9, 1);
     for (const [a, b] of [[0.18, 0.3], [0.62, 0.3], [0.3, 0.62]]) d.box(a, b, 0.05, 0.04, 3, "#7a6a52");
+  },
+  clocktower(d, t, n) {
+    d.flat(0.04, 0.04, 0.92, 0.92, 0.2, "#b5b3a0");
+    d.box(0.3, 0.3, 0.4, 0.4, 44, "#c9bfa4"); d.windows(0.3, 0.3, 0.4, 0.4, 44, t.x + t.y);
+    d.box(0.26, 0.26, 0.48, 0.48, 5, "#ded6c1", 44); d.flat(0.36, 0.36, 0.28, 0.28, 49.1, "#f2efe0"); d.flat(0.44, 0.44, 0.12, 0.02, 49.3, "#333"); d.flat(0.49, 0.42, 0.02, 0.1, 49.3, "#333");
+    d.roof(0.24, 0.24, 0.52, 0.52, 49, 12, "#4f6a63");
+    for (const [a, b] of [[0.1, 0.1], [0.85, 0.1], [0.1, 0.85], [0.85, 0.85]]) d.tree(a, b, 1);
+  },
+  operahouse(d, t, n) {
+    d.flat(0.02, 0.02, 0.96, 0.96, 0.2, "#b8b6a6");
+    d.box(0.08, 0.14, 0.84, 0.6, 16, "#e2d9c4"); d.windows(0.08, 0.14, 0.84, 0.6, 16, t.x + t.y, true);
+    for (let a = 0.12; a < 0.9; a += 0.11) d.box(a, 0.76, 0.04, 0.04, 16, "#f0ead9");
+    d.flat(0.06, 0.12, 0.88, 0.66, 16.1, "#8a8f82");
+    d.cyl(0.5, 0.42, 0.24, 8, "#cdbfa0", 16); d.cyl(0.5, 0.42, 0.2, 8, "#7fa39a", 24); d.cyl(0.5, 0.42, 0.04, 6, "#e8d27a", 32);
+    d.flat(0.1, 0.82, 0.8, 0.12, 0.3, "#c9c4ad"); d.line(0.2, 0.9, 0, 0.2, 0.9, 10, "#c9c9c9", 1); d.line(0.8, 0.9, 0, 0.8, 0.9, 10, "#c9c9c9", 1);
+  },
+  observatory(d, t, n) {
+    d.flat(0.05, 0.05, 0.9, 0.9, 0.2, "#9aa38a");
+    d.box(0.2, 0.3, 0.6, 0.5, 12, "#d8d3c0"); d.windows(0.2, 0.3, 0.6, 0.5, 12, t.x + t.y);
+    d.cyl(0.5, 0.5, 0.2, 10, "#cfcbb8", 12); d.cyl(0.5, 0.5, 0.18, 6, "#a9b3b8", 22); d.cyl(0.5, 0.5, 0.05, 8, "#6f7a80", 26);
+    d.tree(0.12, 0.85, 2); d.tree(0.88, 0.15, 1);
+  },
+  cathedral(d, t, n) {
+    d.flat(0.03, 0.03, 0.94, 0.94, 0.2, "#b3b1a0");
+    d.box(0.2, 0.1, 0.6, 0.7, 26, "#d5cbb3"); d.windows(0.2, 0.1, 0.6, 0.7, 26, t.x + t.y, true); d.roof(0.18, 0.08, 0.64, 0.74, 26, 14, "#5a6270");
+    d.box(0.12, 0.72, 0.18, 0.18, 46, "#cdc3a9"); d.roof(0.1, 0.7, 0.22, 0.22, 46, 14, "#4f5866");
+    d.box(0.7, 0.72, 0.18, 0.18, 46, "#cdc3a9"); d.roof(0.68, 0.7, 0.22, 0.22, 46, 14, "#4f5866");
+    d.line(0.5, 0.45, 40, 0.5, 0.45, 52, "#e8d27a", 1.2);
+    d.flat(0.3, 0.9, 0.4, 0.06, 0.3, "#c9c4ad");
+  },
+  aquarium(d, t, n) {
+    d.flat(0.02, 0.02, 0.96, 0.96, 0.2, "#9aaaa6");
+    d.box(0.1, 0.1, 0.8, 0.5, 14, "#7fa3b8"); d.windows(0.1, 0.1, 0.8, 0.5, 14, t.x + t.y, true);
+    d.roof(0.08, 0.08, 0.84, 0.54, 14, 8, "#3f6f88");
+    d.flat(0.14, 0.66, 0.72, 0.26, 0.4, "#5fa0b5"); d.cyl(0.3, 0.79, 0.06, 4, "#9fc5cf"); d.cyl(0.7, 0.79, 0.06, 4, "#9fc5cf");
+    d.tree(0.9, 0.9, 1);
   },
   substation(d, t, n) {
     d.flat(0.06, 0.06, 0.88, 0.88, 0.2, "#a8a99a");

@@ -1422,6 +1422,29 @@ input[type="range"].chrome-slider::-moz-range-thumb {
   #hint-line { width: 120px; }
 }
 
+/* ── Tip box ─────────────────────────────────────────────────────── */
+#tip-box {
+  position: absolute;
+  left: 50%;
+  top: 44px;
+  transform: translateX(calc(-50% + 100px));
+  max-width: 520px;
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: rgba(20, 32, 44, 0.94);
+  border: 1px solid;
+  border-color: var(--teal-br) var(--chrome-sh) var(--chrome-sh) var(--teal-br);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.45);
+  pointer-events: auto;
+  z-index: 21;
+}
+#tip-box.show { display: flex; }
+.tip-text { font-size: 0.66rem; line-height: 1.5; color: var(--text-bright); }
+@media (max-width: 800px) { #tip-box { top: 120px; transform: translateX(-50%); max-width: 90vw; } }
+
 /* ── Report graphs and help text ──────────────────────────────────── */
 .graph-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 .graph-card { background: rgba(0,0,0,0.18); border: 1px solid rgba(82,104,127,0.25); border-radius: var(--radius-sm); padding: 4px 6px; }

@@ -86,6 +86,23 @@ function policy(key, value) {
   return result;
 }
 
+// First-city tips: each fires once, when the previous step is done.
+const TIPS = [
+  { when: (c) => true, text: "Welcome, Mayor. Start with a road: open Transport, pick Road and drag a line across the land." },
+  { when: (c) => c.tiles.some((t) => t.type === "road"), text: "Zone next to the road: open Zones, pick Residential and drag a rectangle. Lots need a road within three tiles." },
+  { when: (c) => c.tiles.some((t) => t.type === "residential"), text: "Power it: build a plant (Power group) and drag a power line to your zone. Power hops across a single street on its own." },
+  { when: (c) => c.tiles.some((t) => sim.BUILDINGS[t.type]?.powerOut), text: "Add industry and commerce for jobs, then press 1 to run time. Watch the R C I bars: green means people want in." },
+  { when: (c) => c.tiles.some((t) => t.type === "industrial") && c.tiles.some((t) => t.type === "commercial"), text: "Water lets medium and high density grow: a pump beside water, pipes under the streets (each pipe serves six tiles around it)." },
+  { when: (c) => c.tiles.some((t) => sim.BUILDINGS[t.type]?.waterOut) && c.tiles.some((t) => t.pipe), text: "You are on your way. Check the Budget every January, keep an eye on the advisors, and connect a road to the map edge for trade." },
+];
+let tipIndex = -1;
+function advanceTips() {
+  if (tipIndex >= TIPS.length) return;
+  while (tipIndex + 1 < TIPS.length && TIPS[tipIndex + 1].when(city)) tipIndex++;
+  if (tipIndex >= 0) ui.tip(TIPS[tipIndex].text);
+  if (tipIndex === TIPS.length - 1) tipIndex = TIPS.length;
+}
+
 function loadFrom(raw, message) {
   try {
     city = sim.deserialize(raw);
@@ -142,6 +159,9 @@ const actions = {
     restore();
     lookAtCity();
     ui.notify(scenario === "recovery" ? "Riverton needs you. Fix the budget and win back the residents." : "New city. Lay roads and power, then zone near the roads.");
+    tipIndex = city.population > 0 ? TIPS.length : -1;
+    ui.tip(null);
+    advanceTips();
   },
   setOverlay: (id) => { renderer.overlay = id; renderer.dirty = true; ui?.setOverlay(id); },
   zoom: (d) => renderer.zoomAt(d * 0.18),
@@ -175,6 +195,7 @@ input = attachInput(canvas, renderer, {
       undo.record(before);
       renderer.dirty = true;
       refresh();
+      advanceTips();
       audio.effect("build");
       ui.notify(`${result.changed} tile${result.changed === 1 ? "" : "s"} · $${Math.round(result.cost).toLocaleString()}`);
     } else {
@@ -185,6 +206,7 @@ input = attachInput(canvas, renderer, {
 }, planConstruction);
 const minimap = createMinimap(renderer);
 refresh(); choose("inspect"); setDensity(1); setSpeed(0);
+tipIndex = TIPS.length; // the starter town needs no walkthrough
 document.addEventListener("visibilitychange", () => { lastTick = performance.now(); previousTime = lastTick; });
 
 function frame(now) {

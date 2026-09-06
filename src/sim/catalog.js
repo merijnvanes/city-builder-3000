@@ -90,6 +90,13 @@ export const BUILDINGS = {
   stadium:     { label: "Stadium",         group: "special", cost: 0,    w: 5, h: 5, upkeep: 200, dept: "parks", unique: true, reward: { population: 40000 }, service: { kind: "park", radius: 14, strength: 80 }, effects: { happiness: 5, jobs: 300, traffic: 30 }, powerUse: 10, waterUse: 6 },
   statue:      { label: "Mayor's Statue",  group: "special", cost: 0,    w: 1, h: 1, upkeep: 5,   dept: "parks", unique: true, reward: { population: 60000 }, service: { kind: "park", radius: 5, strength: 50 }, effects: { happiness: 2 } },
 
+  // Landmarks: pricey showpieces that lift land value, culture and tourism.
+  clocktower:  { label: "Clock Tower",     group: "landmark", cost: 8000,  w: 2, h: 2, upkeep: 40,  dept: "parks", unique: true, service: { kind: "culture", radius: 8, strength: 70 }, effects: { landValue: 10, radius: 7, demand: { commercial: 3 } }, powerUse: 2 },
+  operahouse:  { label: "Opera House",     group: "landmark", cost: 12000, w: 3, h: 3, upkeep: 90,  dept: "parks", unique: true, service: { kind: "culture", radius: 12, strength: 100 }, effects: { landValue: 14, radius: 9, demand: { commercial: 6 }, jobs: 120, traffic: 15 }, powerUse: 6, waterUse: 3 },
+  observatory: { label: "Observatory",     group: "landmark", cost: 6000,  w: 2, h: 2, upkeep: 40,  dept: "education", unique: true, service: { kind: "education", radius: 12, strength: 60 }, effects: { landValue: 8, radius: 6 }, powerUse: 3 },
+  cathedral:   { label: "Cathedral",       group: "landmark", cost: 10000, w: 3, h: 3, upkeep: 50,  dept: "parks", unique: true, service: { kind: "culture", radius: 12, strength: 90 }, effects: { landValue: 12, radius: 9, happiness: 2, demand: { commercial: 3 } }, powerUse: 2 },
+  aquarium:    { label: "Aquarium",        group: "landmark", cost: 9000,  w: 3, h: 3, upkeep: 80,  dept: "parks", unique: true, requiresWater: true, service: { kind: "park", radius: 10, strength: 80 }, effects: { landValue: 10, radius: 8, demand: { commercial: 5 }, jobs: 80 }, powerUse: 5, waterUse: 6 },
+
   // Business deals: offered by petitioners; pay monthly but cost the city otherwise.
   prison:      { label: "Maximum Security Prison", group: "special", cost: 0, w: 4, h: 4, upkeep: 0, dept: "police", unique: true, offer: { income: 600 }, effects: { crime: 18, radius: 10, landValue: -12, jobs: 120 }, powerUse: 6, waterUse: 4 },
   casino:      { label: "Casino",          group: "special", cost: 0,    w: 3, h: 3, upkeep: 0,   dept: "parks", unique: true, offer: { income: 450 }, effects: { crime: 10, radius: 8, jobs: 200, traffic: 20, happiness: -1 }, powerUse: 6, waterUse: 3 },

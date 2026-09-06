@@ -32,6 +32,7 @@ const GROUP_DEFS = [
   { id: "civic",     label: "Civic",     tools: ["police", "fire", "hospital", "school", "college", "library", "museum"] },
   { id: "sanitation", label: "Sanitation", tools: ["landfill", "incinerator", "recycling"] },
   { id: "landscape", label: "Parks & Land", tools: ["park", "largepark", "zoo", "tree", "makewater", "makeland", "raise", "lower", "level"] },
+  { id: "landmark",  label: "Landmarks", tools: ["clocktower", "operahouse", "observatory", "cathedral", "aquarium"] },
   { id: "special",   label: "Rewards & Deals", tools: SPECIAL_TYPES },
   { id: "emergency", label: "Emergency", tools: ["dispatch"] },
 ];
@@ -327,7 +328,7 @@ export function mountUI(actions) {
   const toolBtns = {}; // id -> button element
   const groupEls = {}; // groupId -> { header, body, el }
 
-  const groupIcons = { zone: "residential", transport: "road", power: "power", water: "water", civic: "police", sanitation: "landfill", landscape: "park", special: "school", emergency: "fire" };
+  const groupIcons = { zone: "residential", transport: "road", power: "power", water: "water", civic: "police", sanitation: "landfill", landscape: "park", landmark: "commercial", special: "school", emergency: "fire" };
   groups.forEach((g) => {
     const groupEl = el("div", "tool-group");
     const header = el("button", "group-header");
@@ -528,6 +529,16 @@ export function mountUI(actions) {
   bpInner.appendChild(bpCost);
   bpInner.appendChild(bpMsg);
   buildPreview.appendChild(bpInner);
+
+  // ── Tip box: a persistent hint with a dismiss button ──────────────────────
+  const tipBox = el("div");
+  tipBox.id = "tip-box";
+  tipBox.setAttribute("role", "note");
+  const tipText = el("span", "tip-text", "");
+  tipBox.appendChild(tipText);
+  const tipClose = btn("btn btn-sm", "Got it", "Dismiss tip", () => tipBox.classList.remove("show"));
+  tipBox.appendChild(tipClose);
+  app.appendChild(tipBox);
 
   // ── Notification ──────────────────────────────────────────────────────────
   const notif = el("div");
@@ -1330,6 +1341,12 @@ export function mountUI(actions) {
 
     notify(message) {
       showNotice(message);
+    },
+
+    tip(message) {
+      if (!message) { tipBox.classList.remove("show"); return; }
+      tipText.textContent = message;
+      tipBox.classList.add("show");
     },
 
     setTool(id) {
