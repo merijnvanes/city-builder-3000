@@ -537,7 +537,7 @@ describe('applyConstruction hardening', () => {
     assert.equal(plan.valid, true);
     const result = applyConstruction(city, plan);
     assert.equal(result.ok, true);
-    assert.equal(tileAt(city, 4, 4).powerline, undefined);
+    assert.equal(tileAt(city, 4, 4).powerline, false);
   });
 });
 
@@ -675,5 +675,29 @@ describe('plan → apply → undo integration', () => {
       for (let x = 0; x <= 9; x++)
         if (tileAt(city, x, y).terrain !== 'water')
           assert.equal(tileAt(city, x, y).type, 'empty');
+  });
+
+  test('applyConstruction charges exactly the plan cost for dense zoning', () => {
+    const city = blankCity();
+    const before = city.money;
+    const plan = planConstruction(city, { x: 1, y: 1 }, { x: 3, y: 5 }, 'residential', { density: 3 });
+    assert.equal(plan.cost, 15 * 300);
+    const result = applyConstruction(city, plan);
+    assert.equal(result.ok, true);
+    assert.equal(result.cost, plan.cost);
+    assert.equal(before - city.money, plan.cost);
+    for (const t of plan.tiles) assert.equal(tileAt(city, t.x, t.y).density, 3);
+  });
+
+  test('rezone via applyConstruction charges plan cost and keeps level within the new cap', () => {
+    const city = blankCity();
+    applyConstruction(city, planConstruction(city, { x: 2, y: 2 }, { x: 2, y: 2 }, 'commercial', { density: 3 }));
+    tileAt(city, 2, 2).level = 4;
+    const before = city.money;
+    const plan = planConstruction(city, { x: 2, y: 2 }, { x: 2, y: 2 }, 'commercial', { density: 2 });
+    assert.equal(applyConstruction(city, plan).ok, true);
+    assert.equal(before - city.money, plan.cost);
+    assert.equal(tileAt(city, 2, 2).density, 2);
+    assert.equal(tileAt(city, 2, 2).level, 2);
   });
 });

@@ -168,6 +168,7 @@ export function mountUI(actions) {
   topMenuBtns.appendChild(reportDlgBtn);
   const advisorBtn = btn("btn", "Advisors", "Advisors", () => { buildAdvisors(); advisorDialog.showModal(); });
   topMenuBtns.appendChild(advisorBtn);
+  topMenuBtns.appendChild(btn("btn", "Disasters", "Disasters", () => disasterDialog.showModal()));
 
   topMenuBtns.appendChild(el("div", "top-sep"));
 
@@ -770,6 +771,45 @@ export function mountUI(actions) {
     card.appendChild(info);
     parent.appendChild(card);
   }
+
+  // ── Disasters dialog ───────────────────────────────────────────────────────
+  const disasterDialog = document.createElement("dialog");
+  disasterDialog.setAttribute("aria-label", "Disasters");
+  app.appendChild(disasterDialog);
+
+  const disHdr = el("div", "modal-header");
+  disHdr.appendChild(el("span", "modal-title", "Disasters"));
+  disHdr.appendChild(btn("btn btn-icon", "✕", "Close", () => disasterDialog.close()));
+  disasterDialog.appendChild(disHdr);
+
+  const disBody = el("div", "modal-body");
+  const disMsg = el("p");
+  disMsg.style.cssText = "font-size:.62rem;color:var(--text-dim);line-height:1.55";
+  disMsg.textContent = "Trigger a disaster on your city. Funded fire stations contain fires; damaged roads cut off neighborhoods.";
+  disBody.appendChild(disMsg);
+  const disRow = el("div", "slider-row");
+  disRow.style.marginTop = "10px";
+  [
+    { id: "fire", label: "Fire" },
+    { id: "earthquake", label: "Earthquake" },
+  ].forEach(({ id, label }) => {
+    const b = btn("btn btn-sm btn-danger", label, `Start ${label.toLowerCase()}`, () => {
+      disasterDialog.close();
+      actions.setDisaster?.(id);
+    });
+    b.dataset.disaster = id;
+    disRow.appendChild(b);
+  });
+  disBody.appendChild(disRow);
+  disasterDialog.appendChild(disBody);
+
+  const disFooter = el("div", "modal-footer");
+  disFooter.appendChild(btn("btn", "Cancel", null, () => disasterDialog.close()));
+  disasterDialog.appendChild(disFooter);
+
+  disasterDialog.addEventListener("click", (e) => {
+    if (e.target === disasterDialog) disasterDialog.close();
+  });
 
   // ── Help dialog ────────────────────────────────────────────────────────────
   const helpDialog = document.createElement("dialog");

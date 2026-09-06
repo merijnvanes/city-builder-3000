@@ -8,23 +8,8 @@ const PATH_TOOLS = new Set(['road', 'rail', 'powerline', 'pipe']);
 const OVERLAY_TOOLS = new Set(['powerline', 'pipe']);
 const MAX_TILES = 1600;
 
-// Fallback costs for tools sim.js worker adds concurrently.
-const FALLBACK_TOOLS = {
-  powerline: { id: 'powerline', label: 'Powerline', cost: 25, description: 'Build powerline ($25)' },
-  pipe:      { id: 'pipe',      label: 'Pipe',      cost: 25, description: 'Build pipe ($25)' },
-  rail:      { id: 'rail',      label: 'Rail',      cost: 150, description: 'Build rail ($150)' },
-  landfill:  { id: 'landfill',  label: 'Landfill',  cost: 300, description: 'Build landfill ($300)' },
-  school:    { id: 'school',    label: 'School',    cost: 5000, description: 'Build school ($5,000)' },
-  hospital:  { id: 'hospital',  label: 'Hospital',  cost: 8000, description: 'Build hospital ($8,000)' },
-  bus:       { id: 'bus',       label: 'Bus Stop',  cost: 500, description: 'Build bus stop ($500)' },
-};
-
 function getToolMap() {
-  const map = Object.fromEntries(TOOLS.map(t => [t.id, t]));
-  for (const [id, def] of Object.entries(FALLBACK_TOOLS)) {
-    if (!map[id]) map[id] = def;
-  }
-  return map;
+  return Object.fromEntries(TOOLS.map(t => [t.id, t]));
 }
 
 function inBounds(size, x, y) {
@@ -224,48 +209,6 @@ export function planConstruction(city, start, end, tool, options = {}) {
   return { tiles, cost, count, valid, affordable, message, tool, density };
 }
 
-// Local mutation for cases place() does not support: overlays, rezones, overlay demolition.
-function commitTileLocal(city, info, tool, density, toolMap) {
-  const t = tileAt(city, info.x, info.y);
-  const toolDef = toolMap[tool];
-
-  if (tool === 'bulldoze') {
-    if (t.type === 'empty') {
-      // Clear overlay flags only
-      delete t.powerline;
-      delete t.pipe;
-      city.money -= toolDef.cost;
-      return;
-    }
-    const refund = Math.floor((toolMap[t.type]?.cost ?? 0) * 0.25);
-    city.money += refund - toolDef.cost;
-    t.type = 'empty';
-    t.level = 0;
-    delete t.density;
-    return;
-  }
-
-  if (OVERLAY_TOOLS.has(tool)) {
-    const flag = tool === 'powerline' ? 'powerline' : 'pipe';
-    t[flag] = true;
-    city.money -= info.cost;
-    return;
-  }
-
-  if (ZONE_TYPES.has(tool) && t.type === tool) {
-    // Rezone: same type, different density. Cap level on downgrade.
-    city.money -= info.cost;
-    t.density = density;
-    t.level = Math.min(t.level ?? 0, density);
-    return;
-  }
-
-  // Fallback for any unsupported path
-  city.money -= info.cost;
-  t.type = tool;
-  t.level = 0;
-}
-
 export function applyConstruction(city, plan) {
   if (!city || !plan || typeof plan !== 'object') {
     return { ok: false, message: 'Invalid arguments', changed: 0, cost: 0 };
@@ -325,29 +268,11 @@ export function applyConstruction(city, plan) {
   const snapshot = structuredClone(city);
 
   try {
+    // place() owns every mutation and charge (overlays, rezones, bulldoze
+    // included) so the plan cost from evalTile matches what the player pays.
     for (const tile of actionable) {
-      const t = tileAt(city, tile.x, tile.y);
-      const isOverlay = OVERLAY_TOOLS.has(plan.tool);
-      const isRezone = ZONE_TYPES.has(plan.tool) && t.type === plan.tool;
-      const isOverlayBulldoze = plan.tool === 'bulldoze' && t.type === 'empty';
-
-      if (isOverlay || isRezone || isOverlayBulldoze) {
-        // place() does not support overlays, rezones, or overlay-only bulldoze
-        commitTileLocal(city, tile, plan.tool, plan.density, toolMap);
-      } else {
-        // Use public place() with options for future deferRefresh support
-        const result = place(city, tile.x, tile.y, plan.tool, { density: plan.density, deferRefresh: true });
-        if (!result.ok) throw new Error(result.message);
-
-        // place() charges base cost; deduct density premium separately
-        if (ZONE_TYPES.has(plan.tool) && plan.density > 1) {
-          const freshTile = tileAt(city, tile.x, tile.y);
-          freshTile.density = plan.density;
-          const extra = toolDef.cost * (plan.density - 1);
-          if (city.money < extra) throw new Error('Insufficient funds for density upgrade');
-          city.money -= extra;
-        }
-      }
+      const result = place(city, tile.x, tile.y, plan.tool, { density: plan.density, deferRefresh: true });
+      if (!result.ok) throw new Error(result.message);
     }
 
     // Single infrastructure pass after all mutations (deferRefresh intent)
