@@ -1,611 +1,395 @@
-// Civic 3000 – simulation unit tests. Missing/broken imports must fail CI.
-import { test } from "node:test";
+// Simulation tests: terrain, lots, placement, utilities, growth, economy, saves.
+import { test, describe } from "node:test";
 import assert from "node:assert/strict";
-import * as sim from "../src/sim.js";
+import { createCity, tick, getStats, place, evaluate, serialize, deserialize, setPolicy, disaster, refresh, inspectTile, TOOLS, BUILDINGS } from "../src/sim/index.js";
+import { generateTerrain } from "../src/sim/terrain.js";
+import { findLot, assignLot, capacityOf, isAnchor, anchorOf } from "../src/sim/lots.js";
+import { computeDemand } from "../src/sim/growth.js";
+import { computeMetrics } from "../src/sim/metrics.js";
+import { sourceEfficiency } from "../src/sim/utilities.js";
 
-// ── TOOLS array ──────────────────────────────────────────────────────────────
+const at = (c, x, y) => c.tiles[y * c.size + x];
+const blank = (seed = 7) => createCity(seed, false);
+const put = (c, x, y, tool, options) => place(c, x, y, tool, { ...options, deferRefresh: true });
 
-test("TOOLS has all required ids", (t) => {
-  const REQUIRED = [
-    "inspect",
-    "road",
-    "residential",
-    "commercial",
-    "industrial",
-    "park",
-    "power",
-    "water",
-    "police",
-    "fire",
-    "bulldoze",
-  ];
-  assert.ok(Array.isArray(sim.TOOLS), "TOOLS is not an array");
-  for (const id of REQUIRED) {
-    assert.ok(
-      sim.TOOLS.some((tool) => tool.id === id),
-      `TOOLS missing id: "${id}"`,
-    );
-  }
+// Lay a simple powered, watered district and return the city.
+function district(seed = 7, density = 1) {
+  const c = blank(seed);
+  for (let x = 10; x <= 30; x++) { put(c, x, 20, "road"); put(c, x, 26, "road"); }
+  for (let y = 14; y <= 32; y++) { put(c, 16, y, "road"); put(c, 24, y, "road"); }
+  put(c, 4, 14, "coal");
+  for (let x = 8; x <= 15; x++) put(c, x, 15, "powerline");
+  for (let y = 16; y <= 21; y++) put(c, 15, y, "powerline");
+  for (let y = 21; y <= 25; y++) for (let x = 17; x <= 23; x++) put(c, x, y, "residential", { density });
+  for (let y = 21; y <= 25; y++) for (let x = 25; x <= 29; x++) put(c, x, y, "commercial", { density });
+  for (let y = 27; y <= 31; y++) for (let x = 17; x <= 23; x++) put(c, x, y, "industrial", { density });
+  put(c, 12, 21, "watertower"); put(c, 13, 21, "watertower");
+  for (let x = 12; x <= 29; x++) put(c, x, 22, "pipe");
+  for (let x = 12; x <= 15; x++) put(c, x, 21, "powerline");
+  refresh(c);
+  return c;
+}
+
+describe("terrain", () => {
+  test("is deterministic and has land, water and forests", () => {
+    const a = generateTerrain(64, 5), b = generateTerrain(64, 5);
+    assert.deepEqual(a.terrain, b.terrain);
+    assert.ok(a.terrain.filter((t) => t === "water").length > 100);
+    assert.ok(a.terrain.filter((t) => t === "grass").length > 2000);
+    assert.ok(a.trees.some((t) => t === 3));
+  });
+  test("every layout generates", () => {
+    for (const layout of ["river", "coast", "lakes", "delta", "plains"]) {
+      const g = generateTerrain(64, 3, layout);
+      assert.equal(g.layout, layout);
+      assert.equal(g.terrain.length, 4096);
+    }
+  });
 });
 
-test("each TOOL entry has label, cost, description", (t) => {
-  for (const tool of sim.TOOLS) {
-    assert.equal(typeof tool.label, "string", `${tool.id}: label not string`);
-    assert.equal(typeof tool.cost, "number", `${tool.id}: cost not number`);
-    assert.equal(
-      typeof tool.description,
-      "string",
-      `${tool.id}: description not string`,
-    );
-  }
+describe("city creation", () => {
+  test("blank city has the requested size and starting money", () => {
+    const c = blank();
+    assert.equal(c.size, 64);
+    assert.equal(c.tiles.length, 4096);
+    assert.equal(c.money, 50000);
+    assert.equal(getStats(c).population, 0);
+  });
+  test("starter town is powered, watered, populated and solvent", () => {
+    for (const seed of [42, 43, 44, 45]) {
+      const c = createCity(seed, true);
+      const s = getStats(c);
+      assert.ok(s.population > 8000, `seed ${seed} population ${s.population}`);
+      assert.ok(s.power >= 95, `seed ${seed} power ${s.power}`);
+      assert.ok(s.water >= 95, `seed ${seed} water ${s.water}`);
+      assert.ok(s.balance > 0, `seed ${seed} balance ${s.balance}`);
+      assert.equal(c.money, 50000);
+    }
+  });
+  test("starter town survives twenty years untouched", () => {
+    const c = createCity(44, true);
+    for (let i = 0; i < 240; i++) tick(c);
+    const s = getStats(c);
+    assert.ok(s.population > 10000, `population ${s.population}`);
+    assert.ok(c.money > 50000, `money ${c.money}`);
+    assert.equal(c.history.length, 240);
+  });
+  test("custom size and layout", () => {
+    const c = createCity({ seed: 9, size: 32, layout: "coast", starter: false });
+    assert.equal(c.size, 32);
+    assert.equal(c.layout, "coast");
+  });
 });
 
-// ── createCity structure ──────────────────────────────────────────────────────
-
-test("createCity returns required city structure", (t) => {
-  const city = sim.createCity(42, false);
-  assert.equal(city.size, 40, "size !== 40");
-  assert.equal(city.tiles.length, 40 * 40, "tiles length wrong");
-  assert.equal(city.money, 50000, "starting money wrong");
-  assert.equal(city.month, 0, "month not 0");
-  assert.equal(city.tax, 9, "tax not 9");
-  assert.equal(city.revision, 0, "revision not 0");
-  assert.ok(Array.isArray(city.history), "history not array");
-  assert.deepEqual(Object.keys(city.demand).sort(), [
-    "commercial",
-    "industrial",
-    "residential",
-  ]);
+describe("lots", () => {
+  test("high density zone forms 3x3 lots, low density 1x1", () => {
+    const c = blank();
+    for (let y = 5; y < 8; y++) for (let x = 5; x < 8; x++) put(c, x, y, "residential", { density: 3 });
+    const lot = findLot(c, at(c, 6, 6));
+    assert.deepEqual(lot, { x: 5, y: 5, w: 3, h: 3 });
+    put(c, 10, 10, "residential", { density: 1 });
+    assert.deepEqual(findLot(c, at(c, 10, 10)), { x: 10, y: 10, w: 1, h: 1 });
+  });
+  test("lots never cross zone types, densities or water", () => {
+    const c = blank();
+    for (let y = 5; y < 8; y++) for (let x = 5; x < 8; x++) put(c, x, y, "residential", { density: 3 });
+    put(c, 7, 7, "commercial", { density: 3 });
+    const lot = findLot(c, at(c, 5, 5));
+    assert.ok(lot.w < 3 || lot.h < 3);
+  });
+  test("capacity scales with tiles, density and level", () => {
+    const c = blank();
+    for (let y = 5; y < 8; y++) for (let x = 5; x < 8; x++) put(c, x, y, "residential", { density: 3 });
+    const a = assignLot(c, findLot(c, at(c, 5, 5)), 4, 0.5);
+    assert.equal(capacityOf(a), 320 * 9);
+    a.level = 2;
+    assert.equal(capacityOf(a), 320 * 9 / 2);
+    a.abandoned = true;
+    assert.equal(capacityOf(a), 0);
+  });
 });
 
-test("each tile has required fields with correct types", (t) => {
-  const city = sim.createCity(42, false);
-  for (let i = 0; i < city.tiles.length; i += 100) {
-    // spot-check every 100th
-    const tile = city.tiles[i];
-    const y = Math.floor(i / 40),
-      x = i % 40;
-    assert.equal(tile.x, x, `tile[${i}].x mismatch`);
-    assert.equal(tile.y, y, `tile[${i}].y mismatch`);
-    assert.ok(
-      ["grass", "water", "sand"].includes(tile.terrain),
-      `bad terrain: ${tile.terrain}`,
-    );
-    assert.equal(typeof tile.type, "string", `tile.type not string`);
-    assert.equal(typeof tile.level, "number", `tile.level not number`);
-    assert.ok(
-      tile.level >= 0 && tile.level <= 4,
-      `level out of range: ${tile.level}`,
-    );
-    assert.equal(typeof tile.variant, "number", `tile.variant not number`);
-    assert.ok(
-      tile.variant >= 0 && tile.variant <= 1,
-      `variant out of 0-1: ${tile.variant}`,
-    );
-    assert.equal(typeof tile.powered, "boolean", `tile.powered not boolean`);
-    assert.equal(typeof tile.watered, "boolean", `tile.watered not boolean`);
-    assert.equal(
-      typeof tile.roadAccess,
-      "boolean",
-      `tile.roadAccess not boolean`,
-    );
-  }
+describe("placement", () => {
+  test("rejects unknown tools, prototype names and out-of-bounds", () => {
+    const c = blank();
+    for (const tool of ["laser", "constructor", "__proto__", "toString"]) assert.equal(place(c, 1, 1, tool).ok, false);
+    assert.equal(place(c, -1, 0, "road").ok, false);
+    assert.equal(place(c, 64, 0, "road").ok, false);
+  });
+  test("zones cost by density and rezoning undeveloped land is allowed", () => {
+    const c = blank();
+    const money = c.money;
+    assert.equal(place(c, 5, 5, "residential", { density: 3 }).ok, true);
+    assert.equal(money - c.money, 50);
+    assert.equal(at(c, 5, 5).density, 3);
+    assert.equal(place(c, 5, 5, "commercial", { density: 1 }).ok, true);
+    assert.equal(at(c, 5, 5).type, "commercial");
+    assert.equal(place(c, 5, 5, "commercial", { density: 1 }).noop, true);
+  });
+  test("multi-tile buildings occupy their footprint and refuse blocked sites", () => {
+    const c = blank();
+    const land = c.tiles.find((t) => t.terrain === "grass" && t.x > 5 && t.y > 5 && [0, 1, 2].every((dx) => [0, 1, 2].every((dy) => at(c, t.x + dx, t.y + dy).terrain !== "water")));
+    const r = place(c, land.x, land.y, "police");
+    assert.equal(r.ok, true);
+    assert.equal(r.cost, BUILDINGS.police.cost);
+    for (let dy = 0; dy < 3; dy++) for (let dx = 0; dx < 3; dx++) {
+      const t = at(c, land.x + dx, land.y + dy);
+      assert.equal(t.type, "police");
+      assert.deepEqual(t.lot, { x: land.x, y: land.y, w: 3, h: 3 });
+    }
+    assert.ok(isAnchor(at(c, land.x, land.y)));
+    assert.equal(place(c, land.x + 1, land.y + 1, "fire").ok, false);
+    assert.equal(place(c, land.x + 2, land.y + 2, "road").ok, false);
+  });
+  test("bulldozing a building clears the whole footprint and keeps zoning", () => {
+    const c = blank();
+    for (let y = 5; y < 8; y++) for (let x = 5; x < 8; x++) put(c, x, y, "residential", { density: 3 });
+    assignLot(c, findLot(c, at(c, 5, 5)), 2, 0.5);
+    const ev = evaluate(c, 6, 6, "bulldoze");
+    assert.equal(ev.tiles.length, 9);
+    assert.equal(place(c, 6, 6, "bulldoze").ok, true);
+    for (let y = 5; y < 8; y++) for (let x = 5; x < 8; x++) {
+      assert.equal(at(c, x, y).lot, null);
+      assert.equal(at(c, x, y).type, "residential");
+    }
+    assert.equal(place(c, 6, 6, "bulldoze").ok, true);
+    assert.equal(at(c, 6, 6).type, "empty");
+    assert.equal(place(c, 6, 6, "bulldoze").ok, false);
+  });
+  test("roads bridge water at a premium, rail and pipes do not", () => {
+    const c = blank();
+    const w = c.tiles.find((t) => t.terrain === "water");
+    assert.equal(evaluate(c, w.x, w.y, "road").cost, BUILDINGS.road.cost * 5);
+    assert.equal(evaluate(c, w.x, w.y, "rail").ok, false);
+    assert.equal(evaluate(c, w.x, w.y, "pipe").ok, false);
+    assert.equal(place(c, w.x, w.y, "road").ok, true);
+    assert.equal(evaluate(c, w.x, w.y, "powerline").ok, true);
+  });
+  test("insufficient funds leaves the city untouched", () => {
+    const c = blank();
+    c.money = 10;
+    const before = serialize(c);
+    assert.equal(place(c, 5, 5, "coal").ok, false);
+    assert.equal(serialize(c), before);
+  });
+  test("trees clear when built over and can be planted", () => {
+    const c = blank();
+    const t = c.tiles.find((t) => t.trees > 0 && t.terrain === "grass");
+    assert.equal(place(c, t.x, t.y, "road").ok, true);
+    assert.equal(t.trees, 0);
+    const g = c.tiles.find((t) => t.trees === 0 && t.terrain === "grass" && t.type === "empty");
+    assert.equal(place(c, g.x, g.y, "tree").ok, true);
+    assert.equal(g.trees, 1);
+  });
 });
 
-// ── createCity determinism ────────────────────────────────────────────────────
-
-test("same seed produces identical terrain layout", (t) => {
-  const a = sim.createCity(42, false);
-  const b = sim.createCity(42, false);
-  const terrainA = a.tiles.map((tile) => tile.terrain).join(",");
-  const terrainB = b.tiles.map((tile) => tile.terrain).join(",");
-  assert.equal(terrainA, terrainB, "terrain differs between identical seeds");
-  assert.equal(a.seed, b.seed, "seed not stored on city");
+describe("utilities", () => {
+  test("power jumps a single road but not open land; lines bridge gaps", () => {
+    const c = createCity({ seed: 7, layout: "plains", starter: false });
+    put(c, 4, 4, "coal");
+    for (let x = 8; x <= 9; x++) put(c, x, 5, "powerline");
+    put(c, 10, 5, "residential", { density: 1 });
+    put(c, 11, 5, "road");
+    put(c, 12, 5, "residential", { density: 1 });
+    put(c, 14, 5, "residential", { density: 1 });
+    refresh(c);
+    assert.equal(at(c, 10, 5).powered, true);
+    assert.equal(at(c, 12, 5).powered, true, "across a road");
+    assert.equal(at(c, 14, 5).powered, false, "across open land");
+    assert.equal(at(c, 9, 5).powered, true);
+    place(c, 13, 5, "powerline");
+    assert.equal(at(c, 14, 5).powered, true);
+  });
+  test("plant capacity limits how many lots are powered", () => {
+    const c = district(7, 3);
+    for (const t of c.tiles) if (t.type === "residential" && !t.lot) { const lot = findLot(c, t); if (lot) assignLot(c, lot, 4, 0.5); }
+    refresh(c);
+    const s = getStats(c);
+    assert.ok(s.utilities.power.demand > 0);
+    put(c, 4, 14, "bulldoze");
+    put(c, 4, 14, "wind");
+    refresh(c);
+    const weak = getStats(c);
+    assert.ok(weak.power < s.power, `${weak.power} < ${s.power}`);
+    assert.ok(weak.utilities.power.supply < weak.utilities.power.demand);
+  });
+  test("water reaches tiles near powered pipes only", () => {
+    const c = district();
+    assert.equal(at(c, 20, 23).watered, true);
+    assert.equal(at(c, 20, 31).watered, false, "nine tiles from the pipe");
+    for (const t of c.tiles) if (t.type === "watertower") { put(c, t.x, t.y, "bulldoze"); }
+    refresh(c);
+    assert.equal(at(c, 20, 23).watered, false);
+  });
+  test("pumps near water outperform inland pumps", () => {
+    const c = blank();
+    const shore = c.tiles.find((t) => t.terrain !== "water" && t.type === "empty" && t.x > 2 && t.y > 2 && [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => at(c, t.x + dx, t.y + dy)?.terrain === "water"));
+    put(c, shore.x, shore.y, "waterpump");
+    assert.equal(sourceEfficiency(c, at(c, shore.x, shore.y)), 1);
+    const inland = c.tiles.find((t) => t.terrain === "grass" && t.type === "empty" && t.x > 20 && ![[1, 0], [-1, 0], [0, 1], [0, -1], [2, 0], [-2, 0], [0, 2], [0, -2], [1, 1], [-1, -1], [1, -1], [-1, 1]].some(([dx, dy]) => at(c, t.x + dx, t.y + dy)?.terrain === "water"));
+    put(c, inland.x, inland.y, "waterpump");
+    assert.equal(sourceEfficiency(c, at(c, inland.x, inland.y)), 0.3);
+  });
 });
 
-test("same seed, starter vs blank, share identical terrain", (t) => {
-  // terrain should be independent of starter flag
-  const blank = sim.createCity(42, false);
-  const starter = sim.createCity(42, true);
-  const terrainBlank = blank.tiles.map((tile) => tile.terrain).join(",");
-  const terrainStarter = starter.tiles.map((tile) => tile.terrain).join(",");
-  assert.equal(
-    terrainBlank,
-    terrainStarter,
-    "starter flag changed terrain layout",
-  );
+describe("growth", () => {
+  test("a new town has positive demand and develops within a year", () => {
+    const c = district();
+    const d = computeDemand(c, computeMetrics(c));
+    assert.ok(d.residential > 50, `residential ${d.residential}`);
+    assert.ok(d.industrial > 20, `industrial ${d.industrial}`);
+    for (let i = 0; i < 12; i++) tick(c);
+    const s = getStats(c);
+    assert.ok(s.population > 300, `population ${s.population}`);
+    assert.ok(s.jobs > 100, `jobs ${s.jobs}`);
+  });
+  test("demand is deterministic for a seed", () => {
+    const a = district(3), b = district(3);
+    for (let i = 0; i < 24; i++) { tick(a); tick(b); }
+    assert.equal(serialize(a), serialize(b));
+  });
+  test("losing power drains a district into abandonment", () => {
+    const c = district();
+    for (let i = 0; i < 24; i++) tick(c);
+    const before = getStats(c).population;
+    assert.ok(before > 0);
+    put(c, 4, 14, "bulldoze");
+    refresh(c);
+    for (let i = 0; i < 24; i++) tick(c);
+    const s = getStats(c);
+    assert.ok(s.population < before * 0.5, `${s.population} < ${before}`);
+    assert.ok(s.abandonedLots > 0 || s.population === 0);
+  });
+  test("negative demand under punishing taxes stalls growth", () => {
+    const c = district();
+    setPolicy(c, "tax.residential", 20);
+    const d = computeDemand(c, computeMetrics(c));
+    const low = district();
+    assert.ok(d.residential < computeDemand(low, computeMetrics(low)).residential);
+  });
+  test("medium density needs water to develop", () => {
+    const c = district(7, 2);
+    for (const t of c.tiles) if (t.type === "watertower") put(c, t.x, t.y, "bulldoze");
+    refresh(c);
+    for (let i = 0; i < 24; i++) tick(c);
+    assert.equal(getStats(c).population, 0);
+  });
 });
 
-test("different seeds produce different variant values", (t) => {
-  const a = sim.createCity(1, false);
-  const b = sim.createCity(9999, false);
-  const varA = a.tiles.map((tile) => tile.variant).join(",");
-  const varB = b.tiles.map((tile) => tile.variant).join(",");
-  // Collision across all 1600 tiles is astronomically unlikely
-  assert.notEqual(varA, varB, "different seeds produced identical variants");
+describe("economy", () => {
+  test("budget splits income and expenses by department", () => {
+    const c = createCity(44, true);
+    const s = getStats(c);
+    assert.ok(s.budget.income.residential > 0);
+    assert.ok(s.budget.expenses.police > 0);
+    assert.ok(s.budget.expenses.transport > 0);
+    assert.equal(s.balance, s.income - s.expenses);
+  });
+  test("funding scales department cost and coverage", () => {
+    const c = createCity(44, true);
+    const full = getStats(c);
+    setPolicy(c, "funding.police", 50);
+    const half = getStats(c);
+    assert.ok(half.budget.expenses.police < full.budget.expenses.police);
+    assert.ok(half.crime >= full.crime);
+  });
+  test("loans add money and monthly payments, and can be repaid", () => {
+    const c = blank();
+    assert.equal(setPolicy(c, "loan", 10000).ok, true);
+    assert.equal(c.money, 60000);
+    assert.ok(c.debt > 10000);
+    assert.ok(getStats(c).loanPayment > 0);
+    tick(c);
+    const afterTick = c.debt;
+    assert.ok(afterTick < 11600);
+    assert.equal(setPolicy(c, "repayLoan", true).ok, true);
+    assert.equal(c.debt, 0);
+    assert.equal(setPolicy(c, "loan", 200000).ok, false);
+  });
+  test("ordinances toggle and cost per resident", () => {
+    const c = createCity(44, true);
+    const before = getStats(c).expenses;
+    assert.equal(setPolicy(c, "ordinance.cleanAir", true).ok, true);
+    const s = getStats(c);
+    assert.ok(s.expenses > before);
+    assert.equal(s.ordinances.cleanAir, true);
+    assert.equal(setPolicy(c, "ordinance.bogus", true).ok, false);
+  });
+  test("tax and funding bounds are enforced", () => {
+    const c = blank();
+    assert.equal(setPolicy(c, "tax.residential", 25).ok, false);
+    assert.equal(setPolicy(c, "tax.residential", 12).ok, true);
+    assert.equal(setPolicy(c, "funding.fire", 150).ok, false);
+    assert.equal(setPolicy(c, "funding.bogus", 50).ok, false);
+  });
 });
 
-// ── terrain ───────────────────────────────────────────────────────────────────
-
-test("river zone (x 28-32) contains water tiles", (t) => {
-  const city = sim.createCity(42, false);
-  const waterInRiver = city.tiles.filter(
-    (tile) => tile.x >= 28 && tile.x <= 32 && tile.terrain === "water",
-  );
-  assert.ok(
-    waterInRiver.length > 0,
-    "No water tiles found in x=28..32 river zone",
-  );
+describe("saves", () => {
+  test("round trip preserves the city", () => {
+    const c = createCity(44, true);
+    for (let i = 0; i < 6; i++) tick(c);
+    const raw = serialize(c);
+    const d = deserialize(raw);
+    assert.equal(d.month, c.month);
+    assert.equal(getStats(d).population, getStats(c).population);
+    assert.equal(serialize(d), raw);
+    for (let i = 0; i < 6; i++) { tick(c); tick(d); }
+    assert.equal(serialize(d), serialize(c));
+  });
+  test("corrupt and tampered saves are rejected", () => {
+    const c = createCity(44, true);
+    const raw = JSON.parse(serialize(c));
+    assert.throws(() => deserialize("nope"));
+    for (const mutate of [
+      (d) => (d.version = 2), (d) => (d.size = 10), (d) => d.tiles.pop(), (d) => (d.money = "lots"),
+      (d) => (d.taxes.residential = 99), (d) => (d.tiles[0][0] = 9), (d) => (d.tiles[0][8] = 7),
+      (d) => (d.types[0] = "castle"), (d) => (d.loans = [{ amount: 1 }]), (d) => (d.name = "x".repeat(60)),
+    ]) {
+      const bad = structuredClone(raw); mutate(bad);
+      assert.throws(() => deserialize(JSON.stringify(bad)));
+    }
+  });
+  test("lot consistency is validated", () => {
+    const c = blank();
+    for (let y = 5; y < 8; y++) for (let x = 5; x < 8; x++) put(c, x, y, "residential", { density: 3 });
+    assignLot(c, findLot(c, at(c, 5, 5)), 2, 0.5);
+    const raw = JSON.parse(serialize(c));
+    raw.tiles[5 * 64 + 6][4] = 7; // point one tile at a different anchor
+    assert.throws(() => deserialize(JSON.stringify(raw)));
+  });
 });
 
-test("all terrain values are valid", (t) => {
-  const city = sim.createCity(42, false);
-  const valid = new Set(["grass", "water", "sand"]);
-  for (const tile of city.tiles) {
-    assert.ok(
-      valid.has(tile.terrain),
-      `invalid terrain "${tile.terrain}" at (${tile.x},${tile.y})`,
-    );
-  }
-});
-
-// ── starter city ──────────────────────────────────────────────────────────────
-
-test("starter city has roads pre-placed", (t) => {
-  const city = sim.createCity(42, true);
-  const roads = city.tiles.filter((tile) => tile.type === "road");
-  assert.ok(roads.length > 0, "Starter city has no roads");
-});
-
-test("starter city has zoned tiles (residential/commercial/industrial)", (t) => {
-  const city = sim.createCity(42, true);
-  const zones = city.tiles.filter((tile) =>
-    ["residential", "commercial", "industrial"].includes(tile.type),
-  );
-  assert.ok(zones.length > 0, "Starter city has no zoned tiles");
-});
-
-test("starter city has power and water coverage", (t) => {
-  const city = sim.createCity(42, true);
-  const powered = city.tiles.filter((tile) => tile.powered);
-  const watered = city.tiles.filter((tile) => tile.watered);
-  assert.ok(powered.length > 0, "Starter city has no powered tiles");
-  assert.ok(watered.length > 0, "Starter city has no watered tiles");
-});
-
-test("starter city zones have level > 0", (t) => {
-  const city = sim.createCity(42, true);
-  const builtZones = city.tiles.filter(
-    (tile) =>
-      ["residential", "commercial", "industrial"].includes(tile.type) &&
-      tile.level > 0,
-  );
-  assert.ok(builtZones.length > 0, "Starter city has no zones at level > 0");
-});
-
-// ── place – bounds ────────────────────────────────────────────────────────────
-
-test("place at x=-1 returns {ok:false}", (t) => {
-  const city = sim.createCity(42, false);
-  const r = sim.place(city, -1, 5, "residential");
-  assert.equal(r.ok, false, "Expected ok:false for x=-1");
-  assert.equal(typeof r.message, "string", "Expected message string");
-});
-
-test("place at y=-1 returns {ok:false}", (t) => {
-  const city = sim.createCity(42, false);
-  const r = sim.place(city, 5, -1, "residential");
-  assert.equal(r.ok, false, "Expected ok:false for y=-1");
-});
-
-test("place at x=40 returns {ok:false}", (t) => {
-  const city = sim.createCity(42, false);
-  const r = sim.place(city, 40, 5, "residential");
-  assert.equal(r.ok, false, "Expected ok:false for x=40 (out of bounds)");
-});
-
-test("place at y=40 returns {ok:false}", (t) => {
-  const city = sim.createCity(42, false);
-  const r = sim.place(city, 5, 40, "road");
-  assert.equal(r.ok, false, "Expected ok:false for y=40 (out of bounds)");
-});
-
-// ── place – water / bridge ────────────────────────────────────────────────────
-
-test("road on water tile succeeds (bridge)", (t) => {
-  const city = sim.createCity(42, false);
-  const waterTile = city.tiles.find((tile) => tile.terrain === "water");
-  if (!waterTile) {
-    t.skip("No water tile found in city");
-    return;
-  }
-  const r = sim.place(city, waterTile.x, waterTile.y, "road");
-  assert.equal(
-    r.ok,
-    true,
-    `Road on water (${waterTile.x},${waterTile.y}) returned ok:false — "${r.message}"`,
-  );
-});
-
-test("residential on water tile returns {ok:false}", (t) => {
-  const city = sim.createCity(42, false);
-  const waterTile = city.tiles.find((tile) => tile.terrain === "water");
-  if (!waterTile) {
-    t.skip("No water tile found");
-    return;
-  }
-  const r = sim.place(city, waterTile.x, waterTile.y, "residential");
-  assert.equal(
-    r.ok,
-    false,
-    `Expected residential on water to fail, but got ok:true`,
-  );
-});
-
-// ── place – finances ──────────────────────────────────────────────────────────
-
-test("successful placement deducts tool cost from city.money", (t) => {
-  const city = sim.createCity(42, false);
-  const grassTile = city.tiles.find(
-    (tile) => tile.terrain === "grass" && tile.type === "empty",
-  );
-  if (!grassTile) {
-    t.skip("No grass tile available");
-    return;
-  }
-  const toolDef = sim.TOOLS.find((tool) => tool.id === "residential");
-  const moneyBefore = city.money;
-  const r = sim.place(city, grassTile.x, grassTile.y, "residential");
-  if (!r.ok) {
-    t.skip(`Could not place residential: ${r.message}`);
-    return;
-  }
-  assert.equal(
-    city.money,
-    moneyBefore - toolDef.cost,
-    `Expected money to drop by ${toolDef.cost}, actual: ${moneyBefore} → ${city.money}`,
-  );
-});
-
-test("place returns {ok:false} when city.money is 0", (t) => {
-  const city = sim.createCity(42, false);
-  city.money = 0;
-  const grassTile = city.tiles.find(
-    (tile) => tile.terrain === "grass" && tile.type === "empty",
-  );
-  if (!grassTile) {
-    t.skip("No grass tile");
-    return;
-  }
-  const r = sim.place(city, grassTile.x, grassTile.y, "residential");
-  assert.equal(r.ok, false, "Should not allow placement with 0 money");
-  assert.ok(r.message.length > 0, "Expected a non-empty error message");
-});
-
-test("money unchanged after failed placement", (t) => {
-  const city = sim.createCity(42, false);
-  city.money = 0;
-  const moneyBefore = city.money;
-  const grassTile = city.tiles.find(
-    (tile) => tile.terrain === "grass" && tile.type === "empty",
-  );
-  if (!grassTile) {
-    t.skip("No grass tile");
-    return;
-  }
-  sim.place(city, grassTile.x, grassTile.y, "residential");
-  assert.equal(
-    city.money,
-    moneyBefore,
-    "Failed placement should not change money",
-  );
-});
-
-// ── tick ──────────────────────────────────────────────────────────────────────
-
-test("tick increments city.month by 1", (t) => {
-  const city = sim.createCity(42, false);
-  assert.equal(city.month, 0);
-  sim.tick(city);
-  assert.equal(city.month, 1);
-  sim.tick(city);
-  assert.equal(city.month, 2);
-});
-
-test("tick increments city.revision", (t) => {
-  const city = sim.createCity(42, false);
-  assert.equal(city.revision, 0);
-  sim.tick(city);
-  assert.equal(city.revision, 1);
-  sim.tick(city);
-  assert.equal(city.revision, 2);
-});
-
-test("tick on empty city keeps population non-negative", (t) => {
-  const city = sim.createCity(42, false);
-  for (let i = 0; i < 24; i++) sim.tick(city);
-  assert.ok(
-    city.population >= 0,
-    `population went negative: ${city.population}`,
-  );
-});
-
-test("tick on starter city keeps population non-negative", (t) => {
-  const city = sim.createCity(42, true);
-  for (let i = 0; i < 12; i++) sim.tick(city);
-  assert.ok(
-    city.population >= 0,
-    `population went negative: ${city.population}`,
-  );
-});
-
-// ── growth: serviced zones vs unserviced ──────────────────────────────────────
-
-test("zones with road/power/water grow more than unserviced zones after 24 ticks", (t) => {
-  // City A: one residential zone, no services
-  const cityA = sim.createCity(7, false);
-  const grassA = cityA.tiles.find(
-    (tile) =>
-      tile.terrain === "grass" &&
-      tile.type === "empty" &&
-      tile.x < 20 &&
-      tile.y < 20,
-  );
-  if (!grassA) {
-    t.skip("No suitable grass tile for city A");
-    return;
-  }
-  sim.place(cityA, grassA.x, grassA.y, "residential");
-  for (let i = 0; i < 24; i++) sim.tick(cityA);
-
-  // City B: residential zone with adjacent road, power, water
-  const cityB = sim.createCity(7, false);
-  const cx = 5,
-    cy = 5; // well within grass zone
-  sim.place(cityB, cx, cy, "residential");
-  sim.place(cityB, cx - 1, cy, "road");
-  sim.place(cityB, cx + 1, cy, "road");
-  sim.place(cityB, cx, cy - 1, "road");
-  sim.place(cityB, cx, cy + 1, "power");
-  sim.place(cityB, cx + 1, cy + 1, "water");
-  for (let i = 0; i < 24; i++) sim.tick(cityB);
-
-  assert.ok(
-    cityB.population >= cityA.population,
-    `Serviced city pop (${cityB.population}) should be >= unserviced (${cityA.population})`,
-  );
-});
-
-// ── getStats ──────────────────────────────────────────────────────────────────
-
-test("getStats returns all required fields", (t) => {
-  const city = sim.createCity(42, true);
-  const stats = sim.getStats(city);
-  for (const key of [
-    "population",
-    "money",
-    "happiness",
-    "income",
-    "expenses",
-    "balance",
-    "power",
-    "water",
-    "jobs",
-    "demand",
-    "date",
-    "advice",
-  ]) {
-    assert.ok(key in stats, `getStats missing field: "${key}"`);
-  }
-  for (const key of ["residential", "commercial", "industrial"]) {
-    assert.ok(key in stats.demand, `stats.demand missing: "${key}"`);
-  }
-  assert.equal(typeof stats.date, "string", "stats.date not string");
-  assert.equal(typeof stats.advice, "string", "stats.advice not string");
-});
-
-test("getStats power and water are in range 0-100", (t) => {
-  const city = sim.createCity(42, true);
-  const stats = sim.getStats(city);
-  assert.ok(
-    stats.power >= 0 && stats.power <= 100,
-    `power out of 0-100: ${stats.power}`,
-  );
-  assert.ok(
-    stats.water >= 0 && stats.water <= 100,
-    `water out of 0-100: ${stats.water}`,
-  );
-});
-
-test("getStats balance equals income minus expenses", (t) => {
-  const city = sim.createCity(42, true);
-  const stats = sim.getStats(city);
-  assert.equal(
-    stats.balance,
-    stats.income - stats.expenses,
-    `balance (${stats.balance}) !== income (${stats.income}) - expenses (${stats.expenses})`,
-  );
-});
-
-test("getStats money matches city.money", (t) => {
-  const city = sim.createCity(42, false);
-  const stats = sim.getStats(city);
-  assert.equal(
-    stats.money,
-    city.money,
-    "getStats.money differs from city.money",
-  );
-});
-
-// ── monthly economics ─────────────────────────────────────────────────────────
-
-test("higher tax rate produces higher income (same city, same ticks)", (t) => {
-  const cityLow = sim.createCity(42, true);
-  cityLow.tax = 1;
-  sim.tick(cityLow);
-  const statsLow = sim.getStats(cityLow);
-
-  const cityHigh = sim.createCity(42, true);
-  cityHigh.tax = 20;
-  sim.tick(cityHigh);
-  const statsHigh = sim.getStats(cityHigh);
-
-  assert.ok(
-    statsHigh.income >= statsLow.income,
-    `High-tax income (${statsHigh.income}) < low-tax income (${statsLow.income})`,
-  );
-});
-
-test("income and expenses are non-negative", (t) => {
-  const city = sim.createCity(42, true);
-  for (let i = 0; i < 6; i++) sim.tick(city);
-  const stats = sim.getStats(city);
-  assert.ok(stats.income >= 0, `income negative: ${stats.income}`);
-  assert.ok(stats.expenses >= 0, `expenses negative: ${stats.expenses}`);
-});
-
-// ── inspectTile ───────────────────────────────────────────────────────────────
-
-test("inspectTile returns {title, description, details}", (t) => {
-  const city = sim.createCity(42, false);
-  const info = sim.inspectTile(city, 0, 0);
-  assert.equal(typeof info.title, "string", "title not string");
-  assert.equal(typeof info.description, "string", "description not string");
-  assert.ok(Array.isArray(info.details), "details not array");
-  for (const d of info.details) {
-    assert.equal(
-      typeof d,
-      "string",
-      `details element not string: ${JSON.stringify(d)}`,
-    );
-  }
-});
-
-test("inspectTile on road tile mentions road in output", (t) => {
-  const city = sim.createCity(42, false);
-  const grassTile = city.tiles.find(
-    (tile) => tile.terrain === "grass" && tile.type === "empty",
-  );
-  if (!grassTile) {
-    t.skip("No grass tile");
-    return;
-  }
-  const r = sim.place(city, grassTile.x, grassTile.y, "road");
-  if (!r.ok) {
-    t.skip(`place road failed: ${r.message}`);
-    return;
-  }
-  const info = sim.inspectTile(city, grassTile.x, grassTile.y);
-  const text = [info.title, info.description, ...info.details]
-    .join(" ")
-    .toLowerCase();
-  assert.ok(
-    text.includes("road"),
-    `Expected "road" in inspect output. Got: "${text}"`,
-  );
-});
-
-test("inspectTile on water tile mentions water or river", (t) => {
-  const city = sim.createCity(42, false);
-  const waterTile = city.tiles.find((tile) => tile.terrain === "water");
-  if (!waterTile) {
-    t.skip("No water tile");
-    return;
-  }
-  const info = sim.inspectTile(city, waterTile.x, waterTile.y);
-  const text = [info.title, info.description, ...info.details]
-    .join(" ")
-    .toLowerCase();
-  assert.ok(
-    text.includes("water") || text.includes("river"),
-    `Expected water/river in inspect output. Got: "${text}"`,
-  );
-});
-
-// ── serialize / deserialize ───────────────────────────────────────────────────
-
-test("serialize returns a non-empty string", (t) => {
-  const city = sim.createCity(42, true);
-  const str = sim.serialize(city);
-  assert.equal(typeof str, "string", "serialize did not return string");
-  assert.ok(str.length > 0, "serialize returned empty string");
-});
-
-test("serialize output is valid JSON", (t) => {
-  const city = sim.createCity(42, false);
-  const str = sim.serialize(city);
-  assert.doesNotThrow(
-    () => JSON.parse(str),
-    "serialize output is not valid JSON",
-  );
-});
-
-test("deserialize(serialize(city)) preserves key fields", (t) => {
-  const city = sim.createCity(42, true);
-  sim.tick(city);
-  const str = sim.serialize(city);
-  const restored = sim.deserialize(str);
-
-  assert.equal(restored.money, city.money, "money mismatch after roundtrip");
-  assert.equal(restored.month, city.month, "month mismatch after roundtrip");
-  assert.equal(restored.size, city.size, "size mismatch after roundtrip");
-  assert.equal(restored.seed, city.seed, "seed mismatch after roundtrip");
-  assert.equal(
-    restored.revision,
-    city.revision,
-    "revision mismatch after roundtrip",
-  );
-  assert.equal(restored.tax, city.tax, "tax mismatch after roundtrip");
-  assert.equal(
-    restored.tiles.length,
-    city.tiles.length,
-    "tiles length mismatch after roundtrip",
-  );
-});
-
-test("deserialize(serialize(city)) preserves tile terrain and type", (t) => {
-  const city = sim.createCity(42, true);
-  sim.tick(city);
-  const restored = sim.deserialize(sim.serialize(city));
-  for (let i = 0; i < city.tiles.length; i += 50) {
-    // spot-check every 50th tile
-    const orig = city.tiles[i],
-      rest = restored.tiles[i];
-    assert.equal(rest.terrain, orig.terrain, `tile[${i}] terrain mismatch`);
-    assert.equal(rest.type, orig.type, `tile[${i}] type mismatch`);
-    assert.equal(rest.level, orig.level, `tile[${i}] level mismatch`);
-  }
-});
-
-test("deserialize throws on completely invalid input", (t) => {
-  const { deserialize } = sim;
-  assert.throws(
-    () => deserialize("not json at all ###"),
-    "Should throw on non-JSON string",
-  );
-  assert.throws(() => deserialize(""), "Should throw on empty string");
-});
-
-test("deserialize throws on JSON missing required fields", (t) => {
-  const { deserialize } = sim;
-  // Empty object is valid JSON but missing all required city fields
-  assert.throws(
-    () => deserialize("{}"),
-    "Should throw on JSON object missing required city fields",
-  );
-  // Has size but no tiles
-  assert.throws(
-    () => deserialize(JSON.stringify({ size: 40, money: 50000 })),
-    "Should throw on city object missing tiles array",
-  );
-});
-
-test("deserialize throws on truncated/corrupt tile array", (t) => {
-  const city = sim.createCity(42, false);
-  const serialized = JSON.parse(sim.serialize(city));
-  serialized.tiles = serialized.tiles.slice(0, 10); // truncate tiles
-  assert.throws(
-    () => sim.deserialize(JSON.stringify(serialized)),
-    "Should throw when tiles array has wrong length",
-  );
+describe("disasters and inspection", () => {
+  test("fire damages buildings over time", () => {
+    const c = createCity(44, true);
+    const before = getStats(c).population;
+    let burning = 0;
+    for (let i = 0; i < 5; i++) { disaster(c, "fire"); }
+    burning = c.tiles.filter((t) => t.fire > 0).length;
+    assert.ok(burning > 0);
+    for (let i = 0; i < 6; i++) tick(c);
+    assert.ok(c.tiles.filter((t) => t.fire > 0).length < burning + 40);
+    assert.ok(getStats(c).population <= before + 2000);
+  });
+  test("every disaster runs without throwing", () => {
+    const c = createCity(44, true);
+    for (const id of ["fire", "earthquake", "tornado", "flood", "riot"]) assert.equal(typeof disaster(c, id), "string");
+    for (let i = 0; i < 3; i++) tick(c);
+    assert.ok(Number.isFinite(getStats(c).population));
+  });
+  test("inspect describes zones, buildings and land", () => {
+    const c = createCity(44, true);
+    const anchor = c.tiles.find((t) => isAnchor(t) && t.type === "residential" && t.level > 0);
+    const info = inspectTile(c, anchor.x, anchor.y);
+    assert.match(info.title, /residential/i);
+    assert.ok(info.details.some((d) => /Residents/.test(d)));
+    const plant = c.tiles.find((t) => t.type === "coal");
+    assert.match(inspectTile(c, plant.x, plant.y).title, /Coal/);
+    assert.equal(inspectTile(c, -1, 0).title, "Out of bounds");
+  });
+  test("tools cover every catalog building", () => {
+    const ids = new Set(TOOLS.map((t) => t.id));
+    for (const id of Object.keys(BUILDINGS)) assert.ok(ids.has(id), id);
+    assert.ok(ids.has("bulldoze") && ids.has("inspect"));
+  });
 });

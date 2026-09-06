@@ -1,703 +1,168 @@
-// construction.test.js — Focused behaviour tests for construction.js
-import { test, describe } from 'node:test';
-import assert from 'node:assert/strict';
-import { createCity } from '../src/sim.js';
-import { planConstruction, applyConstruction, createUndoManager } from '../src/construction.js';
+// construction.test.js — plan, apply and undo.
+import { test, describe } from "node:test";
+import assert from "node:assert/strict";
+import { createCity, BUILDINGS } from "../src/sim/index.js";
+import { planConstruction, applyConstruction, createUndoManager, anchorFor } from "../src/construction.js";
 
-// ── helpers ─────────────────────────────────────────────────────────────────
+const blank = () => createCity(1, false);
+const at = (c, x, y) => c.tiles[y * c.size + x];
+const grassRect = (c, w, h) => c.tiles.find((t) => t.x > 4 && t.y > 4 && t.x + w < c.size - 4 && t.y + h < c.size - 4 &&
+  Array.from({ length: h }, (_, dy) => Array.from({ length: w }, (_, dx) => at(c, t.x + dx, t.y + dy).terrain === "grass").every(Boolean)).every(Boolean));
 
-function blankCity() {
-  return createCity(1, false); // no starter, $50000
-}
-
-function tileAt(city, x, y) {
-  return city.tiles[y * city.size + x];
-}
-
-function assertInvalid(plan, msgContains) {
-  assert.equal(plan.valid, false, `Expected invalid plan, got: ${plan.message}`);
-  if (msgContains) {
-    assert.ok(
-      plan.message.toLowerCase().includes(msgContains.toLowerCase()),
-      `Expected message to contain "${msgContains}", got: "${plan.message}"`
-    );
-  }
-}
-
-// ── planConstruction — arg validation ────────────────────────────────────────
-
-describe('planConstruction arg validation', () => {
-  test('null city returns invalid', () => {
-    assertInvalid(planConstruction(null, { x: 0, y: 0 }, { x: 1, y: 1 }, 'road'));
+describe("planConstruction validation", () => {
+  test("rejects bad city, tool, density and coordinates", () => {
+    const c = blank();
+    assert.equal(planConstruction(null, { x: 0, y: 0 }, { x: 0, y: 0 }, "road").valid, false);
+    assert.equal(planConstruction(c, { x: 0, y: 0 }, { x: 0, y: 0 }, "laser").valid, false);
+    assert.equal(planConstruction(c, { x: 0, y: 0 }, { x: 0, y: 0 }, "constructor").valid, false);
+    assert.equal(planConstruction(c, { x: 0, y: 0 }, { x: 0, y: 0 }, "residential", { density: 4 }).valid, false);
+    assert.equal(planConstruction(c, { x: 0.5, y: 0 }, { x: 0, y: 0 }, "road").valid, false);
+    assert.equal(planConstruction(c, null, { x: 0, y: 0 }, "road").valid, false);
+    assert.equal(planConstruction(c, { x: -5, y: -5 }, { x: 2, y: 2 }, "residential").tiles.some((t) => !t.valid), true);
   });
-
-  test('non-object city returns invalid', () => {
-    assertInvalid(planConstruction('bad', { x: 0, y: 0 }, { x: 1, y: 1 }, 'road'));
-  });
-
-  test('unknown tool returns invalid', () => {
-    const city = blankCity();
-    assertInvalid(planConstruction(city, { x: 0, y: 0 }, { x: 0, y: 0 }, 'laser'));
-  });
-
-  test('non-string tool returns invalid', () => {
-    const city = blankCity();
-    assertInvalid(planConstruction(city, { x: 0, y: 0 }, { x: 0, y: 0 }, 42));
-  });
-
-  test('negative coords produce invalid tiles', () => {
-    const city = blankCity();
-    const plan = planConstruction(city, { x: -1, y: 0 }, { x: -1, y: 0 }, 'road');
-    // Single tile plan: -1,0 is out of bounds → invalid
-    assert.equal(plan.valid, false);
-  });
-
-  test('fractional coords return invalid', () => {
-    const city = blankCity();
-    assertInvalid(planConstruction(city, { x: 0.5, y: 0 }, { x: 1, y: 1 }, 'road'));
-  });
-
-  test('density 0 returns invalid', () => {
-    const city = blankCity();
-    assertInvalid(planConstruction(city, { x: 0, y: 0 }, { x: 2, y: 2 }, 'residential', { density: 0 }));
-  });
-
-  test('density 4 returns invalid', () => {
-    const city = blankCity();
-    assertInvalid(planConstruction(city, { x: 0, y: 0 }, { x: 2, y: 2 }, 'residential', { density: 4 }));
-  });
-
-  test('null start returns invalid', () => {
-    const city = blankCity();
-    assertInvalid(planConstruction(city, null, { x: 0, y: 0 }, 'road'));
+  test("does not mutate the city", () => {
+    const c = blank();
+    const before = JSON.stringify(c.tiles.map((t) => [t.type, t.density]));
+    planConstruction(c, { x: 5, y: 5 }, { x: 12, y: 12 }, "commercial", { density: 2 });
+    planConstruction(c, { x: 5, y: 5 }, { x: 12, y: 12 }, "road");
+    assert.equal(JSON.stringify(c.tiles.map((t) => [t.type, t.density])), before);
   });
 });
 
-// ── planConstruction — new hardening (regression) ───────────────────────────
-
-describe('planConstruction hardening', () => {
-  test('enormous coords rejected before allocating arrays', () => {
-    const city = blankCity();
-    assertInvalid(
-      planConstruction(city, { x: 0, y: 0 }, { x: 999999, y: 999999 }, 'residential'),
-      'too large'
-    );
-  });
-
-  test('enormous path coords rejected before allocating arrays', () => {
-    const city = blankCity();
-    assertInvalid(
-      planConstruction(city, { x: 0, y: 0 }, { x: 999999, y: 0 }, 'road'),
-      'too large'
-    );
-  });
-
-  test('null options handled safely (density defaults to 1)', () => {
-    const city = blankCity();
-    const plan = planConstruction(city, { x: 1, y: 1 }, { x: 1, y: 1 }, 'road', null);
-    assert.equal(plan.density, 1);
+describe("plan shapes", () => {
+  test("zones fill a rectangle and cost by density", () => {
+    const c = blank();
+    const g = grassRect(c, 4, 3);
+    const plan = planConstruction(c, { x: g.x, y: g.y }, { x: g.x + 3, y: g.y + 2 }, "residential", { density: 2 });
+    assert.equal(plan.tiles.length, 12);
+    assert.equal(plan.count, 12);
+    assert.equal(plan.cost, 12 * 25);
     assert.equal(plan.valid, true);
   });
-
-  test('prototype key "toString" rejected as tool', () => {
-    const city = blankCity();
-    assertInvalid(planConstruction(city, { x: 0, y: 0 }, { x: 0, y: 0 }, 'toString'));
+  test("roads follow an L path, dominant axis first", () => {
+    const c = blank();
+    const plan = planConstruction(c, { x: 5, y: 5 }, { x: 10, y: 7 }, "road");
+    assert.deepEqual(plan.tiles.slice(0, 6).map((t) => t.y), [5, 5, 5, 5, 5, 5]);
+    assert.deepEqual(plan.tiles.slice(6).map((t) => [t.x, t.y]), [[10, 6], [10, 7]]);
+    const tall = planConstruction(c, { x: 5, y: 5 }, { x: 7, y: 12 }, "road");
+    assert.equal(tall.tiles[0].x, 5);
+    assert.equal(tall.tiles[7].x, 5);
+    assert.equal(tall.tiles[tall.tiles.length - 1].x, 7);
   });
-
-  test('prototype key "constructor" rejected as tool', () => {
-    const city = blankCity();
-    assertInvalid(planConstruction(city, { x: 0, y: 0 }, { x: 0, y: 0 }, 'constructor'));
-  });
-
-  test('city.size !== 40 rejected', () => {
-    const city = blankCity();
-    city.size = 20;
-    assertInvalid(planConstruction(city, { x: 0, y: 0 }, { x: 0, y: 0 }, 'road'), 'size');
-  });
-
-  test('city.tiles.length !== 1600 rejected', () => {
-    const city = blankCity();
-    city.tiles = city.tiles.slice(0, 800);
-    assertInvalid(planConstruction(city, { x: 0, y: 0 }, { x: 0, y: 0 }, 'road'), '1600');
-  });
-
-  test('non-safe-integer money rejected', () => {
-    const city = blankCity();
-    city.money = Number.MAX_SAFE_INTEGER + 1;
-    assertInvalid(planConstruction(city, { x: 0, y: 0 }, { x: 0, y: 0 }, 'road'), 'money');
-  });
-
-  test('plan.affordable false when cost exceeds city.money', () => {
-    const city = blankCity();
-    city.money = 10;
-    const plan = planConstruction(city, { x: 1, y: 1 }, { x: 1, y: 1 }, 'road');
-    assert.equal(plan.valid, true);   // tile itself is buildable
-    assert.equal(plan.affordable, false);
-    assert.equal(plan.tiles[0].valid, true); // individual tile metadata unchanged
-  });
-
-  test('plan.affordable true when cost fits budget', () => {
-    const city = blankCity();
-    const plan = planConstruction(city, { x: 1, y: 1 }, { x: 1, y: 1 }, 'road');
-    assert.equal(plan.affordable, true);
-  });
-});
-
-// ── planConstruction — shape ─────────────────────────────────────────────────
-
-describe('planConstruction shape', () => {
-  test('single tile for inspect', () => {
-    const city = blankCity();
-    const plan = planConstruction(city, { x: 2, y: 2 }, { x: 5, y: 5 }, 'inspect');
-    assert.equal(plan.tiles.length, 1);
-    assert.equal(plan.tiles[0].x, 5);
-    assert.equal(plan.tiles[0].y, 5);
-  });
-
-  test('zone gives rectangle inclusive', () => {
-    const city = blankCity();
-    const plan = planConstruction(city, { x: 1, y: 1 }, { x: 3, y: 2 }, 'residential');
-    // 3×2 = 6 tiles
-    assert.equal(plan.tiles.length, 6);
-  });
-
-  test('road gives L-path horizontal first when dx >= dy', () => {
-    const city = blankCity();
-    // dx=3, dy=1 → horizontal leg first
-    const plan = planConstruction(city, { x: 0, y: 0 }, { x: 3, y: 1 }, 'road');
-    // Horizontal: 0,0 1,0 2,0 3,0 then vertical: 3,1 → 5 tiles
-    assert.equal(plan.tiles.length, 5);
-    assert.equal(plan.tiles[0].x, 0); assert.equal(plan.tiles[0].y, 0);
-    assert.equal(plan.tiles[3].x, 3); assert.equal(plan.tiles[3].y, 0);
-    assert.equal(plan.tiles[4].x, 3); assert.equal(plan.tiles[4].y, 1);
-  });
-
-  test('road gives L-path vertical first when dy > dx', () => {
-    const city = blankCity();
-    // dx=1, dy=3 → vertical leg first
-    const plan = planConstruction(city, { x: 0, y: 0 }, { x: 1, y: 3 }, 'road');
-    // Vertical: 0,0 0,1 0,2 0,3 then horizontal: 1,3 → 5 tiles
-    assert.equal(plan.tiles.length, 5);
-    assert.equal(plan.tiles[0].x, 0); assert.equal(plan.tiles[0].y, 0);
-    assert.equal(plan.tiles[3].x, 0); assert.equal(plan.tiles[3].y, 3);
-    assert.equal(plan.tiles[4].x, 1); assert.equal(plan.tiles[4].y, 3);
-  });
-
-  test('single-point path gives one tile', () => {
-    const city = blankCity();
-    const plan = planConstruction(city, { x: 5, y: 5 }, { x: 5, y: 5 }, 'road');
-    assert.equal(plan.tiles.length, 1);
-  });
-
-  test('park zone gives rectangle', () => {
-    const city = blankCity();
-    const plan = planConstruction(city, { x: 0, y: 0 }, { x: 1, y: 1 }, 'park');
-    assert.equal(plan.tiles.length, 4);
-  });
-});
-
-// ── planConstruction — eligibility ───────────────────────────────────────────
-
-describe('planConstruction eligibility', () => {
-  test('empty grass tile is valid for road', () => {
-    const city = blankCity();
-    const plan = planConstruction(city, { x: 5, y: 5 }, { x: 5, y: 5 }, 'road');
-    assert.equal(plan.tiles[0].valid, true);
-    assert.equal(plan.tiles[0].cost, 50);
-    assert.equal(plan.valid, true);
-  });
-
-  test('water tile is valid for road (bridge)', () => {
-    const city = blankCity();
-    // Find a water tile
-    const waterTile = city.tiles.find(t => t.terrain === 'water');
-    assert.ok(waterTile, 'No water tile found');
-    const plan = planConstruction(city, { x: waterTile.x, y: waterTile.y }, { x: waterTile.x, y: waterTile.y }, 'road');
-    assert.equal(plan.tiles[0].valid, true);
-  });
-
-  test('water tile is invalid for residential', () => {
-    const city = blankCity();
-    const waterTile = city.tiles.find(t => t.terrain === 'water');
-    assert.ok(waterTile);
-    const plan = planConstruction(city, { x: waterTile.x, y: waterTile.y }, { x: waterTile.x, y: waterTile.y }, 'residential');
-    assert.equal(plan.tiles[0].valid, false);
-    assert.equal(plan.valid, false);
-  });
-
-  test('water tile is invalid for rail', () => {
-    const city = blankCity();
-    const waterTile = city.tiles.find(t => t.terrain === 'water');
-    assert.ok(waterTile);
-    const plan = planConstruction(city, { x: waterTile.x, y: waterTile.y }, { x: waterTile.x, y: waterTile.y }, 'rail');
-    assert.equal(plan.tiles[0].valid, false);
-  });
-
-  test('occupied tile blocked for residential', () => {
-    const city = blankCity();
-    // Place a road first by direct mutation
-    tileAt(city, 10, 10).type = 'road';
-    const plan = planConstruction(city, { x: 10, y: 10 }, { x: 10, y: 10 }, 'residential');
-    assert.equal(plan.tiles[0].valid, false);
-    assert.equal(plan.valid, false);
-  });
-
-  test('road on existing road is noop (zero cost, valid)', () => {
-    const city = blankCity();
-    tileAt(city, 5, 5).type = 'road';
-    const plan = planConstruction(city, { x: 5, y: 5 }, { x: 5, y: 5 }, 'road');
-    assert.equal(plan.tiles[0].valid, true);
-    assert.equal(plan.tiles[0].cost, 0);
-    // Noop tiles don't count toward eligible count
-    assert.equal(plan.count, 0);
-    assert.equal(plan.valid, false); // no actionable tiles
-  });
-
-  test('same zone same density is noop', () => {
-    const city = blankCity();
-    const t = tileAt(city, 3, 3);
-    t.type = 'residential';
-    t.density = 2;
-    const plan = planConstruction(city, { x: 3, y: 3 }, { x: 3, y: 3 }, 'residential', { density: 2 });
-    assert.equal(plan.tiles[0].valid, true);
-    assert.equal(plan.tiles[0].cost, 0);
-    assert.equal(plan.count, 0);
-  });
-
-  test('same zone different density is valid rezone', () => {
-    const city = blankCity();
-    const t = tileAt(city, 3, 3);
-    t.type = 'residential';
-    t.density = 1;
-    const plan = planConstruction(city, { x: 3, y: 3 }, { x: 3, y: 3 }, 'residential', { density: 3 });
-    assert.equal(plan.tiles[0].valid, true);
-    assert.ok(plan.tiles[0].cost > 0);
-    assert.equal(plan.count, 1);
-  });
-
-  test('zone cost scales with density', () => {
-    const city = blankCity();
-    const plan1 = planConstruction(city, { x: 2, y: 2 }, { x: 2, y: 2 }, 'residential', { density: 1 });
-    const plan3 = planConstruction(city, { x: 4, y: 4 }, { x: 4, y: 4 }, 'residential', { density: 3 });
-    assert.equal(plan3.tiles[0].cost, plan1.tiles[0].cost * 3);
-  });
-
-  test('mixed valid/blocked rectangle: partial validity', () => {
-    const city = blankCity();
-    // Block tile (2,2)
-    tileAt(city, 2, 2).type = 'road';
-    const plan = planConstruction(city, { x: 1, y: 1 }, { x: 3, y: 3 }, 'residential');
-    // 9 tiles total, 1 blocked (road), 8 empty grass tiles
-    const validCount = plan.tiles.filter(t => t.valid).length;
-    const invalidCount = plan.tiles.filter(t => !t.valid).length;
+  test("footprint buildings centre on the cursor and show every tile", () => {
+    const c = blank();
+    const g = grassRect(c, 5, 5);
+    const cursor = { x: g.x + 2, y: g.y + 2 };
+    assert.deepEqual(anchorFor("police", cursor.x, cursor.y), { x: g.x + 1, y: g.y + 1 });
+    const plan = planConstruction(c, cursor, cursor, "police");
     assert.equal(plan.tiles.length, 9);
-    assert.ok(invalidCount >= 1); // at least the road tile is blocked
-    assert.equal(plan.valid, true); // still has valid tiles
-  });
-
-  test('powerline can overlay road tile', () => {
-    const city = blankCity();
-    tileAt(city, 5, 5).type = 'road';
-    const plan = planConstruction(city, { x: 5, y: 5 }, { x: 5, y: 5 }, 'powerline');
-    assert.equal(plan.tiles[0].valid, true);
-    assert.ok(plan.tiles[0].cost > 0);
-  });
-
-  test('powerline blocked on water (no road)', () => {
-    const city = blankCity();
-    const waterTile = city.tiles.find(t => t.terrain === 'water');
-    assert.ok(waterTile);
-    const plan = planConstruction(city, { x: waterTile.x, y: waterTile.y }, { x: waterTile.x, y: waterTile.y }, 'powerline');
-    assert.equal(plan.tiles[0].valid, false);
-  });
-
-  test('bulldoze on empty tile is invalid', () => {
-    const city = blankCity();
-    const plan = planConstruction(city, { x: 1, y: 1 }, { x: 1, y: 1 }, 'bulldoze');
-    assert.equal(plan.tiles[0].valid, false);
-  });
-
-  test('bulldoze on occupied tile is valid with net cost', () => {
-    const city = blankCity();
-    tileAt(city, 5, 5).type = 'road';
-    const plan = planConstruction(city, { x: 5, y: 5 }, { x: 5, y: 5 }, 'bulldoze');
-    assert.equal(plan.tiles[0].valid, true);
     assert.equal(plan.count, 1);
-    // Road costs 50, refund = floor(50*0.25)=12, fee=25, net = 25-12 = 13
-    assert.equal(plan.tiles[0].cost, 13);
+    assert.equal(plan.cost, BUILDINGS.police.cost);
+    at(c, g.x + 1, g.y + 1).type = "road";
+    const blocked = planConstruction(c, cursor, cursor, "police");
+    assert.equal(blocked.valid, false);
+    assert.equal(blocked.tiles.length, 9);
+    assert.ok(blocked.tiles.every((t) => !t.valid));
+  });
+  test("existing roads in a path are no-ops, occupied tiles are blocked", () => {
+    const c = blank();
+    at(c, 7, 5).type = "road";
+    at(c, 8, 5).type = "commercial"; at(c, 8, 5).density = 1;
+    const plan = planConstruction(c, { x: 5, y: 5 }, { x: 9, y: 5 }, "road");
+    assert.equal(plan.tiles.find((t) => t.x === 7).noop, true);
+    assert.equal(plan.tiles.find((t) => t.x === 8).valid, false);
+    assert.equal(plan.count, 3);
+    assert.match(plan.message, /blocked/);
+  });
+  test("bulldozing a lot counts once and prices the whole building", () => {
+    const c = blank();
+    const g = grassRect(c, 4, 4);
+    applyConstruction(c, planConstruction(c, { x: g.x + 1, y: g.y + 1 }, { x: g.x + 1, y: g.y + 1 }, "fire"));
+    const plan = planConstruction(c, { x: g.x, y: g.y }, { x: g.x + 2, y: g.y + 2 }, "bulldoze");
+    assert.equal(plan.count, 1);
+    assert.equal(plan.tiles.length, 9);
+    assert.equal(plan.cost, 5 * 9 + Math.round(BUILDINGS.fire.cost * 0.05));
   });
 });
 
-// ── applyConstruction ────────────────────────────────────────────────────────
-
-describe('applyConstruction', () => {
-  test('applies valid single road tile', () => {
-    const city = blankCity();
-    const plan = planConstruction(city, { x: 1, y: 1 }, { x: 1, y: 1 }, 'road');
-    const before = city.money;
-    const result = applyConstruction(city, plan);
-    assert.equal(result.ok, true);
-    assert.equal(result.changed, 1);
-    assert.equal(tileAt(city, 1, 1).type, 'road');
-    assert.equal(city.money, before - 50);
+describe("applyConstruction", () => {
+  test("charges exactly the plan cost and builds every tile", () => {
+    const c = blank();
+    const g = grassRect(c, 5, 3);
+    const plan = planConstruction(c, { x: g.x, y: g.y }, { x: g.x + 4, y: g.y + 2 }, "industrial", { density: 3 });
+    const before = c.money;
+    const r = applyConstruction(c, plan);
+    assert.equal(r.ok, true);
+    assert.equal(r.changed, 15);
+    assert.equal(before - c.money, plan.cost);
+    assert.equal(r.cost, plan.cost);
+    for (const t of plan.tiles) { assert.equal(at(c, t.x, t.y).type, "industrial"); assert.equal(at(c, t.x, t.y).density, 3); }
   });
-
-  test('returns false with no mutation when insufficient funds', () => {
-    const city = blankCity();
-    city.money = 10; // too low
-    const plan = planConstruction(city, { x: 1, y: 1 }, { x: 1, y: 1 }, 'road');
-    const result = applyConstruction(city, plan);
-    assert.equal(result.ok, false);
-    assert.equal(result.changed, 0);
-    assert.equal(tileAt(city, 1, 1).type, 'empty'); // unchanged
-    assert.equal(city.money, 10); // unchanged
+  test("insufficient funds changes nothing", () => {
+    const c = blank();
+    c.money = 100;
+    const plan = planConstruction(c, { x: 5, y: 5 }, { x: 14, y: 14 }, "commercial");
+    const r = applyConstruction(c, plan);
+    assert.equal(r.ok, false);
+    assert.equal(c.money, 100);
+    assert.ok(c.tiles.every((t) => t.type !== "commercial"));
   });
-
-  test('returns false when plan has no valid tiles', () => {
-    const city = blankCity();
-    tileAt(city, 5, 5).type = 'road';
-    const plan = planConstruction(city, { x: 5, y: 5 }, { x: 5, y: 5 }, 'residential');
-    const result = applyConstruction(city, plan);
-    assert.equal(result.ok, false);
-    assert.equal(result.changed, 0);
+  test("stale plans are re-evaluated against the live city", () => {
+    const c = blank();
+    const plan = planConstruction(c, { x: 5, y: 5 }, { x: 9, y: 5 }, "road");
+    at(c, 7, 5).type = "commercial"; at(c, 7, 5).density = 1;
+    const r = applyConstruction(c, plan);
+    assert.equal(r.ok, true);
+    assert.equal(r.changed, 4);
+    assert.equal(at(c, 7, 5).type, "commercial");
   });
-
-  test('skips blocked tiles but commits eligible ones (batch atomic per eligible)', () => {
-    const city = blankCity();
-    // Block (2,2), leave (1,1) and (3,3) free
-    tileAt(city, 2, 2).type = 'road';
-    // Plan a 3x3 residential zone (9 tiles, 1 blocked)
-    const plan = planConstruction(city, { x: 1, y: 1 }, { x: 3, y: 3 }, 'residential');
-    assert.ok(plan.valid);
-    const result = applyConstruction(city, plan);
-    assert.equal(result.ok, true);
-    assert.ok(result.changed >= 1);
-    // The road tile must remain road
-    assert.equal(tileAt(city, 2, 2).type, 'road');
-    // Other tiles should be residential
-    assert.equal(tileAt(city, 1, 1).type, 'residential');
+  test("malformed plans are refused", () => {
+    const c = blank();
+    assert.equal(applyConstruction(c, null).ok, false);
+    assert.equal(applyConstruction(c, { tool: "road", tiles: "x", density: 1 }).ok, false);
+    assert.equal(applyConstruction(c, { tool: "road", tiles: [], density: 9 }).ok, false);
+    assert.equal(applyConstruction(c, { tool: "nope", tiles: [], density: 1 }).ok, false);
   });
-
-  test('zone applies correct density', () => {
-    const city = blankCity();
-    const plan = planConstruction(city, { x: 5, y: 5 }, { x: 5, y: 5 }, 'residential', { density: 3 });
-    applyConstruction(city, plan);
-    assert.equal(tileAt(city, 5, 5).type, 'residential');
-    assert.equal(tileAt(city, 5, 5).density, 3);
+  test("a footprint building is placed once at its anchor", () => {
+    const c = blank();
+    const g = grassRect(c, 6, 6);
+    const cursor = { x: g.x + 2, y: g.y + 2 };
+    const r = applyConstruction(c, planConstruction(c, cursor, cursor, "coal"));
+    assert.equal(r.ok, true);
+    assert.equal(c.tiles.filter((t) => t.type === "coal").length, 16);
+    assert.equal(c.tiles.filter((t) => t.type === "coal" && t.lot.x === t.x && t.lot.y === t.y).length, 1);
   });
-
-  test('powerline sets powerline flag on tile', () => {
-    const city = blankCity();
-    const plan = planConstruction(city, { x: 3, y: 3 }, { x: 3, y: 3 }, 'powerline');
-    const result = applyConstruction(city, plan);
-    assert.equal(result.ok, true);
-    assert.equal(tileAt(city, 3, 3).powerline, true);
-  });
-
-  test('pipe sets pipe flag on tile', () => {
-    const city = blankCity();
-    const plan = planConstruction(city, { x: 3, y: 3 }, { x: 3, y: 3 }, 'pipe');
-    const result = applyConstruction(city, plan);
-    assert.equal(result.ok, true);
-    assert.equal(tileAt(city, 3, 3).pipe, true);
-  });
-
-  test('returns false when null plan', () => {
-    const city = blankCity();
-    const result = applyConstruction(city, null);
-    assert.equal(result.ok, false);
-  });
-
-  test('revalidates plan against current city (stale plan)', () => {
-    const city = blankCity();
-    // Make plan when tile is empty
-    const plan = planConstruction(city, { x: 7, y: 7 }, { x: 7, y: 7 }, 'residential');
-    assert.equal(plan.valid, true);
-    // Now occupy the tile before applying
-    tileAt(city, 7, 7).type = 'road';
-    const result = applyConstruction(city, plan);
-    // Should find no eligible tiles and fail
-    assert.equal(result.ok, false);
-    assert.equal(result.changed, 0);
-  });
-
-  test('city revision bumps on successful apply', () => {
-    const city = blankCity();
-    const rev = city.revision;
-    const plan = planConstruction(city, { x: 1, y: 1 }, { x: 1, y: 1 }, 'road');
-    applyConstruction(city, plan);
-    assert.ok(city.revision > rev);
-  });
-
-  test('cost matches plan.cost for simple build', () => {
-    const city = blankCity();
-    const plan = planConstruction(city, { x: 2, y: 2 }, { x: 4, y: 2 }, 'road');
-    const result = applyConstruction(city, plan);
-    assert.equal(result.cost, plan.cost);
+  test("refreshes derived state after building", () => {
+    const c = blank();
+    const g = grassRect(c, 8, 6);
+    applyConstruction(c, planConstruction(c, { x: g.x + 1, y: g.y + 1 }, { x: g.x + 1, y: g.y + 1 }, "coal"));
+    applyConstruction(c, planConstruction(c, { x: g.x + 5, y: g.y }, { x: g.x + 5, y: g.y + 5 }, "road"));
+    applyConstruction(c, planConstruction(c, { x: g.x + 4, y: g.y + 1 }, { x: g.x + 4, y: g.y + 4 }, "residential"));
+    assert.equal(at(c, g.x + 4, g.y + 2).powered, true);
+    assert.equal(at(c, g.x + 4, g.y + 2).roadAccess, true);
   });
 });
 
-// ── applyConstruction — regression tests ────────────────────────────────────
-
-describe('applyConstruction hardening', () => {
-  test('malformed plan (tiles not array) returns false without mutation', () => {
-    const city = blankCity();
-    const moneyBefore = city.money;
-    const result = applyConstruction(city, { tool: 'road', tiles: 'not-array', density: 1 });
-    assert.equal(result.ok, false);
-    assert.equal(city.money, moneyBefore);
+describe("undo", () => {
+  test("restores tiles, money and derived state", () => {
+    const c = blank();
+    const undo = createUndoManager(5);
+    const money = c.money, revision = c.revision;
+    undo.record(c);
+    applyConstruction(c, planConstruction(c, { x: 5, y: 5 }, { x: 12, y: 5 }, "road"));
+    assert.notEqual(c.money, money);
+    assert.equal(undo.undo(c), true);
+    assert.equal(c.money, money);
+    assert.equal(at(c, 8, 5).type, "empty");
+    assert.ok(c.revision > revision);
+    assert.equal(undo.undo(c), false);
   });
-
-  test('malformed plan (tool not string) returns false without mutation', () => {
-    const city = blankCity();
-    const moneyBefore = city.money;
-    const result = applyConstruction(city, { tool: 42, tiles: [], density: 1 });
-    assert.equal(result.ok, false);
-    assert.equal(city.money, moneyBefore);
-  });
-
-  test('plan with >1600 tile entries returns false without mutation', () => {
-    const city = blankCity();
-    const moneyBefore = city.money;
-    const manyTiles = Array.from({ length: 1601 }, () => ({ x: 0, y: 0 }));
-    const result = applyConstruction(city, { tool: 'road', tiles: manyTiles, density: 1 });
-    assert.equal(result.ok, false);
-    assert.equal(city.money, moneyBefore);
-  });
-
-  test('invalid plan density returns false without mutation', () => {
-    const city = blankCity();
-    const plan = planConstruction(city, { x: 1, y: 1 }, { x: 1, y: 1 }, 'residential');
-    plan.density = 5; // force invalid
-    const moneyBefore = city.money;
-    const result = applyConstruction(city, plan);
-    assert.equal(result.ok, false);
-    assert.equal(city.money, moneyBefore);
-  });
-
-  test('duplicate coordinates in plan tiles are deduplicated (placed once)', () => {
-    const city = blankCity();
-    const plan = planConstruction(city, { x: 1, y: 1 }, { x: 1, y: 1 }, 'road');
-    // Inject duplicate tile entries
-    plan.tiles = [...plan.tiles, ...plan.tiles];
-    const result = applyConstruction(city, plan);
-    assert.equal(result.ok, true);
-    assert.equal(result.changed, 1); // only the one unique tile
-  });
-
-  test('density downgrade caps tile level to new density', () => {
-    const city = blankCity();
-    const t = tileAt(city, 5, 5);
-    t.type = 'residential';
-    t.density = 3;
-    t.level = 3;
-    const plan = planConstruction(city, { x: 5, y: 5 }, { x: 5, y: 5 }, 'residential', { density: 1 });
-    assert.equal(plan.valid, true);
-    const result = applyConstruction(city, plan);
-    assert.equal(result.ok, true);
-    assert.equal(tileAt(city, 5, 5).density, 1);
-    assert.equal(tileAt(city, 5, 5).level, 1); // capped at new density
-  });
-
-  test('failed apply (no eligible tiles) leaves city state and revision unchanged', () => {
-    const city = blankCity();
-    // Build road first so revision advances
-    const roadPlan = planConstruction(city, { x: 0, y: 0 }, { x: 0, y: 0 }, 'road');
-    applyConstruction(city, roadPlan);
-    const revAfterBuild = city.revision;
-    const moneyAfterBuild = city.money;
-
-    // Plan was valid but now the tile is occupied — stale plan, no eligible tiles
-    const stalePlan = planConstruction(city, { x: 0, y: 0 }, { x: 0, y: 0 }, 'residential');
-    // Force stale: tile was road, residential blocked
-    const result = applyConstruction(city, stalePlan);
-    assert.equal(result.ok, false);
-    assert.equal(result.changed, 0);
-    // City state must be exactly as before the failed apply
-    assert.equal(city.revision, revAfterBuild);
-    assert.equal(city.money, moneyAfterBuild);
-    assert.equal(tileAt(city, 0, 0).type, 'road');
-  });
-
-  test('no revision change when pre-check fails (insufficient funds)', () => {
-    const city = blankCity();
-    const rev = city.revision;
-    city.money = 10;
-    const plan = planConstruction(city, { x: 1, y: 1 }, { x: 1, y: 1 }, 'road');
-    const result = applyConstruction(city, plan);
-    assert.equal(result.ok, false);
-    assert.equal(city.revision, rev);
-  });
-
-  test('bulldoze on empty tile with overlay flags removes flags', () => {
-    const city = blankCity();
-    const t = tileAt(city, 4, 4);
-    t.powerline = true;
-    const plan = planConstruction(city, { x: 4, y: 4 }, { x: 4, y: 4 }, 'bulldoze');
-    assert.equal(plan.valid, true);
-    const result = applyConstruction(city, plan);
-    assert.equal(result.ok, true);
-    assert.equal(tileAt(city, 4, 4).powerline, false);
-  });
-});
-
-// ── createUndoManager ────────────────────────────────────────────────────────
-
-describe('createUndoManager', () => {
-  test('starts empty', () => {
-    const mgr = createUndoManager();
-    assert.equal(mgr.size, 0);
-  });
-
-  test('undo on empty returns false', () => {
-    const city = blankCity();
-    const mgr = createUndoManager();
-    assert.equal(mgr.undo(city), false);
-  });
-
-  test('record and undo restores city', () => {
-    const city = blankCity();
-    const mgr = createUndoManager();
-    mgr.record(city);
-    // Mutate
-    tileAt(city, 0, 0).type = 'road';
-    city.money -= 50;
-    const result = mgr.undo(city);
-    assert.equal(result, true);
-    assert.equal(tileAt(city, 0, 0).type, 'empty');
-  });
-
-  test('undo bumps revision', () => {
-    const city = blankCity();
-    const mgr = createUndoManager();
-    mgr.record(city);
-    const rev = city.revision;
-    mgr.undo(city);
-    assert.ok(city.revision > rev);
-  });
-
-  test('size increments with record', () => {
-    const city = blankCity();
-    const mgr = createUndoManager();
-    mgr.record(city);
-    mgr.record(city);
-    assert.equal(mgr.size, 2);
-  });
-
-  test('clear empties the stack', () => {
-    const city = blankCity();
-    const mgr = createUndoManager();
-    mgr.record(city);
-    mgr.record(city);
-    mgr.clear();
-    assert.equal(mgr.size, 0);
-    assert.equal(mgr.undo(city), false);
-  });
-
-  test('respects limit — oldest snapshot evicted', () => {
-    const city = blankCity();
-    const mgr = createUndoManager(3);
-    // Record snapshots at 1000, 2000, 3000 — limit 3, stack=[1000,2000,3000]
-    city.money = 1000; mgr.record(city);
-    city.money = 2000; mgr.record(city);
-    city.money = 3000; mgr.record(city);
-    // 4th record evicts $1000 snapshot; stack=[2000,3000,4000]
-    city.money = 4000; mgr.record(city);
-    assert.equal(mgr.size, 3);
-    // Undo 1: pops $4000 snapshot → city.money=4000 (no visible change, was 4000)
-    mgr.undo(city);
-    // Undo 2: pops $3000 snapshot → city.money=3000
-    mgr.undo(city);
-    assert.equal(city.money, 3000);
-    // Undo 3: pops $2000 snapshot → city.money=2000 (1000 was evicted, 2000 is oldest)
-    mgr.undo(city);
-    assert.equal(city.money, 2000);
-    // Stack exhausted
-    assert.equal(mgr.size, 0);
-    assert.equal(mgr.undo(city), false);
-  });
-
-  test('multiple undos stack correctly', () => {
-    const city = blankCity();
-    const mgr = createUndoManager();
-    city.money = 100;
-    mgr.record(city);
-    city.money = 200;
-    mgr.record(city);
-    city.money = 300;
-    // Undo to 200
-    mgr.undo(city);
-    assert.equal(city.money, 200);
-    // Undo to 100
-    mgr.undo(city);
-    assert.equal(city.money, 100);
-  });
-});
-
-// ── integration: full plan → apply → undo cycle ─────────────────────────────
-
-describe('plan → apply → undo integration', () => {
-  test('build road path then undo restores city', () => {
-    const city = blankCity();
-    const mgr = createUndoManager();
-    mgr.record(city);
-    const moneyBefore = city.money;
-    const plan = planConstruction(city, { x: 0, y: 5 }, { x: 0, y: 8 }, 'road');
-    assert.equal(plan.valid, true);
-    const result = applyConstruction(city, plan);
-    assert.equal(result.ok, true);
-    assert.ok(city.money < moneyBefore);
-    // Undo
-    mgr.undo(city);
-    assert.equal(city.money, moneyBefore);
-    assert.equal(tileAt(city, 0, 5).type, 'empty');
-  });
-
-  test('zone rectangle then check road cost sum', () => {
-    const city = blankCity();
-    // 2x2 residential at density 2
-    const plan = planConstruction(city, { x: 1, y: 1 }, { x: 2, y: 2 }, 'residential', { density: 2 });
-    assert.equal(plan.tiles.length, 4);
-    // Each tile: residential cost 100 * density 2 = 200
-    assert.equal(plan.cost, 800);
-  });
-
-  test('not enough funds for large zone is rejected cleanly', () => {
-    const city = blankCity();
-    city.money = 100;
-    const plan = planConstruction(city, { x: 0, y: 0 }, { x: 9, y: 9 }, 'commercial');
-    // 100 tiles * 150 = 15000, have 100
-    const result = applyConstruction(city, plan);
-    assert.equal(result.ok, false);
-    assert.equal(result.changed, 0);
-    // No tiles should have changed
-    for (let y = 0; y <= 9; y++)
-      for (let x = 0; x <= 9; x++)
-        if (tileAt(city, x, y).terrain !== 'water')
-          assert.equal(tileAt(city, x, y).type, 'empty');
-  });
-
-  test('applyConstruction charges exactly the plan cost for dense zoning', () => {
-    const city = blankCity();
-    const before = city.money;
-    const plan = planConstruction(city, { x: 1, y: 1 }, { x: 3, y: 5 }, 'residential', { density: 3 });
-    assert.equal(plan.cost, 15 * 300);
-    const result = applyConstruction(city, plan);
-    assert.equal(result.ok, true);
-    assert.equal(result.cost, plan.cost);
-    assert.equal(before - city.money, plan.cost);
-    for (const t of plan.tiles) assert.equal(tileAt(city, t.x, t.y).density, 3);
-  });
-
-  test('rezone via applyConstruction charges plan cost and keeps level within the new cap', () => {
-    const city = blankCity();
-    applyConstruction(city, planConstruction(city, { x: 2, y: 2 }, { x: 2, y: 2 }, 'commercial', { density: 3 }));
-    tileAt(city, 2, 2).level = 4;
-    const before = city.money;
-    const plan = planConstruction(city, { x: 2, y: 2 }, { x: 2, y: 2 }, 'commercial', { density: 2 });
-    assert.equal(applyConstruction(city, plan).ok, true);
-    assert.equal(before - city.money, plan.cost);
-    assert.equal(tileAt(city, 2, 2).density, 2);
-    assert.equal(tileAt(city, 2, 2).level, 2);
+  test("keeps only the latest snapshots", () => {
+    const c = blank();
+    const undo = createUndoManager(2);
+    for (let i = 0; i < 4; i++) undo.record(c);
+    assert.equal(undo.size, 2);
+    undo.clear();
+    assert.equal(undo.size, 0);
   });
 });

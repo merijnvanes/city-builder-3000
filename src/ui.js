@@ -1,4 +1,4 @@
-import { TOOLS } from "./sim.js";
+import { TOOLS, BUILDINGS, ORDINANCES, DISASTERS, FUNDED_DEPARTMENTS } from "./sim.js";
 
 // ── SVG Icons ─────────────────────────────────────────────────────────────────
 const ICONS = {
@@ -23,14 +23,28 @@ const ICONS = {
   undo: `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h8a6 6 0 0 1 0 12H7"/><path d="M3 8 7 4M3 8l4 4"/></svg>`,
 };
 
-// ── Tool group definitions (fallback-inferred if groups absent in TOOLS) ──────
+// ── Tool group definitions ───────────────────────────────────────────────────
 const GROUP_DEFS = [
   { id: "zone",      label: "Zones",     tools: ["residential", "commercial", "industrial"], hasDensity: true },
-  { id: "transport", label: "Transport", tools: ["road", "rail", "bus"] },
-  { id: "utilities", label: "Utilities", tools: ["power", "powerline", "pipe", "water"] },
-  { id: "civic",     label: "Civic",     tools: ["police", "fire", "school", "hospital"] },
-  { id: "landscape", label: "Landscape", tools: ["park", "landfill"] },
+  { id: "transport", label: "Transport", tools: ["road", "rail", "bus", "railstation"] },
+  { id: "power",     label: "Power",     tools: ["coal", "oil", "gas", "nuclear", "wind", "solar", "powerline"] },
+  { id: "water",     label: "Water",     tools: ["waterpump", "watertower", "treatment", "pipe"] },
+  { id: "civic",     label: "Civic",     tools: ["police", "fire", "hospital", "school", "college", "library", "museum"] },
+  { id: "sanitation", label: "Sanitation", tools: ["landfill", "incinerator", "recycling"] },
+  { id: "landscape", label: "Parks",     tools: ["park", "largepark", "zoo", "tree"] },
 ];
+
+// Icons fall back to a lettered badge so every catalog entry gets a button.
+function iconFor(id, label) {
+  if (ICONS[id]) return ICONS[id];
+  const alias = { coal: "power", oil: "power", gas: "power", nuclear: "power", wind: "power", solar: "power", waterpump: "water", watertower: "water", treatment: "water", railstation: "rail", largepark: "park", zoo: "park", tree: "park", college: "school", library: "school", museum: "school", incinerator: "landfill", recycling: "landfill" }[id];
+  if (alias && ICONS[alias]) return ICONS[alias];
+  const letter = (label || id).charAt(0).toUpperCase();
+  return `<svg viewBox="0 0 20 20" fill="currentColor"><rect x="3" y="3" width="14" height="14" rx="3" opacity=".35"/><text x="10" y="14.5" text-anchor="middle" font-size="11" font-weight="700" fill="currentColor">${letter}</text></svg>`;
+}
+
+const PATH_TOOLS = new Set(["road", "rail", "powerline", "pipe"]);
+const RECT_TOOLS = new Set(["residential", "commercial", "industrial", "park", "landfill", "tree", "bulldoze"]);
 
 // ── Formatters ─────────────────────────────────────────────────────────────────
 function fmtMoney(v) {
@@ -264,7 +278,7 @@ export function mountUI(actions) {
       b.title = `${t.label}\n${t.description || ""}\nCost: ${costStr}${t.shortcut ? ` [${t.shortcut.toUpperCase()}]` : ""}`;
       b.setAttribute("aria-label", t.label);
       const iconWrap = el("span");
-      iconWrap.innerHTML = ICONS[toolId] || "";
+      iconWrap.innerHTML = iconFor(toolId, t.label);
       b.appendChild(iconWrap);
       b.appendChild(el("span", "tool-label", t.label));
       b.addEventListener("click", () => { actions.selectTool(toolId); expandGroup(g.id); });
@@ -363,6 +377,10 @@ export function mountUI(actions) {
     { id: "pollution", label: "Pollut." },
     { id: "crime",     label: "Crime" },
     { id: "traffic",   label: "Traffic" },
+    { id: "police",    label: "Police" },
+    { id: "fire",      label: "Fire" },
+    { id: "health",    label: "Health" },
+    { id: "education", label: "Educ." },
   ].forEach(({ id, label }) => {
     const b = el("button", id === "none" ? "overlay-btn active" : "overlay-btn", label);
     b.dataset.overlay = id;
@@ -526,10 +544,10 @@ export function mountUI(actions) {
     const s = document.createElement("input");
     s.type = "range";
     s.className = "chrome-slider";
-    s.min = "4"; s.max = "20"; s.step = "1"; s.value = "9";
+    s.min = "0"; s.max = "20"; s.step = "1"; s.value = "7";
     s.setAttribute("aria-label", `${label} tax rate`);
     row.appendChild(s);
-    const v = el("span", "slider-val", "9%");
+    const v = el("span", "slider-val", "7%");
     row.appendChild(v);
     parent.appendChild(row);
     s.addEventListener("input", () => {
@@ -560,7 +578,7 @@ export function mountUI(actions) {
     const s = document.createElement("input");
     s.type = "range";
     s.className = "chrome-slider";
-    s.min = "0"; s.max = "150"; s.step = "5"; s.value = "100";
+    s.min = "0"; s.max = "120"; s.step = "5"; s.value = "100";
     s.setAttribute("aria-label", `${label} funding`);
     row.appendChild(s);
     const v = el("span", "slider-val", "100%");
@@ -574,10 +592,31 @@ export function mountUI(actions) {
     fundVals[key] = v;
   }
 
-  ["police", "fire", "health", "education", "transport"].forEach((k) =>
+  FUNDED_DEPARTMENTS.forEach((k) =>
     addFundSlider(fundSection, k, k.charAt(0).toUpperCase() + k.slice(1)),
   );
   budBody.appendChild(fundSection);
+
+  // Department breakdown
+  const deptSection = el("div", "modal-section");
+  deptSection.appendChild(el("div", "modal-section-title", "Monthly Ledger"));
+  const deptGrid = el("div", "stat-grid");
+  const deptItems = {};
+  [
+    ["income.residential", "Residential tax"], ["income.commercial", "Commercial tax"], ["income.industrial", "Industrial tax"], ["income.ordinances", "Ordinance income"],
+    ["expenses.police", "Police"], ["expenses.fire", "Fire"], ["expenses.health", "Health"], ["expenses.education", "Education"],
+    ["expenses.transport", "Transportation"], ["expenses.utilities", "Utilities"], ["expenses.sanitation", "Sanitation"], ["expenses.parks", "Parks"],
+    ["expenses.ordinances", "Ordinance costs"], ["expenses.loans", "Loan payments"],
+  ].forEach(([k, label]) => {
+    const item = el("div", "stat-item");
+    item.appendChild(el("span", "stat-item-label", label));
+    const v = el("span", "stat-item-val", "--");
+    item.appendChild(v);
+    deptGrid.appendChild(item);
+    deptItems[k] = v;
+  });
+  deptSection.appendChild(deptGrid);
+  budBody.appendChild(deptSection);
 
   // Budget summary
   const budSummary = el("div", "modal-section");
@@ -618,13 +657,11 @@ export function mountUI(actions) {
   const ordinanceSection = el("div", "modal-section");
   ordinanceSection.appendChild(el("div", "modal-section-title", "Ordinances"));
   const ordinanceToggles = {};
-  [
-    ["recycling",          "Recycling Program"],
-    ["cleanAir",           "Clean Air Act"],
-    ["neighborhoodWatch",  "Neighborhood Watch"],
-  ].forEach(([key, label]) => {
+  Object.entries(ORDINANCES).forEach(([key, { label, description }]) => {
     const row = el("div", "ordinance-row");
-    row.appendChild(el("span", "ordinance-label", label));
+    const lbl = el("span", "ordinance-label", label);
+    lbl.title = description;
+    row.appendChild(lbl);
     const tb = btn("toggle-btn", "OFF", `Toggle ${label}`, () => {
       const on = tb.classList.toggle("on");
       tb.textContent = on ? "ON" : "OFF";
@@ -789,10 +826,7 @@ export function mountUI(actions) {
   disBody.appendChild(disMsg);
   const disRow = el("div", "slider-row");
   disRow.style.marginTop = "10px";
-  [
-    { id: "fire", label: "Fire" },
-    { id: "earthquake", label: "Earthquake" },
-  ].forEach(({ id, label }) => {
+  Object.entries(DISASTERS).map(([id, d]) => ({ id, label: d.label, description: d.description })).forEach(({ id, label, description }) => {
     const b = btn("btn btn-sm btn-danger", label, `Start ${label.toLowerCase()}`, () => {
       disasterDialog.close();
       actions.setDisaster?.(id);
@@ -969,9 +1003,18 @@ export function mountUI(actions) {
         });
       }
 
+      // Ledger
+      if (stats.budget) {
+        Object.entries(deptItems).forEach(([k, el]) => {
+          const [group, key] = k.split(".");
+          const v = stats.budget[group]?.[key];
+          el.textContent = v != null ? fmtMoney(v) : "--";
+        });
+      }
+
       // Ordinance toggles
       if (city.ordinances) {
-        ["recycling", "cleanAir", "neighborhoodWatch"].forEach((k) => {
+        Object.keys(ORDINANCES).forEach((k) => {
           const tb = ordinanceToggles[k];
           if (!tb) return;
           const on = !!city.ordinances[k];
@@ -1023,9 +1066,11 @@ export function mountUI(actions) {
       // Hint
       const tool = TOOLS.find((t) => t.id === id);
       if (tool) {
+        const b = BUILDINGS[id];
+        const size = b && b.w > 1 ? ` (${b.w}×${b.h})` : "";
         hintLine.textContent = id === "inspect"
           ? "Click a tile to inspect it"
-          : `${tool.label} — ${tool.cost > 0 ? fmtMoney(tool.cost) : "Free"} — ${["road","rail","pipe","powerline"].includes(tool.id) ? "drag a route" : ["residential","commercial","industrial","park","landfill"].includes(tool.id) ? "drag an area" : "click to place"}`;
+          : `${tool.label}${size} — ${tool.cost > 0 ? fmtMoney(tool.cost) : "Free"} — ${PATH_TOOLS.has(id) ? "drag a route" : RECT_TOOLS.has(id) ? "drag an area" : "click to place"}`;
       }
 
       // Density strip visibility
@@ -1070,7 +1115,7 @@ export function mountUI(actions) {
         return;
       }
       buildPreview.classList.add("visible");
-      bpCount.textContent = `${count} tile${count !== 1 ? "s" : ""}`;
+      bpCount.textContent = `${count} ${count !== 1 ? "tiles" : "tile"}`;
       bpCost.textContent  = fmtMoney(cost);
       bpCost.className    = `preview-cost ${valid ? "valid" : "invalid"}`;
       bpMsg.textContent   = message || "";

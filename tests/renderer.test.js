@@ -9,6 +9,9 @@ function camera() {
     zoom: 1,
     panX: 0,
     panY: 0,
+    size: 64,
+    minZoom: 0.3,
+    maxZoom: 2.8,
   });
 }
 test("isometric picking selects every tile after pan and zoom", () => {
@@ -32,7 +35,7 @@ test("zoom stays anchored at the pointer and clamps extreme input", () => {
   r.zoomAt(100);
   assert.equal(r.zoom, 2.8);
   r.zoomAt(-100);
-  assert.equal(r.zoom, 0.35);
+  assert.equal(r.zoom, 0.3);
 });
 test("home clears camera displacement", () => {
   const r = camera();
