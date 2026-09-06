@@ -157,13 +157,15 @@ describe("placement", () => {
     assert.equal(at(c, 6, 6).type, "empty");
     assert.equal(place(c, 6, 6, "bulldoze").ok, false);
   });
-  test("roads bridge water at a premium, rail and pipes do not", () => {
+  test("roads and rail bridge water at a premium, pipes and subways do not", () => {
     const c = blank();
     const w = c.tiles.find((t) => t.terrain === "water");
     assert.equal(evaluate(c, w.x, w.y, "road").cost, BUILDINGS.road.cost * 5);
-    assert.equal(evaluate(c, w.x, w.y, "rail").ok, false);
+    assert.equal(evaluate(c, w.x, w.y, "rail").cost, BUILDINGS.rail.cost * 5);
     assert.equal(evaluate(c, w.x, w.y, "pipe").ok, false);
-    assert.equal(place(c, w.x, w.y, "road").ok, true);
+    assert.equal(evaluate(c, w.x, w.y, "subway").ok, false);
+    assert.equal(evaluate(c, w.x, w.y, "powerline").ok, false);
+    assert.equal(place(c, w.x, w.y, "rail").ok, true);
     assert.equal(evaluate(c, w.x, w.y, "powerline").ok, true);
   });
   test("insufficient funds leaves the city untouched", () => {

@@ -1,7 +1,7 @@
 // Construction rules: evaluate() prices a single action without mutating;
 // place() applies it. Multi-tile buildings are placed by their top-left
 // anchor and every footprint tile must be free land.
-import { BUILDINGS, ZONE_COST, ZONE_TYPES, OVERLAY_TOOLS, TOOL_MAP, TECH_YEAR, LEVEL_FEE } from "./catalog.js";
+import { BUILDINGS, ZONE_COST, ZONE_TYPES, OVERLAY_TOOLS, TOOL_MAP, TECH_YEAR, LEVEL_FEE, ROAD_TYPES } from "./catalog.js";
 import { yearOf } from "./metrics.js";
 import { MAX_ELEVATION } from "./terrain.js";
 
@@ -67,7 +67,7 @@ export function evaluate(city, x, y, tool, options = {}) {
 
   if (OVERLAY_TOOLS.has(tool)) {
     const b = BUILDINGS[tool];
-    if (t.terrain === "water" && (tool === "subway" || t.type !== "road")) return fail(tool === "pipe" ? "Pipes cannot cross water." : tool === "subway" ? "Subways cannot run under water." : "Power lines need a bridge to cross water.");
+    if (t.terrain === "water" && (tool === "subway" || !ROAD_TYPES.has(t.type))) return fail(tool === "pipe" ? "Pipes cannot cross water." : tool === "subway" ? "Subways cannot run under water." : "Power lines need a bridge to cross water.");
     if (t[tool]) return noop("Already here.", here);
     return { ok: true, noop: false, cost: b.cost, message: "", tiles: here };
   }
@@ -103,10 +103,7 @@ export function evaluate(city, x, y, tool, options = {}) {
     const b = BUILDINGS[tool];
     if (t.type === tool) return noop(`${b.label} already here.`, here);
     if (t.type !== "empty") return fail("Tile is occupied. Bulldoze first.");
-    if (t.terrain === "water") {
-      if (tool === "rail") return fail("Rail cannot cross water.");
-      return { ok: true, noop: false, cost: b.cost * BRIDGE_MULTIPLIER, message: "Bridge", tiles: here };
-    }
+    if (t.terrain === "water") return { ok: true, noop: false, cost: b.cost * BRIDGE_MULTIPLIER, message: "Bridge", tiles: here };
     return { ok: true, noop: false, cost: b.cost, message: "", tiles: here };
   }
 
