@@ -339,6 +339,32 @@ describe("saves", () => {
     for (let i = 0; i < 6; i++) { tick(c); tick(d); }
     assert.equal(serialize(d), serialize(c));
   });
+  test("road, rail and highway bridges survive saving with power lines", () => {
+    const c = blank();
+    const water = c.tiles.filter(t => t.terrain === "water").slice(0, 3);
+    for (const [i, type] of ["road", "rail", "highway"].entries()) {
+      const t = water[i];
+      assert.equal(place(c, t.x, t.y, type).ok, true);
+      assert.equal(place(c, t.x, t.y, "powerline").ok, true);
+    }
+    const loaded = deserialize(serialize(c));
+    for (const t of water) {
+      const restored = at(loaded, t.x, t.y);
+      assert.equal(restored.type, t.type);
+      assert.equal(restored.terrain, "water");
+      assert.equal(restored.powerline, true);
+    }
+  });
+  test("lots cannot change density or elevation partway through a saved footprint", () => {
+    const c = blank();
+    for (let y = 5; y < 7; y++) for (let x = 5; x < 7; x++) put(c, x, y, "residential", { density: 2 });
+    assignLot(c, findLot(c, at(c, 5, 5)), 2, 0.5);
+    for (const [field, value, message] of [[3, 3, /different densities/], [15, 1, /different elevations/]]) {
+      const raw = JSON.parse(serialize(c));
+      raw.tiles[5 * c.size + 6][field] = value;
+      assert.throws(() => deserialize(JSON.stringify(raw)), message);
+    }
+  });
   test("corrupt and tampered saves are rejected", () => {
     const c = createCity(44, true);
     const raw = JSON.parse(serialize(c));

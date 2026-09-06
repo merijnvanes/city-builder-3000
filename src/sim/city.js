@@ -170,7 +170,7 @@ export function deserialize(raw) {
     if (![0, 1].includes(abandoned) || ![0, 1].includes(powerline) || ![0, 1].includes(pipe)) throw new Error(`Invalid save: tile ${i} bad flags.`);
     if (!Number.isInteger(age) || age < 0 || !Number.isInteger(fire) || fire < 0 || fire > 6) throw new Error(`Invalid save: tile ${i} bad counters.`);
     const terrain = TERRAIN_NAME[terrainCode];
-    if (terrain === "water" && type !== "empty" && type !== "road") throw new Error(`Invalid save: tile ${i} built on water.`);
+    if (terrain === "water" && type !== "empty" && !ROAD_TYPES.has(type)) throw new Error(`Invalid save: tile ${i} built on water.`);
     const t = makeTile(x, y, terrain, trees, variant, elev);
     t.type = type; t.density = density; t.level = level; t.abandoned = !!abandoned; t.age = age; t.fire = fire;
     t.powerline = !!powerline; t.pipe = !!pipe; t.subway = !!subway; t.flooded = flooded;
@@ -215,7 +215,11 @@ export function deserialize(raw) {
     const anchor = tileAt(city, t.lot.x, t.lot.y);
     if (!anchor?.lot || anchor.lot.x !== t.lot.x || anchor.lot.y !== t.lot.y || anchor.lot.w !== t.lot.w || anchor.lot.h !== t.lot.h)
       throw new Error("Invalid save: inconsistent lot.");
-    for (const n of lotTiles(city, t.lot)) if (n.type !== anchor.type) throw new Error("Invalid save: lot spans different types.");
+    for (const n of lotTiles(city, t.lot)) {
+      if (n.type !== anchor.type) throw new Error("Invalid save: lot spans different types.");
+      if (n.density !== anchor.density) throw new Error("Invalid save: lot spans different densities.");
+      if (n.elev !== anchor.elev) throw new Error("Invalid save: lot spans different elevations.");
+    }
     if (t !== anchor) { t.level = 0; t.abandoned = false; }
   }
   return city;
