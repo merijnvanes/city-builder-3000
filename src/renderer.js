@@ -4,6 +4,7 @@
 import { drawArchitecture, heightOf, random } from "./building-art.js";
 import { BUILDINGS } from "./sim/catalog.js";
 import { drawTree } from "./foliage.js";
+import { surfaceColor, drawShoreline } from "./terrain-art.js";
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const shade = (hex, k) => {
@@ -248,17 +249,15 @@ export class CityRenderer {
     return clamp(1 + (ew * 0.5 + ns * 0.35) / ELEV_PX * 0.11, 0.8, 1.2);
   }
   terrain(t, city) {
-    const { x, y } = t, n = random(x, y), water = t.terrain === "water";
-    let color = water ? ["#477e92", "#4b8396", "#528b9a", "#4c8390"][Math.floor(n * 4)]
-      : t.terrain === "sand" ? ["#b3b17b", "#bdba88", "#aeb07d"][Math.floor(n * 3)]
-      : t.terrain === "rock" ? ["#5e5650", "#66605a", "#575049", "#6b625b"][Math.floor(n * 4)]
-      : ["#78904d", "#7c9550", "#829950", "#7c914b", "#759049"][Math.floor(n * 5)];
+    const { x, y } = t, water = t.terrain === "water";
+    let color = surfaceColor(t, city);
     if (!water) {
       const k = this.slopeShade(x, y);
       if (k !== 1) color = shade(color, k);
       else if (t.elev >= 5) color = shade(color, 1 + (t.elev - 4) * 0.03);
     }
     this.flat(x, y, 1, 1, 0, color);
+    if (water) drawShoreline(this, t, city);
     if (!water && t.type === "empty" && !t.trees) for (let i = 0; i < 3; i++) { const a = random(x, y, i + 1), b = random(y, x, i + 7); this.flat(x + a * 0.85, y + b * 0.85, 0.1, 0.045, 0.05, "#a8ae642b"); }
     if (this.tool !== "inspect" && !water && this.zoom > 0.55) this.flat(x, y, 1, 1, 0.1, null, "#344b2833");
     if (!ROAD.has(t.type)) return;
