@@ -2,6 +2,7 @@ import "./minimap.css";
 
 const colors = {
   road: "#647b75",
+  highway: "#4f5d63",
   rail: "#5a5a4c",
   residential: "#73936d",
   commercial: "#6192a0",

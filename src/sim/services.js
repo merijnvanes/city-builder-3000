@@ -1,6 +1,6 @@
 // Road access, service coverage, pollution, crime, land value and garbage.
 import { forRadius, tileAt } from "./grid.js";
-import { BUILDINGS, ZONE_TYPES, ROAD_TYPES, FUNDED_DEPARTMENTS } from "./catalog.js";
+import { BUILDINGS, ZONE_TYPES, ACCESS_TYPES, FUNDED_DEPARTMENTS } from "./catalog.js";
 import { isAnchor, lotTiles, capacityOf } from "./lots.js";
 
 export const ROAD_REACH = 3;
@@ -17,7 +17,7 @@ export function updateServices(city) {
   // ── Road access: within ROAD_REACH of a road or rail tile ────
   for (const t of tiles) { t.roadAccess = false; t.svc = blankServices(); }
   for (const t of tiles) {
-    if (!ROAD_TYPES.has(t.type)) continue;
+    if (!ACCESS_TYPES.has(t.type)) continue;
     forRadius(city, t.x, t.y, ROAD_REACH, (n) => { n.roadAccess = true; });
   }
   // A lot has access when any of its tiles has it.
@@ -64,8 +64,8 @@ export function updateServices(city) {
     }
   }
   for (const t of tiles) {
-    if (t.type !== "road" || !t.traffic) continue;
-    addSource(t.x, t.y, t.traffic * 0.12, 2);
+    if ((t.type !== "road" && t.type !== "highway") || !t.traffic) continue;
+    addSource(t.x, t.y, t.traffic * (t.type === "highway" ? 0.2 : 0.12), 2);
   }
   // Special buildings with area effects (prisons, dumps, city hall...).
   const crimeBump = new Float32Array(tiles.length);

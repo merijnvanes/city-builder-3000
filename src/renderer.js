@@ -9,7 +9,7 @@ const shade = (hex, k) => {
   const n = parseInt(hex.slice(1), 16);
   return "rgb(" + [n >> 16, (n >> 8) & 255, n & 255].map((v) => clamp(v * k, 0, 255) | 0).join(",") + ")";
 };
-const ROAD = new Set(["road", "rail"]);
+const ROAD = new Set(["road", "rail", "highway"]);
 const TILE_W = 32, TILE_H = 16;
 const ELEV_PX = 8; // screen pixels per terrain level at zoom 1
 
@@ -257,7 +257,17 @@ export class CityRenderer {
     if (this.tool !== "inspect" && !water && this.zoom > 0.55) this.flat(x, y, 1, 1, 0.1, null, "#344b2833");
     if (!ROAD.has(t.type)) return;
     const isRail = t.type === "rail";
-    const adjacent = (dx, dy) => city.tiles[(y + dy) * city.size + x + dx]?.type === t.type && x + dx >= 0 && y + dy >= 0 && x + dx < city.size && y + dy < city.size;
+    const joins = (a, b) => a === b || (a !== "rail" && b !== "rail" && ROAD.has(a) && ROAD.has(b));
+    const adjacent = (dx, dy) => x + dx >= 0 && y + dy >= 0 && x + dx < city.size && y + dy < city.size && joins(city.tiles[(y + dy) * city.size + x + dx]?.type, t.type);
+    if (t.type === "highway") {
+      const ew = adjacent(1, 0) || adjacent(-1, 0), ns = adjacent(0, 1) || adjacent(0, -1);
+      this.flat(x, y, 1, 1, 0.3, "#5c6266");
+      this.flat(x + 0.04, y + 0.04, 0.92, 0.92, 0.45, "#3f4549");
+      if (ew) { this.line(this.project(x, y + 0.5, 0.8), this.project(x + 1, y + 0.5, 0.8), "#d9c34a", 1); this.line(this.project(x, y + 0.26, 0.7), this.project(x + 1, y + 0.26, 0.7), "#8a9296", 0.5); this.line(this.project(x, y + 0.74, 0.7), this.project(x + 1, y + 0.74, 0.7), "#8a9296", 0.5); }
+      if (ns) { this.line(this.project(x + 0.5, y, 0.8), this.project(x + 0.5, y + 1, 0.8), "#d9c34a", 1); this.line(this.project(x + 0.26, y, 0.7), this.project(x + 0.26, y + 1, 0.7), "#8a9296", 0.5); this.line(this.project(x + 0.74, y, 0.7), this.project(x + 0.74, y + 1, 0.7), "#8a9296", 0.5); }
+      if (water) { this.line(this.project(x, y + 0.03, 5), this.project(x + 1, y + 0.03, 5), "#b9bda8", 1.8); this.line(this.project(x, y + 0.97, 5), this.project(x + 1, y + 0.97, 5), "#b9bda8", 1.8); }
+      return;
+    }
     this.flat(x + 0.015, y + 0.015, 0.97, 0.97, 0.3, isRail ? "#857f67" : "#a3a796");
     this.flat(x + 0.1, y + 0.1, 0.8, 0.8, 0.4, isRail ? "#736e5c" : "#69736b");
     const ew = adjacent(1, 0) || adjacent(-1, 0), ns = adjacent(0, 1) || adjacent(0, -1);
@@ -454,14 +464,15 @@ export class CityRenderer {
     }
     ctx.globalAlpha = 1;
 
-    // Cars: more on busy roads.
+    // Cars: more on busy roads, faster on highways.
     if (this.overlay !== "water" && this.tool !== "pipe") {
       for (let i = 0; i < city.tiles.length; i++) {
         const t = city.tiles[i];
-        if (t.type !== "road" || random(t.x, t.y, 9) > 0.18 + (t.traffic || 0) * 0.008) continue;
-        const east = t.x + 1 < city.size && city.tiles[i + 1]?.type === "road", south = city.tiles[i + city.size]?.type === "road";
+        const hw = t.type === "highway";
+        if ((t.type !== "road" && !hw) || random(t.x, t.y, 9) > (hw ? 0.3 : 0.18) + (t.traffic || 0) * 0.008) continue;
+        const east = t.x + 1 < city.size && city.tiles[i + 1]?.type === t.type, south = city.tiles[i + city.size]?.type === t.type;
         if (!east && !south) continue;
-        const vertical = south && (!east || i % 2 === 0), f = (time * 0.00016 + random(t.x, t.y)) % 1, back = i % 3 === 0;
+        const vertical = south && (!east || i % 2 === 0), f = (time * (hw ? 0.0003 : 0.00016) + random(t.x, t.y)) % 1, back = i % 3 === 0;
         const a = back ? 1 - f : f, p = this.project(t.x + (vertical ? (back ? 0.68 : 0.32) : a), t.y + (vertical ? a : back ? 0.68 : 0.32), 2.1);
         if (p.x < -20 || p.x > this.w + 20 || p.y < -20 || p.y > this.h + 20) continue;
         const bus = i % 17 === 0;
@@ -509,6 +520,24 @@ export class CityRenderer {
 
     ctx.drawImage(this.cache, 0, 0, this.w, this.h);
     if (this.night) { ctx.fillStyle = "#12253d45"; ctx.fillRect(0, 0, this.w, this.h); }
+
+    // Neighbour names along the map edges.
+    if (city._connections && this.zoom > 0.4) {
+      const n = city.size;
+      const spots = { north: [n / 2, -1.5], south: [n / 2, n + 1.5], west: [-1.5, n / 2], east: [n + 1.5, n / 2] };
+      ctx.font = `700 ${Math.max(10, 12 * this.zoom)}px system-ui, sans-serif`;
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      for (const [side, [x, y]] of Object.entries(spots)) {
+        const c = city._connections[side];
+        if (!c) continue;
+        const p = this.project(x, y, 0);
+        if (p.x < 0 || p.x > this.w || p.y < 0 || p.y > this.h) continue;
+        const links = [c.road ? "road" : "", c.rail ? "rail" : "", c.power ? "power" : "", c.water ? "water" : ""].filter(Boolean).join(" · ");
+        const label = `${c.name}${links ? " — " + links : ""}`;
+        ctx.lineWidth = 3; ctx.strokeStyle = "#101820cc"; ctx.strokeText(label, p.x, p.y);
+        ctx.fillStyle = links ? "#e8f0d8" : "#b8c4b0"; ctx.fillText(label, p.x, p.y);
+      }
+    }
 
     // Fires and smoke.
     for (const t of city.tiles) {

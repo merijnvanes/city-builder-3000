@@ -1,7 +1,7 @@
 // Neighbour connections, deals, external jobs, passenger rail, airport/seaport.
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
-import { createCity, tick, getStats, place, setPolicy, serialize, deserialize, refresh } from "../src/sim/index.js";
+import { createCity, tick, getStats, place, setPolicy, serialize, deserialize, refresh, disaster } from "../src/sim/index.js";
 import { detectConnections, DEALS } from "../src/sim/neighbors.js";
 import { findLot, assignLot } from "../src/sim/lots.js";
 import { computeDemand } from "../src/sim/growth.js";
@@ -121,6 +121,39 @@ describe("transport buildings", () => {
     assert.ok(c._traffic.railRiders > 0);
     put(c, 39, 19, "bulldoze"); refresh(c); tick(c);
     assert.equal(getStats(c).employed, 0, "no station, no rail commute");
+  });
+  test("highways carry commuters further and faster than streets", () => {
+    const build = (kind) => {
+      const c = plains();
+      // Homes at the west end, jobs 45 tiles east: too far for streets, fine by highway.
+      for (let x = 2; x <= 8; x++) put(c, x, 20, "road");
+      for (let x = 9; x <= 46; x++) put(c, x, 20, kind);
+      for (let x = 47; x <= 52; x++) put(c, x, 20, "road");
+      put(c, 2, 10, "coal"); for (let x = 6; x <= 8; x++) put(c, x, 12, "powerline"); for (let y = 13; y <= 20; y++) put(c, 8, y, "powerline");
+      for (let y = 21; y <= 23; y++) for (let x = 3; x <= 8; x++) put(c, x, y, "residential", { density: 1 });
+      for (let x = 9; x <= 52; x++) put(c, x, 19, "powerline");
+      for (let y = 21; y <= 23; y++) for (let x = 47; x <= 52; x++) put(c, x, y, "industrial", { density: 1 });
+      refresh(c);
+      for (const t of c.tiles) if (["residential", "industrial"].includes(t.type) && !t.lot) { const lot = findLot(c, t); if (lot) assignLot(c, lot, 2, 0.5); }
+      refresh(c); tick(c);
+      return getStats(c);
+    };
+    const street = build("road"), highway = build("highway");
+    assert.ok(highway.employed > street.employed, `${highway.employed} > ${street.employed}`);
+    const c = plains();
+    put(c, 10, 10, "highway"); put(c, 11, 12, "residential", { density: 1 }); refresh(c);
+    assert.equal(at(c, 11, 12).roadAccess, false, "highways give no lot access");
+  });
+  test("a fire crew puts out a burning lot for a fee", () => {
+    const c = createCity(44, true);
+    let burning;
+    for (let i = 0; i < 6 && !burning; i++) { disaster(c, "fire"); burning = c.tiles.find((t) => t.fire > 0); }
+    assert.ok(burning, "something burns");
+    assert.equal(place(c, 5, 5, "dispatch").ok, false);
+    const money = c.money;
+    assert.equal(place(c, burning.x, burning.y, "dispatch").ok, true);
+    assert.equal(burning.fire, 0);
+    assert.equal(money - c.money, 300);
   });
   test("seaport needs water and boosts industrial demand; airport is unique", () => {
     const c = createCity({ seed: 5, layout: "river", starter: false, hills: 0 });

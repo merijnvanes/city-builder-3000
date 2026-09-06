@@ -99,7 +99,7 @@ export function evaluate(city, x, y, tool, options = {}) {
     return { ok: true, noop: false, cost: BUILDINGS.makeland.cost, message: "", tiles: here };
   }
 
-  if (tool === "road" || tool === "rail") {
+  if (tool === "road" || tool === "rail" || tool === "highway") {
     const b = BUILDINGS[tool];
     if (t.type === tool) return noop(`${b.label} already here.`, here);
     if (t.type !== "empty") return fail("Tile is occupied. Bulldoze first.");
@@ -108,6 +108,12 @@ export function evaluate(city, x, y, tool, options = {}) {
       return { ok: true, noop: false, cost: b.cost * BRIDGE_MULTIPLIER, message: "Bridge", tiles: here };
     }
     return { ok: true, noop: false, cost: b.cost, message: "", tiles: here };
+  }
+
+  if (tool === "dispatch") {
+    const a = t.lot ? anchorOf(city, t) : t;
+    if (!a?.fire) return fail("Nothing is burning here.");
+    return { ok: true, noop: false, cost: BUILDINGS.dispatch.cost, message: "Send a fire crew", tiles: a.lot ? lotTiles(city, a.lot).map((n) => ({ x: n.x, y: n.y })) : here };
   }
 
   if (tool === "bulldoze") {
@@ -177,8 +183,11 @@ export function place(city, x, y, tool, options = {}) {
     t.terrain = "sand";
   } else if (tool === "raise" || tool === "lower" || tool === "level") {
     for (const c of ev.changes) c.tile.elev = c.elev;
-  } else if (tool === "road" || tool === "rail") {
+  } else if (tool === "road" || tool === "rail" || tool === "highway") {
     t.type = tool; t.trees = 0; t.density = 0; t.level = 0;
+  } else if (tool === "dispatch") {
+    const a = t.lot ? anchorOf(city, t) : t;
+    a.fire = 0;
   } else if (tool === "bulldoze") {
     if (t.lot) {
       const a = anchorOf(city, t);

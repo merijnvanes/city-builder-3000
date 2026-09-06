@@ -11,7 +11,7 @@ import { startScenario, updateScenario } from "./scenarios.js";
 const SAVE_KEY = "city-builder-3000-save-v3";
 const MONTH_MS = 2500;
 const SLOTS = 3;
-const slotKey = (slot) => (slot === 1 ? SAVE_KEY : `${SAVE_KEY}-slot${slot}`);
+const slotKey = (slot) => (slot === 0 ? `${SAVE_KEY}-autosave` : slot === 1 ? SAVE_KEY : `${SAVE_KEY}-slot${slot}`);
 
 let city = startScenario(sim.createCity(42, true));
 let tool = "inspect", density = 1, speed = 0;
@@ -111,14 +111,14 @@ const actions = {
     if (!raw) { ui.notify("No saved city yet."); return; }
     loadFrom(raw, "Saved city restored. Simulation paused.");
   },
-  listSaves: () => Array.from({ length: SLOTS }, (_, i) => {
-    const slot = i + 1;
+  listSaves: () => Array.from({ length: SLOTS + 1 }, (_, slot) => {
+    const label = slot === 0 ? "Autosave" : `Slot ${slot}`;
     try {
       const raw = localStorage.getItem(slotKey(slot));
-      if (!raw) return { slot, empty: true };
+      if (!raw) return { slot, label, empty: true };
       const d = JSON.parse(raw);
-      return { slot, empty: false, name: d.name, population: d.population, money: d.money, date: sim.dateOf(d.month, d.startYear) };
-    } catch { return { slot, empty: true }; }
+      return { slot, label, empty: false, name: d.name, population: d.population, money: d.money, date: sim.dateOf(d.month, d.startYear) };
+    } catch { return { slot, label, empty: true }; }
   }),
   exportSave: () => {
     try {
@@ -197,6 +197,8 @@ function frame(now) {
     const goal = updateScenario(city, stats);
     if (result.disaster) ui.notify(result.disaster);
     if (goal) ui.notify(goal);
+    // Autosave every January.
+    if (city.month % 12 === 0) { try { localStorage.setItem(slotKey(0), sim.serialize(city)); } catch { /* storage full or blocked */ } }
   }
   if (now - lastFrame > 32) { renderer.render(city, animationTime); minimap.update(city); lastFrame = now; }
   requestAnimationFrame(frame);

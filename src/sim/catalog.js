@@ -2,7 +2,9 @@
 // utilities, services and art. No browser deps.
 
 export const ZONE_TYPES = new Set(["residential", "commercial", "industrial"]);
-export const ROAD_TYPES = new Set(["road", "rail"]);
+export const ROAD_TYPES = new Set(["road", "rail", "highway"]);
+// Lots get road access from these; highways need a road to reach a lot.
+export const ACCESS_TYPES = new Set(["road", "rail"]);
 export const OVERLAY_TOOLS = new Set(["powerline", "pipe"]);
 
 // Zone cost per tile scales with density. Density 1 = low, 2 = medium, 3 = high.
@@ -15,7 +17,7 @@ export const LOT_SIZES_BY_TYPE = { industrial: { 1: [3, 1], 2: [2, 1], 3: [3, 2,
 
 // First year a technology is available. Anything unlisted is always there.
 export const TECH_YEAR = {
-  coal: 1900, oil: 1925, gas: 1950, nuclear: 1975, wind: 1985, solar: 2000,
+  coal: 1900, oil: 1925, gas: 1950, nuclear: 1975, wind: 1985, solar: 2000, highway: 1940,
   treatment: 1940, incinerator: 1930, recycling: 1980, airport: 1935, railstation: 1900, bus: 1920,
   college: 1900, hospital: 1900, museum: 1900, zoo: 1900, casino: 1930, toxicdump: 1960, prison: 1900, armybase: 1900,
 };
@@ -39,6 +41,7 @@ export const DRAW = {
 export const BUILDINGS = {
   road:        { label: "Road",            group: "transport", cost: 10,   w: 1, h: 1, upkeep: 1.5, dept: "transport", path: true, water: true },
   rail:        { label: "Rail",            group: "transport", cost: 25,   w: 1, h: 1, upkeep: 3,   dept: "transport", path: true },
+  highway:     { label: "Highway",         group: "transport", cost: 60,   w: 1, h: 1, upkeep: 4,   dept: "transport", path: true, water: true },
   bus:         { label: "Bus Stop",        group: "transport", cost: 150,  w: 1, h: 1, upkeep: 5,   dept: "transport", service: { kind: "bus", radius: 8 }, powerUse: 1 },
   railstation: { label: "Rail Station",    group: "transport", cost: 500,  w: 2, h: 2, upkeep: 20,  dept: "transport", service: { kind: "rail", radius: 10 }, powerUse: 4 },
   airport:     { label: "Airport",         group: "transport", cost: 10000, w: 6, h: 5, upkeep: 250, dept: "transport", unique: true, effects: { jobs: 500, traffic: 40, pollution: 25, radius: 8, demand: { commercial: 18 } }, powerUse: 12, waterUse: 6 },
@@ -71,6 +74,7 @@ export const BUILDINGS = {
   largepark:   { label: "Large Park",      group: "landscape", cost: 200,  w: 3, h: 3, upkeep: 10,  dept: "parks", service: { kind: "park", radius: 7, strength: 60 } },
   zoo:         { label: "Zoo",             group: "landscape", cost: 3000, w: 4, h: 4, upkeep: 100, dept: "parks", service: { kind: "park", radius: 10, strength: 90 }, powerUse: 3, waterUse: 3 },
   tree:        { label: "Plant Trees",     group: "landscape", cost: 3,    w: 1, h: 1, upkeep: 0,   dept: "parks", rect: true, overlay: true },
+  dispatch:    { label: "Fire Crew",       group: "emergency", cost: 300,  w: 1, h: 1, upkeep: 0,   dept: "fire", emergency: true },
   makewater:   { label: "Dig Water",       group: "landscape", cost: 120,  w: 1, h: 1, upkeep: 0,   dept: "parks", rect: true, terrain: "water" },
   makeland:    { label: "Fill Land",       group: "landscape", cost: 180,  w: 1, h: 1, upkeep: 0,   dept: "parks", rect: true, terrain: "land" },
   raise:       { label: "Raise Terrain",   group: "landscape", cost: 25,   w: 1, h: 1, upkeep: 0,   dept: "parks", rect: true, terrain: "raise" },
@@ -105,7 +109,7 @@ export const TOOLS = [
   ...Object.entries(BUILDINGS).map(([id, b]) => ({
     id, label: b.label, cost: b.cost, group: b.group,
     description: `${b.label} ($${b.cost.toLocaleString()}${b.path || b.rect ? " per tile" : ""}${b.w > 1 ? `, ${b.w}×${b.h}` : ""})`,
-    shortcut: { road: "r", rail: "t", coal: "e", waterpump: "u", police: "l", fire: "f", park: "p", powerline: "w", pipe: "q" }[id] || "",
+    shortcut: { road: "r", rail: "t", highway: "y", coal: "e", waterpump: "u", police: "l", fire: "f", park: "p", powerline: "w", pipe: "q", dispatch: "x" }[id] || "",
     w: b.w, h: b.h,
   })),
   { id: "bulldoze",    label: "Bulldoze",       cost: 5,  group: "demolish",  description: "Demolish ($5 per tile plus building fee)", shortcut: "b" },

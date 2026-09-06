@@ -26,25 +26,26 @@ const ICONS = {
 // ── Tool group definitions ───────────────────────────────────────────────────
 const GROUP_DEFS = [
   { id: "zone",      label: "Zones",     tools: ["residential", "commercial", "industrial"], hasDensity: true },
-  { id: "transport", label: "Transport", tools: ["road", "rail", "bus", "railstation", "airport", "seaport"] },
+  { id: "transport", label: "Transport", tools: ["road", "highway", "rail", "bus", "railstation", "airport", "seaport"] },
   { id: "power",     label: "Power",     tools: ["coal", "oil", "gas", "nuclear", "wind", "solar", "powerline"] },
   { id: "water",     label: "Water",     tools: ["waterpump", "watertower", "treatment", "pipe"] },
   { id: "civic",     label: "Civic",     tools: ["police", "fire", "hospital", "school", "college", "library", "museum"] },
   { id: "sanitation", label: "Sanitation", tools: ["landfill", "incinerator", "recycling"] },
   { id: "landscape", label: "Parks & Land", tools: ["park", "largepark", "zoo", "tree", "makewater", "makeland", "raise", "lower", "level"] },
   { id: "special",   label: "Rewards & Deals", tools: SPECIAL_TYPES },
+  { id: "emergency", label: "Emergency", tools: ["dispatch"] },
 ];
 
 // Icons fall back to a lettered badge so every catalog entry gets a button.
 function iconFor(id, label) {
   if (ICONS[id]) return ICONS[id];
-  const alias = { coal: "power", oil: "power", gas: "power", nuclear: "power", wind: "power", solar: "power", waterpump: "water", watertower: "water", treatment: "water", railstation: "rail", largepark: "park", zoo: "park", tree: "park", college: "school", library: "school", museum: "school", incinerator: "landfill", recycling: "landfill" }[id];
+  const alias = { coal: "power", oil: "power", gas: "power", nuclear: "power", wind: "power", solar: "power", waterpump: "water", watertower: "water", treatment: "water", railstation: "rail", highway: "road", largepark: "park", zoo: "park", tree: "park", college: "school", library: "school", museum: "school", incinerator: "landfill", recycling: "landfill", dispatch: "fire" }[id];
   if (alias && ICONS[alias]) return ICONS[alias];
   const letter = (label || id).charAt(0).toUpperCase();
   return `<svg viewBox="0 0 20 20" fill="currentColor"><rect x="3" y="3" width="14" height="14" rx="3" opacity=".35"/><text x="10" y="14.5" text-anchor="middle" font-size="11" font-weight="700" fill="currentColor">${letter}</text></svg>`;
 }
 
-const PATH_TOOLS = new Set(["road", "rail", "powerline", "pipe"]);
+const PATH_TOOLS = new Set(["road", "rail", "highway", "powerline", "pipe"]);
 const RECT_TOOLS = new Set(["residential", "commercial", "industrial", "park", "landfill", "tree", "bulldoze", "makewater", "makeland", "raise", "lower", "level"]);
 
 // ── Formatters ─────────────────────────────────────────────────────────────────
@@ -326,7 +327,7 @@ export function mountUI(actions) {
   const toolBtns = {}; // id -> button element
   const groupEls = {}; // groupId -> { header, body, el }
 
-  const groupIcons = { zone: "residential", transport: "road", power: "power", water: "water", civic: "police", sanitation: "landfill", landscape: "park", special: "school" };
+  const groupIcons = { zone: "residential", transport: "road", power: "power", water: "water", civic: "police", sanitation: "landfill", landscape: "park", special: "school", emergency: "fire" };
   groups.forEach((g) => {
     const groupEl = el("div", "tool-group");
     const header = el("button", "group-header");
@@ -974,11 +975,12 @@ export function mountUI(actions) {
     const slots = actions.listSaves?.() || [];
     for (const s of slots) {
       const row = el("div", "save-slot");
-      const info = el("div", "save-slot-info", s.empty ? `Slot ${s.slot}: empty` : `Slot ${s.slot}: ${s.name}`);
+      const label = s.label || `Slot ${s.slot}`;
+      const info = el("div", "save-slot-info", s.empty ? `${label}: empty` : `${label}: ${s.name}`);
       if (!s.empty) { const small = document.createElement("small"); small.textContent = `${s.date} · ${fmtPop(s.population)} residents · ${fmtMoney(s.money)}`; info.appendChild(small); }
       row.appendChild(info);
-      row.appendChild(btn("btn btn-sm", "Save", `Save to slot ${s.slot}`, () => { actions.save?.(s.slot); buildFiles(); }));
-      const load = btn("btn btn-sm btn-teal", "Load", `Load slot ${s.slot}`, () => { filesDialog.close(); actions.load?.(s.slot); });
+      if (s.slot > 0) row.appendChild(btn("btn btn-sm", "Save", `Save to slot ${s.slot}`, () => { actions.save?.(s.slot); buildFiles(); }));
+      const load = btn("btn btn-sm btn-teal", "Load", s.slot === 0 ? "Load autosave" : `Load slot ${s.slot}`, () => { filesDialog.close(); actions.load?.(s.slot); });
       if (s.empty) load.disabled = true;
       row.appendChild(load);
       slotList.appendChild(row);

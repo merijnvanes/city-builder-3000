@@ -43,7 +43,7 @@ export function sourceEfficiency(city, anchor) {
 // jumps across a single road or rail tile, so lots on both sides of a
 // street share a network without lines along every block.
 const conducts = (t) => t.powerline || !!t.lot || ZONE_TYPES.has(t.type);
-const isRoad = (t) => t.type === "road" || t.type === "rail";
+const isRoad = (t) => t.type === "road" || t.type === "rail" || t.type === "highway";
 
 function powerComponents(city) {
   const { size, tiles } = city;
