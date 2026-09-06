@@ -324,6 +324,20 @@ export class CityRenderer {
   }
 
   // Data maps: dim the world and tint only the tiles that carry a value.
+  subway(t, city) {
+    const { x, y } = t, center = this.project(x + 0.5, y + 0.5, 0.9);
+    let any = false;
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      if (x + dx < 0 || y + dy < 0 || x + dx >= city.size || y + dy >= city.size) continue;
+      const n = city.tiles[(y + dy) * city.size + x + dx];
+      if (!n.subway && n.type !== "substation") continue;
+      any = true;
+      this.line(center, this.project(x + 0.5 + dx * 0.5, y + 0.5 + dy * 0.5, 0.9), "#e0a83a", 5);
+      this.line(center, this.project(x + 0.5 + dx * 0.5, y + 0.5 + dy * 0.5, 0.9), "#5a4a2a", 1.5);
+    }
+    if (!any) this.flat(x + 0.35, y + 0.35, 0.3, 0.3, 0.9, "#e0a83a");
+  }
+
   heatColor(t) {
     const o = this.overlay;
     if (t.terrain === "water" && o !== "pollution") return null;
@@ -331,6 +345,7 @@ export class CityRenderer {
     if (o === "water") return t.watered ? "#469bdbaa" : (t.lot || t.type !== "empty") ? "#bd7045aa" : null;
     if (o === "landvalue") return "hsla(" + (t.landValue * 1.2) + ",65%,48%,.6)";
     if (["police", "fire", "health", "education"].includes(o)) { const v = t.svc?.[o] || 0; return v ? "hsla(" + (60 + v * 0.6) + ",70%,50%," + (0.15 + v / 160) + ")" : null; }
+    if (o === "transit") { const v = (t.svc?.rail || 0) + (t.svc?.bus || 0); return v ? "hsla(200,70%,55%," + (0.1 + Math.min(1, v / 100) * 0.4) + ")" : null; }
     const value = t[o] || 0;
     if (value <= 0) return null;
     return "hsla(" + (60 - value * 0.6) + ",80%,50%," + (0.25 + value / 160) + ")";
@@ -405,8 +420,10 @@ export class CityRenderer {
       ctx.fillRect(0, 0, this.w, this.h);
       for (const t of this.sorted) { const c = this.heatColor(t); if (c) this.flat(t.x, t.y, 1, 1, 0.5, c); }
     }
-    const showPipes = this.overlay === "water" || this.tool === "pipe";
-    if (showPipes) for (const t of this.sorted) if (t.pipe) this.pipe(t, city);
+    const showSubway = this.overlay === "transit" || this.tool === "subway" || this.tool === "substation";
+    const showPipes = this.overlay === "water" || this.tool === "pipe" || showSubway;
+    if (this.overlay === "water" || this.tool === "pipe") for (const t of this.sorted) if (t.pipe) this.pipe(t, city);
+    if (showSubway) for (const t of this.sorted) if (t.subway || t.type === "substation") this.subway(t, city);
 
     const ground = this.ground.getContext("2d");
     ground.clearRect(0, 0, this.ground.width, this.ground.height);

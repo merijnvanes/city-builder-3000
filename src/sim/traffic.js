@@ -16,9 +16,9 @@ const TRAFFIC_PER_POINT = 6; // commuters per traffic point on a road tile
 const RAIL_PER_POINT = 20;   // trains carry more per tile
 const HIGHWAY_PER_POINT = 18;
 
-const ROAD = 1, RAIL = 2, STATION = 3, HIGHWAY = 4;
-// Travel cost per tile: highways and rail are twice as fast as streets.
-const STEP_COST = [0, 2, 1, 2, 1];
+const ROAD = 1, RAIL = 2, STATION = 3, HIGHWAY = 4, SUBSTATION = 5, TUNNEL = 6;
+// Travel cost per tile: highways, rail and subways are twice as fast as streets.
+const STEP_COST = [0, 2, 1, 2, 1, 2, 1];
 const MAX_COST = MAX_TRIP * 2;
 
 // Nearest road tile index within reach of a lot, or -1.
@@ -34,13 +34,17 @@ function entryOf(city, anchor, kind) {
 
 export function updateTraffic(city) {
   const { tiles, size } = city;
-  const kind = new Uint8Array(tiles.length);
-  for (let i = 0; i < tiles.length; i++) {
+  const N = tiles.length;
+  // Two layers: surface nodes 0..N-1, tunnel nodes N..2N-1 under subway tiles.
+  const kind = new Uint8Array(N * 2);
+  for (let i = 0; i < N; i++) {
     const t = tiles[i];
     if (t.type === "road") kind[i] = ROAD;
     else if (t.type === "rail") kind[i] = RAIL;
     else if (t.type === "railstation") kind[i] = STATION;
     else if (t.type === "highway") kind[i] = HIGHWAY;
+    else if (t.type === "substation") kind[i] = SUBSTATION;
+    if (t.subway || t.type === "substation") kind[N + i] = TUNNEL;
   }
 
   // Jobs reachable from each road tile.
@@ -79,23 +83,47 @@ export function updateTraffic(city) {
     for (const t of side.roadTiles || []) { addJobs(t.y * size + t.x, outside, EXTERNAL_JOBS_PER_ROAD); externalJobs += EXTERNAL_JOBS_PER_ROAD; }
   }
 
-  const parent = new Int32Array(tiles.length).fill(-1);
-  const dist = new Int32Array(tiles.length).fill(-1);
-  const settled = new Uint8Array(tiles.length);
+  const parent = new Int32Array(N * 2).fill(-1);
+  const dist = new Int32Array(N * 2).fill(-1);
+  const settled = new Uint8Array(N * 2);
   const touched = [];
   const buckets = Array.from({ length: MAX_COST + 3 }, () => []);
 
-  // Movement rules: streets join highways; rail only through stations.
+  // Movement rules on the surface: streets join highways; rail only through
+  // stations; subway stations join the street to the tunnel beneath them.
   const canStep = (from, to) => {
     const a = kind[from], b = kind[to];
-    if (a === STATION || b === STATION) return b !== 0;
+    if (a === STATION || b === STATION || a === SUBSTATION || b === SUBSTATION) return b !== 0;
     if (a === RAIL || b === RAIL) return a === b;
     return true; // road <-> road, road <-> highway, highway <-> highway
+  };
+  const neighborsOf = (n) => {
+    const out = [];
+    const i = n < N ? n : n - N;
+    const x = i % size, y = (i - x) / size;
+    if (n < N) {
+      for (const [dx, dy] of NEIGHBORS4) {
+        const nx = x + dx, ny = y + dy;
+        if (nx < 0 || ny < 0 || nx >= size || ny >= size) continue;
+        const ni = ny * size + nx;
+        if (kind[ni] && canStep(n, ni)) out.push(ni);
+      }
+      if (kind[n] === SUBSTATION) out.push(N + i);
+    } else {
+      for (const [dx, dy] of NEIGHBORS4) {
+        const nx = x + dx, ny = y + dy;
+        if (nx < 0 || ny < 0 || nx >= size || ny >= size) continue;
+        const ni = N + ny * size + nx;
+        if (kind[ni] === TUNNEL) out.push(ni);
+      }
+      if (kind[i] === SUBSTATION) out.push(i);
+    }
+    return out;
   };
 
   // One assignment pass. `jam` marks tiles that cost an extra step.
   const assign = (jam) => {
-    const load = new Float64Array(tiles.length);
+    const load = new Float64Array(N * 2);
     for (const j of jobList) { j.open = j.cap; j.anchor.filled = 0; }
     let employed = 0, commuters = 0;
     for (const home of homes) {
@@ -121,12 +149,8 @@ export function updateTraffic(city) {
               for (let k = i; k >= 0; k = parent[k]) load[k] += take;
             }
           }
-          const x = i % size, y = (i - x) / size;
-          for (const [dx, dy] of NEIGHBORS4) {
-            const nx = x + dx, ny = y + dy;
-            if (nx < 0 || ny < 0 || nx >= size || ny >= size) continue;
-            const ni = ny * size + nx;
-            if (!kind[ni] || settled[ni] || !canStep(i, ni)) continue;
+          for (const ni of neighborsOf(i)) {
+            if (settled[ni]) continue;
             const nd = d + STEP_COST[kind[ni]] + (jam && jam[ni] ? 1 : 0);
             if (nd > MAX_COST) continue;
             if (dist[ni] === -1 || nd < dist[ni]) {
@@ -154,13 +178,14 @@ export function updateTraffic(city) {
   };
 
   const first = assign(null);
-  const jam = new Uint8Array(tiles.length);
+  const jam = new Uint8Array(N * 2);
   let jams = 0;
-  for (let i = 0; i < tiles.length; i++) if (kind[i] !== RAIL && kind[i] !== 0 && trafficOf(i, first.load) >= 80) { jam[i] = 1; jams++; }
+  for (let i = 0; i < N; i++) if ((kind[i] === ROAD || kind[i] === HIGHWAY) && trafficOf(i, first.load) >= 80) { jam[i] = 1; jams++; }
   const { load, employed, commuters } = jams ? assign(jam) : first;
 
-  let sum = 0, roads = 0, congested = 0, railRiders = 0;
-  for (let i = 0; i < tiles.length; i++) {
+  let sum = 0, roads = 0, congested = 0, railRiders = 0, subwayRiders = 0;
+  for (let i = N; i < N * 2; i++) if (kind[i] === TUNNEL) subwayRiders += load[i];
+  for (let i = 0; i < N; i++) {
     const t = tiles[i];
     if (kind[i] === ROAD || kind[i] === HIGHWAY) {
       t.traffic = Math.max(0, Math.min(100, Math.round(trafficOf(i, load))));
@@ -187,7 +212,7 @@ export function updateTraffic(city) {
   const unemployment = workers > 0 ? Math.round(100 * (1 - employed / workers)) : 0;
   return {
     workers, employed, jobs: jobsTotal, unemployment, externalJobs, commuters,
-    railRiders: Math.round(railRiders),
+    railRiders: Math.round(railRiders), subwayRiders: Math.round(subwayRiders),
     traffic: roads ? Math.round(sum / roads) : 0,
     congestion: roads ? Math.round(100 * congested / roads) : 0,
   };

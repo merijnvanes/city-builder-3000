@@ -18,7 +18,7 @@ export function heightOf(t) {
   if (t.type === "industrial") return t.density === 1 ? 12 : t.density === 2 ? 18 : 26;
   return { coal: 46, oil: 34, gas: 30, nuclear: 60, wind: 42, solar: 6, waterpump: 10, watertower: 47, treatment: 14,
     police: 24, fire: 21, hospital: 40, school: 22, college: 30, library: 18, museum: 26, landfill: 6, incinerator: 40, recycling: 16,
-    park: 14, largepark: 16, zoo: 14, bus: 9, railstation: 16, airport: 18, seaport: 16,
+    park: 14, largepark: 16, zoo: 14, bus: 9, railstation: 16, airport: 18, seaport: 16, substation: 8,
     mayorhouse: 24, cityhall: 46, courthouse: 27, stadium: 30, statue: 25, prison: 20, casino: 36, toxicdump: 10, armybase: 14 }[t.type] || 12;
 }
 
@@ -355,6 +355,12 @@ const RECIPES = {
     d.box(0.56, 0.54, 0.38, 0.1, 8, "#c9b58c"); d.roof(0.54, 0.52, 0.42, 0.14, 8, 4, "#6c7666");
     d.tree(0.2, 0.2, 1); d.tree(0.7, 0.24, 2); d.tree(0.24, 0.7, 0); d.tree(0.9, 0.9, 1);
     for (const [a, b] of [[0.18, 0.3], [0.62, 0.3], [0.3, 0.62]]) d.box(a, b, 0.05, 0.04, 3, "#7a6a52");
+  },
+  substation(d, t, n) {
+    d.flat(0.06, 0.06, 0.88, 0.88, 0.2, "#a8a99a");
+    d.box(0.22, 0.28, 0.56, 0.44, 6, "#5f8fa8"); d.flat(0.18, 0.24, 0.64, 0.52, 6.1, "#3f6b84");
+    d.flat(0.3, 0.72, 0.4, 0.2, 0.3, "#5a5a56"); for (let a = 0; a < 4; a++) d.flat(0.32, 0.74 + a * 0.045, 0.36, 0.02, 0.4, "#8f8f8a");
+    d.box(0.44, 0.34, 0.12, 0.05, 3, "#e0a83a", 6); d.line(0.5, 0.36, 9, 0.5, 0.36, 14, "#e0a83a", 1.2);
   },
   bus(d, t, n) {
     d.flat(0.08, 0.08, 0.84, 0.84, 0.2, "#aeb5a0");

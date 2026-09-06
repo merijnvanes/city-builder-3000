@@ -5,7 +5,7 @@ export const ZONE_TYPES = new Set(["residential", "commercial", "industrial"]);
 export const ROAD_TYPES = new Set(["road", "rail", "highway"]);
 // Lots get road access from these; highways need a road to reach a lot.
 export const ACCESS_TYPES = new Set(["road", "rail"]);
-export const OVERLAY_TOOLS = new Set(["powerline", "pipe"]);
+export const OVERLAY_TOOLS = new Set(["powerline", "pipe", "subway"]);
 
 // Zone cost per tile scales with density. Density 1 = low, 2 = medium, 3 = high.
 export const ZONE_COST = { residential: [0, 10, 25, 50], commercial: [0, 10, 25, 50], industrial: [0, 10, 25, 50] };
@@ -17,7 +17,7 @@ export const LOT_SIZES_BY_TYPE = { industrial: { 1: [3, 1], 2: [2, 1], 3: [3, 2,
 
 // First year a technology is available. Anything unlisted is always there.
 export const TECH_YEAR = {
-  coal: 1900, oil: 1925, gas: 1950, nuclear: 1975, wind: 1985, solar: 2000, highway: 1940,
+  coal: 1900, oil: 1925, gas: 1950, nuclear: 1975, wind: 1985, solar: 2000, highway: 1940, subway: 1920, substation: 1920,
   treatment: 1940, incinerator: 1930, recycling: 1980, airport: 1935, railstation: 1900, bus: 1920,
   college: 1900, hospital: 1900, museum: 1900, zoo: 1900, casino: 1930, toxicdump: 1960, prison: 1900, armybase: 1900,
 };
@@ -44,6 +44,8 @@ export const BUILDINGS = {
   highway:     { label: "Highway",         group: "transport", cost: 60,   w: 1, h: 1, upkeep: 4,   dept: "transport", path: true, water: true },
   bus:         { label: "Bus Stop",        group: "transport", cost: 150,  w: 1, h: 1, upkeep: 5,   dept: "transport", service: { kind: "bus", radius: 8 }, powerUse: 1 },
   railstation: { label: "Rail Station",    group: "transport", cost: 500,  w: 2, h: 2, upkeep: 20,  dept: "transport", service: { kind: "rail", radius: 10 }, powerUse: 4 },
+  subway:      { label: "Subway",          group: "transport", cost: 40,   w: 1, h: 1, upkeep: 3,   dept: "transport", path: true, overlay: true, underground: true },
+  substation:  { label: "Subway Station",  group: "transport", cost: 400,  w: 1, h: 1, upkeep: 15,  dept: "transport", service: { kind: "rail", radius: 8 }, powerUse: 3 },
   airport:     { label: "Airport",         group: "transport", cost: 10000, w: 6, h: 5, upkeep: 250, dept: "transport", unique: true, effects: { jobs: 500, traffic: 40, pollution: 25, radius: 8, demand: { commercial: 18 } }, powerUse: 12, waterUse: 6 },
   seaport:     { label: "Seaport",         group: "transport", cost: 5000, w: 4, h: 4, upkeep: 150, dept: "transport", unique: true, requiresWater: true, effects: { jobs: 350, traffic: 25, pollution: 15, radius: 6, demand: { industrial: 18 } }, powerUse: 8, waterUse: 4 },
 

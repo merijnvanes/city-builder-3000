@@ -67,7 +67,7 @@ export function evaluate(city, x, y, tool, options = {}) {
 
   if (OVERLAY_TOOLS.has(tool)) {
     const b = BUILDINGS[tool];
-    if (t.terrain === "water" && t.type !== "road") return fail(tool === "pipe" ? "Pipes cannot cross water." : "Power lines need a bridge to cross water.");
+    if (t.terrain === "water" && (tool === "subway" || t.type !== "road")) return fail(tool === "pipe" ? "Pipes cannot cross water." : tool === "subway" ? "Subways cannot run under water." : "Power lines need a bridge to cross water.");
     if (t[tool]) return noop("Already here.", here);
     return { ok: true, noop: false, cost: b.cost, message: "", tiles: here };
   }
@@ -124,7 +124,7 @@ export function evaluate(city, x, y, tool, options = {}) {
       const cost = DEMOLISH_FEE * tiles.length + (b ? Math.round(b.cost * 0.05) : 0);
       return { ok: true, noop: false, cost, message: `Demolish ${b ? b.label : a.type}`, tiles };
     }
-    if (t.type !== "empty" || t.powerline || t.pipe || t.trees) {
+    if (t.type !== "empty" || t.powerline || t.pipe || t.trees || t.subway) {
       return { ok: true, noop: false, cost: DEMOLISH_FEE, message: "", tiles: here };
     }
     return fail("Nothing to demolish here.");
@@ -193,6 +193,8 @@ export function place(city, x, y, tool, options = {}) {
       const a = anchorOf(city, t);
       clearLot(city, a, { keepZone: ZONE_TYPES.has(a.type) });
     } else {
+      // Surface first; a subway under an empty tile goes on the next pass.
+      if (t.type === "empty" && !t.powerline && !t.pipe && !t.trees) t.subway = false;
       t.type = "empty"; t.density = 0; t.level = 0; t.powerline = false; t.pipe = false; t.trees = 0; t.fire = 0;
     }
   } else {

@@ -144,6 +144,29 @@ describe("transport buildings", () => {
     put(c, 10, 10, "highway"); put(c, 11, 12, "residential", { density: 1 }); refresh(c);
     assert.equal(at(c, 11, 12).roadAccess, false, "highways give no lot access");
   });
+  test("subways carry commuters between subway stations under the city", () => {
+    const c = plains();
+    for (let x = 2; x <= 8; x++) put(c, x, 20, "road");
+    for (let x = 47; x <= 52; x++) put(c, x, 20, "road");
+    assert.equal(put(c, 9, 20, "substation").ok, true);
+    assert.equal(put(c, 46, 20, "substation").ok, true);
+    for (let x = 10; x <= 45; x++) assert.equal(put(c, x, 20, "subway").ok, true);
+    put(c, 2, 10, "coal"); for (let x = 6; x <= 8; x++) put(c, x, 12, "powerline"); for (let y = 13; y <= 20; y++) put(c, 8, y, "powerline");
+    for (let y = 21; y <= 23; y++) for (let x = 3; x <= 8; x++) put(c, x, y, "residential", { density: 1 });
+    for (let x = 9; x <= 52; x++) put(c, x, 19, "powerline");
+    for (let y = 21; y <= 23; y++) for (let x = 47; x <= 52; x++) put(c, x, y, "industrial", { density: 1 });
+    refresh(c);
+    for (const t of c.tiles) if (["residential", "industrial"].includes(t.type) && !t.lot) { const lot = findLot(c, t); if (lot) assignLot(c, lot, 2, 0.5); }
+    refresh(c); tick(c);
+    assert.ok(getStats(c).employed > 0, "workers ride the subway");
+    assert.ok(c._traffic.subwayRiders > 0);
+    // A subway can run under a road, and a bulldozed empty tile drops its tunnel.
+    assert.equal(put(c, 5, 20, "subway").ok, true);
+    put(c, 30, 20, "bulldoze"); refresh(c);
+    assert.equal(at(c, 30, 20).subway, false);
+    const d = deserialize(serialize(c));
+    assert.equal(at(d, 20, 20).subway, true);
+  });
   test("a fire crew puts out a burning lot for a fee", () => {
     const c = createCity(44, true);
     let burning;
