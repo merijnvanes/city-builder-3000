@@ -33,13 +33,14 @@ With Chrome installed, run `pnpm dev --port 4173` in one terminal and `pnpm test
 - **Power** flows from six plant types through power lines, zones and buildings and hops a single road. Plants have capacity; overload means brownouts.
 - **Water** comes from pumps (best beside water), towers and treatment plants through underground pipes; each pipe serves the six tiles around it.
 - **Services**: police, fire, hospitals, schools, colleges, libraries, museums, landfills, incinerators, recycling, parks and zoos. Coverage depends on distance and department funding.
-- **Transport**: roads with commuting traffic, rail with passenger stations, bus stops, airport and seaport.
-- **Budget**: separate R/C/I taxes, six funded departments, twelve ordinances, amortised loans, a monthly ledger and an annual review every January.
-- **Neighbors**: roads, rails, power lines and pipes to the map edge connect you to a neighboring city for trade, outside jobs and power/water/garbage deals.
-- **Rewards** unlock at population milestones (Mayor's House, City Hall, Courthouse, Stadium, Statue). **Petitioners** offer business deals with strings attached.
-- **Disasters**: fire, earthquake, tornado, flood and riot, triggered or random.
-- **Data maps** for power, water, land value, pollution, crime, traffic and service coverage; a report with eight history graphs; seven advisors; a news ticker.
-- **Saves**: three browser slots plus export and import as a file.
+- **Transport**: roads and highways with commuting traffic that routes around jams, rail with stations, subways with stations, bus stops, airport and seaport.
+- **Budget**: separate R/C/I taxes, six funded departments, eighteen ordinances, amortised loans, a monthly ledger and an annual review every January.
+- **Neighbors**: roads, rails, power lines and pipes to the map edge connect you to a named neighboring city for trade, outside jobs and power/water/garbage deals.
+- **Rewards** unlock at population milestones (Mayor's House, City Hall, Courthouse, Stadium, Statue). **Petitioners** offer business deals with strings attached. **Landmarks** can be bought outright.
+- **Disasters**: fire, earthquake, tornado, flood and riot, triggered or random, with fire crews to dispatch.
+- **Data maps** for power, water, land value, pollution, crime, traffic, transit and service coverage; a report with eight history graphs; seven advisors with portraits; a news ticker.
+- **Scenarios**: open play, grow to 20,000, Boomtown, rescue a failing town, clear the air of a factory town, rebuild after a quake. Start years from 1900 gate technology.
+- **Saves**: three browser slots, an autosave every January, plus export and import as a file.
 
 ## Controls
 
