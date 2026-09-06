@@ -29,9 +29,9 @@ export function computeBudget(city) {
     if (ZONE_TYPES.has(t.type)) {
       const cap = capacityOf(t);
       if (!cap) continue;
-      if (t.type === "residential") { population += cap; income.residential += cap * (taxes.residential / 100) * 1.4 * wealth(t); }
-      else if (t.type === "commercial") income.commercial += cap * (taxes.commercial / 100) * 1.6 * wealth(t);
-      else income.industrial += cap * (taxes.industrial / 100) * 1.4;
+      if (t.type === "residential") { population += cap; income.residential += cap * (taxes.residential / 100) * 1.2 * wealth(t); }
+      else if (t.type === "commercial") income.commercial += cap * (taxes.commercial / 100) * 1.4 * wealth(t);
+      else income.industrial += cap * (taxes.industrial / 100) * 1.2;
       continue;
     }
     const b = BUILDINGS[t.type];
