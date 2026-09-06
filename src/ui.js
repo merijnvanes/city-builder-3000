@@ -1188,7 +1188,7 @@ export function mountUI(actions) {
   form.money = formRow("Starting funds", select("Starting funds", [["50000", "$50,000 (easy)"], ["25000", "$25,000 (medium)"], ["10000", "$10,000 (hard)"]], "50000"));
   form.year = formRow("Start year", select("Start year", [["1900", "1900 — coal and rail"], ["1950", "1950 — oil, gas and airports"], ["2000", "2000 — everything"], ["2050", "2050"]], "2000"));
   form.start = formRow("Start with", select("Start with", [["blank", "Empty land"], ["town", "An established town"]], "blank"));
-  form.scenario = formRow("Scenario", select("Scenario", [["sandbox", "Open play"], ["growth", "Grow to 20,000 in ten years"], ["recovery", "Rescue a failing town"]], "sandbox"));
+  form.scenario = formRow("Scenario", select("Scenario", [["sandbox", "Open play"], ["growth", "Grow to 20,000 in ten years"], ["boomtown", "Boomtown: 50,000 in twenty years"], ["recovery", "Rescue a failing town"], ["cleanup", "Smokestack City: clear the air"], ["aftermath", "After the quake: rebuild"]], "sandbox"));
   confirmDialog.appendChild(cfmBody);
 
   const cfmFooter = el("div", "modal-footer");
