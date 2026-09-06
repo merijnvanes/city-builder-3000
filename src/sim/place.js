@@ -49,6 +49,17 @@ export function evaluate(city, x, y, tool, options = {}) {
     return { ok: true, noop: false, cost: BUILDINGS.tree.cost, message: "", tiles: here };
   }
 
+  if (tool === "makewater") {
+    if (t.terrain === "water") return noop("Already water.", here);
+    if (t.type !== "empty" || t.powerline || t.pipe) return fail("Clear the tile before flooding it.");
+    return { ok: true, noop: false, cost: BUILDINGS.makewater.cost, message: "", tiles: here };
+  }
+  if (tool === "makeland") {
+    if (t.terrain !== "water") return noop("Already dry land.", here);
+    if (t.type !== "empty") return fail("Remove the bridge first.");
+    return { ok: true, noop: false, cost: BUILDINGS.makeland.cost, message: "", tiles: here };
+  }
+
   if (tool === "road" || tool === "rail") {
     const b = BUILDINGS[tool];
     if (t.type === tool) return noop(`${b.label} already here.`, here);
@@ -116,6 +127,10 @@ export function place(city, x, y, tool, options = {}) {
     t[tool] = true;
   } else if (tool === "tree") {
     t.trees = Math.min(3, (t.trees || 0) + 1);
+  } else if (tool === "makewater") {
+    t.terrain = "water"; t.trees = 0;
+  } else if (tool === "makeland") {
+    t.terrain = "sand";
   } else if (tool === "road" || tool === "rail") {
     t.type = tool; t.trees = 0; t.density = 0; t.level = 0;
   } else if (tool === "bulldoze") {

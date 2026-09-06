@@ -31,7 +31,7 @@ const GROUP_DEFS = [
   { id: "water",     label: "Water",     tools: ["waterpump", "watertower", "treatment", "pipe"] },
   { id: "civic",     label: "Civic",     tools: ["police", "fire", "hospital", "school", "college", "library", "museum"] },
   { id: "sanitation", label: "Sanitation", tools: ["landfill", "incinerator", "recycling"] },
-  { id: "landscape", label: "Parks",     tools: ["park", "largepark", "zoo", "tree"] },
+  { id: "landscape", label: "Parks & Land", tools: ["park", "largepark", "zoo", "tree", "makewater", "makeland"] },
   { id: "special",   label: "Rewards & Deals", tools: SPECIAL_TYPES },
 ];
 
@@ -45,7 +45,7 @@ function iconFor(id, label) {
 }
 
 const PATH_TOOLS = new Set(["road", "rail", "powerline", "pipe"]);
-const RECT_TOOLS = new Set(["residential", "commercial", "industrial", "park", "landfill", "tree", "bulldoze"]);
+const RECT_TOOLS = new Set(["residential", "commercial", "industrial", "park", "landfill", "tree", "bulldoze", "makewater", "makeland"]);
 
 // ── Formatters ─────────────────────────────────────────────────────────────────
 function fmtMoney(v) {
@@ -93,20 +93,33 @@ function svgBtn(cls, id, title, onclick) {
 }
 
 // ── SVG history graph ──────────────────────────────────────────────────────────
-function buildHistoryGraph(history, key, color) {
+function buildHistoryGraph(history, key, color, fmt = fmtPop) {
   const W = 460, H = 100, PAD = 10;
-  const vals = history.map((h) => h[key] ?? 0).filter((v) => !isNaN(v));
+  const vals = history.map((h) => (typeof key === "function" ? key(h) : h[key]) ?? 0).filter((v) => !isNaN(v));
   if (!vals.length) return "";
   const mn = Math.min(...vals);
   const mx = Math.max(...vals) || 1;
   const scale = (v) => H - PAD - ((v - mn) / (mx - mn || 1)) * (H - PAD * 2);
   const pts = vals.map((v, i) => `${PAD + (i / (vals.length - 1 || 1)) * (W - PAD * 2)},${scale(v)}`).join(" ");
+  const zero = mn < 0 && mx > 0 ? `<line x1="${PAD}" x2="${W - PAD}" y1="${scale(0)}" y2="${scale(0)}" stroke="#7a90a8" stroke-dasharray="3 3" stroke-width=".8"/>` : "";
   return `<svg class="history-graph" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
-    <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round"/>
-    <text x="${PAD}" y="${H - 2}" font-size="8" fill="#7a90a8">${fmtPop(mn)}</text>
-    <text x="${PAD}" y="10" font-size="8" fill="#7a90a8">${fmtPop(mx)}</text>
+    ${zero}
+    <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+    <text x="${PAD}" y="${H - 2}" font-size="8" fill="#7a90a8">${fmt(mn)}</text>
+    <text x="${PAD}" y="10" font-size="8" fill="#7a90a8">${fmt(mx)}</text>
   </svg>`;
 }
+
+const REPORT_GRAPHS = [
+  ["population", "Population", "var(--res)", fmtPop],
+  ["money", "Funds", "#40e890", fmtMoney],
+  [(h) => h.balance, "Monthly balance", "#8fd0ff", fmtMoney],
+  ["happiness", "Approval", "#f0d040", fmtPct],
+  ["pollution", "Pollution", "#e07040", fmtPct],
+  ["crime", "Crime", "#d05060", fmtPct],
+  ["traffic", "Traffic", "#80a0c0", fmtPct],
+  ["landValue", "Land value", "#60c0a0", fmtPct],
+];
 
 // ── mountUI ────────────────────────────────────────────────────────────────────
 export function mountUI(actions) {
@@ -189,6 +202,7 @@ export function mountUI(actions) {
 
   topMenuBtns.appendChild(btn("btn", "Save", "Save city", () => actions.save?.()));
   topMenuBtns.appendChild(btn("btn", "Load", "Load city", () => actions.load?.()));
+  topMenuBtns.appendChild(btn("btn", "Files", "Save slots and files", () => { buildFiles(); filesDialog.showModal(); }));
   topMenuBtns.appendChild(btn("btn btn-danger", "New", "New city", () => confirmDialog.showModal()));
 
   topMenuBtns.appendChild(el("div", "top-sep"));
@@ -769,8 +783,8 @@ export function mountUI(actions) {
   reportDialog.appendChild(repBody);
 
   const repGraphWrap = el("div", "modal-section");
-  repGraphWrap.appendChild(el("div", "modal-section-title", "Population History"));
-  const repGraphEl = el("div");
+  repGraphWrap.appendChild(el("div", "modal-section-title", "History (last 20 years)"));
+  const repGraphEl = el("div", "graph-grid");
   repGraphWrap.appendChild(repGraphEl);
   repBody.appendChild(repGraphWrap);
 
@@ -815,8 +829,8 @@ export function mountUI(actions) {
     if (!s) return;
     const history = s.history || [];
     repGraphEl.innerHTML = history.length >= 2
-      ? buildHistoryGraph(history, "population", "var(--res)")
-      : "<p style='color:var(--text-dim);font-size:.6rem'>Not enough history yet.</p>";
+      ? REPORT_GRAPHS.map(([key, label, color, fmt]) => `<div class="graph-card"><div class="graph-title">${label}</div>${buildHistoryGraph(history, key, color, fmt)}</div>`).join("")
+      : "<p style='color:var(--text-dim);font-size:.6rem'>Not enough history yet. Run the simulation for a couple of months.</p>";
 
     const fmt = (k, v) => {
       if (v == null) return "--";
@@ -919,6 +933,55 @@ export function mountUI(actions) {
     if (e.target === disasterDialog) disasterDialog.close();
   });
 
+  // ── Files dialog: three save slots, export and import ──────────────────────
+  const filesDialog = document.createElement("dialog");
+  filesDialog.setAttribute("aria-label", "Files");
+  app.appendChild(filesDialog);
+  const filHdr = el("div", "modal-header");
+  filHdr.appendChild(el("span", "modal-title", "Save Slots & Files"));
+  filHdr.appendChild(btn("btn btn-icon", "✕", "Close", () => filesDialog.close()));
+  filesDialog.appendChild(filHdr);
+  const filBody = el("div", "modal-body");
+  filesDialog.appendChild(filBody);
+  const slotList = el("div");
+  filBody.appendChild(slotList);
+  const fileRow = el("div", "slider-row");
+  fileRow.style.marginTop = "10px";
+  fileRow.appendChild(btn("btn btn-sm", "Export to file", "Export city to a file", () => actions.exportSave?.()));
+  const importInput = document.createElement("input");
+  importInput.type = "file"; importInput.accept = ".json,application/json"; importInput.style.display = "none";
+  importInput.setAttribute("aria-label", "Import city file");
+  importInput.addEventListener("change", async () => {
+    const file = importInput.files?.[0];
+    if (!file) return;
+    const text = await file.text();
+    importInput.value = "";
+    filesDialog.close();
+    actions.importSave?.(text);
+  });
+  fileRow.appendChild(btn("btn btn-sm", "Import from file", "Import city from a file", () => importInput.click()));
+  fileRow.appendChild(importInput);
+  filBody.appendChild(fileRow);
+  const filFooter = el("div", "modal-footer");
+  filFooter.appendChild(btn("btn btn-teal", "Close", null, () => filesDialog.close()));
+  filesDialog.appendChild(filFooter);
+  filesDialog.addEventListener("click", (e) => { if (e.target === filesDialog) filesDialog.close(); });
+  function buildFiles() {
+    slotList.innerHTML = "";
+    const slots = actions.listSaves?.() || [];
+    for (const s of slots) {
+      const row = el("div", "save-slot");
+      const info = el("div", "save-slot-info", s.empty ? `Slot ${s.slot}: empty` : `Slot ${s.slot}: ${s.name}`);
+      if (!s.empty) { const small = document.createElement("small"); small.textContent = `${s.date} · ${fmtPop(s.population)} residents · ${fmtMoney(s.money)}`; info.appendChild(small); }
+      row.appendChild(info);
+      row.appendChild(btn("btn btn-sm", "Save", `Save to slot ${s.slot}`, () => { actions.save?.(s.slot); buildFiles(); }));
+      const load = btn("btn btn-sm btn-teal", "Load", `Load slot ${s.slot}`, () => { filesDialog.close(); actions.load?.(s.slot); });
+      if (s.empty) load.disabled = true;
+      row.appendChild(load);
+      slotList.appendChild(row);
+    }
+  }
+
   // ── Petition dialog ────────────────────────────────────────────────────────
   const petitionDialog = document.createElement("dialog");
   petitionDialog.setAttribute("aria-label", "Petition");
@@ -971,18 +1034,33 @@ export function mountUI(actions) {
     hlpBody.appendChild(sec);
   }
 
+  function helpText(title, paragraphs) {
+    const sec = el("div", "help-section");
+    sec.appendChild(el("div", "help-section-title", title));
+    for (const p of paragraphs) { const para = el("p", "help-para", p); sec.appendChild(para); }
+    hlpBody.appendChild(sec);
+  }
+  helpText("How to play", [
+    "Zone land (residential, commercial, industrial) next to roads. Lots develop when they have road access within three tiles, power, and for medium or high density, water. Demand (the R C I bars) decides how fast they grow; jobs attract residents, residents attract shops, and industry follows the workforce.",
+    "Power flows from plants through power lines, zoned tiles and buildings, and hops across a single road. Water comes from pumps (best next to water) or towers through pipes; every pipe serves six tiles around it. Plants and pumps have limited capacity.",
+    "Police, fire, health and education coverage depends on distance and department funding in the Budget. Garbage needs landfills, an incinerator or a recycling center. Parks, trees and water raise land value; industry, pollution, crime and traffic lower it.",
+    "Roads, rails, power lines and pipes that reach the map edge connect you to a neighbor: trade lifts demand, roads bring outside jobs, and lines or pipes let you buy or sell power and water.",
+    "Population milestones unlock rewards such as the Mayor's House and City Hall. Petitioners offer money-making deals with strings attached. Every January the budget review pauses the game.",
+  ]);
   helpSection("Navigation", [
     ["WASD / ↑↓←→", "Pan the map"],
     ["Scroll", "Zoom in / out"],
     ["Right drag", "Pan the map"],
-    ["H", "Home view"],
+    ["[ / ]", "Rotate the view"],
+    ["H", "Center on the city"],
     ["+ / −", "Zoom in / out"],
   ]);
   helpSection("Building", [
-    ["Click/drag", "Place selected tool"],
-    ["Drag rectangle", "Zone an area (release to commit)"],
-    ["Esc", "Switch to inspect mode"],
-    ["Ctrl+Z", "Undo last action"],
+    ["Click", "Place a building (large ones center on the cursor)"],
+    ["Drag", "Zone an area or draw a road, rail, line or pipe (release to commit)"],
+    ["Esc", "Cancel a drag, then switch to the query tool"],
+    ["Ctrl+Z", "Undo the last construction"],
+    ["Bulldoze", "Clears a building first, the zone second"],
   ]);
   helpSection("Speed", [
     ["0", "Pause"],

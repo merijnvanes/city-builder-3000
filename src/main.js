@@ -10,6 +10,8 @@ import { startScenario, updateScenario } from "./scenarios.js";
 
 const SAVE_KEY = "city-builder-3000-save-v3";
 const MONTH_MS = 2500;
+const SLOTS = 3;
+const slotKey = (slot) => (slot === 1 ? SAVE_KEY : `${SAVE_KEY}-slot${slot}`);
 
 let city = startScenario(sim.createCity(42, true));
 let tool = "inspect", density = 1, speed = 0;
@@ -83,28 +85,53 @@ function policy(key, value) {
   return result;
 }
 
+function loadFrom(raw, message) {
+  try {
+    city = sim.deserialize(raw);
+    if (!city.scenario) startScenario(city, "sandbox");
+    restore();
+    lookAtCity();
+    ui.notify(message);
+  } catch (err) { ui.notify(`That save could not be loaded: ${err.message}`); }
+}
+
 const actions = {
   selectTool: choose, setSpeed, setDensity, undo: undoLast,
   setTax: (n) => { for (const key of ["residential", "commercial", "industrial"]) sim.setPolicy(city, `tax.${key}`, Number(n)); refresh(); },
   setPolicy: policy,
   renameCity: (name) => policy("name", name),
-  save: () => {
+  save: (slot = 1) => {
     try {
-      localStorage.setItem(SAVE_KEY, sim.serialize(city));
-      ui.notify("City saved in this browser.");
+      localStorage.setItem(slotKey(slot), sim.serialize(city));
+      ui.notify(slot === 1 ? "City saved in this browser." : `City saved to slot ${slot}.`);
     } catch { ui.notify("Unable to save: browser storage is unavailable or full."); }
   },
-  load: () => {
-    const raw = localStorage.getItem(SAVE_KEY);
+  load: (slot = 1) => {
+    const raw = localStorage.getItem(slotKey(slot));
     if (!raw) { ui.notify("No saved city yet."); return; }
-    try {
-      city = sim.deserialize(raw);
-      if (!city.scenario) startScenario(city, "sandbox");
-      restore();
-      lookAtCity();
-      ui.notify("Saved city restored. Simulation paused.");
-    } catch (err) { ui.notify(`That save could not be loaded: ${err.message}`); }
+    loadFrom(raw, "Saved city restored. Simulation paused.");
   },
+  listSaves: () => Array.from({ length: SLOTS }, (_, i) => {
+    const slot = i + 1;
+    try {
+      const raw = localStorage.getItem(slotKey(slot));
+      if (!raw) return { slot, empty: true };
+      const d = JSON.parse(raw);
+      return { slot, empty: false, name: d.name, population: d.population, money: d.money, date: sim.dateOf(d.month) };
+    } catch { return { slot, empty: true }; }
+  }),
+  exportSave: () => {
+    try {
+      const blob = new Blob([sim.serialize(city)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `${city.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase() || "city"}-${sim.dateOf(city.month).replace(" ", "-")}.json`;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      ui.notify("City exported.");
+    } catch { ui.notify("Export failed in this browser."); }
+  },
+  importSave: (text) => loadFrom(text, "City imported. Simulation paused."),
   newCity: (options = {}) => {
     const scenario = options?.scenario || "sandbox";
     const seed = Number.isFinite(options?.seed) ? options.seed : Math.floor(Math.random() * 100000);

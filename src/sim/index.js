@@ -17,6 +17,7 @@ import { WATER_RADIUS } from "./utilities.js";
 import { updateEvents, respondPetition, openPetition, specialAvailable, ensureEvents, PETITIONS } from "./events.js";
 import { SPECIAL_TYPES } from "./catalog.js";
 import { DEALS, SIDES, signDeal, cancelDeal, auditDeals, dealAvailable } from "./neighbors.js";
+import { buildingName } from "./names.js";
 
 export { TOOLS, TOOL_MAP, BUILDINGS, ZONE_TYPES, ORDINANCES, ADVISORS, DISASTERS, START_YEAR, DEFAULT_SIZE, FUNDED_DEPARTMENTS, SPECIAL_TYPES, PETITIONS, DEALS, SIDES, serialize, place, evaluate, isZone };
 
@@ -208,9 +209,10 @@ export function inspectTile(city, x, y) {
   const yesNo = (v) => (v ? "Yes" : "No");
   if (ZONE_TYPES.has(t.type)) {
     title = `${DENSITY_NAMES[t.density]} ${t.type}`;
+    const name = buildingName(a);
     if (!a.lot) description = "Zoned, waiting for development. Needs road access and power" + (t.density >= 2 ? " and water." : ".");
     else if (a.abandoned) description = `Abandoned ${STAGE_NAMES[t.type][Math.max(1, a.level)].toLowerCase()}. Restore services and demand to bring residents back.`;
-    else description = `${STAGE_NAMES[t.type][a.level]} (${a.lot.w}×${a.lot.h} lot, stage ${a.level}/4).`;
+    else { title = name || title; description = `${STAGE_NAMES[t.type][a.level]}, ${DENSITY_NAMES[t.density].toLowerCase()} ${t.type} (${a.lot.w}×${a.lot.h} lot, stage ${a.level}/4).`; }
     const cap = capacityOf(a);
     if (cap) details.push(t.type === "residential" ? `Residents: ${cap.toLocaleString()}` : `Jobs: ${cap.toLocaleString()}${a.filled != null ? ` (${Math.min(cap, Math.round(a.filled)).toLocaleString()} filled)` : ""}`);
     if (t.type === "residential" && a.commute != null && cap) details.push(`Workers with a job: ${Math.round(a.commute * 100)}%`);

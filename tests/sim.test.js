@@ -381,7 +381,8 @@ describe("disasters and inspection", () => {
     const c = createCity(44, true);
     const anchor = c.tiles.find((t) => isAnchor(t) && t.type === "residential" && t.level > 0);
     const info = inspectTile(c, anchor.x, anchor.y);
-    assert.match(info.title, /residential/i);
+    assert.match(info.description, /residential/i);
+    assert.match(info.title, /^[A-Z][a-z]+ /, "developed lots get a name");
     assert.ok(info.details.some((d) => /Residents/.test(d)));
     const plant = c.tiles.find((t) => t.type === "coal");
     assert.match(inspectTile(c, plant.x, plant.y).title, /Coal/);

@@ -62,6 +62,8 @@ export const BUILDINGS = {
   largepark:   { label: "Large Park",      group: "landscape", cost: 200,  w: 3, h: 3, upkeep: 10,  dept: "parks", service: { kind: "park", radius: 7, strength: 60 } },
   zoo:         { label: "Zoo",             group: "landscape", cost: 3000, w: 4, h: 4, upkeep: 100, dept: "parks", service: { kind: "park", radius: 10, strength: 90 }, powerUse: 3, waterUse: 3 },
   tree:        { label: "Plant Trees",     group: "landscape", cost: 3,    w: 1, h: 1, upkeep: 0,   dept: "parks", rect: true, overlay: true },
+  makewater:   { label: "Dig Water",       group: "landscape", cost: 120,  w: 1, h: 1, upkeep: 0,   dept: "parks", rect: true, terrain: "water" },
+  makeland:    { label: "Fill Land",       group: "landscape", cost: 180,  w: 1, h: 1, upkeep: 0,   dept: "parks", rect: true, terrain: "land" },
 
   // Rewards: unlocked once the city reaches a population milestone. One each.
   mayorhouse:  { label: "Mayor's House",   group: "special", cost: 0,    w: 2, h: 2, upkeep: 20,  dept: "parks", unique: true, reward: { population: 2000 },  service: { kind: "culture", radius: 6, strength: 40 }, effects: { landValue: 8, radius: 6 } },

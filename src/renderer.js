@@ -378,6 +378,41 @@ export class CityRenderer {
       }
     }
 
+    // Trains on busy rails.
+    for (let i = 0; i < city.tiles.length; i++) {
+      const t = city.tiles[i];
+      if (t.type !== "rail" || !t.traffic || random(t.x, t.y, 5) > 0.12) continue;
+      const east = city.tiles[i + 1]?.type === "rail" && t.x + 1 < city.size, south = city.tiles[i + city.size]?.type === "rail";
+      if (!east && !south) continue;
+      const f = (time * 0.0002 + random(t.x, t.y, 6)) % 1;
+      const p = this.project(t.x + (east ? f : 0.5), t.y + (east ? 0.5 : f), 3);
+      if (p.x < -20 || p.x > this.w + 20 || p.y < -20 || p.y > this.h + 20) continue;
+      ctx.fillStyle = "#3b4a52"; ctx.fillRect(p.x - 6 * this.zoom, p.y - 4 * this.zoom, 12 * this.zoom, 5 * this.zoom);
+      ctx.fillStyle = "#c9a23a"; ctx.fillRect(p.x - 5 * this.zoom, p.y - 5 * this.zoom, 3 * this.zoom, 1.5 * this.zoom);
+    }
+    // Boats near seaports, planes over airports.
+    for (const t of city.tiles) {
+      if (!t.lot || t.lot.x !== t.x || t.lot.y !== t.y) continue;
+      if (t.type === "seaport") {
+        const a = time * 0.0004 + t.x;
+        const p = this.project(t.x + t.lot.w / 2 + Math.cos(a) * 4, t.y + t.lot.h / 2 + Math.sin(a) * 4, 1);
+        const tile = city.tiles[Math.floor(t.y + t.lot.h / 2 + Math.sin(a) * 4) * city.size + Math.floor(t.x + t.lot.w / 2 + Math.cos(a) * 4)];
+        if (tile?.terrain === "water") {
+          ctx.fillStyle = "#e9e6d8"; ctx.fillRect(p.x - 5 * this.zoom, p.y - 2 * this.zoom, 10 * this.zoom, 3 * this.zoom);
+          ctx.fillStyle = "#5b6f7a"; ctx.fillRect(p.x - 2 * this.zoom, p.y - 4 * this.zoom, 3 * this.zoom, 2 * this.zoom);
+        }
+      } else if (t.type === "airport") {
+        const a = time * 0.0005 + t.y;
+        const p = this.project(t.x + 3 + Math.cos(a) * 9, t.y + 2 + Math.sin(a) * 6, 60 + Math.sin(a * 2) * 10);
+        const s = this.project(t.x + 3 + Math.cos(a) * 9, t.y + 2 + Math.sin(a) * 6, 0);
+        ctx.fillStyle = "#00000022"; ctx.beginPath(); ctx.ellipse(s.x, s.y, 5 * this.zoom, 2 * this.zoom, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#f2f2ec";
+        ctx.fillRect(p.x - 6 * this.zoom, p.y - 1 * this.zoom, 12 * this.zoom, 2 * this.zoom);
+        ctx.fillRect(p.x - 1 * this.zoom, p.y - 4 * this.zoom, 2 * this.zoom, 8 * this.zoom);
+        if (this.night) { ctx.fillStyle = Math.floor(time / 400) % 2 ? "#ff6060" : "#f2f2ec"; ctx.fillRect(p.x - 7 * this.zoom, p.y - 1.5 * this.zoom, 2 * this.zoom, 2 * this.zoom); }
+      }
+    }
+
     ctx.drawImage(this.cache, 0, 0, this.w, this.h);
     if (this.night) { ctx.fillStyle = "#12253d45"; ctx.fillRect(0, 0, this.w, this.h); }
 
