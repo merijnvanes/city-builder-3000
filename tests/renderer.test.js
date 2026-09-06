@@ -1,0 +1,51 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { CityRenderer } from "../src/renderer.js";
+
+function camera() {
+  return Object.assign(Object.create(CityRenderer.prototype), {
+    w: 1440,
+    h: 900,
+    zoom: 1,
+    panX: 0,
+    panY: 0,
+  });
+}
+test("isometric picking selects every tile after pan and zoom", () => {
+  const r = camera();
+  r.zoom = 1.73;
+  r.panX = -117;
+  r.panY = 209;
+  for (let x = 0; x < 40; x++)
+    for (let y = 0; y < 40; y++) {
+      const p = r.project(x + 0.5, y + 0.5);
+      assert.deepEqual(r.pick(p.x, p.y), { x, y });
+    }
+});
+test("zoom stays anchored at the pointer and clamps extreme input", () => {
+  const r = camera(),
+    point = r.project(12.5, 19.5);
+  r.zoomAt(0.5, point.x, point.y);
+  const next = r.project(12.5, 19.5);
+  assert.ok(Math.abs(point.x - next.x) < 1e-8);
+  assert.ok(Math.abs(point.y - next.y) < 1e-8);
+  r.zoomAt(100);
+  assert.equal(r.zoom, 2.8);
+  r.zoomAt(-100);
+  assert.equal(r.zoom, 0.35);
+});
+test("home clears camera displacement", () => {
+  const r = camera();
+  r.pan(100, 250);
+  r.home();
+  assert.equal(r.panX, 0);
+  assert.equal(r.panY, 0);
+  assert.equal(r.dirty, true);
+});
+
+test('isometric picking remains exact in all four orientations',()=>{
+ for(let rotation=0;rotation<4;rotation++){
+  const r=camera();r.rotation=rotation;r.size=40;r.zoom=.73;r.panX=78;r.panY=-120;
+  for(let x=0;x<40;x+=3)for(let y=0;y<40;y+=3){const p=r.project(x+.5,y+.5);assert.deepEqual(r.pick(p.x,p.y),{x,y});}
+ }
+});
