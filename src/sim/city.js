@@ -98,6 +98,8 @@ export function serialize(city) {
     population: city.population, happiness: city.happiness, demand: city.demand,
     history: city.history, news: city.news, revision: city.revision, _rng: city._rng,
     scenario: city.scenario ?? null,
+    prev: city._prev ?? null,
+    disasters: city.disasters !== false,
   });
 }
 
@@ -180,7 +182,8 @@ export function deserialize(raw) {
     news: d.news,
     revision: d.revision,
     _rng: d._rng,
-    _prev: null,
+    _prev: d.prev && typeof d.prev === "object" && Object.values(d.prev).every(Number.isFinite) ? { ...d.prev } : null,
+    disasters: d.disasters !== false,
   };
   if (d.scenario && typeof d.scenario === "object") city.scenario = d.scenario;
   // Every lot must be consistent: all its tiles reference the same anchor and share a type.

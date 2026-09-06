@@ -89,36 +89,39 @@ export function updateServices(city) {
   const garbage = garbageProduced > 0 ? Math.round(100 * uncollected / garbageProduced) : 0;
   if (garbage > 0) for (const t of tiles) if (ZONE_TYPES.has(t.type)) t.pollution = Math.min(100, t.pollution + Math.round(garbage * 0.06));
 
-  // ── Crime ─────────────────────────────────────────────────────
-  const unemployment = city._metrics?.unemployment ?? 0;
-  const watch = ord.neighborhoodWatch ? 0.85 : 1;
-  for (const t of tiles) {
-    if (!ZONE_TYPES.has(t.type) || !t.lot) { t.crime = 0; continue; }
-    let c = 4 + t.density * 5 + (100 - (t.landValue ?? 45)) * 0.18 + unemployment * 0.35;
-    if (t.abandoned) c += 20;
-    c -= t.svc.police * 0.55;
-    c *= watch;
-    t.crime = Math.max(0, Math.min(100, Math.round(c)));
-  }
-
-  // ── Land value ────────────────────────────────────────────────
+  // ── Land value (before crime, so the result depends only on the
+  //    current state and a reload reproduces it exactly) ───────────
   const waterNear = new Float32Array(tiles.length);
   const industryNear = new Float32Array(tiles.length);
   for (const t of tiles) {
     if (t.terrain === "water") forRadius(city, t.x, t.y, 3, (n, d) => { const v = 14 - d * 4; if (v > waterNear[n.y * size + n.x]) waterNear[n.y * size + n.x] = v; });
     if (isAnchor(t) && t.type === "industrial" && t.level) forRadius(city, t.x, t.y, 4, (n, d) => { const v = 14 - d * 3; if (v > industryNear[n.y * size + n.x]) industryNear[n.y * size + n.x] = v; });
   }
+  const baseValue = new Float32Array(tiles.length);
   for (const t of tiles) {
     const i = t.y * size + t.x;
-    let v = 32 + waterNear[i] - industryNear[i];
+    let v = 34 + waterNear[i] - industryNear[i];
     v += t.svc.park * 0.28 + t.svc.culture * 0.2 + t.svc.education * 0.08 + t.svc.health * 0.06;
     v += t.trees * 2.5;
-    v -= t.pollution * 0.38 + t.crime * 0.2 + (t.traffic || 0) * 0.08;
+    v -= t.pollution * 0.38 + (t.traffic || 0) * 0.08;
     if (t.powered) v += 5;
     if (t.watered) v += 5;
     if (t.roadAccess) v += 5;
-    t.landValue = Math.max(0, Math.min(100, Math.round(v)));
+    baseValue[i] = Math.max(0, Math.min(100, v));
   }
+
+  // ── Crime ─────────────────────────────────────────────────────
+  const unemployment = city._traffic?.unemployment ?? 0;
+  const watch = ord.neighborhoodWatch ? 0.85 : 1;
+  for (const t of tiles) {
+    if (!ZONE_TYPES.has(t.type) || !t.lot) { t.crime = 0; continue; }
+    let c = 4 + t.density * 5 + (100 - baseValue[t.y * size + t.x]) * 0.18 + unemployment * 0.35;
+    if (t.abandoned) c += 20;
+    c -= t.svc.police * 0.55;
+    c *= watch;
+    t.crime = Math.max(0, Math.min(100, Math.round(c)));
+  }
+  for (const t of tiles) t.landValue = Math.max(0, Math.min(100, Math.round(baseValue[t.y * size + t.x] - t.crime * 0.2)));
 
   return { garbage, garbageProduced: Math.round(garbageProduced), garbageCapacity: Math.round(garbageCapacity), industrialLots };
 }

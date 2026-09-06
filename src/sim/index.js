@@ -47,17 +47,19 @@ export function deserialize(raw) {
   return settle(parseCity(raw));
 }
 
+// One month. Growth uses the demand shown to the player (computed at the end
+// of the previous month), then every derived value is recomputed from the
+// settled state so a save/load round trip reproduces it exactly.
 export function tick(city) {
   const rng = lcg(nextRandom(city) * 4294967296);
+  if (!city._metrics) settle(city);
+  const growth = updateGrowth(city, city.demand, rng);
+  const fireMessage = advanceFires(city, rng);
   refreshCity(city);
   city._traffic = updateTraffic(city);
   refreshCity(city);
-  const before = computeMetrics(city);
-  const demand = computeDemand(city, before);
-  const growth = updateGrowth(city, demand, rng);
-  const fireMessage = advanceFires(city, rng);
-  refreshCity(city);
   const m = computeMetrics(city);
+  const demand = computeDemand(city, m);
   const budget = computeBudget(city);
   const statsForNews = { ...m, balance: budget.balance, money: city.money, demand };
 

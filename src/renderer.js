@@ -314,9 +314,10 @@ export class CityRenderer {
       if (it.kind === "lot" || it.kind === "zone") drawArchitecture(this, t);
       else if (it.kind === "trees") {
         const n = Math.floor(random(t.y, t.x) * 3);
-        if (t.trees >= 1) this.tree(t.x + 0.35, t.y + 0.45, n);
-        if (t.trees >= 2) this.tree(t.x + 0.72, t.y + 0.72, (n + 1) % 3);
-        if (t.trees >= 3) this.tree(t.x + 0.7, t.y + 0.25, (n + 2) % 3);
+        const jx = random(t.x, t.y, 11) * 0.4, jy = random(t.x, t.y, 12) * 0.4;
+        if (t.trees >= 1) this.tree(t.x + 0.2 + jx, t.y + 0.3 + jy, n);
+        if (t.trees >= 2) this.tree(t.x + 0.55 + jy * 0.8, t.y + 0.6 + jx * 0.8, (n + 1) % 3);
+        if (t.trees >= 3) this.tree(t.x + 0.65 - jx * 0.5, t.y + 0.15 + jy * 0.5, (n + 2) % 3);
       } else this.powerline(t, city);
     }
     ctx.globalAlpha = 1;

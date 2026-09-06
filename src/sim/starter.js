@@ -71,8 +71,18 @@ export function buildStarterTown(city) {
   const nearWater = (t) => { let near = false; forRadius(city, t.x, t.y, 1, (n) => { if (n.terrain === "water") near = true; }); return near; };
 
   const size = city.size;
-  const ox = Math.max(4, Math.round(size * 0.12)), oy = Math.max(4, Math.round(size * 0.2));
   const span = 28;
+  // Site the town on the driest 29×29 window, preferring the west-centre.
+  const prefX = Math.round(size * 0.12), prefY = Math.round(size * 0.2);
+  let ox = prefX, oy = prefY, bestScore = Infinity;
+  for (let cy = 3; cy + span < size - 3; cy += 2) {
+    for (let cx = 3; cx + span < size - 3; cx += 2) {
+      let wet = 0;
+      for (let y = cy; y <= cy + span; y++) for (let x = cx; x <= cx + span; x++) if (tileAt(city, x, y).terrain !== "grass") wet++;
+      const score = wet * 4 + Math.abs(cx - prefX) + Math.abs(cy - prefY);
+      if (score < bestScore) { bestScore = score; ox = cx; oy = cy; }
+    }
+  }
 
   // Road grid: 8 streets each way, 49 blocks of 3×3.
   for (let i = 0; i <= 7; i++) {
@@ -162,24 +172,49 @@ export function buildStarterTown(city) {
     if (site) pumps.push(tileAt(city, site.x, site.y), tileAt(city, site.x + 1, site.y));
   }
   for (const p of pumps) put(p.x, p.y, sourceTool);
+  // Nearest dry tile to a point, so routes never start or end on a bridge.
+  const dry = (x, y) => {
+    let best = null, bestD = Infinity;
+    forRadius(city, x, y, 6, (t, d) => { if (t.terrain !== "water" && d < bestD) { bestD = d; best = t; } });
+    return best;
+  };
+  // Nearest zoned or civic block tile: those conduct power, road corners do not.
+  const nearestBlockTile = (x, y) => {
+    let best = null, bestD = Infinity;
+    for (let j = 0; j <= 6; j++) for (let i = 0; i <= 6; i++) {
+      const b = blockAt(i, j), t = tileAt(city, b.x, b.y);
+      if (!t || t.terrain === "water" || t.type === "empty") continue;
+      const d = Math.abs(b.x - x) + Math.abs(b.y - y);
+      if (d < bestD) { bestD = d; best = t; }
+    }
+    return best;
+  };
   if (pumps.length) {
     const p = pumps[0];
     const rowY = [oy, oy + 12, oy + 24].sort((a, b) => Math.abs(a - p.y) - Math.abs(b - p.y))[0];
     const edgeX = p.x > cx ? ox + span : ox;
-    route(p, tileAt(city, edgeX, rowY), ["pipe", "powerline"]);
+    const edge = dry(edgeX, rowY);
+    if (edge) {
+      route(p, edge, ["pipe", "powerline"]);
+      const block = nearestBlockTile(edge.x, edge.y);
+      if (block) route(edge, block, ["powerline"]);
+    }
     for (const other of pumps.slice(1)) route(other, p, ["pipe", "powerline"]);
-    for (const y of [oy, oy + 12, oy + 24]) line(ox, y, ox + span, y, "pipe");
-    line(ox + 16, oy, ox + 16, oy + span, "pipe");
+    // Pipe mains under three streets and one avenue, detouring around water.
+    for (const y of [oy, oy + 12, oy + 24]) { const a = dry(ox, y), b = dry(ox + span, y); if (a && b) route(a, b, ["pipe"]); }
+    { const a = dry(ox + 16, oy), b = dry(ox + 16, oy + span); if (a && b) route(a, b, ["pipe"]); }
   }
 
   // Develop lots.
+  // Workplaces start a stage ahead so the first commute finds enough jobs.
   const levels = { 1: [1, 1, 2, 2, 3], 2: [1, 2, 2, 3, 3], 3: [1, 2, 2, 3, 3, 4] };
+  const jobLevels = { 1: [2, 2, 3, 3], 2: [2, 3, 3, 4], 3: [3, 3, 4, 4] };
   for (const t of city.tiles) {
     if (!["residential", "commercial", "industrial"].includes(t.type) || t.lot) continue;
     const lot = findLot(city, t);
     if (!lot) continue;
     if (rng() < 0.12) continue; // leave a few empty lots
-    assignLot(city, lot, pick(rng, levels[t.density]), rng());
+    assignLot(city, lot, pick(rng, (t.type === "residential" ? levels : jobLevels)[t.density]), rng());
   }
 
   city.money = savedMoney;
