@@ -163,6 +163,7 @@ const actions = {
     ui.tip(null);
     advanceTips();
   },
+  explore: () => { ui.notify("Welcome to New Riverton. Press 1 to run time, or click a tool to build."); },
   setOverlay: (id) => { renderer.overlay = id; renderer.dirty = true; ui?.setOverlay(id); },
   zoom: (d) => renderer.zoomAt(d * 0.18),
   home: () => lookAtCity(),
@@ -207,6 +208,7 @@ input = attachInput(canvas, renderer, {
 const minimap = createMinimap(renderer);
 refresh(); choose("inspect"); setDensity(1); setSpeed(0);
 tipIndex = TIPS.length; // the starter town needs no walkthrough
+if (!new URLSearchParams(location.search).has("play")) ui.showTitle();
 document.addEventListener("visibilitychange", () => { lastTick = performance.now(); previousTime = lastTick; });
 
 function frame(now) {

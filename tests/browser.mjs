@@ -15,6 +15,8 @@ const tile = (x, y) => page.evaluate(({ x, y }) => civic.city.tiles[y * civic.ci
 try {
   await page.goto(process.env.CIVIC_TEST_URL || "http://127.0.0.1:4173");
   await page.waitForFunction(() => window.civic?.city?.tiles.length > 0);
+  assert.ok(await page.getByRole("dialog", { name: "Welcome", exact: true }).isVisible(), "title screen shows");
+  await page.getByRole("button", { name: "Explore the sample town", exact: true }).click();
   const initial = await money();
   await page.waitForTimeout(2700);
   assert.equal(await page.evaluate(() => civic.city.month), 0, "Starts paused");

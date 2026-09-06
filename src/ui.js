@@ -530,6 +530,25 @@ export function mountUI(actions) {
   bpInner.appendChild(bpMsg);
   buildPreview.appendChild(bpInner);
 
+  // ── Title screen ───────────────────────────────────────────────────────────
+  const titleScreen = el("div");
+  titleScreen.id = "title-screen";
+  titleScreen.setAttribute("role", "dialog");
+  titleScreen.setAttribute("aria-label", "Welcome");
+  const titleCard = el("div", "title-card");
+  const titleLogo = el("div", "title-logo");
+  titleLogo.innerHTML = "CITY BUILDER <span>3000</span>";
+  titleCard.appendChild(titleLogo);
+  titleCard.appendChild(el("p", "title-tagline", "Zone it. Wire it. Water it. Watch it grow."));
+  const titleBtns = el("div", "title-buttons");
+  titleBtns.appendChild(btn("btn btn-teal title-btn", "New City", "Start a new city", () => { titleScreen.classList.remove("show"); confirmDialog.showModal(); }));
+  titleBtns.appendChild(btn("btn title-btn", "Load City", "Load a saved city", () => { titleScreen.classList.remove("show"); buildFiles(); filesDialog.showModal(); }));
+  titleBtns.appendChild(btn("btn title-btn", "Explore New Riverton", "Explore the sample town", () => { titleScreen.classList.remove("show"); actions.explore?.(); }));
+  titleCard.appendChild(titleBtns);
+  titleCard.appendChild(el("p", "title-foot", "Original art and code. Press ? in game for help."));
+  titleScreen.appendChild(titleCard);
+  app.appendChild(titleScreen);
+
   // ── Tip box: a persistent hint with a dismiss button ──────────────────────
   const tipBox = el("div");
   tipBox.id = "tip-box";
@@ -904,12 +923,38 @@ export function mountUI(actions) {
     }
   }
 
+  // A small procedural portrait per advisor: skin, hair, glasses and a mood.
+  function portrait(name, mood) {
+    let h = 0;
+    for (const ch of name) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    const skin = ["#e8c9a6", "#d4a57c", "#b87d55", "#8d5a3b", "#f0d7bd", "#6b4630"][h % 6];
+    const hair = ["#2b1d14", "#5a3a22", "#a86a2a", "#d9c28a", "#3a3a3a", "#8b8b8b", "#b0402a"][(h >> 3) % 7];
+    const shirt = ["#3a6fa0", "#7a4f8a", "#3f7a5c", "#a05a3a", "#4a4a5a"][(h >> 6) % 5];
+    const glasses = (h >> 9) % 3 === 0;
+    const long = (h >> 11) % 2 === 0;
+    const bg = mood === "bad" ? "#5a2a2a" : mood === "warning" ? "#5a4a1a" : "#1e4a40";
+    const mouth = mood === "bad" ? "M16 27 q4 -2 8 0" : mood === "warning" ? "M16 26 h8" : "M16 25 q4 3 8 0";
+    return `<svg viewBox="0 0 40 40" width="44" height="44" aria-hidden="true">
+      <rect width="40" height="40" rx="4" fill="${bg}"/>
+      <path d="M8 40 v-6 a12 8 0 0 1 24 0 v6 z" fill="${shirt}"/>
+      ${long ? `<ellipse cx="20" cy="20" rx="11" ry="13" fill="${hair}"/>` : ""}
+      <ellipse cx="20" cy="18" rx="8.5" ry="10" fill="${skin}"/>
+      <path d="M11.5 15 q8.5 -11 17 0 q-2 -4 -8.5 -5 q-6.5 1 -8.5 5z" fill="${hair}"/>
+      <circle cx="16.5" cy="18" r="1.1" fill="#222"/><circle cx="23.5" cy="18" r="1.1" fill="#222"/>
+      ${glasses ? `<circle cx="16.5" cy="18" r="3" fill="none" stroke="#333" stroke-width=".8"/><circle cx="23.5" cy="18" r="3" fill="none" stroke="#333" stroke-width=".8"/><path d="M19.5 18 h1" stroke="#333" stroke-width=".8"/>` : ""}
+      <path d="${mouth}" fill="none" stroke="#5a2a20" stroke-width="1.1" stroke-linecap="round"/>
+    </svg>`;
+  }
+
   function renderAdvisor(parent, { name, role, mood, message }) {
     const card = el("div", "advisor-card");
-    const dot = el("div", `advisor-mood ${mood || "good"}`);
-    card.appendChild(dot);
+    const face = el("div", "advisor-portrait");
+    face.innerHTML = portrait(name, mood);
+    card.appendChild(face);
     const info = el("div");
-    info.appendChild(el("div", "advisor-name", name + (role ? ` — ${role}` : "")));
+    const nameRow = el("div", "advisor-name", name + (role ? ` — ${role}` : ""));
+    nameRow.prepend(el("span", `advisor-mood ${mood || "good"}`));
+    info.appendChild(nameRow);
     info.appendChild(el("div", "advisor-msg", message));
     card.appendChild(info);
     parent.appendChild(card);
@@ -1347,6 +1392,10 @@ export function mountUI(actions) {
       if (!message) { tipBox.classList.remove("show"); return; }
       tipText.textContent = message;
       tipBox.classList.add("show");
+    },
+
+    showTitle() {
+      titleScreen.classList.add("show");
     },
 
     setTool(id) {

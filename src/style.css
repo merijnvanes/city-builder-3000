@@ -1422,6 +1422,41 @@ input[type="range"].chrome-slider::-moz-range-thumb {
   #hint-line { width: 120px; }
 }
 
+/* ── Title screen ────────────────────────────────────────────────── */
+#title-screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at center, rgba(18,30,42,0.55) 0%, rgba(10,16,24,0.92) 100%);
+  pointer-events: auto;
+  z-index: 40;
+}
+#title-screen.show { display: flex; }
+.title-card {
+  width: min(520px, 92vw);
+  padding: 28px 30px 22px;
+  text-align: center;
+  background: linear-gradient(180deg, #33465a 0%, #22303e 100%);
+  border: 2px solid;
+  border-color: var(--chrome-hi) var(--chrome-sh) var(--chrome-sh) var(--chrome-hi);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+}
+.title-logo { font-size: 1.7rem; font-weight: 900; letter-spacing: 0.18em; color: var(--teal-br); text-transform: uppercase; }
+.title-logo span { color: #e8d040; }
+.title-tagline { font-size: 0.72rem; color: var(--text-dim); margin: 6px 0 18px; }
+.title-buttons { display: flex; flex-direction: column; gap: 8px; align-items: stretch; }
+.title-btn { padding: 10px 14px; font-size: 0.72rem; }
+.title-foot { font-size: 0.56rem; color: var(--text-dim); margin-top: 16px; }
+
+/* ── Advisor portraits ───────────────────────────────────────────── */
+.advisor-card { display: flex; gap: 10px; align-items: flex-start; }
+.advisor-portrait { flex-shrink: 0; width: 44px; height: 44px; border: 1px solid var(--chrome-sh); border-radius: 4px; overflow: hidden; }
+.advisor-portrait svg { display: block; }
+.advisor-name .advisor-mood { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+
 /* ── Tip box ─────────────────────────────────────────────────────── */
 #tip-box {
   position: absolute;
