@@ -10,8 +10,25 @@
 import { components, forSquare, forRadius, tileAt } from "./grid.js";
 import { BUILDINGS, ZONE_TYPES } from "./catalog.js";
 import { isAnchor, anchorOf, drawOf } from "./lots.js";
+import { DEALS } from "./neighbors.js";
 
 export const WATER_RADIUS = 6;
+
+// Neighbour deals: bought supply arrives on the network touching the edge;
+// sold supply is a fixed extra load on that network.
+function applyDeal(city, resource, netIds, supply, consumers, tilesKey) {
+  const deal = city.deals?.[resource];
+  if (!deal) return null;
+  const side = city._connections?.[deal.side];
+  const edge = side?.[tilesKey]?.[0];
+  if (!edge) return null;
+  const net = netIds[edge.y * city.size + edge.x];
+  if (net < 0) return null;
+  const d = DEALS[resource][deal.kind];
+  if (deal.kind === "buy") supply[net] += d.amount;
+  else consumers.unshift({ anchor: { deal: resource }, net, draw: d.amount });
+  return { net, kind: deal.kind, amount: d.amount };
+}
 
 // Pumps near water give full output; elsewhere they trickle.
 export function sourceEfficiency(city, anchor) {
@@ -94,6 +111,8 @@ export function updateUtilities(city) {
     const draw = drawOf(t).power;
     if (draw > 0) powerConsumers.push({ anchor: t, net, draw });
   }
+  if (city.ordinances?.energyConservation) for (const c of powerConsumers) c.draw *= 0.85;
+  const powerDeal = applyDeal(city, "power", power.ids, powerSupply, powerConsumers, "powerTiles");
   const p = allocate(city, power.ids, power.count, powerSupply, powerConsumers);
   for (const t of tiles) {
     const net = power.ids[t.y * size + t.x];
@@ -129,6 +148,8 @@ export function updateUtilities(city) {
     const draw = drawOf(t).water;
     if (draw > 0) waterConsumers.push({ anchor: t, net, draw });
   }
+  if (city.ordinances?.waterConservation) for (const c of waterConsumers) c.draw *= 0.85;
+  const waterDeal = applyDeal(city, "water", water.ids, waterSupply, waterConsumers, "pipeTiles");
   const w = allocate(city, cover, water.count, waterSupply, waterConsumers);
   for (const t of tiles) {
     const net = cover[t.y * size + t.x];
@@ -138,8 +159,10 @@ export function updateUtilities(city) {
     if (a && w.served.has(a)) t.watered = true;
   }
 
+  // A sale is honoured only when the network can carry it.
+  const sold = (deal, served) => deal?.kind === "sell" ? [...served].some((a) => a.deal) : deal?.kind === "buy" ? true : null;
   return {
-    power: { supply: Math.round(p.totalSupply), demand: Math.round(p.totalDemand) },
-    water: { supply: Math.round(w.totalSupply), demand: Math.round(w.totalDemand) },
+    power: { supply: Math.round(p.totalSupply), demand: Math.round(p.totalDemand), deal: powerDeal ? { ...powerDeal, met: sold(powerDeal, p.served) } : null },
+    water: { supply: Math.round(w.totalSupply), demand: Math.round(w.totalDemand), deal: waterDeal ? { ...waterDeal, met: sold(waterDeal, w.served) } : null },
   };
 }

@@ -1294,6 +1294,15 @@ input[type="range"].chrome-slider::-moz-range-thumb {
   color: var(--text-dim);
 }
 
+/* ── Neighbor deals ───────────────────────────────────────────────── */
+.neighbor-row {
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(82,104,127,0.2);
+}
+.neighbor-name { font-size: 0.62rem; color: var(--text); margin-bottom: 4px; }
+.neighbor-actions { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.neighbor-active { font-size: 0.58rem; color: var(--text-pos); padding: 2px 6px; border: 1px solid rgba(64,232,144,0.35); border-radius: var(--radius-sm); }
+
 /* ── Form controls in dialogs ─────────────────────────────────────── */
 .chrome-select,
 .chrome-input {

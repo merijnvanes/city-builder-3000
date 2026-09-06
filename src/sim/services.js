@@ -100,6 +100,9 @@ export function updateServices(city) {
   }
   let garbageProduced = population * 0.03 + jobs * 0.015;
   if (ord.recycling) garbageProduced *= 0.75;
+  const garbageDeal = city.deals?.garbage;
+  if (garbageDeal?.kind === "sell") garbageCapacity += 500;
+  if (garbageDeal?.kind === "buy") garbageProduced += 600;
   const uncollected = Math.max(0, garbageProduced - garbageCapacity);
   const garbage = garbageProduced > 0 ? Math.round(100 * uncollected / garbageProduced) : 0;
   if (garbage > 0) for (const t of tiles) if (ZONE_TYPES.has(t.type)) t.pollution = Math.min(100, t.pollution + Math.round(garbage * 0.06));

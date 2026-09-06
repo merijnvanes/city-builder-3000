@@ -16,8 +16,9 @@ import { anchorOf, capacityOf, drawOf } from "./lots.js";
 import { WATER_RADIUS } from "./utilities.js";
 import { updateEvents, respondPetition, openPetition, specialAvailable, ensureEvents, PETITIONS } from "./events.js";
 import { SPECIAL_TYPES } from "./catalog.js";
+import { DEALS, SIDES, signDeal, cancelDeal, auditDeals, dealAvailable } from "./neighbors.js";
 
-export { TOOLS, TOOL_MAP, BUILDINGS, ZONE_TYPES, ORDINANCES, ADVISORS, DISASTERS, START_YEAR, DEFAULT_SIZE, FUNDED_DEPARTMENTS, SPECIAL_TYPES, PETITIONS, serialize, place, evaluate, isZone };
+export { TOOLS, TOOL_MAP, BUILDINGS, ZONE_TYPES, ORDINANCES, ADVISORS, DISASTERS, START_YEAR, DEFAULT_SIZE, FUNDED_DEPARTMENTS, SPECIAL_TYPES, PETITIONS, DEALS, SIDES, serialize, place, evaluate, isZone };
 
 export function createCity(seed = 42, starter = true, options = {}) {
   if (seed && typeof seed === "object") { options = seed; seed = options.seed ?? 42; starter = options.starter ?? true; }
@@ -77,6 +78,7 @@ export function tick(city) {
 
   const news = generateNews(city, statsForNews, city._prev);
   news.push(...updateEvents(city, statsForNews, rng));
+  news.push(...auditDeals(city, city._connections));
   const disaster = randomDisaster(city, m, rng);
   if (disaster) news.push(disaster);
   if (fireMessage) news.push(fireMessage);
@@ -119,6 +121,12 @@ export function getStats(city) {
     unlocked: { ...(city.unlocked || {}) },
     available: Object.fromEntries(SPECIAL_TYPES.map((type) => [type, specialAvailable(city, type)])),
     petition: (() => { const p = openPetition(city); return p ? { ...p, ...PETITIONS[p.id] } : null; })(),
+    neighbors: SIDES.map((side) => {
+      const c = city._connections?.[side] || {};
+      return { side, name: c.name, road: c.road || 0, rail: c.rail || 0, power: c.power || 0, water: c.water || 0,
+        deals: Object.fromEntries(Object.keys(DEALS).map((r) => [r, dealAvailable(city._connections, r, side)])) };
+    }),
+    deals: Object.fromEntries(Object.entries(city.deals || {}).map(([r, d]) => [r, { ...d, ...DEALS[r][d.kind], met: r === "garbage" ? true : city._util?.[r]?.deal?.met !== false }])),
     advice: "",
   };
   stats.advisors = generateAdvisors(city, stats);
@@ -160,6 +168,10 @@ export function setPolicy(city, key, value) {
       result = { ok: true, message: "" };
     } else if (key === "petition") {
       result = respondPetition(city, value?.id, !!value?.accept);
+    } else if (key === "deal") {
+      result = signDeal(city, value?.resource, value?.side, value?.kind);
+    } else if (key === "cancelDeal") {
+      result = cancelDeal(city, value);
     } else if (key === "name") {
       const text = String(value ?? "").trim().slice(0, 40);
       if (!text) return { ok: false, message: "Name cannot be empty." };

@@ -80,6 +80,12 @@ export function evaluate(city, x, y, tool, options = {}) {
   if ((b.reward || b.offer) && !specialAvailable(city, tool)) {
     return fail(b.reward ? `${b.label} unlocks at ${b.reward.population.toLocaleString()} residents and can be built once.` : `${b.label} needs an accepted deal and can be built once.`);
   }
+  if (b.unique && !b.reward && !b.offer && city.tiles.some((n) => n.type === tool)) return fail(`Only one ${b.label} can be built.`);
+  if (b.requiresWater) {
+    let near = false;
+    for (let yy = y - 2; yy < y + b.h + 2 && !near; yy++) for (let xx = x - 2; xx < x + b.w + 2; xx++) { const n = tileAt(city, xx, yy); if (n?.terrain === "water") { near = true; break; } }
+    if (!near) return fail(`${b.label} must be built at the water's edge.`);
+  }
   const tiles = [];
   for (let yy = y; yy < y + b.h; yy++) {
     for (let xx = x; xx < x + b.w; xx++) {

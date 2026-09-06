@@ -18,6 +18,7 @@ export function computeMetrics(city) {
   const counts = {};
   const zones = { residential: { tiles: 0, developed: 0, abandoned: 0 }, commercial: { tiles: 0, developed: 0, abandoned: 0 }, industrial: { tiles: 0, developed: 0, abandoned: 0 } };
   let abandonedLots = 0, landValueSum = 0, landTiles = 0, specialJobs = 0, specialHappiness = 0;
+  const demandBonus = {};
 
   for (const t of tiles) {
     if (t.terrain !== "water") { landValueSum += t.landValue; landTiles++; }
@@ -49,12 +50,15 @@ export function computeMetrics(city) {
       if (b?.waterUse) { needWater++; if (t.watered) haveWater++; }
       if (b?.effects?.jobs) specialJobs += b.effects.jobs;
       if (b?.effects?.happiness) specialHappiness += b.effects.happiness;
+      if (b?.effects?.demand) for (const [k, v] of Object.entries(b.effects.demand)) demandBonus[k] = (demandBonus[k] || 0) + v;
     }
   }
 
   const per = (v) => (population ? v / population : 0);
   const jobs = jobsCommercial + jobsIndustrial + specialJobs;
-  const traffic = city._traffic || { unemployment: 0, traffic: 0, congestion: 0, workers: 0, employed: 0 };
+  const traffic = city._traffic || { unemployment: 0, traffic: 0, congestion: 0, workers: 0, employed: 0, externalJobs: 0 };
+  const connections = city._connections || {};
+  const tradeConnections = Object.values(connections).filter((c) => c.road || c.rail).length;
   const svc = city._svc || { garbage: 0 };
   const pollution = Math.round(per(wPoll));
   const crime = Math.round(per(wCrime));
@@ -82,7 +86,8 @@ export function computeMetrics(city) {
   happiness = Math.round(clamp(happiness, 5, 100));
 
   return {
-    population, jobs, jobsCommercial, jobsIndustrial, specialJobs,
+    population, jobs, jobsCommercial, jobsIndustrial, specialJobs, demandBonus,
+    tradeConnections, externalJobs: traffic.externalJobs || 0, connections,
     workers: traffic.workers, employed: traffic.employed, unemployment: traffic.unemployment,
     traffic: traffic.traffic, congestion: traffic.congestion,
     pollution, crime, education, health, parks, police, fireCover,

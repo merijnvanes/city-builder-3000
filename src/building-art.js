@@ -18,7 +18,7 @@ export function heightOf(t) {
   if (t.type === "industrial") return t.density === 1 ? 12 : t.density === 2 ? 18 : 26;
   return { coal: 46, oil: 34, gas: 30, nuclear: 60, wind: 42, solar: 6, waterpump: 10, watertower: 47, treatment: 14,
     police: 24, fire: 21, hospital: 40, school: 22, college: 30, library: 18, museum: 26, landfill: 6, incinerator: 40, recycling: 16,
-    park: 14, largepark: 16, zoo: 14, bus: 9, railstation: 16,
+    park: 14, largepark: 16, zoo: 14, bus: 9, railstation: 16, airport: 18, seaport: 16,
     mayorhouse: 24, cityhall: 46, courthouse: 27, stadium: 30, statue: 25, prison: 20, casino: 36, toxicdump: 10, armybase: 14 }[t.type] || 12;
 }
 
@@ -353,6 +353,24 @@ const RECIPES = {
     d.flat(0.08, 0.58, 0.84, 0.32, 1.5, "#bdbaa5");
     for (const a of [0.15, 0.5, 0.85]) d.line(a, 0.62, 1.5, a, 0.62, 9, "#8e8f80", 1);
     d.flat(0.08, 0.58, 0.84, 0.32, 9, "#7c8a83");
+  },
+  airport(d, t, n) {
+    d.flat(0.01, 0.01, 0.98, 0.98, 0.2, "#8f9a86");
+    d.flat(0.06, 0.12, 0.88, 0.16, 0.4, "#6d7370"); d.flat(0.08, 0.19, 0.84, 0.02, 0.6, "#e6e2c8");
+    for (let a = 0.1; a < 0.9; a += 0.1) d.flat(a, 0.18, 0.04, 0.04, 0.6, "#e6e2c8");
+    d.flat(0.06, 0.34, 0.5, 0.12, 0.4, "#767b76");
+    d.box(0.1, 0.56, 0.5, 0.26, 12, "#c9ccc2"); d.windows(0.1, 0.56, 0.5, 0.26, 12, t.x + t.y, true); d.flat(0.08, 0.54, 0.54, 0.3, 12.1, "#7f8a83");
+    d.box(0.7, 0.6, 0.12, 0.12, 20, "#b9bdb5"); d.box(0.68, 0.58, 0.16, 0.16, 5, "#6f8f8a", 20);
+    d.box(0.64, 0.34, 0.3, 0.16, 10, "#a7aba2"); d.roof(0.64, 0.34, 0.3, 0.16, 10, 4, "#7e8479");
+    d.box(0.3, 0.36, 0.14, 0.05, 3, "#e8e8e0"); d.box(0.36, 0.33, 0.03, 0.11, 2, "#e8e8e0", 2); d.box(0.28, 0.375, 0.03, 0.03, 4, "#e8e8e0", 3);
+  },
+  seaport(d, t, n) {
+    d.flat(0.02, 0.02, 0.96, 0.96, 0.2, "#8c9088");
+    d.flat(0.05, 0.05, 0.9, 0.24, 0.4, "#7a7f7b");
+    for (let i = 0; i < 6; i++) d.box(0.08 + (i % 3) * 0.16, 0.08 + Math.floor(i / 3) * 0.1, 0.14, 0.08, 4 + (i % 2) * 3, pick(["#b0473a", "#3a6fa0", "#c9a53a", "#5a8f5a"], random(t.x, t.y, i)));
+    d.box(0.1, 0.4, 0.5, 0.3, 10, "#a9aa9b"); d.roof(0.1, 0.4, 0.5, 0.3, 10, 4, "#6d7470"); d.windows(0.1, 0.4, 0.5, 0.3, 10, t.x + t.y);
+    d.line(0.78, 0.5, 0, 0.78, 0.5, 30, "#8e8f80", 1.4); d.line(0.78, 0.5, 30, 0.95, 0.35, 24, "#8e8f80", 1.2);
+    d.cyl(0.8, 0.8, 0.08, 10, "#c3c4b4"); d.cyl(0.62, 0.84, 0.06, 8, "#b0b3a3");
   },
   mayorhouse(d, t, n) {
     d.flat(0.03, 0.03, 0.94, 0.94, 0.2, "#6f8f48");

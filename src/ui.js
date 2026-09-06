@@ -26,7 +26,7 @@ const ICONS = {
 // ── Tool group definitions ───────────────────────────────────────────────────
 const GROUP_DEFS = [
   { id: "zone",      label: "Zones",     tools: ["residential", "commercial", "industrial"], hasDensity: true },
-  { id: "transport", label: "Transport", tools: ["road", "rail", "bus", "railstation"] },
+  { id: "transport", label: "Transport", tools: ["road", "rail", "bus", "railstation", "airport", "seaport"] },
   { id: "power",     label: "Power",     tools: ["coal", "oil", "gas", "nuclear", "wind", "solar", "powerline"] },
   { id: "water",     label: "Water",     tools: ["waterpump", "watertower", "treatment", "pipe"] },
   { id: "civic",     label: "Civic",     tools: ["police", "fire", "hospital", "school", "college", "library", "museum"] },
@@ -614,6 +614,7 @@ export function mountUI(actions) {
     ["expenses.police", "Police"], ["expenses.fire", "Fire"], ["expenses.health", "Health"], ["expenses.education", "Education"],
     ["expenses.transport", "Transportation"], ["expenses.utilities", "Utilities"], ["expenses.sanitation", "Sanitation"], ["expenses.parks", "Parks"],
     ["expenses.ordinances", "Ordinance costs"], ["expenses.loans", "Loan payments"],
+    ["income.neighbors", "Neighbor sales"], ["expenses.neighbors", "Neighbor purchases"],
   ].forEach(([k, label]) => {
     const item = el("div", "stat-item");
     item.appendChild(el("span", "stat-item-label", label));
@@ -706,6 +707,45 @@ export function mountUI(actions) {
     ordinanceToggles[key] = tb;
   });
   budBody.appendChild(ordinanceSection);
+
+  // Neighbor deals
+  const neighborSection = el("div", "modal-section");
+  neighborSection.appendChild(el("div", "modal-section-title", "Neighbor Deals"));
+  const neighborHint = el("p");
+  neighborHint.style.cssText = "font-size:.6rem;color:var(--text-dim);line-height:1.5;margin:0 0 6px";
+  neighborHint.textContent = "Run a road, rail, power line or pipe to the map edge to connect with a neighbor. Connections bring trade and jobs; power lines and pipes allow deals.";
+  neighborSection.appendChild(neighborHint);
+  const neighborList = el("div");
+  neighborSection.appendChild(neighborList);
+  budBody.appendChild(neighborSection);
+  let neighborKey = "";
+  function buildNeighbors(stats) {
+    const key = JSON.stringify([stats.neighbors, stats.deals]);
+    if (key === neighborKey) return;
+    neighborKey = key;
+    neighborList.innerHTML = "";
+    const resources = { power: "power", water: "water", garbage: "garbage" };
+    for (const n of stats.neighbors || []) {
+      const row = el("div", "neighbor-row");
+      const links = [n.road ? "road" : null, n.rail ? "rail" : null, n.power ? "power line" : null, n.water ? "pipe" : null].filter(Boolean);
+      row.appendChild(el("div", "neighbor-name", `${n.side.charAt(0).toUpperCase() + n.side.slice(1)}: ${n.name}` + (links.length ? ` — connected by ${links.join(", ")}` : " — not connected")));
+      const acts = el("div", "neighbor-actions");
+      for (const r of Object.keys(resources)) {
+        const active = stats.deals?.[r];
+        if (active && active.side === n.side) {
+          const tag = el("span", "neighbor-active", `${active.kind === "buy" ? "Buying" : "Selling"} ${r}: ${active.kind === "buy" ? (r === "garbage" ? "+" : "−") : (r === "garbage" ? "−" : "+")}$${active.price}/mo${active.met === false ? " (not delivered)" : ""}`);
+          acts.appendChild(tag);
+          acts.appendChild(btn("btn btn-sm btn-danger", "Cancel", `Cancel ${r} deal`, () => actions.setPolicy?.("cancelDeal", r)));
+          continue;
+        }
+        if (!n.deals?.[r] || active) continue;
+        acts.appendChild(btn("btn btn-sm", `Buy ${r}`, `Buy ${r} from ${n.name}`, () => actions.setPolicy?.("deal", { resource: r, side: n.side, kind: "buy" })));
+        acts.appendChild(btn("btn btn-sm", `Sell ${r}`, `Sell ${r} to ${n.name}`, () => actions.setPolicy?.("deal", { resource: r, side: n.side, kind: "sell" })));
+      }
+      if (acts.children.length) row.appendChild(acts);
+      neighborList.appendChild(row);
+    }
+  }
 
   const budFooter = el("div", "modal-footer");
   budFooter.appendChild(btn("btn btn-teal", "Close", null, () => budgetDialog.close()));
@@ -1087,6 +1127,9 @@ export function mountUI(actions) {
           }
         });
       }
+
+      // Neighbors
+      buildNeighbors(stats);
 
       // Ledger
       if (stats.budget) {

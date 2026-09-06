@@ -2,6 +2,7 @@
 import { BUILDINGS, ZONE_TYPES, DEPARTMENTS, FUNDED_DEPARTMENTS } from "./catalog.js";
 import { isAnchor, capacityOf } from "./lots.js";
 import { ORDINANCES } from "./city.js";
+import { DEALS } from "./neighbors.js";
 
 export const LOAN_AMOUNT = 10000;
 export const LOAN_MONTHS = 60;
@@ -16,9 +17,9 @@ const wealth = (t) => 0.7 + ((t.landValue ?? 40) / 100) * 0.6;
 
 export function computeBudget(city) {
   const { tiles, taxes, funding = {}, ordinances = {} } = city;
-  const income = { residential: 0, commercial: 0, industrial: 0, ordinances: 0, deals: 0, total: 0 };
+  const income = { residential: 0, commercial: 0, industrial: 0, ordinances: 0, deals: 0, neighbors: 0, total: 0 };
   const expenses = Object.fromEntries(DEPARTMENTS.map((d) => [d, 0]));
-  expenses.ordinances = 0; expenses.loans = 0;
+  expenses.ordinances = 0; expenses.loans = 0; expenses.neighbors = 0;
   let population = 0;
   const pct = (d) => (FUNDED_DEPARTMENTS.includes(d) ? (funding[d] ?? 100) / 100 : 1);
 
@@ -50,8 +51,18 @@ export function computeBudget(city) {
   for (const loan of city.loans || []) expenses.loans += Math.min(loan.payment, loan.remaining);
   expenses.loans = Math.round(expenses.loans);
 
+  // Neighbour deals: sales pay only when the network could deliver.
+  for (const [resource, deal] of Object.entries(city.deals || {})) {
+    const d = DEALS[resource]?.[deal.kind];
+    if (!d) continue;
+    const met = resource === "garbage" ? true : city._util?.[resource]?.deal?.met !== false;
+    const earns = (deal.kind === "sell") !== (resource === "garbage");
+    if (earns) { if (met) income.neighbors += d.price; }
+    else expenses.neighbors += d.price;
+  }
+
   for (const k of ["residential", "commercial", "industrial"]) income[k] = Math.round(income[k]);
-  income.total = income.residential + income.commercial + income.industrial + income.ordinances + income.deals;
+  income.total = income.residential + income.commercial + income.industrial + income.ordinances + income.deals + income.neighbors;
   expenses.total = Object.entries(expenses).filter(([k]) => k !== "total").reduce((s, [, v]) => s + v, 0);
   return { income, expenses, balance: income.total - expenses.total };
 }

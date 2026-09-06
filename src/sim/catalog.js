@@ -32,6 +32,8 @@ export const BUILDINGS = {
   rail:        { label: "Rail",            group: "transport", cost: 25,   w: 1, h: 1, upkeep: 2,   dept: "transport", path: true },
   bus:         { label: "Bus Stop",        group: "transport", cost: 150,  w: 1, h: 1, upkeep: 5,   dept: "transport", service: { kind: "bus", radius: 8 }, powerUse: 1 },
   railstation: { label: "Rail Station",    group: "transport", cost: 500,  w: 2, h: 2, upkeep: 20,  dept: "transport", service: { kind: "rail", radius: 10 }, powerUse: 4 },
+  airport:     { label: "Airport",         group: "transport", cost: 10000, w: 6, h: 5, upkeep: 250, dept: "transport", unique: true, effects: { jobs: 500, traffic: 40, pollution: 25, radius: 8, demand: { commercial: 18 } }, powerUse: 12, waterUse: 6 },
+  seaport:     { label: "Seaport",         group: "transport", cost: 5000, w: 4, h: 4, upkeep: 150, dept: "transport", unique: true, requiresWater: true, effects: { jobs: 350, traffic: 25, pollution: 15, radius: 6, demand: { industrial: 18 } }, powerUse: 8, waterUse: 4 },
 
   coal:        { label: "Coal Plant",      group: "utilities", cost: 4000,  w: 4, h: 4, upkeep: 150, dept: "utilities", powerOut: 6000,  pollution: 60 },
   oil:         { label: "Oil Plant",       group: "utilities", cost: 6600,  w: 4, h: 4, upkeep: 200, dept: "utilities", powerOut: 7000,  pollution: 40 },

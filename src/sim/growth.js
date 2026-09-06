@@ -14,7 +14,8 @@ export function computeDemand(city, m) {
   const taxes = city.taxes;
   const ord = city.ordinances || {};
   const pop = m.population, jobs = m.jobs;
-  const externalJobs = 350;
+  const trade = m.tradeConnections || 0;
+  const externalJobs = 350 + (m.externalJobs || 0);
   const wantedPop = (jobs + externalJobs) / WORKFORCE_SHARE;
   let res = (wantedPop - pop) / Math.max(900, pop * 0.5) * 100;
   res -= (taxes.residential - 7) * 4;
@@ -22,15 +23,17 @@ export function computeDemand(city, m) {
   res -= Math.max(0, m.pollution - 30) * 0.4;
   res -= Math.max(0, m.unemployment - 8) * 1.2;
 
-  const wantedC = pop * 0.3 + 60 + (ord.tourismPromotion ? pop * 0.04 : 0);
+  const wantedC = pop * 0.3 + 60 + (ord.tourismPromotion ? pop * 0.04 : 0) + trade * 150;
   let com = (wantedC - m.jobsCommercial) / Math.max(250, wantedC) * 100;
   com -= (taxes.commercial - 7) * 3;
   com -= (ord.smokingBan ? 3 : 0);
+  com += m.demandBonus?.commercial || 0;
 
-  const wantedI = pop * 0.25 + 260;
+  const wantedI = pop * 0.25 + 260 + trade * 250;
   let ind = (wantedI - m.jobsIndustrial) / Math.max(350, wantedI) * 100;
   ind -= (taxes.industrial - 7) * 3;
   ind -= (ord.cleanAir ? 6 : 0);
+  ind += m.demandBonus?.industrial || 0;
 
   return {
     residential: Math.round(clamp(res, -100, 100)),
