@@ -1,4 +1,5 @@
 import { TOOLS, BUILDINGS, ORDINANCES, DISASTERS, FUNDED_DEPARTMENTS, SPECIAL_TYPES } from "./sim.js";
+import { createPortrait } from "./portrait.js";
 
 // ── SVG Icons ─────────────────────────────────────────────────────────────────
 const ICONS = {
@@ -316,6 +317,9 @@ export function mountUI(actions) {
   inspPanel.setAttribute("aria-live", "polite");
   const inspHeaderLbl = el("div", "insp-header-label", "Inspect");
   inspPanel.appendChild(inspHeaderLbl);
+  const inspPortrait = el("canvas", "insp-portrait");
+  inspPanel.appendChild(inspPortrait);
+  const lotCard = createPortrait(inspPortrait);
   const inspTitle = el("div", "insp-title", "--");
   inspPanel.appendChild(inspTitle);
   const inspDesc = el("div", "insp-desc", "");
@@ -1435,6 +1439,8 @@ export function mountUI(actions) {
         return;
       }
       inspPanel.classList.add("visible");
+      inspPortrait.classList.toggle("visible", !!info.anchor);
+      if (info.anchor) lotCard.draw(info.anchor, info.night);
       inspTitle.textContent = info.title || "--";
       inspDesc.textContent  = info.description || "";
       inspDetails.innerHTML = "";

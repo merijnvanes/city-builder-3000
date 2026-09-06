@@ -189,7 +189,7 @@ input = attachInput(canvas, renderer, {
   getCity: () => city, getTool: () => tool, getDensity: () => density, getTools: () => sim.TOOLS,
   onChoose: choose, onSpeed: setSpeed, onUndo: undoLast, onHome: actions.home, onRotate: actions.rotate,
   onPreview: (plan) => ui.setBuildPreview?.(plan || { count: 0, cost: 0, valid: true, message: "" }),
-  onInspect: (tile) => ui.setSelection(sim.inspectTile(city, tile.x, tile.y)),
+  onInspect: (tile) => ui.setSelection({ ...sim.inspectTile(city, tile.x, tile.y), night: renderer.night }),
   onCommit: (plan) => {
     const before = structuredClone(city);
     const result = applyConstruction(city, plan);

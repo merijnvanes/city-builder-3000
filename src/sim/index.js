@@ -246,7 +246,7 @@ export function inspectTile(city, x, y) {
   if (t.pipe) details.push("Water pipe");
   if (t.fire) details.push("ON FIRE");
   details.push(`(${x}, ${y})`);
-  return { title, description, details, x, y, lot: a.lot ? { ...a.lot } : null };
+  return { title, description, details, x, y, lot: a.lot ? { ...a.lot } : null, anchor: a.lot ? a : null };
 }
 
 export { dateOf, WATER_RADIUS, defaultPolicies, techAvailable };

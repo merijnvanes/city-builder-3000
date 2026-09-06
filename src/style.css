@@ -643,6 +643,17 @@ html, body {
   margin-bottom: 3px;
 }
 
+.insp-portrait {
+  display: none;
+  width: 100%;
+  height: 112px;
+  margin-bottom: 5px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #24384a 0%, #17262f 100%);
+  border: 1px solid rgba(0,0,0,0.35);
+}
+.insp-portrait.visible { display: block; }
+
 .insp-title {
   font-size: 0.78rem;
   font-weight: 700;
