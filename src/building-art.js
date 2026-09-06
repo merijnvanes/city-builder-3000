@@ -45,7 +45,7 @@ function scoped(r, lot, dim) {
     tree: (a, b, n = 0) => r.tree(x + a * w, y + b * h, n),
     fence: (a, b, fw, fd, c) => r.fence(x + a * w, y + b * h, fw * w, fd * h, tone(c)),
     line: (a, b, z, a2, b2, z2, c, width = 1) => r.line(r.project(x + a * w, y + b * h, z), r.project(x + a2 * w, y + b2 * h, z2), tone(c), width),
-    windows: (a, b, fw, fd, hh, seed, glass = false, z = 0, lit = !dim) => r.windows(x + a * w, y + b * h, fw * w, fd * h, hh, seed, glass, z, lit),
+    windows: (a, b, fw, fd, hh, seed, glass = false, z = 0, lit = !dim, floorHeight = 8) => r.windows(x + a * w, y + b * h, fw * w, fd * h, hh, seed, glass, z, lit, floorHeight),
     bands: (a, b, fw, fd, from, to, step, c) => { for (let z = from; z < to; z += step) for (const f of r.faces(x + a * w, y + b * h, fw * w, fd * h, 0, z)) r.line(f.points[0], f.points[1], tone(c), 1); },
     pt: (a, b, z = 0) => r.project(x + a * w, y + b * h, z),
   };
@@ -169,7 +169,7 @@ function residential(d, t, n, level, r) {
   d.flat(0.09, 0.09, 0.82, 0.82, 8.1, "#858978");
   const tw = d.w >= 3 && level === 4 ? 0.34 : 0.56, tx = d.w >= 3 && level === 4 ? 0.12 : 0.22;
   d.box(tx, 0.2, tw, 0.58, hh, n > 0.5 ? glass : wall, 8); d.windows(tx, 0.2, tw, 0.58, hh, t.x + t.y, n > 0.5, 8);
-  d.bands(tx, 0.2, tw, 0.58, 14, hh + 8, 8, "#d1c4a0");
+  d.bands(tx, 0.2, tw, 0.58, 16, hh + 8, 8, "#d1c4a0");
   d.flat(tx + 0.02, 0.22, tw - 0.04, 0.54, hh + 8.1, "#6f7368"); d.box(tx + tw * 0.35, 0.42, tw * 0.3, 0.16, 5, "#a39e88", hh + 8);
   if (d.w >= 3 && level === 4) {
     d.box(0.54, 0.2, 0.34, 0.58, hh - 12, wall, 8); d.windows(0.54, 0.2, 0.34, 0.58, hh - 12, t.y * 5, false, 8);
@@ -242,7 +242,7 @@ function commercial(d, t, n, level, r) {
   d.flat(0.07, 0.07, 0.86, 0.86, 10.1, "#6c7f75");
   const w1 = fam === 1 ? 0.52 : 0.66, d1 = fam === 2 ? 0.5 : 0.66;
   const gx = 0.5 - w1 / 2, gy = 0.5 - d1 / 2;
-  d.box(gx, gy, w1, d1, hh, glass, 10); d.windows(gx, gy, w1, d1, hh, t.x + t.y, true, 10);
+  d.box(gx, gy, w1, d1, hh, glass, 10); d.windows(gx, gy, w1, d1, hh, t.x + t.y, true, 10, !t.abandoned, 6);
   d.bands(gx - 0.003, gy - 0.003, w1 + 0.006, d1 + 0.006, 16, hh + 10, 6, fam === 0 ? "#aab5a6" : "#9aa89c");
   if (fam === 1) { d.box(gx + 0.06, gy + 0.06, w1 - 0.12, d1 - 0.12, 12, glass, hh + 10); d.box(0.44, 0.44, 0.12, 0.12, 8, stone, hh + 22); if (level === 4) d.line(0.5, 0.5, hh + 30, 0.5, 0.5, hh + 52, "#c6c8b5", 1.2); }
   else if (fam === 2) { d.box(gx + 0.03, gy + 0.03, w1 - 0.06, d1 - 0.06, 4, "#c4c8b5", hh + 10); d.roof(gx + 0.03, gy + 0.03, w1 - 0.06, d1 - 0.06, hh + 14, 14, "#607d76"); }

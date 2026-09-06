@@ -3,6 +3,7 @@
 // fires and the construction preview are drawn every frame on top.
 import { drawArchitecture, heightOf, random } from "./building-art.js";
 import { BUILDINGS } from "./sim/catalog.js";
+import { drawTree } from "./foliage.js";
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const shade = (hex, k) => {
@@ -215,32 +216,22 @@ export class CityRenderer {
     this.line(this.project(x, y, 3), this.project(x + w, y + d, 3), color, 0.8);
     for (let a = 0; a <= 1; a += 0.12) this.line(this.project(x + w * a, y + d * a), this.project(x + w * a, y + d * a, 5), color, 0.6);
   }
-  tree(x, y, n = 0) {
-    const h = 10 + random(x, y, n) * 11, p = this.project(x, y, h), ctx = this.base;
-    this.line(this.project(x, y), this.project(x, y, h * 0.8), "#61523a", 1.5);
-    ctx.fillStyle = "#263d242e";
-    const foot = this.project(x, y);
-    ctx.beginPath(); ctx.ellipse(foot.x - 4 * this.zoom, foot.y + 2 * this.zoom, 8 * this.zoom, 3 * this.zoom, 0, 0, Math.PI * 2); ctx.fill();
-    for (let i = 0; i < 6; i++) {
-      const a = i * 2.4, r = i ? 3 * this.zoom : 0, cx = p.x + Math.cos(a) * r, cy = p.y + Math.sin(a) * r * 0.6;
-      ctx.beginPath(); ctx.ellipse(cx, cy, 4.1 * this.zoom, (6 + (i % 2)) * this.zoom, 0, 0, Math.PI * 2);
-      ctx.fillStyle = ["#3b632c", "#4b7632", "#628c3c", "#416c2e", "#739348", "#537d34"][(i + n) % 6]; ctx.fill();
-    }
-  }
-  windows(x, y, w, d, h, seed, glass = false, base = 0, lit = true) {
+  tree(x, y, n = 0) { drawTree(this, x, y, n); }
+  windows(x, y, w, d, h, seed, glass = false, base = 0, lit = true, floorHeight = 8) {
     if (this.zoom < 0.5) return;
     const faces = this.faces(x, y, w, d, h, base);
-    const rows = Math.max(1, Math.floor((h - 4) / 7));
+    const sill = Math.min(3, floorHeight * 0.35), paneHeight = Math.min(3.3, floorHeight * 0.5);
+    const rows = Math.max(1, Math.floor((h - sill - paneHeight) / floorHeight) + 1);
     for (const face of faces) {
       const alongX = face.name === "south" || face.name === "north", length = alongX ? w : d, cols = Math.max(1, Math.min(7, Math.floor(length * 7)));
       for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
-          const z = base + 3 + row * 7, offset = 0.055 + col * (length - 0.1) / cols, span = ((length - 0.12) / cols) * 0.66;
+          const z = base + sill + row * floorHeight, offset = 0.055 + col * (length - 0.1) / cols, span = ((length - 0.12) / cols) * 0.66;
           const a = alongX ? x + offset : face.name === "east" ? x + w + 0.002 : x - 0.002;
           const b = alongX ? (face.name === "south" ? y + d + 0.002 : y - 0.002) : y + offset;
           const on = this.night && lit && random(seed + row, col) > 0.35;
           const color = on ? "#edcd77" : glass ? ["#38545a", "#496c70", "#69908e", "#89a5a0"][(row + col + seed) % 4 | 0] : "#425751";
-          this.poly([this.project(a, b, z + 3.3), this.project(a + (alongX ? span : 0), b + (alongX ? 0 : span), z + 3.3), this.project(a + (alongX ? span : 0), b + (alongX ? 0 : span), z), this.project(a, b, z)], color);
+          this.poly([this.project(a, b, z + paneHeight), this.project(a + (alongX ? span : 0), b + (alongX ? 0 : span), z + paneHeight), this.project(a + (alongX ? span : 0), b + (alongX ? 0 : span), z), this.project(a, b, z)], color);
         }
       }
     }

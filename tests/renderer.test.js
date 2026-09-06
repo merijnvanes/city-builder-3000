@@ -52,3 +52,22 @@ test('isometric picking remains exact in all four orientations',()=>{
   for(let x=0;x<40;x+=3)for(let y=0;y<40;y+=3){const p=r.project(x+.5,y+.5);assert.deepEqual(r.pick(p.x,p.y),{x,y});}
  }
 });
+
+test('facade windows stay between floor bands and below the roof', () => {
+  for (const [height, base, floorHeight] of [[48, 0, 8], [90, 8, 8], [136, 10, 6]]) {
+    const r = camera();
+    const panes = [];
+    r.project = (x, y, z = 0) => ({ x, y, z });
+    r.poly = points => panes.push(points);
+    r.windows(0, 0, 1.5, 1, height, 1, true, base, true, floorHeight);
+    assert.ok(panes.length > 10);
+    for (const pane of panes) {
+      const low = Math.min(...pane.map(p => p.z));
+      const high = Math.max(...pane.map(p => p.z));
+      assert.ok(low > base && high < base + height, 'panes fit inside the facade');
+      for (let band = base; band <= base + height; band += floorHeight) {
+        assert.ok(band < low || band > high, 'floor band does not cut through glass');
+      }
+    }
+  }
+});
