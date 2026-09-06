@@ -72,6 +72,7 @@ export function blankCity({ seed = 42, size = DEFAULT_SIZE, layout, name = "New 
     population: 0, happiness: 50,
     demand: { residential: 0, commercial: 0, industrial: 0 },
     history: [], news: [],
+    deals: {},
     revision: 0,
     _rng: seed,
     _prev: null,
