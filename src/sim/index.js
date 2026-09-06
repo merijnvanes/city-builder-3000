@@ -1,7 +1,7 @@
 // Public simulation API. No browser deps.
 import { TOOLS, TOOL_MAP, BUILDINGS, ZONE_TYPES, FUNDED_DEPARTMENTS, isZone } from "./catalog.js";
 import { blankCity, serialize, deserialize as parseCity, ORDINANCES, START_YEAR, DEFAULT_SIZE, defaultPolicies } from "./city.js";
-import { place, evaluate } from "./place.js";
+import { place, evaluate, techAvailable } from "./place.js";
 import { refreshCity } from "./refresh.js";
 import { updateTraffic } from "./traffic.js";
 import { computeMetrics, dateOf } from "./metrics.js";
@@ -23,7 +23,7 @@ export { TOOLS, TOOL_MAP, BUILDINGS, ZONE_TYPES, ORDINANCES, ADVISORS, DISASTERS
 
 export function createCity(seed = 42, starter = true, options = {}) {
   if (seed && typeof seed === "object") { options = seed; seed = options.seed ?? 42; starter = options.starter ?? true; }
-  const city = blankCity({ seed, size: options.size ?? DEFAULT_SIZE, layout: options.layout, name: options.name });
+  const city = blankCity({ seed, size: options.size ?? DEFAULT_SIZE, layout: options.layout, name: options.name, startYear: options.startYear });
   if (starter) buildStarterTown(city);
   return settle(city);
 }
@@ -120,7 +120,9 @@ export function getStats(city) {
     history: city.history,
     settings: { ...(city.settings || { yearEndBudget: true }) },
     unlocked: { ...(city.unlocked || {}) },
-    available: Object.fromEntries(SPECIAL_TYPES.map((type) => [type, specialAvailable(city, type)])),
+    available: Object.fromEntries(SPECIAL_TYPES.map((type) => [type, specialAvailable(city, type) && techAvailable(city, type)])),
+    tech: Object.fromEntries(Object.keys(BUILDINGS).map((type) => [type, techAvailable(city, type)])),
+    startYear: city.startYear,
     petition: (() => { const p = openPetition(city); return p ? { ...p, ...PETITIONS[p.id] } : null; })(),
     neighbors: SIDES.map((side) => {
       const c = city._connections?.[side] || {};
@@ -246,4 +248,4 @@ export function inspectTile(city, x, y) {
   return { title, description, details, x, y, lot: a.lot ? { ...a.lot } : null };
 }
 
-export { dateOf, WATER_RADIUS, defaultPolicies };
+export { dateOf, WATER_RADIUS, defaultPolicies, techAvailable };

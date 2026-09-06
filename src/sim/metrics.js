@@ -5,7 +5,8 @@ import { isAnchor, capacityOf } from "./lots.js";
 import { START_YEAR } from "./city.js";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-export const dateOf = (month) => `${MONTHS[month % 12]} ${START_YEAR + Math.floor(month / 12)}`;
+export const yearOf = (month, startYear = START_YEAR) => startYear + Math.floor(month / 12);
+export const dateOf = (month, startYear = START_YEAR) => `${MONTHS[month % 12]} ${yearOf(month, startYear)}`;
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
@@ -97,6 +98,6 @@ export function computeMetrics(city) {
     landValue: landTiles ? Math.round(landValueSum / landTiles) : 0,
     residentialLandValue: Math.round(per(wLand)),
     happiness, counts, zones, abandonedLots,
-    date: dateOf(city.month), year: START_YEAR + Math.floor(city.month / 12), month: city.month,
+    date: dateOf(city.month, city.startYear), year: yearOf(city.month, city.startYear), month: city.month,
   };
 }

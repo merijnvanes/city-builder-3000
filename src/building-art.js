@@ -159,6 +159,20 @@ function commercial(d, t, n, level, r) {
 function industrial(d, t, n, level, r) {
   const density = t.density;
   const brick = pick(["#9f7558", "#ae9270", "#b0a28a", "#8e8f80", "#aa8d6d"], n);
+  if (density === 1 && d.w >= 3) {
+    // Farm: fields, a barn, a silo and a farmhouse.
+    const crop = pick([["#b9a24a", "#c9b45a"], ["#7f9d3e", "#93b04a"], ["#a77c3e", "#b98c4e"], ["#6f9c54", "#82ad62"]], n);
+    d.flat(0.02, 0.02, 0.96, 0.96, 0.2, "#8f9a5c");
+    for (let row = 0; row < 3; row++) d.flat(0.04, 0.06 + row * 0.2, 0.56, 0.16, 0.35, row % 2 ? crop[0] : crop[1]);
+    for (let a = 0.06; a < 0.6; a += 0.06) d.line(a, 0.06, 0.5, a, 0.62, 0.5, "#0000001a", 0.6);
+    d.box(0.66, 0.1, 0.26, 0.22, 10, "#a8452f"); d.roof(0.64, 0.08, 0.3, 0.26, 10, 6, "#6b3a2a");
+    d.cyl(0.9, 0.42, 0.05, 18, "#c7c4b3"); d.cyl(0.9, 0.42, 0.052, 3, "#8d8a7a", 18);
+    d.box(0.66, 0.5, 0.2, 0.18, 8, pick(WALLS, n)); d.roof(0.64, 0.48, 0.24, 0.22, 8, 5, pick(ROOFS, n));
+    d.flat(0.06, 0.72, 0.86, 0.2, 0.3, "#8a8f66"); d.fence(0.03, 0.96, 0.94, 0, "#ada894"); d.fence(0.03, 0.03, 0.94, 0, "#ada894");
+    d.tree(0.3, 0.86, 1); d.tree(0.5, 0.9, 0);
+    if (level >= 3) { d.box(0.66, 0.74, 0.14, 0.14, 4, "#6f7d3e"); d.cyl(0.88, 0.8, 0.04, 6, "#9a9a8a"); }
+    return;
+  }
   d.flat(0.02, 0.02, 0.96, 0.96, 0.2, "#9e9980");
   if (density === 1) {
     // Workshops with sawtooth roofs and a yard.
@@ -461,5 +475,13 @@ export function drawArchitecture(r, t) {
   if (t.abandoned) {
     // Boarded windows and weeds.
     for (let i = 0; i < 4; i++) d.flat(0.1 + random(t.x, t.y, i) * 0.7, 0.1 + random(t.y, t.x, i + 3) * 0.7, 0.12, 0.08, 0.5, "#6b6a4c");
+  } else if (t.age === 0 && ["residential", "commercial", "industrial"].includes(t.type)) {
+    // Freshly built or expanded: a crane and scaffolding for the month.
+    const h = heightOf(t) + 10;
+    d.line(0.85, 0.15, 0, 0.85, 0.15, h, "#d9c24a", 1.4);
+    d.line(0.85, 0.15, h, 0.3, 0.15, h, "#d9c24a", 1.2);
+    d.line(0.45, 0.15, h, 0.45, 0.15, h * 0.55, "#d9c24a", 0.7);
+    d.box(0.42, 0.12, 0.06, 0.06, 3, "#8a8a80", h * 0.55 - 3);
+    for (let z = 4; z < Math.min(h - 6, 30); z += 6) d.line(0.06, 0.94, z, 0.94, 0.94, z, "#c9c4a8", 0.6);
   }
 }

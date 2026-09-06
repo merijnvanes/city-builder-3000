@@ -1121,6 +1121,7 @@ export function mountUI(actions) {
   form.layout = formRow("Terrain", select("Terrain", [["random", "Surprise me"], ["river", "River"], ["coast", "Coast"], ["lakes", "Lakes"], ["delta", "River delta"], ["plains", "Plains"]], "random"));
   form.size = formRow("Map size", select("Map size", [["64", "Small (64×64)"], ["96", "Medium (96×96)"], ["128", "Large (128×128)"]], "64"));
   form.money = formRow("Starting funds", select("Starting funds", [["50000", "$50,000 (easy)"], ["25000", "$25,000 (medium)"], ["10000", "$10,000 (hard)"]], "50000"));
+  form.year = formRow("Start year", select("Start year", [["1900", "1900 — coal and rail"], ["1950", "1950 — oil, gas and airports"], ["2000", "2000 — everything"], ["2050", "2050"]], "2000"));
   form.start = formRow("Start with", select("Start with", [["blank", "Empty land"], ["town", "An established town"]], "blank"));
   form.scenario = formRow("Scenario", select("Scenario", [["sandbox", "Open play"], ["growth", "Grow to 20,000 in ten years"], ["recovery", "Rescue a failing town"]], "sandbox"));
   confirmDialog.appendChild(cfmBody);
@@ -1134,6 +1135,7 @@ export function mountUI(actions) {
       layout: form.layout.value === "random" ? undefined : form.layout.value,
       size: Number(form.size.value),
       money: Number(form.money.value),
+      startYear: Number(form.year.value),
       starter: form.start.value === "town",
       scenario: form.scenario.value,
     });
@@ -1258,6 +1260,13 @@ export function mountUI(actions) {
         }
         const g = groupEls.special;
         if (g) g.el.style.display = any ? "" : "none";
+      }
+      // Technology: hide buildings the era has not invented yet.
+      if (stats.tech) {
+        for (const [type, ok] of Object.entries(stats.tech)) {
+          const b = toolBtns[type];
+          if (b && !SPECIAL_TYPES.includes(type)) b.style.display = ok ? "" : "none";
+        }
       }
 
       // Petitions: announce once, pause, and keep a button while open.

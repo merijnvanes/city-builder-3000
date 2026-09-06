@@ -384,8 +384,8 @@ describe("disasters and inspection", () => {
     assert.match(info.description, /residential/i);
     assert.match(info.title, /^[A-Z][a-z]+ /, "developed lots get a name");
     assert.ok(info.details.some((d) => /Residents/.test(d)));
-    const plant = c.tiles.find((t) => t.type === "coal");
-    assert.match(inspectTile(c, plant.x, plant.y).title, /Coal/);
+    const plant = c.tiles.find((t) => t.type === "coal" || t.type === "gas");
+    assert.match(inspectTile(c, plant.x, plant.y).title, /Coal|Gas/);
     assert.equal(inspectTile(c, -1, 0).title, "Out of bounds");
   });
   test("tools cover every catalog building", () => {

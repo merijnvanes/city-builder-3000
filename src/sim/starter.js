@@ -134,19 +134,21 @@ export function buildStarterTown(city) {
 
   // Coal plant on the outskirts, wired to the nearest block over land.
   const corners = [[ox - 7, oy - 7], [ox + span + 4, oy - 7], [ox - 7, oy + span + 4], [ox + span + 4, oy + span + 4], [ox - 8, oy + 12], [ox + 12, oy - 8]];
+  const plantType = city.startYear >= 2000 ? "gas" : "coal";
+  const plantSize = plantType === "gas" ? 3 : 4;
   for (const [px, py] of corners) {
-    const plant = findSite(px, py, 4, 4, 6);
+    const plant = findSite(px, py, plantSize, plantSize, 6);
     if (!plant) continue;
     const near = [[0, 0], [6, 0], [0, 6], [6, 6], [3, 0], [0, 3], [6, 3], [3, 6]]
       .map(([i, j]) => blockAt(i, j))
       .sort((a, b) => Math.abs(a.x - plant.x) + Math.abs(a.y - plant.y) - Math.abs(b.x - plant.x) - Math.abs(b.y - plant.y))[0];
     let done = false;
-    for (const [ex, ey] of [[4, 1], [1, 4], [-1, 1], [1, -1]]) {
+    for (const [ex, ey] of [[plantSize, 1], [1, plantSize], [-1, 1], [1, -1]]) {
       const from = tileAt(city, plant.x + ex, plant.y + ey);
       if (!from || from.terrain === "water") continue;
       const path = landPath(city, from, tileAt(city, near.x, near.y));
       if (!path) continue;
-      put(plant.x, plant.y, "coal");
+      put(plant.x, plant.y, plantType);
       for (const t of path) put(t.x, t.y, "powerline");
       done = true;
       break;
@@ -214,7 +216,8 @@ export function buildStarterTown(city) {
     const lot = findLot(city, t);
     if (!lot) continue;
     if (rng() < 0.12) continue; // leave a few empty lots
-    assignLot(city, lot, pick(rng, (t.type === "residential" ? levels : jobLevels)[t.density]), rng());
+    const anchor = assignLot(city, lot, pick(rng, (t.type === "residential" ? levels : jobLevels)[t.density]), rng());
+    anchor.age = 1 + Math.floor(rng() * 24); // established, not under construction
   }
 
   city.money = savedMoney;

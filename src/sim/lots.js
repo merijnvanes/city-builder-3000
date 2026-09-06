@@ -2,7 +2,7 @@
 // carries `lot = { x, y, w, h }`; the tile at (lot.x, lot.y) is the anchor
 // and holds level, variant and abandonment state.
 import { inBounds, tileAt } from "./grid.js";
-import { CAPACITY, DRAW, BUILDINGS, ZONE_TYPES, LOT_SIZES } from "./catalog.js";
+import { CAPACITY, DRAW, BUILDINGS, ZONE_TYPES, LOT_SIZES, LOT_SIZES_BY_TYPE } from "./catalog.js";
 
 export const isAnchor = (t) => !!t.lot && t.lot.x === t.x && t.lot.y === t.y;
 
@@ -42,7 +42,7 @@ function blockFits(city, ax, ay, s, seed) {
 // zone strips pack into a regular block pattern.
 export function findLot(city, seed) {
   if (!ZONE_TYPES.has(seed.type) || seed.lot) return null;
-  const sizes = LOT_SIZES[seed.density] || [1];
+  const sizes = LOT_SIZES_BY_TYPE[seed.type]?.[seed.density] || LOT_SIZES[seed.density] || [1];
   for (const s of sizes) {
     for (let oy = 0; oy < s; oy++) {
       for (let ox = 0; ox < s; ox++) {

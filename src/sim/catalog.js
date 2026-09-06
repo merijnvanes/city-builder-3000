@@ -8,8 +8,17 @@ export const OVERLAY_TOOLS = new Set(["powerline", "pipe"]);
 // Zone cost per tile scales with density. Density 1 = low, 2 = medium, 3 = high.
 export const ZONE_COST = { residential: [0, 10, 25, 50], commercial: [0, 10, 25, 50], industrial: [0, 10, 25, 50] };
 
-// Lot sizes a zone density can form, largest first.
+// Lot sizes a zone density can form, largest first. Low-density industry
+// spreads into 3×3 farms when it has the room.
 export const LOT_SIZES = { 1: [1], 2: [2, 1], 3: [3, 2, 1] };
+export const LOT_SIZES_BY_TYPE = { industrial: { 1: [3, 1], 2: [2, 1], 3: [3, 2, 1] } };
+
+// First year a technology is available. Anything unlisted is always there.
+export const TECH_YEAR = {
+  coal: 1900, oil: 1925, gas: 1950, nuclear: 1975, wind: 1985, solar: 2000,
+  treatment: 1940, incinerator: 1930, recycling: 1980, airport: 1935, railstation: 1900, bus: 1920,
+  college: 1900, hospital: 1900, museum: 1900, zoo: 1900, casino: 1930, toxicdump: 1960, prison: 1900, armybase: 1900,
+};
 
 // Residents or jobs per tile per development level (levels 1..4 scale by level/4).
 export const CAPACITY = {

@@ -1,7 +1,10 @@
 // Construction rules: evaluate() prices a single action without mutating;
 // place() applies it. Multi-tile buildings are placed by their top-left
 // anchor and every footprint tile must be free land.
-import { BUILDINGS, ZONE_COST, ZONE_TYPES, OVERLAY_TOOLS, TOOL_MAP } from "./catalog.js";
+import { BUILDINGS, ZONE_COST, ZONE_TYPES, OVERLAY_TOOLS, TOOL_MAP, TECH_YEAR } from "./catalog.js";
+import { yearOf } from "./metrics.js";
+
+export const techAvailable = (city, type) => !(type in TECH_YEAR) || yearOf(city.month, city.startYear) >= TECH_YEAR[type];
 import { tileAt, inBounds, nextRandom } from "./grid.js";
 import { lotTiles, assignLot, clearLot, anchorOf } from "./lots.js";
 import { refreshCity } from "./refresh.js";
@@ -88,6 +91,7 @@ export function evaluate(city, x, y, tool, options = {}) {
   // Catalog buildings with a footprint.
   const b = BUILDINGS[tool];
   if (!b) return fail("Unknown building.");
+  if (!techAvailable(city, tool)) return fail(`${b.label} is not available until ${TECH_YEAR[tool]}.`);
   if ((b.reward || b.offer) && !specialAvailable(city, tool)) {
     return fail(b.reward ? `${b.label} unlocks at ${b.reward.population.toLocaleString()} residents and can be built once.` : `${b.label} needs an accepted deal and can be built once.`);
   }

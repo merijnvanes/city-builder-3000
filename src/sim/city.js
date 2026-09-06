@@ -42,9 +42,10 @@ export function defaultPolicies() {
   };
 }
 
-export function blankCity({ seed = 42, size = DEFAULT_SIZE, layout, name = "New Riverton" } = {}) {
+export function blankCity({ seed = 42, size = DEFAULT_SIZE, layout, name = "New Riverton", startYear = START_YEAR } = {}) {
   seed = Number.isFinite(seed) ? seed >>> 0 : 42;
   size = Math.max(16, Math.min(MAX_SIZE, size | 0));
+  startYear = Number.isInteger(startYear) && startYear >= 1800 && startYear <= 2200 ? startYear : START_YEAR;
   const gen = generateTerrain(size, seed, layout);
   const tiles = [];
   let v = seed ^ 0x2545f491;
@@ -57,7 +58,7 @@ export function blankCity({ seed = 42, size = DEFAULT_SIZE, layout, name = "New 
   }
   return {
     version: SAVE_VERSION,
-    size, seed, layout: gen.layout, name,
+    size, seed, layout: gen.layout, name, startYear,
     tiles,
     money: START_MONEY, debt: 0, loans: [],
     month: 0,
@@ -91,7 +92,7 @@ export function serialize(city) {
   ]);
   return JSON.stringify({
     version: SAVE_VERSION,
-    size: city.size, seed: city.seed, layout: city.layout, name: city.name,
+    size: city.size, seed: city.seed, layout: city.layout, name: city.name, startYear: city.startYear ?? START_YEAR,
     types, tiles,
     money: city.money, debt: city.debt, loans: city.loans, month: city.month,
     taxes: city.taxes, funding: city.funding, ordinances: city.ordinances,
@@ -173,6 +174,7 @@ export function deserialize(raw) {
   const city = {
     version: SAVE_VERSION,
     size, seed: d.seed, layout: d.layout, name: d.name,
+    startYear: Number.isInteger(d.startYear) && d.startYear >= 1800 && d.startYear <= 2200 ? d.startYear : START_YEAR,
     tiles,
     money: d.money, debt: d.debt, loans: d.loans.map((l) => ({ amount: l.amount, remaining: l.remaining, payment: l.payment })),
     month: d.month,

@@ -117,7 +117,7 @@ const actions = {
       const raw = localStorage.getItem(slotKey(slot));
       if (!raw) return { slot, empty: true };
       const d = JSON.parse(raw);
-      return { slot, empty: false, name: d.name, population: d.population, money: d.money, date: sim.dateOf(d.month) };
+      return { slot, empty: false, name: d.name, population: d.population, money: d.money, date: sim.dateOf(d.month, d.startYear) };
     } catch { return { slot, empty: true }; }
   }),
   exportSave: () => {
@@ -125,7 +125,7 @@ const actions = {
       const blob = new Blob([sim.serialize(city)], { type: "application/json" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = `${city.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase() || "city"}-${sim.dateOf(city.month).replace(" ", "-")}.json`;
+      a.download = `${city.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase() || "city"}-${sim.dateOf(city.month, city.startYear).replace(" ", "-")}.json`;
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(a.href), 1000);
       ui.notify("City exported.");
@@ -135,7 +135,7 @@ const actions = {
   newCity: (options = {}) => {
     const scenario = options?.scenario || "sandbox";
     const seed = Number.isFinite(options?.seed) ? options.seed : Math.floor(Math.random() * 100000);
-    city = sim.createCity({ seed, starter: scenario === "recovery" || options?.starter === true, layout: options?.layout, size: options?.size, name: options?.name });
+    city = sim.createCity({ seed, starter: scenario === "recovery" || options?.starter === true, layout: options?.layout, size: options?.size, name: options?.name, startYear: options?.startYear });
     if (Number.isFinite(options?.money) && scenario !== "recovery") city.money = options.money;
     startScenario(city, scenario);
     restore();
