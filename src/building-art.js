@@ -69,25 +69,65 @@ function residential(d, t, n, level, r) {
   const wall = pick(WALLS, n), brick = pick(BRICKS, n), roof = pick(ROOFS, n * 7);
   d.flat(0.03, 0.03, 0.94, 0.94, 0.2, "#6f8845");
   if (density === 1) {
-    // Detached homes in four styles; level grows the house and adds a
-    // garage, porch and pool.
+    // Detached homes: reserve a real side yard for the garage and keep
+    // paving, pool water and landscaping below the camera-sorted solids.
     const fam = Math.floor(n * 4);
     const hw = 0.42 + level * 0.06, hd = 0.4 + level * 0.05;
-    const hx = fam % 2 ? 0.12 : 0.5 - hw / 2, hy = 0.12;
-    const stories = level >= 3 ? 2 : 1, hh = 9 * stories + 2;
-    d.box(hx, hy, hw, hd, hh, fam === 3 ? pick(["#e6e2d6", "#c9d0cf", "#d9cfc0"], n) : wall);
-    if (fam === 0) d.roof(hx - 0.03, hy - 0.03, hw + 0.06, hd + 0.06, hh, 6 + level, roof);
-    else if (fam === 1) d.hip(hx - 0.03, hy - 0.03, hw + 0.06, hd + 0.06, hh, 5 + level, roof, 0.2);
-    else if (fam === 2) { d.roof(hx - 0.03, hy - 0.03, hw + 0.06, hd + 0.06, hh, 7 + level, roof); d.box(hx + hw * 0.35, hy - 0.02, hw * 0.3, 0.12, 4, wall, hh + 2); d.roof(hx + hw * 0.33, hy - 0.04, hw * 0.34, 0.16, hh + 6, 3, roof); }
-    else { d.box(hx - 0.02, hy - 0.02, hw + 0.04, hd + 0.04, 1.5, "#4f5a58", hh); d.flat(hx + 0.04, hy + 0.04, hw - 0.08, hd - 0.08, hh + 1.6, "#8a9a8c"); }
-    d.windows(hx, hy, hw, hd, hh, t.x + t.y, fam === 3);
-    if (fam === 2) d.box(hx, hy + hd, hw, 0.08, 4, "#d8d2c0");
-    if (level >= 2) { d.box(hx + hw + 0.02, hy + 0.1, 0.24, 0.3, 7, "#b4aa91"); if (fam === 3) d.flat(hx + hw + 0.02, hy + 0.1, 0.24, 0.3, 7.1, "#8a9a8c"); else d.roof(hx + hw, hy + 0.08, 0.28, 0.34, 7, 3, "#6d6b5a"); }
-    if (level >= 4) { d.flat(0.15, 0.68, 0.32, 0.22, 0.4, "#5aa6c9"); d.flat(0.13, 0.66, 0.36, 0.26, 0.3, "#d8d3bb"); }
-    d.flat(0.62, hy + hd + 0.06, 0.12, 0.9 - hy - hd, 0.3, "#b8b39c");
-    if (fam !== 3) d.box(0.2, 0.2, 0.06, 0.06, hh + 5, "#94755a", 0);
-    d.fence(0.05, 0.94, 0.9, 0, fam === 3 ? "#6f7a72" : "#ada894"); d.fence(0.94, 0.05, 0, 0.89, fam === 3 ? "#6f7a72" : "#ada894");
-    d.tree(0.12, 0.85, 1); if (fam >= 2) d.tree(0.88, 0.2, 2);
+    const hx = level === 1 ? 0.5 - hw / 2 : fam % 2 ? 0.08 : 0.1, hy = 0.12;
+    const hh = (level >= 3 ? 2 : 1) * 9 + 2;
+    const gx = hx + hw + 0.02, gy = hy + 0.1, gw = 0.17;
+    const fence = fam === 3 ? "#6f7a72" : "#ada894", entry = hx + hw * 0.65;
+    d.flat(entry, hy + hd, 0.075, 0.94 - hy - hd, 0.3, "#b8b39c");
+    if (level >= 2) d.flat(gx, gy + 0.3, gw, 0.94 - gy - 0.3, 0.3, "#aaa995");
+    if (level >= 4) {
+      d.flat(0.1, 0.79, 0.34, 0.14, 0.3, "#d8d3bb");
+      d.flat(0.12, 0.81, 0.3, 0.1, 0.4, "#5aa6b9");
+      d.line(0.14, 0.83, 0.45, 0.37, 0.83, 0.45, "#a2d3d3", 0.5);
+    }
+    const parts = [
+      [hx + hw / 2, hy + hd / 2, () => {
+        d.box(hx, hy, hw, hd, hh, fam === 3 ? pick(["#e6e2d6", "#c9d0cf", "#d9cfc0"], n) : wall);
+        d.windows(hx, hy, hw, hd, hh, t.x + t.y, fam === 3);
+        if (fam === 0) d.roof(hx - 0.03, hy - 0.03, hw + 0.06, hd + 0.06, hh, 6 + level, roof);
+        else if (fam === 1) d.hip(hx - 0.03, hy - 0.03, hw + 0.06, hd + 0.06, hh, 5 + level, roof, 0.2);
+        else if (fam === 2) {
+          d.roof(hx - 0.03, hy - 0.03, hw + 0.06, hd + 0.06, hh, 7 + level, roof);
+          d.box(hx + hw * 0.35, hy - 0.02, hw * 0.3, 0.12, 4, wall, hh + 2);
+          d.roof(hx + hw * 0.33, hy - 0.04, hw * 0.34, 0.16, hh + 6, 3, roof);
+        } else {
+          d.box(hx - 0.02, hy - 0.02, hw + 0.04, hd + 0.04, 1.5, "#4f5a58", hh);
+          d.flat(hx + 0.04, hy + 0.04, hw - 0.08, hd - 0.08, hh + 1.6, "#8a9a8c");
+        }
+        if (fam !== 3) d.box(hx + hw * 0.22, hy + hd * 0.35, 0.06, 0.06, 6, "#94755a", hh + 3);
+        if ([0, 3].includes(r.rotation || 0)) {
+          d.box(entry, hy + hd + 0.002, 0.075, 0.004, 5.8, "#605746", 0.3);
+          d.line(entry + 0.057, hy + hd + 0.008, 2.8, entry + 0.057, hy + hd + 0.008, 3.2, "#c9b578", 0.5);
+        }
+      }],
+      [0.5, 0.96, () => {
+        const openings = [[entry - 0.015, entry + 0.09]];
+        if (level >= 2) openings.push([gx - 0.01, gx + gw + 0.01]);
+        let cursor = 0.04;
+        for (const [start, end] of openings) {
+          if (start - cursor > 0.025) d.fence(cursor, 0.96, start - cursor, 0, fence);
+          cursor = end;
+        }
+        if (0.96 - cursor > 0.025) d.fence(cursor, 0.96, 0.96 - cursor, 0, fence);
+      }],
+      [0.97, 0.5, () => d.fence(0.97, 0.04, 0, 0.92, fence)],
+      [0.06, 0.76, () => d.tree(0.06, 0.76, 1)],
+    ];
+    if (fam >= 2) parts.push([0.9, 0.1, () => d.tree(0.9, 0.1, 2)]);
+    if (fam === 2) parts.push([hx + hw / 2, hy + hd + 0.0225, () => d.box(hx, hy + hd, hw, 0.045, 3, "#d8d2c0")]);
+    if (level >= 2) parts.push([gx + gw / 2, gy + 0.15, () => {
+      d.box(gx, gy, gw, 0.3, 7, "#b4aa91");
+      if (fam === 3) d.flat(gx, gy, gw, 0.3, 7.1, "#8a9a8c");
+      else d.roof(gx - 0.01, gy - 0.01, gw + 0.02, 0.32, 7, 3, "#6d6b5a");
+      if ([0, 3].includes(r.rotation || 0)) {
+        for (let z = 1; z < 6; z += 1.5) d.line(gx + 0.02, gy + 0.302, z, gx + gw - 0.02, gy + 0.302, z, "#766f5f", 0.45);
+      }
+    }]);
+    d.parts(parts);
     return;
   }
   if (density === 2) {
