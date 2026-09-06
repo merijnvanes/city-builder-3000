@@ -519,7 +519,23 @@ export class CityRenderer {
     }
 
     ctx.drawImage(this.cache, 0, 0, this.w, this.h);
-    if (this.night) { ctx.fillStyle = "#12253d45"; ctx.fillRect(0, 0, this.w, this.h); }
+    if (this.night) {
+      ctx.fillStyle = "#12253d45"; ctx.fillRect(0, 0, this.w, this.h);
+      // Street lamps at intersections and every third road tile.
+      if (this.zoom > 0.5) {
+        for (let i = 0; i < city.tiles.length; i++) {
+          const t = city.tiles[i];
+          if ((t.type !== "road" && t.type !== "highway") || (t.x + t.y) % 3 !== 0) continue;
+          const p = this.project(t.x + 0.5, t.y + 0.5, 0);
+          if (p.x < -40 || p.x > this.w + 40 || p.y < -40 || p.y > this.h + 40) continue;
+          const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 22 * this.zoom);
+          g.addColorStop(0, "rgba(255,214,140,0.28)"); g.addColorStop(1, "rgba(255,214,140,0)");
+          ctx.fillStyle = g;
+          ctx.beginPath(); ctx.ellipse(p.x, p.y, 22 * this.zoom, 11 * this.zoom, 0, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = "#ffe4a0"; ctx.fillRect(p.x - 0.8 * this.zoom, p.y - 12 * this.zoom, 1.6 * this.zoom, 1.6 * this.zoom);
+        }
+      }
+    }
 
     // Neighbour names along the map edges.
     if (city._connections && this.zoom > 0.4) {

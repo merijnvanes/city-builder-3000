@@ -35,6 +35,7 @@ lookAtCity();
 function refresh() {
   const stats = sim.getStats(city);
   ui?.update(city, stats);
+  audio.setAmbience({ traffic: stats.traffic, population: stats.population, night: renderer.night });
   return stats;
 }
 
@@ -146,7 +147,7 @@ const actions = {
   zoom: (d) => renderer.zoomAt(d * 0.18),
   home: () => lookAtCity(),
   rotate: (d) => { input?.cancel(); renderer.rotate(d); },
-  toggleDay: () => { renderer.night = !renderer.night; renderer.dirty = true; },
+  toggleDay: () => { renderer.night = !renderer.night; renderer.dirty = true; audio.setAmbience({ night: renderer.night }); },
   toggleSound: async () => {
     try { const enabled = await audio.toggle(); ui.notify(enabled ? "Soundtrack on." : "Sound muted."); return enabled; }
     catch { ui.notify("Audio could not start in this browser."); return false; }
@@ -156,6 +157,7 @@ const actions = {
     const message = sim.disaster(city, id);
     renderer.dirty = true;
     refresh();
+    audio.effect(id === "fire" || id === "riot" ? "siren" : "disaster");
     ui.notify(message);
   },
 };
@@ -195,8 +197,8 @@ function frame(now) {
     lastTick = now;
     const stats = refresh();
     const goal = updateScenario(city, stats);
-    if (result.disaster) ui.notify(result.disaster);
-    if (goal) ui.notify(goal);
+    if (result.disaster) { ui.notify(result.disaster); audio.effect(/fire|riot/i.test(result.disaster) ? "siren" : "disaster"); }
+    if (goal) { ui.notify(goal); audio.effect("cash"); }
     // Autosave every January.
     if (city.month % 12 === 0) { try { localStorage.setItem(slotKey(0), sim.serialize(city)); } catch { /* storage full or blocked */ } }
   }
