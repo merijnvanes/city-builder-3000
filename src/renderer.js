@@ -10,6 +10,11 @@ const shade = (hex, k) => {
   return "rgb(" + [n >> 16, (n >> 8) & 255, n & 255].map((v) => clamp(v * k, 0, 255) | 0).join(",") + ")";
 };
 const ROAD = new Set(["road", "rail", "highway"]);
+const ZONE_TINT = {
+  residential: { fill: "#7ed05a77", edge: "#dcf7b0" },
+  commercial: { fill: "#5aa0e077", edge: "#c8e4ff" },
+  industrial: { fill: "#e0c04a77", edge: "#fff0b0" },
+};
 const TILE_W = 32, TILE_H = 16;
 const ELEV_PX = 8; // screen pixels per terrain level at zoom 1
 
@@ -629,10 +634,25 @@ export class CityRenderer {
     // Construction preview or hover.
     const preview = this.preview?.tiles;
     if (preview?.length) {
+      const zone = ZONE_TINT[this.preview.tool];
+      // Zoning: show the lot grid the zone will split into.
+      const lot = zone ? (this.preview.tool === "industrial" && this.preview.density === 1 ? 3 : this.preview.density) : 1;
       for (const t of preview) {
         if (t.x < 0 || t.y < 0 || t.x >= city.size || t.y >= city.size) continue;
         const good = t.valid && !t.noop;
-        this.flat(t.x, t.y, 1, 1, 1, t.noop ? "#d9d9a944" : good ? "#aad74977" : "#db513c99", t.noop ? "#e8e6c0" : good ? "#ecf29a" : "#ffc4a7", ctx);
+        const edge = t.noop ? "#e8e6c0" : good ? (zone ? (lot > 1 ? zone.fill : zone.edge) : "#ecf29a") : "#ffc4a7";
+        this.flat(t.x, t.y, 1, 1, 1, t.noop ? "#d9d9a944" : good ? (zone ? zone.fill : "#aad74977") : "#db513c99", edge, ctx);
+      }
+      if (lot > 1) {
+        const good = preview.filter((t) => t.valid && !t.noop);
+        if (good.length) {
+          const x0 = Math.min(...good.map((t) => t.x)), x1 = Math.max(...good.map((t) => t.x)) + 1;
+          const y0 = Math.min(...good.map((t) => t.y)), y1 = Math.max(...good.map((t) => t.y)) + 1;
+          for (let x = x0; x <= x1; x += lot) this.line(this.project(x, y0, 1.2), this.project(x, y1, 1.2), zone.edge, 1.8, ctx);
+          for (let y = y0; y <= y1; y += lot) this.line(this.project(x0, y, 1.2), this.project(x1, y, 1.2), zone.edge, 1.8, ctx);
+          if ((x1 - x0) % lot) this.line(this.project(x1, y0, 1.2), this.project(x1, y1, 1.2), zone.edge, 1.8, ctx);
+          if ((y1 - y0) % lot) this.line(this.project(x0, y1, 1.2), this.project(x1, y1, 1.2), zone.edge, 1.8, ctx);
+        }
       }
     } else if (this.hover && this.hover.x >= 0 && this.hover.y >= 0 && this.hover.x < city.size && this.hover.y < city.size) {
       const { x, y } = this.hover;
