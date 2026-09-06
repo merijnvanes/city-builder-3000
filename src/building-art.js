@@ -20,6 +20,7 @@ export function heightOf(t) {
     police: 24, fire: 21, hospital: 40, school: 22, college: 30, library: 18, museum: 26, landfill: 6, incinerator: 40, recycling: 16,
     park: 14, largepark: 16, zoo: 14, bus: 9, railstation: 16, airport: 18, seaport: 16, substation: 8,
     mayorhouse: 24, cityhall: 46, courthouse: 27, stadium: 30, statue: 25, prison: 20, casino: 36, toxicdump: 10, armybase: 14,
+    marina: 14, university: 34, medcenter: 40, gigamall: 20,
     clocktower: 61, operahouse: 38, observatory: 34, cathedral: 60, aquarium: 22 }[t.type] || 12;
 }
 
@@ -576,6 +577,55 @@ const RECIPES = {
     d.flat(0.52, 0.5, 0.4, 0.42, 0.4, "#6c7358"); for (let i = 0; i < 3; i++) d.box(0.56 + i * 0.12, 0.6, 0.08, 0.16, 4, "#5f6a48");
     d.line(0.9, 0.12, 0, 0.9, 0.12, 30, "#cfcfc0", 1); d.flat(0.86, 0.06, 0.08, 0.05, 28, "#c8443a");
     d.fence(0.03, 0.96, 0.92, 0, "#8d8b6d");
+  },
+  gigamall(d, t, n) {
+    d.flat(0.02, 0.02, 0.96, 0.96, 0.2, "#9a9a90");
+    // Parking on the street side, a long low hall with a glass atrium.
+    for (let a = 0.08; a < 0.9; a += 0.1) d.line(a, 0.7, 0.4, a, 0.94, 0.4, "#c9c8bc", 0.6);
+    for (let i = 0; i < 5; i++) d.box(0.1 + i * 0.17, 0.76, 0.1, 0.12, 3, pick(["#e3dbb9", "#698c9a", "#a66049", "#c9c3a1", "#8a8f96"], (n + i * 0.23) % 1));
+    d.box(0.06, 0.08, 0.88, 0.56, 16, "#d9d2c0"); d.flat(0.07, 0.09, 0.86, 0.54, 16.1, "#b9b3a3");
+    d.box(0.34, 0.16, 0.32, 0.4, 8, "#8fb2c4", 16); d.roof(0.32, 0.14, 0.36, 0.44, 24, 6, "#6f98ad");
+    d.box(0.08, 0.6, 0.84, 0.05, 6, "#c94a3c", 12); d.flat(0.36, 0.58, 0.28, 0.06, 20, "#f2d36b");
+    d.tree(0.03, 0.97, 1); d.tree(0.97, 0.97, 2);
+  },
+  marina(d, t, n) {
+    d.flat(0.02, 0.02, 0.96, 0.96, 0.2, "#4f8fb0");
+    d.flat(0.02, 0.02, 0.96, 0.3, 0.3, "#b9b39c");
+    d.box(0.1, 0.06, 0.34, 0.22, 10, "#e6e0cc"); d.windows(0.1, 0.06, 0.34, 0.22, 10, t.x + t.y); d.roof(0.08, 0.04, 0.38, 0.26, 10, 5, "#7a5340");
+    d.line(0.5, 0.2, 0, 0.5, 0.2, 22, "#d8d4c0", 1); d.flat(0.5, 0.15, 0.08, 0.05, 20, "#3f6f9a");
+    // Piers with moored boats.
+    for (const a of [0.22, 0.5, 0.78]) {
+      d.flat(a - 0.03, 0.3, 0.06, 0.62, 1.2, "#a58c66");
+      for (const b of [0.42, 0.66]) {
+        const side = (Math.floor((a + b) * 7) % 2) ? 0.06 : -0.14;
+        d.flat(a + side, b, 0.08, 0.16, 1, pick(["#f2efe4", "#dfe6ea", "#e8d9b8", "#cfe1d6"], (n + a + b) % 1));
+        d.line(a + side + 0.04, b + 0.06, 1, a + side + 0.04, b + 0.06, 16, "#e4e2d6", 0.8);
+      }
+    }
+    d.tree(0.9, 0.12, 1);
+  },
+  university(d, t, n) {
+    d.flat(0.02, 0.02, 0.96, 0.96, 0.2, "#7c9a56");
+    d.flat(0.3, 0.3, 0.4, 0.4, 0.3, "#c9c3a6"); d.flat(0.47, 0.1, 0.06, 0.8, 0.35, "#c9c3a6"); d.flat(0.1, 0.47, 0.8, 0.06, 0.35, "#c9c3a6");
+    // Main hall with a dome, two wings and a library block.
+    d.box(0.3, 0.06, 0.4, 0.24, 20, "#d8cbb0"); d.windows(0.3, 0.06, 0.4, 0.24, 20, t.x + t.y); d.roof(0.28, 0.04, 0.44, 0.28, 20, 5, "#5f6b66");
+    for (const a of [0.34, 0.42, 0.5, 0.58, 0.66]) d.box(a, 0.3, 0.03, 0.03, 20, "#eee8d8");
+    d.cyl(0.5, 0.18, 0.08, 6, "#c4bda6", 25); d.cyl(0.5, 0.18, 0.06, 5, "#6c8f82", 31);
+    d.box(0.06, 0.06, 0.2, 0.36, 14, "#c9bc9f"); d.windows(0.06, 0.06, 0.2, 0.36, 14, t.x + 3 * t.y); d.roof(0.04, 0.04, 0.24, 0.4, 14, 4, "#6e4b3c");
+    d.box(0.74, 0.06, 0.2, 0.36, 14, "#c9bc9f"); d.windows(0.74, 0.06, 0.2, 0.36, 14, t.x * 3 + t.y); d.roof(0.72, 0.04, 0.24, 0.4, 14, 4, "#6e4b3c");
+    d.box(0.06, 0.62, 0.3, 0.32, 12, "#b9a98f"); d.windows(0.06, 0.62, 0.3, 0.32, 12, t.x + t.y + 5, true); d.flat(0.07, 0.63, 0.28, 0.3, 12.1, "#6f7a72");
+    d.tree(0.62, 0.7, 1); d.tree(0.78, 0.84, 2); d.tree(0.9, 0.62, 0); d.tree(0.66, 0.92, 3);
+  },
+  medcenter(d, t, n) {
+    d.flat(0.02, 0.02, 0.96, 0.96, 0.2, "#aab3ad");
+    d.box(0.08, 0.1, 0.56, 0.5, 38, "#e9ecec"); d.windows(0.08, 0.1, 0.56, 0.5, 38, t.x + t.y, true);
+    d.flat(0.09, 0.11, 0.54, 0.48, 38.1, "#a7b2b4");
+    d.cyl(0.36, 0.35, 0.12, 0.8, "#c5cccb", 38.2); d.line(0.29, 0.35, 39, 0.43, 0.35, 39, "#e8544a", 1.4); d.line(0.36, 0.3, 39, 0.36, 0.4, 39, "#e8544a", 1.4);
+    d.box(0.66, 0.1, 0.28, 0.4, 16, "#dfe3e1"); d.windows(0.66, 0.1, 0.28, 0.4, 16, t.x * 2 + t.y, true); d.flat(0.67, 0.11, 0.26, 0.38, 16.1, "#9fb2b6");
+    d.box(0.08, 0.66, 0.5, 0.26, 10, "#d3d8d5"); d.windows(0.08, 0.66, 0.5, 0.26, 10, t.x + t.y * 2);
+    d.box(0.26, 0.6, 0.12, 0.06, 4, "#e8544a", 10); d.box(0.29, 0.6, 0.06, 0.06, 6, "#e8544a", 10);
+    d.flat(0.64, 0.6, 0.3, 0.34, 0.4, "#8d9a95"); d.box(0.7, 0.7, 0.16, 0.12, 5, "#f2f2ec"); d.box(0.72, 0.68, 0.06, 0.04, 3, "#e8544a", 5);
+    d.tree(0.94, 0.96, 1);
   },
 };
 

@@ -85,6 +85,31 @@ describe("petitions", () => {
     c.petitions.push({ id: "cleanair", status: "open", since: 0, expires: 6 });
     respondPetition(c, "cleanair", true);
     assert.equal(c.ordinances.cleanAir, true);
+    c.funding.education = 50;
+    c.petitions.push({ id: "teachers", status: "open", since: 0, expires: 6 });
+    respondPetition(c, "teachers", true);
+    assert.equal(c.funding.education, 100);
+    c.petitions.push({ id: "repealair", status: "open", since: 0, expires: 6 });
+    respondPetition(c, "repealair", true);
+    assert.equal(c.ordinances.cleanAir, false);
+  });
+  test("unions and councils petition when their cause is neglected", () => {
+    const c = createCity({ seed: 7, layout: "plains", starter: false, hills: 0 });
+    c.month = 24; c.funding.fire = 40;
+    const stats = { population: 3000, money: 50000, balance: 100, happiness: 70, pollution: 0, crime: 0, traffic: 0, garbage: 0, demand: {} };
+    let seen = null;
+    const rng = lcg(5);
+    for (let i = 0; i < 400 && !seen; i++) { updateEvents(c, stats, rng); seen = c.petitions.find((p) => p.status === "open"); }
+    assert.ok(seen, "a petition arrived");
+    assert.ok(["firefighters", "prison", "casino", "toxicdump", "armybase"].includes(seen.id), seen.id);
+  });
+  test("the marina is a shoreline reward", () => {
+    const c = createCity({ seed: 7, layout: "plains", starter: false, hills: 0 });
+    updateEvents(c, { population: 16000, money: 50000, balance: 100, happiness: 60, pollution: 0, crime: 0 }, lcg(1));
+    assert.ok("marina" in c.unlocked);
+    assert.ok(!("university" in c.unlocked));
+    const s = site(c, 3, 3);
+    assert.equal(place(c, s.x, s.y, "marina").ok, false, "marina needs water");
   });
   test("petitions arrive over time in a running city and survive saves", () => {
     const c = createCity(44, true);

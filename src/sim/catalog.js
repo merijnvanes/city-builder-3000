@@ -89,6 +89,9 @@ export const BUILDINGS = {
   courthouse:  { label: "Courthouse",      group: "special", cost: 0,    w: 3, h: 3, upkeep: 70,  dept: "police", unique: true, reward: { population: 25000 }, service: { kind: "police", radius: 16, strength: 60 }, effects: { happiness: 2 } },
   stadium:     { label: "Stadium",         group: "special", cost: 0,    w: 5, h: 5, upkeep: 150, dept: "parks", unique: true, reward: { population: 40000 }, service: { kind: "park", radius: 14, strength: 80 }, effects: { happiness: 5, jobs: 300, traffic: 30 }, powerUse: 10, waterUse: 6 },
   statue:      { label: "Mayor's Statue",  group: "special", cost: 0,    w: 1, h: 1, upkeep: 5,   dept: "parks", unique: true, reward: { population: 60000 }, service: { kind: "park", radius: 5, strength: 50 }, effects: { happiness: 2 } },
+  marina:      { label: "Marina",          group: "special", cost: 0,    w: 3, h: 3, upkeep: 40,  dept: "parks", unique: true, requiresWater: true, reward: { population: 15000 }, service: { kind: "park", radius: 10, strength: 70 }, effects: { landValue: 8, radius: 8, demand: { commercial: 4 }, jobs: 60 }, powerUse: 2, waterUse: 1 },
+  university:  { label: "University",      group: "special", cost: 0,    w: 4, h: 4, upkeep: 160, dept: "education", unique: true, reward: { population: 30000 }, service: { kind: "education", radius: 22, strength: 110 }, effects: { landValue: 6, radius: 8, jobs: 200, demand: { commercial: 4 } }, powerUse: 8, waterUse: 5 },
+  medcenter:   { label: "Medical Research Center", group: "special", cost: 0, w: 4, h: 4, upkeep: 180, dept: "health", unique: true, reward: { population: 50000 }, service: { kind: "health", radius: 20, strength: 120 }, effects: { jobs: 250, happiness: 2 }, powerUse: 8, waterUse: 6 },
 
   // Landmarks: pricey showpieces that lift land value, culture and tourism.
   clocktower:  { label: "Clock Tower",     group: "landmark", cost: 8000,  w: 2, h: 2, upkeep: 30,  dept: "parks", unique: true, service: { kind: "culture", radius: 8, strength: 70 }, effects: { landValue: 10, radius: 7, demand: { commercial: 3 } }, powerUse: 2 },
@@ -102,6 +105,7 @@ export const BUILDINGS = {
   casino:      { label: "Casino",          group: "special", cost: 0,    w: 3, h: 3, upkeep: 0,   dept: "parks", unique: true, offer: { income: 450 }, effects: { crime: 10, radius: 8, jobs: 200, traffic: 20, happiness: -1 }, powerUse: 6, waterUse: 3 },
   toxicdump:   { label: "Toxic Waste Dump", group: "special", cost: 0,   w: 3, h: 3, upkeep: 0,   dept: "sanitation", unique: true, offer: { income: 550 }, effects: { pollution: 55, radius: 9, landValue: -15, jobs: 30 }, garbage: 200 },
   armybase:    { label: "Army Base",       group: "special", cost: 0,    w: 5, h: 5, upkeep: 0,   dept: "police", unique: true, offer: { income: 350 }, effects: { crime: 6, radius: 8, pollution: 12, jobs: 400, landValue: -5 }, powerUse: 8, waterUse: 6 },
+  gigamall:    { label: "Gigamall",        group: "special", cost: 0,    w: 4, h: 4, upkeep: 0,   dept: "parks", unique: true, offer: { income: 400 }, effects: { jobs: 350, traffic: 35, radius: 8, landValue: -4, demand: { commercial: -6 } }, powerUse: 8, waterUse: 4 },
 };
 
 export const SPECIAL_TYPES = Object.entries(BUILDINGS).filter(([, b]) => b.reward || b.offer).map(([id]) => id);
