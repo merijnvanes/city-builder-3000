@@ -114,12 +114,20 @@ function residential(d, t, n, level, r) {
       }
       d.tree(0.85, 0.9, 1);
     } else if (fam === 2) {
-      // Slab block with a lawn.
-      d.box(0.06, 0.1, 0.88, 0.42, hh + 8, wall); d.windows(0.06, 0.1, 0.88, 0.42, hh + 8, t.x + t.y);
-      d.bands(0.06, 0.1, 0.88, 0.42, 8, hh + 8, 8, "#c2baa1");
-      d.flat(0.07, 0.11, 0.86, 0.4, hh + 8.1, "#7b7e6c");
-      d.flat(0.08, 0.58, 0.84, 0.34, 0.3, "#8faa5c"); d.tree(0.2, 0.75, 1); d.tree(0.5, 0.8, 0); d.tree(0.8, 0.72, 2);
+      // Ground and paths sit below the slab in every orientation.
+      d.flat(0.08, 0.58, 0.84, 0.34, 0.3, "#8faa5c");
       d.flat(0.46, 0.52, 0.08, 0.4, 0.4, "#bfb798");
+      d.parts([
+        [0.5, 0.31, () => {
+          d.box(0.06, 0.1, 0.88, 0.42, hh + 8, wall);
+          d.windows(0.06, 0.1, 0.88, 0.42, hh + 8, t.x + t.y);
+          d.bands(0.06, 0.1, 0.88, 0.42, 8, hh + 8, 8, "#c2baa1");
+          d.flat(0.07, 0.11, 0.86, 0.4, hh + 8.1, "#7b7e6c");
+        }],
+        [0.2, 0.75, () => d.tree(0.2, 0.75, 1)],
+        [0.5, 0.8, () => d.tree(0.5, 0.8, 0)],
+        [0.8, 0.72, () => d.tree(0.8, 0.72, 2)],
+      ]);
     } else {
       // Ground must precede the wings, and facade bands belong to their wing.
       d.flat(0.36, 0.42, 0.28, 0.44, 0.3, "#8faa5c");
@@ -157,12 +165,27 @@ function residential(d, t, n, level, r) {
     return;
   }
   if (style === 2) {
-    // Slab with balconies on every floor.
-    const sw = d.w >= 2 ? 0.82 : 0.76;
-    d.box(0.09, 0.2, sw, 0.5, hh + 8, wall); d.windows(0.09, 0.2, sw, 0.5, hh + 8, t.x + t.y);
-    for (let z = 8; z < hh + 4; z += 8) { d.box(0.12, 0.7, sw - 0.06, 0.08, 1.2, "#cfcab6", z); d.line(0.12, 0.78, z + 1.2, 0.12 + sw - 0.06, 0.78, z + 1.2, "#6f6f66", 0.7); }
-    d.flat(0.1, 0.21, sw - 0.02, 0.48, hh + 8.1, "#6f7368"); d.box(0.4, 0.4, 0.2, 0.14, 5, "#a39e88", hh + 8);
-    d.flat(0.1, 0.78, 0.8, 0.14, 0.3, "#8faa5c"); d.tree(0.2, 0.86, 1); d.tree(0.8, 0.86, 2);
+    // The balcony stack is in front only when its facade faces the camera.
+    const sw = d.w >= 2 ? 0.82 : 0.76, balconyDepth = 0.075 / d.h;
+    d.flat(0.1, 0.78, 0.8, 0.14, 0.3, "#8faa5c");
+    d.parts([
+      [0.09 + sw / 2, 0.45, () => {
+        d.box(0.09, 0.2, sw, 0.5, hh + 8, wall);
+        d.windows(0.09, 0.2, sw, 0.5, hh + 8, t.x + t.y);
+        d.flat(0.1, 0.21, sw - 0.02, 0.48, hh + 8.1, "#6f7368");
+        d.box(0.4, 0.4, 0.2, 0.14, 5, "#a39e88", hh + 8);
+      }],
+      [0.09 + sw / 2, 0.7 + balconyDepth / 2, () => {
+        for (let z = 8; z < hh + 4; z += 8) {
+          d.box(0.12, 0.7, sw - 0.06, balconyDepth, 0.65, "#bcbba9", z);
+          const front = 0.7 + balconyDepth;
+          d.line(0.12, front, z + 2, 0.12 + sw - 0.06, front, z + 2, "#646b64", 0.55);
+          for (const a of [0.12, 0.12 + (sw - 0.06) / 2, sw + 0.06]) d.line(a, front, z + 0.65, a, front, z + 2, "#646b64", 0.45);
+        }
+      }],
+      [0.2, 0.86, () => d.tree(0.2, 0.86, 1)],
+      [0.8, 0.86, () => d.tree(0.8, 0.86, 2)],
+    ]);
     return;
   }
   d.box(0.08, 0.08, 0.84, 0.84, 8, brick); d.windows(0.08, 0.08, 0.84, 0.84, 8, t.x + t.y);
