@@ -108,7 +108,9 @@ const actions = {
   newCity: (options = {}) => {
     const scenario = options?.scenario || "sandbox";
     const seed = Number.isFinite(options?.seed) ? options.seed : Math.floor(Math.random() * 100000);
-    city = startScenario(sim.createCity({ seed, starter: scenario === "recovery" || options?.starter === true, layout: options?.layout, size: options?.size, name: options?.name }), scenario);
+    city = sim.createCity({ seed, starter: scenario === "recovery" || options?.starter === true, layout: options?.layout, size: options?.size, name: options?.name });
+    if (Number.isFinite(options?.money) && scenario !== "recovery") city.money = options.money;
+    startScenario(city, scenario);
     restore();
     lookAtCity();
     ui.notify(scenario === "recovery" ? "Riverton needs you. Fix the budget and win back the residents." : "New city. Lay roads and power, then zone near the roads.");

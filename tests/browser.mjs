@@ -18,6 +18,8 @@ try {
   const initial = await money();
   await page.waitForTimeout(2700);
   assert.equal(await page.evaluate(() => civic.city.month), 0, "Starts paused");
+  // Zoom out so open land around the town is in view for placement tests.
+  await page.evaluate(() => civic.renderer.zoomAt(Math.log(0.5 / civic.renderer.zoom)));
 
   // Pick an empty grass tile in view.
   await page.getByRole("button", { name: "Transport", exact: true }).click();
@@ -80,6 +82,7 @@ try {
   for (let i = 1; i <= 4; i++) { await page.getByRole("button", { name: "Rotate right", exact: true }).click(); assert.equal(await page.evaluate(() => civic.renderer.rotation), i % 4); }
 
   // Footprint placement: a police station on a 3x3 grass site.
+  await page.evaluate(() => civic.renderer.zoomAt(Math.log(0.5 / civic.renderer.zoom)));
   await page.getByRole("button", { name: "Civic", exact: true }).click();
   await page.locator('[data-tool="police"]').click();
   const site = await page.evaluate(() => civic.city.tiles.find((t) => {
@@ -121,9 +124,12 @@ try {
   await page.getByRole("button", { name: "Cancel", exact: true }).click();
   assert.ok(await page.evaluate(() => civic.city.population > 0));
   await page.getByRole("button", { name: "New city", exact: true }).click();
-  await page.getByRole("button", { name: "Sandbox ($50K)", exact: true }).click();
+  await page.getByRole("combobox", { name: "Starting funds", exact: true }).selectOption("25000");
+  await page.getByRole("combobox", { name: "Terrain", exact: true }).selectOption("coast");
+  await page.getByRole("button", { name: "Start city", exact: true }).click();
   assert.equal(await page.evaluate(() => civic.city.population), 0);
-  assert.equal(await money(), 50000);
+  assert.equal(await money(), 25000);
+  assert.equal(await page.evaluate(() => civic.city.layout), "coast");
   await page.getByRole("button", { name: "Load city", exact: true }).click();
   assert.ok(await page.evaluate(() => civic.city.population > 0));
   assert.deepEqual(errors, [], "No runtime errors");

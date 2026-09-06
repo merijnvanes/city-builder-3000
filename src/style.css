@@ -277,7 +277,7 @@ html, body {
   position: absolute;
   top: 40px;
   right: 0;
-  width: 180px;
+  width: 200px;
   bottom: 78px;
   background: linear-gradient(180deg, #2e3e50 0%, #243040 100%);
   border-left: 2px solid var(--chrome-sh);
@@ -908,7 +908,7 @@ html, body {
 /* ── Navigator controls (lower-right, above bottom) ─────────────── */
 #navigator {
   position: absolute;
-  right: 184px;
+  right: 204px;
   bottom: 82px;
   pointer-events: auto;
   display: flex;
@@ -1293,6 +1293,28 @@ input[type="range"].chrome-slider::-moz-range-thumb {
   font-size: 0.62rem;
   color: var(--text-dim);
 }
+
+/* ── Form controls in dialogs ─────────────────────────────────────── */
+.chrome-select,
+.chrome-input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 0.66rem;
+  color: var(--text-bright);
+  background: linear-gradient(180deg, #1c2733 0%, #243240 100%);
+  border: 1px solid;
+  border-color: #18273a #5a7090 #5a7090 #18273a;
+  border-radius: var(--radius-sm);
+  padding: 4px 6px;
+  outline: none;
+}
+.chrome-select:focus,
+.chrome-input:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 2px rgba(42,184,144,0.25);
+}
+.chrome-select option { background: #243240; color: var(--text-bright); }
 
 /* ── Mobile ───────────────────────────────────────────────────────── */
 @media (max-width: 800px) {

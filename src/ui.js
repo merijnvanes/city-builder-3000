@@ -909,32 +909,56 @@ export function mountUI(actions) {
   app.appendChild(confirmDialog);
 
   const cfmHdr = el("div", "modal-header");
-  cfmHdr.appendChild(el("span", "modal-title", "Start a new city?"));
+  cfmHdr.appendChild(el("span", "modal-title", "New City"));
+  cfmHdr.appendChild(btn("btn btn-icon", "✕", "Close", () => confirmDialog.close()));
   confirmDialog.appendChild(cfmHdr);
 
   const cfmBody = el("div", "modal-body");
   const cfmMsg = el("p");
-  cfmMsg.style.cssText = "font-size:.62rem;color:var(--text-dim);line-height:1.55";
-  cfmMsg.textContent = "This will discard your current city. Unsaved progress will be lost.";
+  cfmMsg.style.cssText = "font-size:.62rem;color:var(--text-dim);line-height:1.55;margin:0 0 8px";
+  cfmMsg.textContent = "Starting a new city discards the current one unless you saved it.";
   cfmBody.appendChild(cfmMsg);
 
-  const scenarioRow = el("div", "slider-row");
-  scenarioRow.style.marginTop = "10px";
-  [
-    { id: "sandbox",  label: "Sandbox ($50K)" },
-    { id: "growth",   label: "Growth" },
-    { id: "recovery", label: "Recovery" },
-  ].forEach(({ id, label }) => {
-    scenarioRow.appendChild(btn("btn btn-sm", label, null, () => {
-      confirmDialog.close();
-      actions.newCity?.({ scenario: id });
-    }));
-  });
-  cfmBody.appendChild(scenarioRow);
+  const form = {};
+  function formRow(label, control) {
+    const row = el("div", "slider-row");
+    row.appendChild(el("span", "slider-label", label));
+    row.appendChild(control);
+    cfmBody.appendChild(row);
+    return control;
+  }
+  function select(name, options, value) {
+    const s = document.createElement("select");
+    s.className = "chrome-select";
+    s.setAttribute("aria-label", name);
+    for (const [v, text] of options) { const o = document.createElement("option"); o.value = v; o.textContent = text; s.appendChild(o); }
+    s.value = value;
+    return s;
+  }
+  const nameInput = document.createElement("input");
+  nameInput.type = "text"; nameInput.className = "chrome-input"; nameInput.maxLength = 40; nameInput.value = "New Riverton";
+  nameInput.setAttribute("aria-label", "New city name");
+  form.name = formRow("City name", nameInput);
+  form.layout = formRow("Terrain", select("Terrain", [["random", "Surprise me"], ["river", "River"], ["coast", "Coast"], ["lakes", "Lakes"], ["delta", "River delta"], ["plains", "Plains"]], "random"));
+  form.size = formRow("Map size", select("Map size", [["64", "Small (64×64)"], ["96", "Medium (96×96)"], ["128", "Large (128×128)"]], "64"));
+  form.money = formRow("Starting funds", select("Starting funds", [["50000", "$50,000 (easy)"], ["25000", "$25,000 (medium)"], ["10000", "$10,000 (hard)"]], "50000"));
+  form.start = formRow("Start with", select("Start with", [["blank", "Empty land"], ["town", "An established town"]], "blank"));
+  form.scenario = formRow("Scenario", select("Scenario", [["sandbox", "Open play"], ["growth", "Grow to 20,000 in ten years"], ["recovery", "Rescue a failing town"]], "sandbox"));
   confirmDialog.appendChild(cfmBody);
 
   const cfmFooter = el("div", "modal-footer");
   cfmFooter.appendChild(btn("btn", "Cancel", null, () => confirmDialog.close()));
+  cfmFooter.appendChild(btn("btn btn-teal", "Start City", "Start city", () => {
+    confirmDialog.close();
+    actions.newCity?.({
+      name: form.name.value.trim() || "New Riverton",
+      layout: form.layout.value === "random" ? undefined : form.layout.value,
+      size: Number(form.size.value),
+      money: Number(form.money.value),
+      starter: form.start.value === "town",
+      scenario: form.scenario.value,
+    });
+  }));
   confirmDialog.appendChild(cfmFooter);
 
   confirmDialog.addEventListener("click", (e) => {

@@ -48,7 +48,7 @@ export function createMinimap(renderer) {
         ctx.fillRect(tile.x * s, tile.y * s, s, s);
       }
       ctx.beginPath();
-      [[0, 40], [renderer.w - 180, 40], [renderer.w - 180, renderer.h - 78], [0, renderer.h - 78]].forEach(([x, y], i) => {
+      [[0, 40], [renderer.w - 200, 40], [renderer.w - 200, renderer.h - 78], [0, renderer.h - 78]].forEach(([x, y], i) => {
         const p = renderer.pick(x, y);
         if (i) ctx.lineTo(p.x * s, p.y * s); else ctx.moveTo(p.x * s, p.y * s);
       });
