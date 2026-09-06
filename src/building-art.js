@@ -32,6 +32,11 @@ function scoped(r, lot, dim) {
   const tone = (c) => (dim ? shadeHex(c, k) : c);
   return {
     w, h, x, y,
+    // Keep each solid and its surface details together as the camera rotates.
+    parts: (parts) => parts.map(([a, b, draw]) => {
+      const p = r.orient(...s(a, b));
+      return { depth: p.x + p.y, draw };
+    }).sort((a, b) => a.depth - b.depth).forEach((part) => part.draw()),
     flat: (a, b, fw, fd, z, c, stroke) => r.flat(x + a * w, y + b * h, fw * w, fd * h, z, tone(c), stroke),
     box: (a, b, fw, fd, hh, c, z = 0) => r.box(x + a * w, y + b * h, fw * w, fd * h, hh, tone(c), z),
     roof: (a, b, fw, fd, z, hh, c) => r.roof(x + a * w, y + b * h, fw * w, fd * h, z, hh, tone(c)),
@@ -116,13 +121,24 @@ function residential(d, t, n, level, r) {
       d.flat(0.08, 0.58, 0.84, 0.34, 0.3, "#8faa5c"); d.tree(0.2, 0.75, 1); d.tree(0.5, 0.8, 0); d.tree(0.8, 0.72, 2);
       d.flat(0.46, 0.52, 0.08, 0.4, 0.4, "#bfb798");
     } else {
-      // U-shaped block around a courtyard.
-      d.box(0.06, 0.06, 0.88, 0.32, hh, wall); d.windows(0.06, 0.06, 0.88, 0.32, hh, t.x + t.y);
-      d.box(0.06, 0.38, 0.28, 0.5, hh - 4, brick); d.windows(0.06, 0.38, 0.28, 0.5, hh - 4, t.x * 2);
-      d.box(0.66, 0.38, 0.28, 0.5, hh - 4, brick); d.windows(0.66, 0.38, 0.28, 0.5, hh - 4, t.y * 2);
-      d.flat(0.07, 0.07, 0.86, 0.3, hh + 0.1, "#7b7e6c"); d.flat(0.07, 0.39, 0.26, 0.48, hh - 3.9, "#7b7e6c"); d.flat(0.67, 0.39, 0.26, 0.48, hh - 3.9, "#7b7e6c");
-      d.flat(0.36, 0.42, 0.28, 0.44, 0.3, "#8faa5c"); d.tree(0.5, 0.65, 2); d.tree(0.42, 0.85, 1); d.tree(0.6, 0.88, 0);
-      d.bands(0.06, 0.06, 0.88, 0.32, 8, hh, 8, "#c2baa1");
+      // Ground must precede the wings, and facade bands belong to their wing.
+      d.flat(0.36, 0.42, 0.28, 0.44, 0.3, "#8faa5c");
+      d.parts([
+        [0.5, 0.22, () => {
+          d.box(0.06, 0.06, 0.88, 0.32, hh, wall);
+          d.windows(0.06, 0.06, 0.88, 0.32, hh, t.x + t.y);
+          d.bands(0.06, 0.06, 0.88, 0.32, 8, hh, 8, "#c2baa1");
+          d.flat(0.07, 0.07, 0.86, 0.3, hh + 0.1, "#7b7e6c");
+        }],
+        ...[0.06, 0.66].map((a, i) => [a + 0.14, 0.63, () => {
+          d.box(a, 0.38, 0.28, 0.5, hh - 4, brick);
+          d.windows(a, 0.38, 0.28, 0.5, hh - 4, (i ? t.y : t.x) * 2);
+          d.flat(a + 0.01, 0.39, 0.26, 0.48, hh - 3.9, "#7b7e6c");
+        }]),
+        [0.5, 0.65, () => d.tree(0.5, 0.65, 2)],
+        [0.42, 0.85, () => d.tree(0.42, 0.85, 1)],
+        [0.6, 0.88, () => d.tree(0.6, 0.88, 0)],
+      ]);
     }
     return;
   }
