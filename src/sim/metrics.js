@@ -63,8 +63,9 @@ export function computeMetrics(city) {
   const svc = city._svc || { garbage: 0 };
   const pollution = Math.round(per(wPoll));
   const crime = Math.round(per(wCrime));
-  let education = Math.round(clamp(per(wEdu) + (ord.readingCampaign ? 12 : 0), 0, 100));
-  let health = Math.round(clamp(20 + per(wHealth) * 0.8 + (ord.freeClinics ? 12 : 0) + (ord.smokingBan ? 3 : 0) - pollution * 0.25 - svc.garbage * 0.05, 0, 100));
+  const waterPollution = svc.waterPollution || 0;
+  let education = Math.round(clamp(per(wEdu) + (ord.readingCampaign ? 12 : 0) + (ord.juniorSports ? 3 : 0), 0, 100));
+  let health = Math.round(clamp(20 + per(wHealth) * 0.8 + (ord.freeClinics ? 12 : 0) + (ord.smokingBan ? 3 : 0) + (ord.juniorSports ? 4 : 0) + (ord.cprTraining ? 3 : 0) - pollution * 0.25 - svc.garbage * 0.05 - waterPollution * 0.2, 0, 100));
   if (!population) { education = 0; health = 0; }
   const parks = Math.round(per(wPark));
   const police = Math.round(per(wPolice));
@@ -82,6 +83,8 @@ export function computeMetrics(city) {
   if (ord.youthCurfew) happiness -= 2;
   if (ord.parkingFines) happiness -= 2;
   if (ord.gambling) happiness -= 1;
+  if (ord.alternateDriving) happiness -= 3;
+  if (ord.leafBurningBan) happiness -= 1;
   happiness += specialHappiness;
   if (!population) happiness = 50;
   happiness = Math.round(clamp(happiness, 5, 100));
@@ -92,7 +95,7 @@ export function computeMetrics(city) {
     workers: traffic.workers, employed: traffic.employed, unemployment: traffic.unemployment,
     traffic: traffic.traffic, congestion: traffic.congestion,
     pollution, crime, education, health, parks, police, fireCover,
-    garbage: svc.garbage, garbageProduced: svc.garbageProduced || 0, garbageCapacity: svc.garbageCapacity || 0,
+    garbage: svc.garbage, garbageProduced: svc.garbageProduced || 0, garbageCapacity: svc.garbageCapacity || 0, waterPollution,
     power: powerPct, water: waterPct,
     utilities: city._util || { power: { supply: 0, demand: 0 }, water: { supply: 0, demand: 0 } },
     landValue: landTiles ? Math.round(landValueSum / landTiles) : 0,

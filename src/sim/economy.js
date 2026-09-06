@@ -31,7 +31,7 @@ export function computeBudget(city) {
       if (!cap) continue;
       if (t.type === "residential") { population += cap; income.residential += cap * (taxes.residential / 100) * 1.2 * wealth(t); }
       else if (t.type === "commercial") income.commercial += cap * (taxes.commercial / 100) * 1.4 * wealth(t);
-      else income.industrial += cap * (taxes.industrial / 100) * 1.2;
+      else income.industrial += cap * (taxes.industrial / 100) * 1.2 * (ordinances.wasteTax ? 1.15 : 1);
       continue;
     }
     const b = BUILDINGS[t.type];

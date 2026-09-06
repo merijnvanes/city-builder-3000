@@ -82,12 +82,24 @@ export function updateServices(city) {
       if (e.landValue) valueBump[n.y * size + n.x] += e.landValue * f;
     });
   }
-  const airScale = ord.cleanAir ? 0.7 : 1;
+  const airScale = (ord.cleanAir ? 0.7 : 1) * (ord.leafBurningBan ? 0.95 : 1) * (ord.wasteTax ? 0.92 : 1);
   for (const t of tiles) {
     let v = poll[t.y * size + t.x] * airScale;
     if (t.trees) v -= t.trees * 3;
     t.pollution = Math.max(0, Math.min(100, Math.round(v)));
   }
+
+  // Water pollution: what the pumps draw from. Treatment plants clean it.
+  let waterSum = 0, waterCount = 0, treatment = 0;
+  for (const t of tiles) {
+    if (!isAnchor(t)) continue;
+    if (t.type === "treatment") treatment++;
+    if (!BUILDINGS[t.type]?.nearWater) continue;
+    forRadius(city, t.x, t.y, 3, (n) => { if (n.terrain === "water") { waterSum += n.pollution; waterCount++; } });
+  }
+  let waterPollution = waterCount ? waterSum / waterCount : 0;
+  if (treatment) waterPollution *= Math.pow(0.35, treatment);
+  waterPollution = Math.round(Math.min(100, waterPollution));
 
   // ── Garbage ───────────────────────────────────────────────────
   let population = 0, jobs = 0, garbageCapacity = 0;
@@ -141,5 +153,5 @@ export function updateServices(city) {
   }
   for (const t of tiles) t.landValue = Math.max(0, Math.min(100, Math.round(baseValue[t.y * size + t.x] - t.crime * 0.2)));
 
-  return { garbage, garbageProduced: Math.round(garbageProduced), garbageCapacity: Math.round(garbageCapacity), industrialLots };
+  return { garbage, garbageProduced: Math.round(garbageProduced), garbageCapacity: Math.round(garbageCapacity), industrialLots, waterPollution };
 }

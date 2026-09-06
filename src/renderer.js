@@ -326,7 +326,7 @@ export class CityRenderer {
   // Data maps: dim the world and tint only the tiles that carry a value.
   heatColor(t) {
     const o = this.overlay;
-    if (t.terrain === "water") return null;
+    if (t.terrain === "water" && o !== "pollution") return null;
     if (o === "power") return t.powered ? "#dbe64488" : (t.lot || t.type !== "empty") ? "#db5b40aa" : null;
     if (o === "water") return t.watered ? "#469bdbaa" : (t.lot || t.type !== "empty") ? "#bd7045aa" : null;
     if (o === "landvalue") return "hsla(" + (t.landValue * 1.2) + ",65%,48%,.6)";
@@ -552,6 +552,36 @@ export class CityRenderer {
         ctx.beginPath(); ctx.ellipse(p.x + 3 * this.zoom, p.y - 18 * this.zoom - ((time * 0.02 + i * 7) % 20) * this.zoom, 7 * this.zoom, 5 * this.zoom, 0, 0, Math.PI * 2); ctx.fill();
       }
       this.platform = null;
+    }
+
+    // Flood water, tornado funnels, earthquake shake.
+    for (const t of city.tiles) {
+      if (!t.flooded) continue;
+      const p = this.project(t.x + 0.5, t.y + 0.5, 0.6);
+      if (p.x < -40 || p.x > this.w + 40 || p.y < -40 || p.y > this.h + 40) continue;
+      this.flat(t.x, t.y, 1, 1, 0.6, `rgba(70,130,170,${0.35 + 0.1 * Math.sin(time * 0.003 + t.x)})`, null, ctx);
+    }
+    for (const e of city.effects || []) {
+      if (e.type === "tornado") {
+        const f = (time * 0.0005) % 1;
+        const idx = Math.min(e.path.length - 1, Math.floor(f * e.path.length));
+        const at = e.path[idx];
+        const base = this.project(at.x + 0.5, at.y + 0.5, 0);
+        for (let i = 0; i < 7; i++) {
+          const w = (3 + i * 3.2) * this.zoom, y = base.y - i * 9 * this.zoom, wob = Math.sin(time * 0.02 + i) * 3 * this.zoom;
+          ctx.fillStyle = `rgba(90,95,100,${0.55 - i * 0.05})`;
+          ctx.beginPath(); ctx.ellipse(base.x + wob, y, w, w * 0.45, 0, 0, Math.PI * 2); ctx.fill();
+        }
+      } else if (e.type === "earthquake") {
+        this.shakeUntil = Math.max(this.shakeUntil || 0, time + 900);
+      }
+    }
+    if (this.shakeUntil && time < this.shakeUntil) {
+      const k = (this.shakeUntil - time) / 900;
+      ctx.setTransform(this.dpr, 0, 0, this.dpr, Math.sin(time * 0.09) * 6 * k * this.dpr, Math.cos(time * 0.11) * 4 * k * this.dpr);
+      ctx.drawImage(this.ground, 0, 0, this.w, this.h);
+      ctx.drawImage(this.cache, 0, 0, this.w, this.h);
+      ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     }
 
     // Construction preview or hover.

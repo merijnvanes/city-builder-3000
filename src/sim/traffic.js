@@ -1,8 +1,10 @@
 // Commuting. Each residential lot sends its workers along the transport
-// network to the nearest open jobs (breadth-first, up to MAX_TRIP tiles).
-// Roads carry cars; rail carries passengers between stations; roads that
-// reach the map edge lead to jobs in the neighbouring city. Every tile on
-// the way carries the trip, which becomes its traffic level.
+// network to the nearest open jobs (cheapest path, up to MAX_TRIP tiles of
+// street). Roads carry cars; highways and rail move people twice as fast;
+// rail is entered through stations; roads that reach the map edge lead to
+// jobs in the neighbouring city. Every tile on the way carries the trip,
+// which becomes its traffic level. Trips are assigned twice: the second
+// pass routes around the jams the first pass produced.
 import { forRadius, NEIGHBORS4 } from "./grid.js";
 import { ZONE_TYPES, BUILDINGS } from "./catalog.js";
 import { isAnchor, capacityOf, lotTiles } from "./lots.js";
@@ -32,7 +34,6 @@ function entryOf(city, anchor, kind) {
 
 export function updateTraffic(city) {
   const { tiles, size } = city;
-  const load = new Float64Array(tiles.length);
   const kind = new Uint8Array(tiles.length);
   for (let i = 0; i < tiles.length; i++) {
     const t = tiles[i];
@@ -44,7 +45,8 @@ export function updateTraffic(city) {
 
   // Jobs reachable from each road tile.
   const jobsAt = new Map();
-  const addJobs = (entry, anchor, open) => { if (!jobsAt.has(entry)) jobsAt.set(entry, []); jobsAt.get(entry).push({ anchor, open }); };
+  const jobList = [];
+  const addJobs = (entry, anchor, cap) => { const j = { anchor, cap, open: cap }; jobList.push(j); if (!jobsAt.has(entry)) jobsAt.set(entry, []); jobsAt.get(entry).push(j); };
   const homes = [];
   let workers = 0, jobsTotal = 0;
   for (const t of tiles) {
@@ -81,7 +83,7 @@ export function updateTraffic(city) {
   const dist = new Int32Array(tiles.length).fill(-1);
   const settled = new Uint8Array(tiles.length);
   const touched = [];
-  let employed = 0, commuters = 0;
+  const buckets = Array.from({ length: MAX_COST + 3 }, () => []);
 
   // Movement rules: streets join highways; rail only through stations.
   const canStep = (from, to) => {
@@ -91,65 +93,81 @@ export function updateTraffic(city) {
     return true; // road <-> road, road <-> highway, highway <-> highway
   };
 
-  // Bucketed shortest paths (costs are 1 or 2) so fast links shorten trips.
-  const buckets = Array.from({ length: MAX_COST + 3 }, () => []);
-  for (const home of homes) {
-    let remaining = home.workers;
-    for (const b of buckets) b.length = 0;
-    buckets[0].push(home.entry);
-    dist[home.entry] = 0; parent[home.entry] = -1; touched.push(home.entry);
-    for (let d = 0; d <= MAX_COST && remaining > 0; d++) {
-      const bucket = buckets[d];
-      for (let q = 0; q < bucket.length && remaining > 0; q++) {
-        const i = bucket[q];
-        if (settled[i] || dist[i] !== d) continue;
-        settled[i] = 1;
-        const jobs = jobsAt.get(i);
-        if (jobs) {
-          for (const j of jobs) {
-            if (remaining <= 0) break;
-            if (j.open <= 0) continue;
-            const take = Math.min(remaining, j.open);
-            j.open -= take; j.anchor.filled += take;
-            remaining -= take; employed += take;
-            if (j.anchor === outside) commuters += take;
-            for (let k = i; k >= 0; k = parent[k]) load[k] += take;
+  // One assignment pass. `jam` marks tiles that cost an extra step.
+  const assign = (jam) => {
+    const load = new Float64Array(tiles.length);
+    for (const j of jobList) { j.open = j.cap; j.anchor.filled = 0; }
+    let employed = 0, commuters = 0;
+    for (const home of homes) {
+      let remaining = home.workers;
+      for (const b of buckets) b.length = 0;
+      buckets[0].push(home.entry);
+      dist[home.entry] = 0; parent[home.entry] = -1; touched.push(home.entry);
+      for (let d = 0; d <= MAX_COST && remaining > 0; d++) {
+        const bucket = buckets[d];
+        for (let q = 0; q < bucket.length && remaining > 0; q++) {
+          const i = bucket[q];
+          if (settled[i] || dist[i] !== d) continue;
+          settled[i] = 1;
+          const jobs = jobsAt.get(i);
+          if (jobs) {
+            for (const j of jobs) {
+              if (remaining <= 0) break;
+              if (j.open <= 0) continue;
+              const take = Math.min(remaining, j.open);
+              j.open -= take; j.anchor.filled += take;
+              remaining -= take; employed += take;
+              if (j.anchor === outside) commuters += take;
+              for (let k = i; k >= 0; k = parent[k]) load[k] += take;
+            }
           }
-        }
-        const x = i % size, y = (i - x) / size;
-        for (const [dx, dy] of NEIGHBORS4) {
-          const nx = x + dx, ny = y + dy;
-          if (nx < 0 || ny < 0 || nx >= size || ny >= size) continue;
-          const ni = ny * size + nx;
-          if (!kind[ni] || settled[ni] || !canStep(i, ni)) continue;
-          const nd = d + STEP_COST[kind[ni]];
-          if (nd > MAX_COST) continue;
-          if (dist[ni] === -1 || nd < dist[ni]) {
-            if (dist[ni] === -1) touched.push(ni);
-            dist[ni] = nd; parent[ni] = i; buckets[nd].push(ni);
+          const x = i % size, y = (i - x) / size;
+          for (const [dx, dy] of NEIGHBORS4) {
+            const nx = x + dx, ny = y + dy;
+            if (nx < 0 || ny < 0 || nx >= size || ny >= size) continue;
+            const ni = ny * size + nx;
+            if (!kind[ni] || settled[ni] || !canStep(i, ni)) continue;
+            const nd = d + STEP_COST[kind[ni]] + (jam && jam[ni] ? 1 : 0);
+            if (nd > MAX_COST) continue;
+            if (dist[ni] === -1 || nd < dist[ni]) {
+              if (dist[ni] === -1) touched.push(ni);
+              dist[ni] = nd; parent[ni] = i; buckets[nd].push(ni);
+            }
           }
         }
       }
+      home.anchor.commute = home.workers ? 1 - remaining / home.workers : 0;
+      for (const i of touched) { dist[i] = -1; parent[i] = -1; settled[i] = 0; }
+      touched.length = 0;
     }
-    home.anchor.commute = home.workers ? 1 - remaining / home.workers : 0;
-    for (const i of touched) { dist[i] = -1; parent[i] = -1; settled[i] = 0; }
-    touched.length = 0;
-  }
+    return { load, employed, commuters };
+  };
+
+  const ord = city.ordinances || {};
+  const carScale = (ord.carpool ? 0.9 : 1) * (ord.alternateDriving ? 0.75 : 1);
+  const trafficOf = (i, load) => {
+    const t = tiles[i];
+    if (kind[i] === ROAD) { let v = load[i] / TRAFFIC_PER_POINT * carScale; if (t.svc?.bus) v *= 0.75; return v; }
+    if (kind[i] === HIGHWAY) return load[i] / HIGHWAY_PER_POINT * carScale;
+    if (kind[i] === RAIL) return load[i] / RAIL_PER_POINT;
+    return 0;
+  };
+
+  const first = assign(null);
+  const jam = new Uint8Array(tiles.length);
+  let jams = 0;
+  for (let i = 0; i < tiles.length; i++) if (kind[i] !== RAIL && kind[i] !== 0 && trafficOf(i, first.load) >= 80) { jam[i] = 1; jams++; }
+  const { load, employed, commuters } = jams ? assign(jam) : first;
 
   let sum = 0, roads = 0, congested = 0, railRiders = 0;
   for (let i = 0; i < tiles.length; i++) {
     const t = tiles[i];
-    if (kind[i] === ROAD) {
-      let v = load[i] / TRAFFIC_PER_POINT;
-      if (t.svc?.bus) v *= 0.75;
-      t.traffic = Math.max(0, Math.min(100, Math.round(v)));
-      sum += t.traffic; roads++;
-      if (t.traffic >= 70) congested++;
+    if (kind[i] === ROAD || kind[i] === HIGHWAY) {
+      t.traffic = Math.max(0, Math.min(100, Math.round(trafficOf(i, load))));
+      if (kind[i] === ROAD) { sum += t.traffic; roads++; if (t.traffic >= 70) congested++; }
     } else if (kind[i] === RAIL) {
-      t.traffic = Math.max(0, Math.min(100, Math.round(load[i] / RAIL_PER_POINT)));
+      t.traffic = Math.max(0, Math.min(100, Math.round(trafficOf(i, load))));
       railRiders += load[i];
-    } else if (kind[i] === HIGHWAY) {
-      t.traffic = Math.max(0, Math.min(100, Math.round(load[i] / HIGHWAY_PER_POINT)));
     } else t.traffic = 0;
   }
   // Non-road tiles inherit the busiest adjacent road for overlays and desirability.

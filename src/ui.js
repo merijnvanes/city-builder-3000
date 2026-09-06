@@ -807,6 +807,8 @@ export function mountUI(actions) {
     ["crime", "Crime"],
     ["traffic", "Traffic"],
     ["garbage", "Garbage"],
+    ["waterPollution", "Water pollution"],
+    ["landValue", "Land value"],
   ].forEach(([k, label]) => {
     const item = el("div", "stat-item");
     item.appendChild(el("span", "stat-item-label", label));
@@ -844,7 +846,7 @@ export function mountUI(actions) {
     Object.entries(repStats).forEach(([k, el]) => {
       el.textContent = fmt(k, s[k]);
       el.className = "stat-item-val";
-      if (k === "pollution" || k === "crime" || k === "garbage" || k === "traffic") {
+      if (k === "pollution" || k === "crime" || k === "garbage" || k === "traffic" || k === "waterPollution") {
         if (s[k] > 70) el.classList.add("neg");
         else if (s[k] > 40) el.classList.add("warn");
       } else if (k === "health" || k === "education" || k === "happiness") {

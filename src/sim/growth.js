@@ -32,7 +32,7 @@ export function computeDemand(city, m) {
   const wantedI = pop * 0.25 + 260 + trade * 250;
   let ind = (wantedI - m.jobsIndustrial) / Math.max(350, wantedI) * 100;
   ind -= (taxes.industrial - 7) * 3;
-  ind -= (ord.cleanAir ? 6 : 0);
+  ind -= (ord.cleanAir ? 6 : 0) + (ord.wasteTax ? 5 : 0);
   ind += m.demandBonus?.industrial || 0;
 
   return {

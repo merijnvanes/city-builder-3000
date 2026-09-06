@@ -44,6 +44,19 @@ function fireTargets(city) {
   return pool;
 }
 
+// Visual effects for the renderer: { type, x, y, ttl (months), ... }.
+export function addEffect(city, effect) {
+  if (!city.effects) city.effects = [];
+  city.effects.push(effect);
+}
+
+export function advanceEffects(city) {
+  if (!city.effects) return;
+  for (const e of city.effects) e.ttl--;
+  city.effects = city.effects.filter((e) => e.ttl > 0);
+  for (const t of city.tiles) if (t.flooded) { t.flooded--; }
+}
+
 export function triggerDisaster(city, id, rng) {
   const targets = developedTiles(city);
   if (id === "flood") {
@@ -51,7 +64,9 @@ export function triggerDisaster(city, id, rng) {
     for (const w of city.tiles) {
       if (w.terrain !== "water" || rng() > 0.25) continue;
       forRadius(city, w.x, w.y, 2, (n) => {
-        if (n.terrain === "water" || !n.lot || rng() > 0.35) return;
+        if (n.terrain === "water") return;
+        if (n.elev <= 1 && rng() < 0.7) n.flooded = 2;
+        if (!n.lot || rng() > 0.35) return;
         const a = anchorOf(city, n);
         if (!a || a._flooded) return;
         a._flooded = true; damageLot(city, a, rng); hit++;
@@ -73,15 +88,18 @@ export function triggerDisaster(city, id, rng) {
     });
     for (const t of city.tiles) delete t._quake;
     if (rng() < 0.5) ignite(city, center, 2);
+    addEffect(city, { type: "earthquake", x: center.x, y: center.y, ttl: 1 });
     city.revision++;
     return `Earthquake near (${center.x}, ${center.y}): ${hit} roads and buildings damaged.`;
   }
   if (id === "tornado") {
     let x = center.x, y = center.y, hit = 0;
     let dx = rng() < 0.5 ? 1 : -1, dy = rng() < 0.5 ? 1 : -1;
+    const path = [];
     for (let step = 0; step < 18; step++) {
       const t = tileAt(city, x, y);
       if (!t) break;
+      path.push({ x, y });
       forRadius(city, x, y, 1, (n) => {
         if (n.lot) { const a = anchorOf(city, n); if (a && !a._torn) { a._torn = true; damageLot(city, a, rng, true); hit++; } }
         else if (n.trees && rng() < 0.5) n.trees = 0;
@@ -91,6 +109,7 @@ export function triggerDisaster(city, id, rng) {
       if (rng() < 0.15) dy = -dy;
     }
     for (const t of city.tiles) delete t._torn;
+    addEffect(city, { type: "tornado", path, ttl: 2 });
     city.revision++;
     return `A tornado tore through the city, wrecking ${hit} buildings.`;
   }

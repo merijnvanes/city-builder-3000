@@ -23,6 +23,12 @@ export const ORDINANCES = {
   readingCampaign:    { label: "Pro-Reading Campaign",     cost: 0.015, description: "Improves education coverage everywhere." },
   parkingFines:       { label: "Parking Fines",            cost: -0.02, description: "Earns $0.02 per resident. Slightly lowers approval." },
   smokingBan:         { label: "Public Smoking Ban",       cost: 0.004, description: "Small health boost. Commerce grumbles a little." },
+  carpool:            { label: "Carpool Incentive",        cost: 0.008, description: "Cuts road traffic 10%." },
+  alternateDriving:   { label: "Alternate-Day Driving",    cost: 0.004, description: "Cuts road traffic 25%. Drivers hate it." },
+  juniorSports:       { label: "Junior Sports League",     cost: 0.012, description: "Healthier, better-educated kids." },
+  leafBurningBan:     { label: "Leaf Burning Ban",         cost: 0.002, description: "Reduces air pollution 5%. Gardeners grumble." },
+  cprTraining:        { label: "CPR Training",             cost: 0.006, description: "Raises health a little everywhere." },
+  wasteTax:           { label: "Industrial Waste Tax",     cost: 0,     description: "Industry pays 15% more tax and pollutes 8% less, but grows slower." },
 };
 
 export function makeTile(x, y, terrain, trees, variant, elev = 0) {

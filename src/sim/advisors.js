@@ -50,7 +50,8 @@ export function generateAdvisors(city, s) {
   else say("utilities", "good", "Power and water are keeping up with demand.");
 
   // Environment
-  if (s.garbage > 40) say("environment", "bad", `${s.garbage}% of garbage is not collected. Zone a landfill or build an incinerator.`);
+  if (s.waterPollution > 40) say("environment", "bad", `Pumps are drawing polluted water (${s.waterPollution}%). Build a water treatment plant or move industry away from the shore.`);
+  else if (s.garbage > 40) say("environment", "bad", `${s.garbage}% of garbage is not collected. Zone a landfill or build an incinerator.`);
   else if (s.pollution > 45) say("environment", "bad", "Pollution is choking residential areas. Move industry downwind, plant trees, pass the Clean Air Act.");
   else if (s.pollution > 25) say("environment", "warning", "Air quality is slipping. Parks and trees help; keep industry away from homes.");
   else say("environment", "good", "The air is clean and parks are appreciated.");

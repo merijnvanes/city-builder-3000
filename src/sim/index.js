@@ -8,7 +8,7 @@ import { computeMetrics, dateOf } from "./metrics.js";
 import { computeDemand, updateGrowth, conditionsOk } from "./growth.js";
 import { computeBudget, amortize, takeLoan, repayLoan } from "./economy.js";
 import { generateAdvisors, generateNews, ADVISORS } from "./advisors.js";
-import { triggerDisaster, advanceFires, randomDisaster, DISASTERS } from "./disasters.js";
+import { triggerDisaster, advanceFires, randomDisaster, advanceEffects, DISASTERS } from "./disasters.js";
 import { buildStarterTown } from "./starter.js";
 import { lcg } from "./terrain.js";
 import { nextRandom, tileAt, inBounds } from "./grid.js";
@@ -60,6 +60,7 @@ export function tick(city) {
   if (!city._metrics) settle(city);
   const growth = updateGrowth(city, city.demand, rng);
   const fireMessage = advanceFires(city, rng);
+  advanceEffects(city);
   refreshCity(city);
   city._traffic = updateTraffic(city);
   refreshCity(city);
