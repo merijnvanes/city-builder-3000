@@ -6,7 +6,7 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 
 | Area | Reference behavior | Current gap |
 | --- | --- | --- |
-| Highways | Elevated routes; ramps provide road access | Flat single-tile routes connect directly to roads |
+| Highways | Elevated routes; ramps provide road access | **Done.** Streets and highways interchange only at on-ramps |
 | Tunnels | Transport can pass through terrain | No tunnel construction or routing |
 | Power | Eight plant types; aging reduces capacity; prolonged overload can destroy plants | **Done.** All eight types with the manual's invention years; output slides after 55% of a plant's life; a year of overdraw destroys one |
 | Water | Freshwater pumps, towers, coastal desalinization; pumps age | **Done.** Sea and fresh water are distinct; three sources with the manual's weaknesses; pumps age and slow in dirty water; pipes reach seven tiles |
@@ -212,6 +212,26 @@ all-clear on the way up, and querying any street reports its surface.
 A regression test now checks that every building carrying a number the player
 has to manage still reports it when queried. Two such lines had been lost to
 an earlier edit without anything noticing.
+
+## On-ramps, September 7
+
+*"Highways may be built over roads, but if you want your Sims to be able to
+get from one to the other, the intersection requires an on-ramp. On-Ramps
+allow your Sims to get on and off highways."*
+
+A street and a highway used to interchange wherever they touched, so a
+highway was simply a faster road. They no longer connect at all: the only
+tile both will step onto is an **on-ramp**, which must touch a highway and
+reach the street network, and may stand on the road it joins. A highway
+laid across a town without ramps now carries nobody, which is what makes
+routing a corridor a decision rather than a formality.
+
+A ramp behaves like a street in every other respect: it gives lots road
+access, power jumps it, it carries traffic and pollution, and it costs
+transport upkeep. Highways still give no lot access on their own.
+
+Still open here: highways are not yet drawn elevated over the roads they
+cross, and tunnels through steep ground are not implemented.
 
 ## Visual and performance work, September 7
 

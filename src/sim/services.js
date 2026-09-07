@@ -1,6 +1,6 @@
 // Road access, service coverage, pollution, crime, land value and garbage.
 import { forRadius, tileAt } from "./grid.js";
-import { BUILDINGS, ZONE_TYPES, ACCESS_TYPES, FUNDED_DEPARTMENTS } from "./catalog.js";
+import { BUILDINGS, ZONE_TYPES, ACCESS_TYPES, ROAD_TYPES, FUNDED_DEPARTMENTS } from "./catalog.js";
 import { ORDINANCES } from "./city.js";
 import { isAnchor, lotTiles, capacityOf } from "./lots.js";
 import { industryTraits } from "./industry.js";
@@ -108,7 +108,7 @@ export function updateServices(city) {
     }
   }
   for (const t of tiles) {
-    if ((t.type !== "road" && t.type !== "highway") || !t.traffic) continue;
+    if (!ROAD_TYPES.has(t.type) || t.type === "rail" || !t.traffic) continue;
     addSource(t.x, t.y, t.traffic * (t.type === "highway" ? 0.2 : 0.12), 2);
   }
   // A toxic cloud poisons the air around its source while it lasts.

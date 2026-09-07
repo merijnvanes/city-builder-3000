@@ -123,12 +123,16 @@ describe("transport buildings", () => {
     assert.equal(getStats(c).employed, 0, "no station, no rail commute");
   });
   test("highways carry commuters further and faster than streets", () => {
-    const build = (kind) => {
+    const build = (kind, ramps = true) => {
       const c = plains();
       // Homes at the west end, jobs 45 tiles east: too far for streets, fine by highway.
       for (let x = 2; x <= 8; x++) put(c, x, 20, "road");
       for (let x = 9; x <= 46; x++) put(c, x, 20, kind);
       for (let x = 47; x <= 52; x++) put(c, x, 20, "road");
+      // "Highways may be built over roads, but if you want your Sims to be
+      // able to get from one to the other, the intersection requires an
+      // on-ramp." Without these two, nobody reaches the far end.
+      if (kind === "highway" && ramps) { put(c, 8, 20, "onramp"); put(c, 47, 20, "onramp"); }
       put(c, 2, 10, "coal"); for (let x = 6; x <= 8; x++) put(c, x, 12, "powerline"); for (let y = 13; y <= 20; y++) put(c, 8, y, "powerline");
       for (let y = 21; y <= 23; y++) for (let x = 3; x <= 8; x++) put(c, x, y, "residential", { density: 1 });
       for (let x = 9; x <= 52; x++) put(c, x, 19, "powerline");
@@ -140,6 +144,8 @@ describe("transport buildings", () => {
     };
     const street = build("road"), highway = build("highway");
     assert.ok(highway.employed > street.employed, `${highway.employed} > ${street.employed}`);
+    // Take the ramps away and the highway is just a wall the traffic cannot join.
+    assert.equal(build("highway", false).employed, 0, "a highway with no ramps should carry nobody off it");
     const c = plains();
     put(c, 10, 10, "highway"); put(c, 11, 12, "residential", { density: 1 }); refresh(c);
     assert.equal(at(c, 11, 12).roadAccess, false, "highways give no lot access");

@@ -14,7 +14,7 @@ const shade = (hex, k) => {
   const n = parseInt(hex.slice(1), 16);
   return "rgb(" + [n >> 16, (n >> 8) & 255, n & 255].map((v) => clamp(v * k, 0, 255) | 0).join(",") + ")";
 };
-const ROAD = new Set(["road", "rail", "highway"]);
+const ROAD = new Set(["road", "rail", "highway", "onramp"]);
 const ZONE_TINT = {
   residential: { fill: "#7ed05a77", edge: "#dcf7b0" },
   commercial: { fill: "#5aa0e077", edge: "#c8e4ff" },

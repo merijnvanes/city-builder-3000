@@ -2,9 +2,11 @@
 // utilities, services and art. No browser deps.
 
 export const ZONE_TYPES = new Set(["residential", "commercial", "industrial"]);
-export const ROAD_TYPES = new Set(["road", "rail", "highway"]);
+export const ROAD_TYPES = new Set(["road", "rail", "highway", "onramp"]);
 // Lots get road access from these; highways need a road to reach a lot.
-export const ACCESS_TYPES = new Set(["road", "rail"]);
+// Lots reach the network through these. A highway needs a road or a ramp
+// to serve a lot; on its own it just passes over.
+export const ACCESS_TYPES = new Set(["road", "rail", "onramp"]);
 export const OVERLAY_TOOLS = new Set(["powerline", "pipe", "subway"]);
 
 // Zone cost per tile scales with density. Density 1 = low, 2 = medium, 3 = high.
@@ -19,7 +21,7 @@ export const LOT_SIZES_BY_TYPE = { industrial: { 1: [3, 1], 2: [2, 1], 3: [3, 2,
 export const TECH_YEAR = {
   // Power plant years are the manual's, page 38-39.
   coal: 1900, oil: 1900, gas: 1955, nuclear: 1965, wind: 1980, solar: 1990, microwave: 2020, fusion: 2050,
-  highway: 1940, subway: 1920, substation: 1920,
+  highway: 1940, onramp: 1940, subway: 1920, substation: 1920,
   treatment: 1935, desalination: 1960, incinerator: 1920, recycling: 1970, wasteenergy: 2000,
   airport: 1930, railstation: 1900, bus: 1920,
   college: 1900, hospital: 1900, museum: 1900, zoo: 1900, casino: 1930, toxicdump: 1960, prison: 1900, armybase: 1900, jail: 1900,
@@ -47,6 +49,9 @@ export const BUILDINGS = {
   road:        { label: "Road",            group: "transport", cost: 10,   w: 1, h: 1, upkeep: 0.5, dept: "transport", path: true, water: true },
   rail:        { label: "Rail",            group: "transport", cost: 25,   w: 1, h: 1, upkeep: 1,   dept: "transport", path: true },
   highway:     { label: "Highway",         group: "transport", cost: 60,   w: 1, h: 1, upkeep: 2,   dept: "transport", path: true, water: true },
+  // "Highways may be built over roads, but if you want your Sims to be able
+  // to get from one to the other, the intersection requires an on-ramp."
+  onramp:      { label: "On-Ramp",         group: "transport", cost: 120,  w: 1, h: 1, upkeep: 3,   dept: "transport", path: true, ramp: true },
   bus:         { label: "Bus Stop",        group: "transport", cost: 150,  w: 1, h: 1, upkeep: 5,   dept: "transport", service: { kind: "bus", radius: 8 }, powerUse: 1 },
   railstation: { label: "Rail Station",    group: "transport", cost: 500,  w: 2, h: 2, upkeep: 15,  dept: "transport", service: { kind: "rail", radius: 10 }, powerUse: 4 },
   subway:      { label: "Subway",          group: "transport", cost: 40,   w: 1, h: 1, upkeep: 1,   dept: "transport", path: true, overlay: true, underground: true },
@@ -145,7 +150,7 @@ export const TOOLS = [
   ...Object.entries(BUILDINGS).map(([id, b]) => ({
     id, label: b.label, cost: b.cost, group: b.group,
     description: `${b.label} ($${b.cost.toLocaleString()}${b.path || b.rect ? " per tile" : ""}${b.w > 1 ? `, ${b.w}×${b.h}` : ""})`,
-    shortcut: { road: "r", rail: "t", highway: "y", coal: "e", waterpump: "u", police: "l", fire: "f", park: "p", powerline: "w", pipe: "q", dispatch: "x" }[id] || "",
+    shortcut: { road: "r", rail: "t", highway: "y", onramp: "g", coal: "e", waterpump: "u", police: "l", fire: "f", park: "p", powerline: "w", pipe: "q", dispatch: "x" }[id] || "",
     w: b.w, h: b.h,
   })),
   { id: "bulldoze",    label: "Bulldoze",       cost: 5,  group: "demolish",  description: "Demolish ($5 per tile plus building fee)", shortcut: "b" },

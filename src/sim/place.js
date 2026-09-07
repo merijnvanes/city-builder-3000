@@ -100,6 +100,24 @@ export function evaluate(city, x, y, tool, options = {}) {
     return { ok: true, noop: false, cost: BUILDINGS.makeland.cost, message: "", tiles: here };
   }
 
+  // An on-ramp is the only place cars move between a street and a highway.
+  // It has to touch both, so it can only go where the two actually meet.
+  if (tool === "onramp") {
+    if (t.type === "onramp") return noop("On-ramp already here.", here);
+    if (t.terrain === "water") return fail("On-ramps cannot be built on water.");
+    if (t.type !== "empty" && t.type !== "road" && t.type !== "highway") return fail("Tile is occupied. Bulldoze first.");
+    // The ramp itself may stand on the street it joins, or beside it.
+    let road = t.type === "road", highway = t.type === "highway";
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const n = tileAt(city, x + dx, y + dy);
+      if (n?.type === "road" || n?.type === "onramp") road = true;
+      if (n?.type === "highway") highway = true;
+    }
+    if (!highway) return fail("An on-ramp must touch a highway.");
+    if (!road) return fail("An on-ramp must touch a road.");
+    return { ok: true, noop: false, cost: BUILDINGS.onramp.cost, message: "", tiles: here };
+  }
+
   if (tool === "road" || tool === "rail" || tool === "highway") {
     const b = BUILDINGS[tool];
     if (t.type === tool) return noop(`${b.label} already here.`, here);
@@ -187,7 +205,7 @@ export function place(city, x, y, tool, options = {}) {
     t.terrain = "sand";
   } else if (tool === "raise" || tool === "lower" || tool === "level") {
     for (const c of ev.changes) c.tile.elev = c.elev;
-  } else if (tool === "road" || tool === "rail" || tool === "highway") {
+  } else if (tool === "road" || tool === "rail" || tool === "highway" || tool === "onramp") {
     t.type = tool; t.trees = 0; t.density = 0; t.level = 0;
   } else if (tool === "dispatch") {
     const a = t.lot ? anchorOf(city, t) : t;

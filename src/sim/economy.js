@@ -1,5 +1,5 @@
 // Taxes, department budgets, ordinances and loans.
-import { BUILDINGS, ZONE_TYPES, DEPARTMENTS, FUNDED_DEPARTMENTS } from "./catalog.js";
+import { BUILDINGS, ZONE_TYPES, DEPARTMENTS, FUNDED_DEPARTMENTS, ROAD_TYPES } from "./catalog.js";
 import { isAnchor, capacityOf } from "./lots.js";
 import { industryTraits } from "./industry.js";
 import { ORDINANCES } from "./city.js";
@@ -25,7 +25,7 @@ export function computeBudget(city) {
   const pct = (d) => (FUNDED_DEPARTMENTS.includes(d) ? (funding[d] ?? 100) / 100 : 1);
 
   for (const t of tiles) {
-    if (t.type === "road" || t.type === "rail" || t.type === "highway") { expenses.transport += BUILDINGS[t.type].upkeep; continue; }
+    if (ROAD_TYPES.has(t.type) && t.type !== "onramp") { expenses.transport += BUILDINGS[t.type].upkeep; continue; }
     if (!isAnchor(t)) continue;
     if (ZONE_TYPES.has(t.type)) {
       const cap = capacityOf(t);

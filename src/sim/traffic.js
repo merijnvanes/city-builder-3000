@@ -19,9 +19,16 @@ const TRAFFIC_PER_POINT = 6; // commuters per traffic point on a road tile
 const RAIL_PER_POINT = 20;   // trains carry more per tile
 const HIGHWAY_PER_POINT = 18;
 
-const ROAD = 1, RAIL = 2, STATION = 3, HIGHWAY = 4, SUBSTATION = 5, TUNNEL = 6;
 // Travel cost per tile: highways, rail and subways are twice as fast as streets.
-const STEP_COST = [0, 2, 1, 2, 1, 2, 1];
+const ROAD = 1, RAIL = 2, STATION = 3, HIGHWAY = 4, SUBSTATION = 5, TUNNEL = 6, RAMP = 7;
+
+// Cost of entering a tile of each kind, indexed by the constants above.
+// Highways, rail and tunnels move people at twice the speed of a street.
+const STEP_COST = [];
+STEP_COST[0] = 0;
+STEP_COST[ROAD] = 2; STEP_COST[RAIL] = 1; STEP_COST[STATION] = 2;
+STEP_COST[HIGHWAY] = 1; STEP_COST[SUBSTATION] = 2; STEP_COST[TUNNEL] = 1;
+STEP_COST[RAMP] = 2;
 const MAX_COST = MAX_TRIP * 2;
 
 // Nearest road tile index within reach of a lot, or -1.
@@ -29,7 +36,8 @@ function entryOf(city, anchor, kind) {
   let best = -1, bestD = 99;
   for (const t of lotTiles(city, anchor.lot)) {
     forRadius(city, t.x, t.y, 3, (n, d) => {
-      if (kind[n.y * city.size + n.x] === ROAD && d < bestD) { bestD = d; best = n.y * city.size + n.x; }
+      const k = kind[n.y * city.size + n.x];
+      if ((k === ROAD || k === RAMP) && d < bestD) { bestD = d; best = n.y * city.size + n.x; }
     });
   }
   return best;
@@ -47,6 +55,7 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
     else if (t.type === "railstation") kind[i] = STATION;
     else if (t.type === "highway") kind[i] = HIGHWAY;
     else if (t.type === "substation") kind[i] = SUBSTATION;
+    else if (t.type === "onramp") kind[i] = RAMP;
     if (t.subway || t.type === "substation") kind[N + i] = TUNNEL;
   }
 
@@ -98,7 +107,12 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
     const a = kind[from], b = kind[to];
     if (a === STATION || b === STATION || a === SUBSTATION || b === SUBSTATION) return b !== 0;
     if (a === RAIL || b === RAIL) return a === b;
-    return true; // road <-> road, road <-> highway, highway <-> highway
+    // "Highways may be built over roads, but if you want your Sims to be able
+    // to get from one to the other, the intersection requires an on-ramp."
+    // A ramp is the only tile both a street and a highway will step onto.
+    if (a === RAMP || b === RAMP) return true;
+    if ((a === HIGHWAY) !== (b === HIGHWAY)) return false;
+    return true; // road <-> road, highway <-> highway
   };
   const neighborsOf = (n) => {
     const out = [];
@@ -177,7 +191,7 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
   const surface = roadCapacity(city);
   const trafficOf = (i, load) => {
     const t = tiles[i];
-    if (kind[i] === ROAD) { let v = load[i] / (TRAFFIC_PER_POINT * surface) * carScale; if (t.svc?.bus) v *= 0.75; return v; }
+    if (kind[i] === ROAD || kind[i] === RAMP) { let v = load[i] / (TRAFFIC_PER_POINT * surface) * carScale; if (t.svc?.bus) v *= 0.75; return v; }
     if (kind[i] === HIGHWAY) return load[i] / (HIGHWAY_PER_POINT * surface) * carScale;
     if (kind[i] === RAIL) return load[i] / RAIL_PER_POINT;
     return 0;
@@ -186,16 +200,16 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
   const first = assign(null);
   const jam = new Uint8Array(N * 2);
   let jams = 0;
-  for (let i = 0; i < N; i++) if ((kind[i] === ROAD || kind[i] === HIGHWAY) && trafficOf(i, first.load) >= 80) { jam[i] = 1; jams++; }
+  for (let i = 0; i < N; i++) if ((kind[i] === ROAD || kind[i] === HIGHWAY || kind[i] === RAMP) && trafficOf(i, first.load) >= 80) { jam[i] = 1; jams++; }
   const { load, employed, commuters } = jams ? assign(jam) : first;
 
   let sum = 0, roads = 0, congested = 0, railRiders = 0, subwayRiders = 0;
   for (let i = N; i < N * 2; i++) if (kind[i] === TUNNEL) subwayRiders += load[i];
   for (let i = 0; i < N; i++) {
     const t = tiles[i];
-    if (kind[i] === ROAD || kind[i] === HIGHWAY) {
+    if (kind[i] === ROAD || kind[i] === HIGHWAY || kind[i] === RAMP) {
       t.traffic = Math.max(0, Math.min(100, Math.round(trafficOf(i, load))));
-      if (kind[i] === ROAD) { sum += t.traffic; roads++; if (t.traffic >= 70) congested++; }
+      if (kind[i] !== HIGHWAY) { sum += t.traffic; roads++; if (t.traffic >= 70) congested++; }
     } else if (kind[i] === RAIL) {
       t.traffic = Math.max(0, Math.min(100, Math.round(trafficOf(i, load))));
       railRiders += load[i];

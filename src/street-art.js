@@ -4,19 +4,26 @@ export function streetConnections(t, city) {
   return DIRECTIONS.map(([dx, dy]) => {
     const x = t.x + dx, y = t.y + dy;
     if (x < 0 || y < 0 || x >= city.size || y >= city.size) return false;
-    return ['road', 'highway'].includes(city.tiles[y * city.size + x].type);
+    return ['road', 'highway', 'onramp'].includes(city.tiles[y * city.size + x].type);
   });
 }
 
 export function drawStreet(r, t, city) {
-  const { x, y } = t, highway = t.type === 'highway';
-  const joins = streetConnections(t, city), junction = joins.filter(Boolean).length >= 3;
-  const inset = highway ? 0.055 : 0.14, width = 1 - inset * 2;
-  const asphalt = highway ? '#424c53' : '#525f63';
+  const { x, y } = t, highway = t.type === 'highway', ramp = t.type === 'onramp';
+  const joins = streetConnections(t, city), junction = !ramp && joins.filter(Boolean).length >= 3;
+  const inset = highway ? 0.055 : ramp ? 0.09 : 0.14, width = 1 - inset * 2;
+  const asphalt = highway ? '#424c53' : ramp ? '#4a555b' : '#525f63';
   const flat = (a, b, w, d, color, z = 0.5) => r.flat(x + a, y + b, w, d, z, color);
   const line = (a, b, c, d, color, w = 0.7) => r.line(r.project(x + a, y + b, 0.7), r.project(x + c, y + d, 0.7), color, w);
-  flat(0, 0, 1, 1, highway ? '#8c9792' : '#a9afa5', 0.3);
+  flat(0, 0, 1, 1, highway ? '#8c9792' : ramp ? '#93a09a' : '#a9afa5', 0.3);
   flat(inset, inset, width, width, asphalt);
+  // A ramp carries chevrons so it reads as a slip road rather than a street.
+  if (ramp && r.zoom > 0.55) {
+    for (let s = 0.2; s < 0.8; s += 0.18) {
+      line(0.32, s, 0.5, s + 0.09, '#e6d79a', 0.9);
+      line(0.68, s, 0.5, s + 0.09, '#e6d79a', 0.9);
+    }
+  }
   for (let i = 0; i < 4; i++) {
     const [dx, dy] = DIRECTIONS[i];
     if (joins[i]) {
