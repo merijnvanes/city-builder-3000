@@ -935,6 +935,57 @@ and now does: police and fire budgets, health and education budgets, and the
 road budget, each named ahead of the symptom it causes, with a walkout
 outranking the budget line that caused it.
 
+### The founders' town keeps the age structure it was founded with, September 7
+
+`stationaryPyramid` returns shares that sum to one. `ageOneYear` reads counts.
+Nothing reconciled the two, so on a founded town's first birthday the pyramid
+summing to 1.0 met a city of 14,150 and the difference was booked as migration:
+
+```
+after one live year at population 14150:
+  arrivals: 13930  (98.4% of the city)
+  children 0-17: 28.0% -> 15.8%
+```
+
+The seeded age structure was thrown away and replaced by the migration profile,
+and since newcomers bring SimNation's average schooling, every resident was
+recorded as having just turned up knowing nothing in particular about the place
+they had lived all their lives.
+
+The knock-on ran through the demand model. `workforceShare` jumped 0.404 to
+0.477, and residential demand reads
+
+```js
+wantedPop = (jobs + externalJobs) / workforceShare
+```
+
+so wantedPop fell 18% in a single year and the demand handed to a brand new
+mayor swung from **+45 to −28**. The town grew 10% on the strength of the first
+figure and shed all of it against the second, leaving **seventeen buildings
+derelict in the first three years** of a term in which nobody had done anything.
+
+Which of the two shares was right is settled by a test that was already in the
+file: `stationaryPyramid` is asserted to hold `workforceShare` between 0.35 and
+0.45 at every life expectancy. The live city was running at 0.477, outside the
+band its own generator is checked against. 0.404 is the value; 0.477 was the
+artefact.
+
+`createCity` now scales the seeded pyramid to the population of the town it just
+built. A city started on empty land is left alone, because its first residents
+really do arrive from somewhere else.
+
+Children now drift 28.0% to 26.9% over three years instead of collapsing,
+demand settles near zero, and no building is abandoned. Across nine seeds at
+sixty years the trough-to-peak ratio moved from 0.72–0.84 to **0.80–0.96**.
+
+One test changed with it. "Without libraries or museums adult knowledge decays"
+ran on seed 23, whose founders' town has two schools and a library, and passed
+only because the migration overwrite flattened everyone to the national average
+every year. Adult decay is real and visible — EQ falls 55 to 52.5 in five years
+— but well-taught children then age into the workforce and pull it back up to
+57.4 by year 25. The rig now bulldozes the teaching buildings, which is what it
+always claimed to be measuring.
+
 ## Visual and performance work, September 7
 
 - Preserved and verified the previous agent's query-card sizing/rotation work.

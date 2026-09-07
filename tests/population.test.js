@@ -1,7 +1,7 @@
 // Age structure, Education Quotient and Life Expectancy.
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
-import { createCity, tick, getStats, serialize, deserialize, setPolicy } from "../src/sim.js";
+import { createCity, tick, getStats, serialize, deserialize, setPolicy, place, refresh } from "../src/sim.js";
 import { stationaryPyramid, shares, meanLifespan, MAX_AGE, BASE_LIFE_EXPECTANCY, retirementAge } from "../src/sim/population.js";
 import { build, years } from "./city-helpers.mjs";
 
@@ -13,6 +13,32 @@ describe("age structure", () => {
       assert.ok(s.workforceShare > 0.35 && s.workforceShare < 0.45, `workforce at LE ${le}: ${s.workforceShare}`);
       assert.ok(s.seniorShare >= 0 && s.seniorShare < 0.3, `seniors at LE ${le}: ${s.seniorShare}`);
     }
+  });
+
+  // `stationaryPyramid` returns shares that sum to one; `ageOneYear` reads
+  // counts. A town founded with residents already in it used to reconcile the
+  // two by booking 98% of its own population as new arrivals, which threw the
+  // seeded age structure away for the migration profile and handed every
+  // resident SimNation's average schooling on the city's first birthday.
+  test("a founders' town keeps the age structure it was founded with", () => {
+    const c = createCity(21, true);
+    const at0 = getStats(c);
+    for (let i = 0; i < 12; i++) tick(c);
+    const at1 = getStats(c);
+    const drift = Math.abs(at1.childShare - at0.childShare);
+    assert.ok(drift < 0.04, `children went ${(at0.childShare * 100).toFixed(0)}% to ${(at1.childShare * 100).toFixed(0)}% in one year`);
+    // And the share that follows from it, which sets wantedPop = jobs / share
+    // and so the demand the mayor is handed on day one.
+    assert.ok(Math.abs(at1.workforceShare - at0.workforceShare) < 0.03,
+      `workforce share went ${at0.workforceShare.toFixed(3)} to ${at1.workforceShare.toFixed(3)}`);
+    // The band the stationary pyramid itself is asserted to sit in, above.
+    assert.ok(at1.workforceShare > 0.35 && at1.workforceShare < 0.45, `${at1.workforceShare}`);
+  });
+
+  test("a town built on empty land treats its first residents as arrivals", () => {
+    // Nothing to preserve there: they really do come from somewhere else.
+    const c = createCity({ seed: 21, starter: false });
+    assert.equal(getStats(c).population, 0);
   });
 
   test("longer lives mean longer working lives", () => {
@@ -62,9 +88,17 @@ describe("education quotient", () => {
 
   test("without libraries or museums adult knowledge decays", () => {
     const c = createCity(23, true);
+    // The founders' town comes with schools and a library, so take them away:
+    // otherwise this measures well-taught children ageing into the workforce,
+    // which is a different rule and pulls the other way.
+    c.money = 5_000_000;
+    for (const t of [...c.tiles]) {
+      if (["school", "college", "library", "museum"].includes(t.type)) place(c, t.x, t.y, "bulldoze");
+    }
+    refresh(c);
     const before = getStats(c).eq;
     years(c, 25);
-    assert.ok(getStats(c).eq < before, "EQ should fall in a city with no adult learning");
+    assert.ok(getStats(c).eq < before, `EQ should fall in a city with no adult learning: ${before} -> ${getStats(c).eq}`);
   });
 
   test("a teachers' strike follows sustained underfunding and ends when it is restored", () => {

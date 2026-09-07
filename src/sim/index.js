@@ -18,7 +18,7 @@ import { updateEvents, respondPetition, openPetition, specialAvailable, ensureEv
 import { SPECIAL_TYPES } from "./catalog.js";
 import { DEALS, SIDES, cancelDeal, auditDeals, dealAvailable, cancelPenalty, dealTerms } from "./neighbors.js";
 import { buildingName } from "./names.js";
-import { advanceYear, updateStrikes, readPopulation, blankPopulation, serviceQuality } from "./population.js";
+import { advanceYear, updateStrikes, readPopulation, blankPopulation, seedPopulationTo, serviceQuality } from "./population.js";
 import { INDUSTRY, industryOf, ensureIndustry } from "./industry.js";
 import { COMMERCE, commerceOf, ensureCommerce } from "./commerce.js";
 import { agePlants, plantOutput, OVERLOAD_MONTHS } from "./power.js";
@@ -37,7 +37,13 @@ export function createCity(seed = 42, starter = true, options = {}) {
   if (seed && typeof seed === "object") { options = seed; seed = options.seed ?? 42; starter = options.starter ?? true; }
   const city = blankCity({ seed, size: options.size ?? DEFAULT_SIZE, layout: options.layout, name: options.name, startYear: options.startYear, hills: options.hills });
   if (starter) buildStarterTown(city);
-  return settle(city);
+  settle(city);
+  // The founders' town is handed over with people already living in it, so its
+  // age pyramid has to be scaled to them before its first birthday. A city
+  // started on empty land needs nothing: its first residents really do arrive
+  // from somewhere else. See seedPopulationTo.
+  if (starter) seedPopulationTo(city.people, city.population);
+  return city;
 }
 
 const dateYear = (city) => yearOf(city.month, city.startYear);

@@ -307,6 +307,33 @@ export function quantize(pop) {
   return pop;
 }
 
+// Scale a freshly seeded pyramid to the people already living in the city.
+//
+// `stationaryPyramid` returns shares that sum to one; `ageOneYear` reads
+// counts. A town founded with residents already in it has to reconcile those
+// two before its first birthday, or the reconciliation there sees a pyramid
+// summing to one against a city of thousands and books 98% of the population
+// as new arrivals. The seeded age structure is thrown away for the migration
+// profile, and every resident is recorded as having just turned up carrying
+// SimNation's average schooling.
+//
+// What that cost: children fell from 28% of the founders' town to 16% in one
+// year, the working-age share jumped 0.67 to 0.80, and since
+// `wantedPop = jobs / workforceShare` the residential demand the mayor was
+// handed swung from +45 to -28. The town grew 10% on the strength of it and
+// then shed the lot, leaving seventeen buildings derelict in the first three
+// years of a term nobody had done anything with yet.
+//
+// A city grown from empty land needs none of this: its first residents really
+// do arrive from somewhere else.
+export function seedPopulationTo(pop, population) {
+  const total = sum(pop.pyramid);
+  if (!(total > 0) || !(population > 0)) return pop;
+  const scale = population / total;
+  pop.pyramid = pop.pyramid.map((v) => v * scale);
+  return quantize(pop);
+}
+
 export function serializePopulation(pop) {
   return {
     le: pop.le,
