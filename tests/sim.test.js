@@ -6,7 +6,7 @@ import { generateTerrain } from "../src/sim/terrain.js";
 import { findLot, assignLot, capacityOf, isAnchor, anchorOf } from "../src/sim/lots.js";
 import { computeDemand } from "../src/sim/growth.js";
 import { computeMetrics } from "../src/sim/metrics.js";
-import { sourceEfficiency } from "../src/sim/utilities.js";
+import { pumpOutput, hasSource } from "../src/sim/water.js";
 
 const at = (c, x, y) => c.tiles[y * c.size + x];
 // Flat maps keep lot and footprint tests independent of the hills.
@@ -224,14 +224,18 @@ describe("utilities", () => {
     refresh(c);
     assert.equal(at(c, 20, 23).watered, false);
   });
-  test("pumps near water outperform inland pumps", () => {
+  test("a pump away from fresh water has no capacity at all", () => {
     const c = blank();
     const shore = c.tiles.find((t) => t.terrain !== "water" && t.type === "empty" && t.x > 2 && t.y > 2 && [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => at(c, t.x + dx, t.y + dy)?.terrain === "water"));
     put(c, shore.x, shore.y, "waterpump");
-    assert.equal(sourceEfficiency(c, at(c, shore.x, shore.y)), 1);
+    assert.equal(hasSource(c, at(c, shore.x, shore.y)), true);
+    assert.equal(pumpOutput(c, at(c, shore.x, shore.y)), BUILDINGS.waterpump.waterOut);
     const inland = c.tiles.find((t) => t.terrain === "grass" && t.type === "empty" && t.x > 20 && ![[1, 0], [-1, 0], [0, 1], [0, -1], [2, 0], [-2, 0], [0, 2], [0, -2], [1, 1], [-1, -1], [1, -1], [-1, 1]].some(([dx, dy]) => at(c, t.x + dx, t.y + dy)?.terrain === "water"));
     put(c, inland.x, inland.y, "waterpump");
-    assert.equal(sourceEfficiency(c, at(c, inland.x, inland.y)), 0.3);
+    assert.equal(pumpOutput(c, at(c, inland.x, inland.y)), 0);
+    // A tower draws on springs, so it works anywhere.
+    put(c, inland.x + 2, inland.y, "watertower");
+    assert.equal(pumpOutput(c, at(c, inland.x + 2, inland.y)), BUILDINGS.watertower.waterOut);
   });
 });
 

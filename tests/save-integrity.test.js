@@ -25,13 +25,13 @@ function checkTiles(city, when) {
 // aging plant supplying slightly less power reroutes a brownout, and a
 // district develops differently a year later.
 describe("a reloaded city keeps ticking down the same path", () => {
-  for (const seed of [3, 21, 44, 99]) {
+  for (const seed of [3, 7, 21, 44, 99, 123]) {
     test(`seed ${seed} after twenty-five years`, () => {
       const c = createCity(seed, true);
       for (let i = 0; i < 12 * 25; i++) tick(c);
       const d = deserialize(serialize(c));
-      for (let i = 0; i < 12; i++) { tick(c); tick(d); }
-      assert.equal(serialize(d) === serialize(c), true, "the reloaded city diverged within a year");
+      for (let i = 0; i < 24; i++) { tick(c); tick(d); }
+      assert.equal(serialize(d) === serialize(c), true, "the reloaded city diverged within two years");
     });
   }
 });
@@ -72,6 +72,16 @@ describe("save integrity over long games", () => {
       checkTiles(c, `disaster round ${i}`);
     }
     deserialize(serialize(c));
+  });
+
+  test("flood water drains even on a city that has shown no effects", () => {
+    const c = createCity(34, true);
+    delete c.effects;
+    disaster(c, "flood");
+    const flooded = c.tiles.filter((t) => t.flooded).length;
+    assert.ok(flooded > 0, "the flood should have wetted some tiles");
+    for (let i = 0; i < 3; i++) tick(c);
+    assert.equal(c.tiles.filter((t) => t.flooded).length, 0, "the water never drained");
   });
 
   test("every disaster leaves a loadable city", () => {

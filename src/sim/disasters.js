@@ -56,10 +56,12 @@ export function addEffect(city, effect) {
 }
 
 export function advanceEffects(city) {
-  if (!city.effects) return;
-  for (const e of city.effects) e.ttl--;
-  city.effects = city.effects.filter((e) => e.ttl > 0);
-  for (const t of city.tiles) if (t.flooded) { t.flooded--; }
+  // Flood water drains whether or not any on-screen effect is running. An
+  // early return here left a city that had never shown one under water for
+  // good, and a reloaded copy - which always gets an effects array - drained
+  // normally and drifted away from it.
+  city.effects = (city.effects || []).map((e) => ({ ...e, ttl: e.ttl - 1 })).filter((e) => e.ttl > 0);
+  for (const t of city.tiles) if (t.flooded) t.flooded--;
 }
 
 export function triggerDisaster(city, id, rng) {

@@ -20,7 +20,7 @@ export const TECH_YEAR = {
   // Power plant years are the manual's, page 38-39.
   coal: 1900, oil: 1900, gas: 1955, nuclear: 1965, wind: 1980, solar: 1990, microwave: 2020, fusion: 2050,
   highway: 1940, subway: 1920, substation: 1920,
-  treatment: 1935, incinerator: 1920, recycling: 1970,
+  treatment: 1935, desalination: 1960, incinerator: 1920, recycling: 1970,
   airport: 1930, railstation: 1900, bus: 1920,
   college: 1900, hospital: 1900, museum: 1900, zoo: 1900, casino: 1930, toxicdump: 1960, prison: 1900, armybase: 1900,
 };
@@ -65,9 +65,13 @@ export const BUILDINGS = {
   microwave:   { label: "Microwave Plant", group: "utilities", cost: 28000, w: 4, h: 4, upkeep: 300, dept: "utilities", powerOut: 22000, pollution: 6,  lifespan: 60 },
   fusion:      { label: "Fusion Plant",    group: "utilities", cost: 40000, w: 4, h: 4, upkeep: 500, dept: "utilities", powerOut: 45000, pollution: 0,  lifespan: 80 },
   powerline:   { label: "Power Line",      group: "utilities", cost: 5,     w: 1, h: 1, upkeep: 0,   dept: "utilities", path: true, overlay: true, water: true },
-  waterpump:   { label: "Water Pump",      group: "utilities", cost: 150,   w: 1, h: 1, upkeep: 12,  dept: "utilities", waterOut: 2500, nearWater: true, powerUse: 2 },
-  watertower:  { label: "Water Tower",     group: "utilities", cost: 100,   w: 1, h: 1, upkeep: 5,   dept: "utilities", waterOut: 600, powerUse: 1 },
-  treatment:   { label: "Water Treatment", group: "utilities", cost: 5000,  w: 3, h: 3, upkeep: 120, dept: "utilities", waterOut: 4000, powerUse: 8, cleansWater: true },
+  // source: which water the pump can draw from. A tower needs none - it draws
+  // on underground springs, so it works anywhere but yields little.
+  // pollutionSensitivity: how much dirty water slows it down.
+  waterpump:   { label: "Water Pump",      group: "utilities", cost: 150,   w: 1, h: 1, upkeep: 12,  dept: "utilities", waterOut: 2500, source: "fresh", nearWater: true, pollutionSensitivity: 0.7, lifespan: 45, powerUse: 2 },
+  watertower:  { label: "Water Tower",     group: "utilities", cost: 100,   w: 1, h: 1, upkeep: 5,   dept: "utilities", waterOut: 600, pollutionSensitivity: 0.45, lifespan: 40, powerUse: 1 },
+  desalination:{ label: "Desalinization Plant", group: "utilities", cost: 6000, w: 3, h: 3, upkeep: 220, dept: "utilities", waterOut: 1800, source: "salt", nearWater: true, pollutionSensitivity: 0.3, lifespan: 45, powerUse: 10 },
+  treatment:   { label: "Water Treatment", group: "utilities", cost: 5000,  w: 3, h: 3, upkeep: 120, dept: "utilities", powerUse: 8, cleansWater: true, pollution: 4 },
   pipe:        { label: "Water Pipe",      group: "utilities", cost: 5,     w: 1, h: 1, upkeep: 0,   dept: "utilities", path: true, overlay: true, water: true },
 
   police:      { label: "Police Station",  group: "civic", cost: 500,  w: 3, h: 3, upkeep: 90,  dept: "police",    service: { kind: "police", radius: 12, strength: 100 }, powerUse: 3, waterUse: 2 },

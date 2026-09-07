@@ -3,7 +3,8 @@ import { test, describe } from "node:test";
 import assert from "node:assert/strict";
 import { createCity, tick, place, serialize, deserialize, evaluate, setPolicy } from "../src/sim.js";
 import { BUILDINGS, TECH_YEAR } from "../src/sim/catalog.js";
-import { ageFactor, plantOutput, plantLifespan, WORN, OVERLOAD_MONTHS, isPlant } from "../src/sim/power.js";
+import { plantOutput, OVERLOAD_MONTHS, isPlant } from "../src/sim/power.js";
+import { ageFactor, lifespanOf, WORN } from "../src/sim/wear.js";
 
 const blank = (options = {}) => createCity({ seed: 5, starter: false, layout: "flat", ...options });
 const anchors = (city, type) => city.tiles.filter((t) => t.type === type && t.lot?.x === t.x && t.lot?.y === t.y);
@@ -28,7 +29,7 @@ describe("the eight power plants", () => {
 
 describe("ageing", () => {
   test("a plant runs at full output through its prime, then slides", () => {
-    const life = plantLifespan("coal");
+    const life = lifespanOf("coal");
     assert.equal(ageFactor("coal", 0), 1);
     assert.equal(ageFactor("coal", Math.floor(life * 0.5)), 1);
     assert.ok(ageFactor("coal", Math.floor(life * 0.8)) < 1);
@@ -42,7 +43,7 @@ describe("ageing", () => {
     place(c, 4, 4, "coal");
     const plant = c.tiles[4 * c.size + 4];
     assert.equal(plantOutput(plant), BUILDINGS.coal.powerOut);
-    plant.age = plantLifespan("coal");
+    plant.age = lifespanOf("coal");
     assert.ok(plantOutput(plant) < BUILDINGS.coal.powerOut * 0.4);
   });
 
@@ -51,7 +52,7 @@ describe("ageing", () => {
     c.money = 100000;
     place(c, 4, 4, "coal");
     const plant = c.tiles[4 * c.size + 4];
-    plant.age = Math.floor(plantLifespan("coal") * 0.55) - 1;
+    plant.age = Math.floor(lifespanOf("coal") * 0.55) - 1;
     for (let i = 0; i < 60; i++) tick(c);
     assert.ok(c.news.some((n) => /past its prime/.test(n)), c.news.slice(-5).join(" | "));
   });

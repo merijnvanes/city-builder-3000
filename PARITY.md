@@ -9,7 +9,7 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 | Highways | Elevated routes; ramps provide road access | Flat single-tile routes connect directly to roads |
 | Tunnels | Transport can pass through terrain | No tunnel construction or routing |
 | Power | Eight plant types; aging reduces capacity; prolonged overload can destroy plants | **Done.** All eight types with the manual's invention years; output slides after 55% of a plant's life; a year of overdraw destroys one |
-| Water | Freshwater pumps, towers, coastal desalinization; pumps age | No saltwater distinction or desalinization; fixed lifespan |
+| Water | Freshwater pumps, towers, coastal desalinization; pumps age | **Done.** Sea and fresh water are distinct; three sources with the manual's weaknesses; pumps age and slow in dirty water; pipes reach seven tiles |
 | Education | Childhood learning and adult knowledge retention; strikes from sustained underfunding | **Done.** EQ is taught to children aged 5-17, colleges take 18-22, adults decay without libraries or museums, and teachers strike after 18 months below 40% funding |
 | Health | Average city reaches 59 years, a well-run one 90; hospitals need beds and funding; pollution and traffic pull it down | **Done.** Life expectancy is a cohort statistic on the same anchors, with healthcare strikes |
 
@@ -84,6 +84,42 @@ And one this work introduced, now covered by tests: `tick()` aged plants
 *after* the refresh that allocates power, so a save's ages did not match its
 saved allocation and a reloaded city drifted within a year. Every mutation
 now happens above the refreshes; `settle()` runs only the derive half.
+
+## Water, September 7
+
+Water tiles are now either fresh or sea, marked by the generator (only the
+coast layout makes sea) and carried in the save. That one distinction makes
+the manual's three sources meaningfully different:
+
+| Source | Needs | Output | Slowed by dirty water |
+| --- | --- | --- | --- |
+| Water pumping station | fresh water within 2 tiles | 2,500 | heavily |
+| Water tower | nothing, it draws on springs | 600 | a little |
+| Desalinization plant (1960) | sea within 2 tiles | 1,800 | slightly |
+
+A pumping station with no fresh water in reach has **no capacity at all**,
+which is what the manual says. Coast towns are therefore founded on water
+towers and can switch to desalinization once it is invented.
+
+- Pipes water everything within **seven tiles**, up from six, and watered
+  tiles still do not relay.
+- All three sources wear out on the same curve as power plants, in `wear.js`.
+- Water pollution comes from industry, as a concentration rather than a
+  total, and treatment plants remove a share of it. Heavy industry fouls
+  water; high tech barely touches it.
+
+A coverage bug turned up here: a disconnected stub of pipe could claim tiles
+by iteration order and strand a district that a supplied main ran past.
+Coverage now goes to the nearest network, with a supplied one winning ties.
+
+Two more determinism bugs, both pre-existing:
+
+- Disasters and cancelled neighbour deals changed the city *after* the
+  month's derived state was computed, so a save carried tiles that
+  disagreed with it. Both now re-settle.
+- `advanceEffects` returned early when a city had no effects list, so flood
+  water never drained on a city that had never shown an on-screen effect —
+  while a reloaded copy, which always gets a list, drained normally.
 
 ## Visual and performance work, September 7
 

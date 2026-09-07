@@ -19,7 +19,7 @@ export function heightOf(t) {
   if (t.type === "residential") return t.density === 1 ? 10 + level * 3 : t.density === 2 ? 18 + level * 6 : 30 + level * 18;
   if (t.type === "commercial") return t.density === 1 ? 10 + level * 2 : t.density === 2 ? 20 + level * 7 : 40 + level * 24;
   if (t.type === "industrial") return t.density === 1 ? 12 : t.density === 2 ? 18 : 26;
-  return { coal: 46, oil: 34, gas: 30, nuclear: 60, wind: 42, solar: 6, microwave: 45, fusion: 40, waterpump: 10, watertower: 47, treatment: 14,
+  return { coal: 46, oil: 34, gas: 30, nuclear: 60, wind: 42, solar: 6, microwave: 45, fusion: 40, waterpump: 10, watertower: 47, treatment: 14, desalination: 20,
     police: 24, fire: 21, hospital: 40, school: 22, college: 30, library: 18, museum: 26, landfill: 6, incinerator: 40, recycling: 16,
     park: 14, largepark: 16, zoo: 14, bus: 9, railstation: 16, airport: 18, seaport: 16, substation: 8,
     mayorhouse: 24, cityhall: 46, courthouse: 27, stadium: 30, statue: 25, prison: 20, casino: 36, toxicdump: 10, armybase: 14,
@@ -528,6 +528,23 @@ const RECIPES = {
     for (const [a, b] of [[0.22, 0.25], [0.5, 0.25], [0.78, 0.25], [0.22, 0.55], [0.5, 0.55]]) { d.cyl(a, b, 0.1, 4, "#a7b3ae"); d.cyl(a, b, 0.085, 1.5, "#5f8ca6", 4); }
     d.box(0.62, 0.68, 0.32, 0.26, 12, "#b7bdb1"); d.windows(0.62, 0.68, 0.32, 0.26, 12, t.x + t.y, true);
     d.box(0.08, 0.72, 0.4, 0.2, 6, "#98a39b");
+  },
+  // Reverse-osmosis racks under a long hall, with intake pipework running to
+  // the shore and brine tanks behind.
+  desalination(d, t, n) {
+    d.flat(0.02, 0.02, 0.96, 0.96, 0.3, "#93a09c");
+    d.box(0.08, 0.14, 0.62, 0.34, 15, "#c3c9c0"); d.windows(0.08, 0.14, 0.62, 0.34, 15, t.x + t.y, true);
+    d.roof(0.06, 0.12, 0.66, 0.38, 15, 5, "#5d7078");
+    for (let i = 0; i < 4; i++) {
+      const a = 0.1 + i * 0.16;
+      d.cyl(a, 0.62, 0.055, 9, "#aebbb8");
+      d.line(a, 0.56, 6, a, 0.68, 6, "#7d8f92", 1.2);
+    }
+    d.cyl(0.82, 0.28, 0.09, 13, "#d5dad0"); d.cyl(0.82, 0.28, 0.095, 2.5, "#6f9fb0", 13);
+    d.cyl(0.82, 0.62, 0.09, 9, "#c6cdc4");
+    d.box(0.1, 0.82, 0.5, 0.12, 5, "#9fa9a2");
+    d.line(0.6, 0.88, 2.5, 0.96, 0.88, 2.5, "#6f8f9c", 2.2);
+    d.fence(0.03, 0.97, 0.94, 0, "#7d877f");
   },
   police(d, t, n) {
     d.flat(0.03, 0.03, 0.94, 0.94, 0.2, "#a6ac97");

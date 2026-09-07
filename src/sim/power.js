@@ -15,11 +15,8 @@
 import { BUILDINGS } from "./catalog.js";
 import { isAnchor, clearLot } from "./lots.js";
 import { forRadius } from "./grid.js";
+import { ageFactor, lifespanOf, WORN } from "./wear.js";
 
-// Months a plant runs at full output before its capacity starts to slide,
-// and the months after that over which it decays to WORN.
-export const PRIME_SHARE = 0.55;
-export const WORN = 0.35;
 // Consecutive months of an overdrawn network before a plant on it gives way.
 export const OVERLOAD_MONTHS = 12;
 // How overdrawn the network has to be to count as abuse rather than a rough
@@ -27,19 +24,6 @@ export const OVERLOAD_MONTHS = 12;
 export const OVERLOAD_RATIO = 1.02;
 
 export const isPlant = (t) => (BUILDINGS[t.type]?.powerOut || 0) > 0;
-
-export function plantLifespan(type) {
-  return (BUILDINGS[type]?.lifespan ?? 50) * 12;
-}
-
-// Output multiplier for a plant of a given age in months.
-export function ageFactor(type, ageMonths) {
-  const life = plantLifespan(type);
-  const prime = life * PRIME_SHARE;
-  if (ageMonths <= prime) return 1;
-  const worn = Math.min(1, (ageMonths - prime) / (life - prime));
-  return 1 - worn * (1 - WORN);
-}
 
 // What a plant actually delivers this month. "Place these on top of hills to
 // be most effective" is the manual's advice on wind, so height matters there.

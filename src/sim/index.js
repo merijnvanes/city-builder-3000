@@ -21,6 +21,7 @@ import { buildingName } from "./names.js";
 import { advanceYear, updateStrikes, readPopulation, blankPopulation, serviceQuality } from "./population.js";
 import { INDUSTRY, industryOf, ensureIndustry } from "./industry.js";
 import { agePlants, plantOutput, OVERLOAD_MONTHS } from "./power.js";
+import { agePumps, pumpOutput, hasSource, SOURCE_REACH } from "./water.js";
 
 export { TOOLS, TOOL_MAP, BUILDINGS, ZONE_TYPES, ORDINANCES, ADVISORS, DISASTERS, START_YEAR, DEFAULT_SIZE, FUNDED_DEPARTMENTS, SPECIAL_TYPES, PETITIONS, DEALS, SIDES, serialize, place, evaluate, isZone };
 
@@ -74,8 +75,9 @@ export function tick(city) {
   // Sims age once a year: children are schooled, adults forget, and life
   // expectancy drifts toward what the city's hospitals and air support.
   const monthNews = advancePeople(city);
-  // Plants age and, if the grid stayed overdrawn for a year, fail.
+  // Plants and pumps age; a grid overdrawn for a year loses a plant.
   monthNews.push(...agePlants(city, rng));
+  monthNews.push(...agePumps(city));
   advanceEffects(city);
 
   refreshCity(city);
@@ -98,7 +100,8 @@ export function tick(city) {
   const news = [...monthNews];
   news.push(...generateNews(city, statsForNews, city._prev));
   news.push(...updateEvents(city, statsForNews, rng));
-  news.push(...auditDeals(city, city._connections));
+  const cancelled = auditDeals(city, city._connections);
+  news.push(...cancelled);
   const disaster = randomDisaster(city, m, rng);
   if (disaster) news.push(disaster);
   if (fireMessage) news.push(fireMessage);
@@ -113,6 +116,11 @@ export function tick(city) {
     demand: { ...demand },
   });
   if (city.history.length > 240) city.history.shift();
+  // A disaster or a cancelled deal changes the city after this month's
+  // figures were taken. The report above is what the month looked like; the
+  // cached derived state has to catch up, or a save would carry tiles that
+  // disagree with it and the reloaded city would drift.
+  if (disaster || cancelled.length) settle(city);
   city.revision++;
   return { growth, news, disaster: disaster || fireMessage || null };
 }
@@ -278,7 +286,12 @@ export function inspectTile(city, x, y) {
       details.push(`Power output: ${out.toLocaleString()} of ${b.powerOut.toLocaleString()} (age ${years} of ${b.lifespan ?? 50} years)`);
       if (t.strain) details.push(`OVERLOADED for ${t.strain} month${t.strain === 1 ? "" : "s"} — it will explode at ${OVERLOAD_MONTHS}.`);
     }
-    if (b.waterOut) details.push(`Water output: ${b.waterOut.toLocaleString()}${b.nearWater ? " (near water)" : ""}`);
+    if (b.waterOut) {
+      const out = Math.round(pumpOutput(city, t, city._util?.waterPollution || 0));
+      const years = Math.floor((t.age || 0) / 12);
+      details.push(`Water output: ${out.toLocaleString()} of ${b.waterOut.toLocaleString()} (age ${years} of ${b.lifespan ?? 50} years)`);
+      if (!hasSource(city, t)) details.push(`No ${b.source} water within ${SOURCE_REACH} tiles — this pump has no capacity.`);
+    }
     if (b.service) details.push(`${b.service.kind} coverage radius ${b.service.radius}`);
     // The manual tells players to query a school or hospital for its grade:
     // a good grade means enough places, well enough funded, for everyone who

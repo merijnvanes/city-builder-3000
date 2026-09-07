@@ -12,8 +12,13 @@ import { BUILDINGS, ZONE_TYPES } from "./catalog.js";
 import { isAnchor, anchorOf, drawOf } from "./lots.js";
 import { DEALS } from "./neighbors.js";
 import { plantOutput, OVERLOAD_RATIO } from "./power.js";
+import { pumpOutput, waterPollutionOf } from "./water.js";
+import { industryTraits } from "./industry.js";
 
-export const WATER_RADIUS = 6;
+// "Water seeps out along water mains, watering all areas within seven tiles
+// of any part of the pipe. Unlike power transmission, watered tiles do not
+// act as relay stations." - the manual, page 99.
+export const WATER_RADIUS = 7;
 
 // Neighbour deals: bought supply arrives on the network touching the edge;
 // sold supply is a fixed extra load on that network.
@@ -29,15 +34,6 @@ function applyDeal(city, resource, netIds, supply, consumers, tilesKey) {
   if (deal.kind === "buy") supply[net] += d.amount;
   else consumers.unshift({ anchor: { deal: resource }, net, draw: d.amount });
   return { net, kind: deal.kind, amount: d.amount };
-}
-
-// Pumps near water give full output; elsewhere they trickle.
-export function sourceEfficiency(city, anchor) {
-  const b = BUILDINGS[anchor.type];
-  if (!b?.nearWater) return 1;
-  let near = false;
-  forRadius(city, anchor.x, anchor.y, 2, (t) => { if (t.terrain === "water") near = true; });
-  return near ? 1 : 0.3;
 }
 
 // Conductors: power lines, zoned tiles and building footprints. Power also
@@ -125,7 +121,25 @@ export function updateUtilities(city) {
     if (a && (p.served.has(a) || BUILDINGS[a.type]?.powerOut)) t.powered = true;
   }
 
+  // ── Water pollution ──────────────────────────────────────────
+  // "Invisible contaminants, primarily from industry, can invade your water
+  // supply." Computed here, between the two networks, because pumps draw
+  // less from fouled water and treatment plants need power to clean it. Doing
+  // it in one pass keeps the order acyclic, so a reloaded city derives the
+  // same state as the one it was saved from.
+  let industrialLoad = 0;
+  for (const t of tiles) {
+    if (!isAnchor(t) || t.type !== "industrial" || !t.level || t.abandoned) continue;
+    industrialLoad += t.lot.w * t.lot.h * t.density * t.level * industryTraits(t).pollution;
+  }
+  // A concentration, not a total: the same factories foul a small map's water
+  // far more than a large one's.
+  let landTiles = 0;
+  for (const t of tiles) if (t.terrain !== "water") landTiles++;
+  const { waterPollution } = waterPollutionOf(city, landTiles ? 100 * industrialLoad / (landTiles * 0.9) : 0);
+
   // ── Water ────────────────────────────────────────────────────
+  // A pipe network carries water; watered tiles do not relay it onward.
   const carries = (t) => t.pipe || !!BUILDINGS[t.type]?.waterOut;
   const water = components(city, carries);
   const waterSupply = new Float64Array(water.count);
@@ -134,14 +148,24 @@ export function updateUtilities(city) {
     const b = BUILDINGS[t.type];
     if (!b?.waterOut) continue;
     const net = water.ids[t.y * size + t.x];
-    if (net >= 0 && t.powered) waterSupply[net] += b.waterOut * sourceEfficiency(city, t);
+    // Output falls with age, with dirty water, and to nothing at all if the
+    // pump cannot reach the kind of water it needs.
+    if (net >= 0 && t.powered) waterSupply[net] += pumpOutput(city, t, waterPollution);
   }
-  // Coverage: nearest pipe network claims each tile.
+  // Coverage: the nearest pipe network claims each tile, and a network with
+  // pumps on it beats a dry one at the same distance. Claiming by iteration
+  // order instead would let a stub of disconnected pipe strand a whole
+  // district that a supplied main runs right past.
   const cover = new Int32Array(tiles.length).fill(-1);
+  const claim = new Int32Array(tiles.length).fill(WATER_RADIUS * 2 + 4);
   for (const t of tiles) {
     const net = water.ids[t.y * size + t.x];
     if (net < 0) continue;
-    forSquare(city, t.x, t.y, WATER_RADIUS, (n) => { if (cover[n.y * size + n.x] < 0) cover[n.y * size + n.x] = net; });
+    const dry = waterSupply[net] > 0 ? 0 : 1;
+    forSquare(city, t.x, t.y, WATER_RADIUS, (n, d) => {
+      const i = n.y * size + n.x, score = d * 2 + dry;
+      if (score < claim[i]) { claim[i] = score; cover[i] = net; }
+    });
   }
   const waterConsumers = [];
   for (const t of tiles) {
@@ -171,6 +195,7 @@ export function updateUtilities(city) {
   return {
     netOf: power.ids,
     overdrawn,
+    waterPollution,
     power: { supply: Math.round(p.totalSupply), demand: Math.round(p.totalDemand), deal: powerDeal ? { ...powerDeal, met: sold(powerDeal, p.served) } : null },
     water: { supply: Math.round(w.totalSupply), demand: Math.round(w.totalDemand), deal: waterDeal ? { ...waterDeal, met: sold(waterDeal, w.served) } : null },
   };

@@ -55,13 +55,17 @@ export function relaxHeights(heights, size, water) {
   return heights;
 }
 
-// Returns { terrain: Array<'grass'|'water'|'sand'>, trees: Array<0..3>, heights: Array<0..8>, layout }.
+// Returns { terrain: Array<'grass'|'water'|'sand'>, salt: Array<0|1>, trees: Array<0..3>,
+//           heights: Array<0..8>, layout }.
 export function generateTerrain(size, seed, layout, hills = 1) {
   // Random maps never pick plains; it is the flat option for a deliberate choice.
   layout = LAYOUTS.includes(layout) ? layout : LAYOUTS[seed % 4];
   hills = Number.isFinite(hills) ? Math.max(0, Math.min(2, hills)) : 1;
   const rng = lcg(seed ^ 0x9e3779b9);
   const water = new Uint8Array(size * size);
+  // Sea water, as opposed to a river or lake. Pumping stations need fresh
+  // water; only a desalinization plant can use the sea.
+  const salt = new Uint8Array(size * size);
   const terrain = new Array(size * size).fill("grass");
   const trees = new Uint8Array(size * size);
 
@@ -83,7 +87,7 @@ export function generateTerrain(size, seed, layout, hills = 1) {
     const inset = size * (0.18 + rng() * 0.1);
     for (let y = 0; y < size; y++) {
       const edge = size - inset + (noise(0, y, 10, seed + 5) - 0.5) * size * 0.16 + Math.sin(y * 0.2) * 1.5;
-      for (let x = 0; x < size; x++) if (x > edge) water[y * size + x] = 1;
+      for (let x = 0; x < size; x++) if (x > edge) { water[y * size + x] = 1; salt[y * size + x] = 1; }
     }
   };
   const lakes = (threshold) => {
@@ -110,7 +114,7 @@ export function generateTerrain(size, seed, layout, hills = 1) {
       if (x < size - 1 && water[i + 1]) n++;
       if (y > 0 && water[i - size]) n++;
       if (y < size - 1 && water[i + size]) n++;
-      if (n === 0) water[i] = 0;
+      if (n === 0) { water[i] = 0; salt[i] = 0; }
     }
   }
 
@@ -143,5 +147,5 @@ export function generateTerrain(size, seed, layout, hills = 1) {
       else if (hash(x, y, seed + 51) > 0.93) trees[i] = 1;
     }
   }
-  return { terrain, trees: Array.from(trees), heights: Array.from(heights), layout };
+  return { terrain, salt: Array.from(salt), trees: Array.from(trees), heights: Array.from(heights), layout };
 }

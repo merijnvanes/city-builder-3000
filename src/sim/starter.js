@@ -70,6 +70,10 @@ export function buildStarterTown(city) {
     return null;
   };
   const nearWater = (t) => { let near = false; forRadius(city, t.x, t.y, 1, (n) => { if (n.terrain === "water") near = true; }); return near; };
+  // A pumping station only works beside fresh water. On a sea coast the town
+  // is founded on water towers instead, and the mayor can build a
+  // desalinization plant once it is invented.
+  const nearFresh = (t) => { let near = false; forRadius(city, t.x, t.y, 2, (n) => { if (n.terrain === "water" && !n.salt) near = true; }); return near; };
 
   const size = city.size;
   const span = 28;
@@ -184,17 +188,20 @@ export function buildStarterTown(city) {
   const cx = ox + span / 2, cy = oy + span / 2;
   let shore = null, best = Infinity;
   for (const t of city.tiles) {
-    if (t.terrain === "water" || t.type !== "empty" || !nearWater(t)) continue;
+    if (t.terrain === "water" || t.type !== "empty" || !nearFresh(t)) continue;
     const d = Math.abs(t.x - cx) + Math.abs(t.y - cy);
     if (d < best) { best = d; shore = t; }
   }
   const pumps = [];
-  if (shore) forRadius(city, shore.x, shore.y, 3, (t) => { if (pumps.length < 3 && t.terrain !== "water" && t.type === "empty" && nearWater(t)) pumps.push(t); });
+  if (shore) forRadius(city, shore.x, shore.y, 3, (t) => { if (pumps.length < 3 && t.terrain !== "water" && t.type === "empty" && nearFresh(t)) pumps.push(t); });
   let sourceTool = "waterpump";
   if (!pumps.length) {
     sourceTool = "watertower";
-    const site = findSite(ox + span + 2, oy + 12, 2, 1, 10);
-    if (site) pumps.push(tileAt(city, site.x, site.y), tileAt(city, site.x + 1, site.y));
+    // Towers yield far less than a pumping station, so the town needs more.
+    for (let i = 0; i < 6; i++) {
+      const site = findSite(ox + span + 2, oy + 4 + i * 4, 2, 1, 10);
+      if (site) pumps.push(tileAt(city, site.x, site.y), tileAt(city, site.x + 1, site.y));
+    }
   }
   for (const p of pumps) put(p.x, p.y, sourceTool);
   // Nearest dry tile to a point, so routes never start or end on a bridge.
