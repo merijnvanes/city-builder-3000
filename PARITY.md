@@ -799,6 +799,54 @@ old version scanned from the top-left and wired only the plant's own footprint,
 so a new plant could sit alone on an island, lifting the city-wide total while
 the strained grid stayed exactly as short as it was.
 
+### The founders' town keeps its safety services, September 7
+
+The starter town lays its civic buildings on fixed blocks of the road grid. A
+block that landed on water or a slope failed `siteFree` and the building was
+dropped without a word. Four of forty seeds founded a town with no jail or no
+fire station.
+
+The jail case matters most, because the game already models what it costs:
+
+> *"If you do not have enough jails in your city, the police will be forced to
+> release any new criminals they catch back onto the street. Keep enough jails
+> around or your police effectiveness will drop."*
+
+So those towns started with a police station whose precinct was permanently
+weakened and no way for the mayor to know why. `findSite` already existed for
+this; the civic loop now uses it, searching four tiles out from the intended
+block. Police, jails, fire stations and schools are now founded on all forty
+seeds tested; one seed still cannot fit its hospital.
+
+Worth recording separately, because it looked like the same bug and is not:
+seeds 7 and 44 have no police station after thirty years. Both were founded
+with one. An earthquake took seed 7's in year 25, and three tornadoes took seed
+44's police station, fire station and one of its schools between years 16 and
+17. That is the disaster model working. Nothing rebuilds civic buildings after
+a disaster, which is the mayor's job and, in the long-run harness, a limit of
+`maintainUtilities`.
+
+### Where the crime model stands, September 7
+
+Checked and found correct, recorded so it is not re-litigated. The citywide
+crime average moves only about six points when every police station in a town
+is destroyed, which looks inert until the tiles are read separately:
+
+| | homes | mean crime | mean land value |
+| --- | --- | --- | --- |
+| inside a precinct | 67 | 5 | 38 |
+| outside one | 124 | 22 | 44 |
+
+That is the manual's rule holding exactly:
+
+> *"Criminals can roam free in any area that is not covered by a precinct...
+> Criminals that commit crimes outside of a police precinct will not get
+> caught."*
+
+One starter police station reaches about 30% of the population, so the citywide
+mean is dominated by the uncovered majority and moves little. The mean is the
+wrong statistic to judge this system by.
+
 ## Visual and performance work, September 7
 
 - Preserved and verified the previous agent's query-card sizing/rotation work.

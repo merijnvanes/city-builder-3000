@@ -81,6 +81,20 @@ describe("city creation", () => {
     assert.equal(c.size, 32);
     assert.equal(c.layout, "coast");
   });
+  // The founders' town is laid out on fixed blocks, and a block that lands on
+  // water or a slope cannot hold a building. It used to be dropped: four of
+  // forty seeds started with no jail or no fire station, and nothing in the
+  // city said one had ever been planned. A police station with no cells to go
+  // with it releases everyone it arrests.
+  test("every starter town is founded with its safety services", () => {
+    const stations = (c, type) => c.tiles.filter((t) => t.type === type && t.lot?.x === t.x && t.lot?.y === t.y).length;
+    for (let seed = 1; seed <= 20; seed++) {
+      const c = createCity(seed, true);
+      for (const type of ["police", "jail", "fire", "school"]) {
+        assert.ok(stations(c, type) > 0, `seed ${seed} was founded with no ${type}`);
+      }
+    }
+  });
 });
 
 describe("lots", () => {

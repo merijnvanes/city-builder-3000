@@ -126,7 +126,12 @@ export function buildStarterTown(city) {
     const [i, j] = key.split(",").map(Number);
     const b = blockAt(i, j);
     if (type === "landfill") { for (let y = 0; y < 3; y++) for (let x = 0; x < 3; x++) put(b.x + x, b.y + y, "landfill"); }
-    else if (siteFree(b.x, b.y, 3, 3)) put(b.x, b.y, type);
+    // A block that happens to be wet or steep used to lose its building
+    // outright. Four of forty seeds founded a town with no jail or no fire
+    // station, and nothing said one had ever been meant to stand there: a
+    // town with a police station and no cells releases everyone it arrests.
+    // Take the nearest site that will hold it instead.
+    else { const site = siteFree(b.x, b.y, 3, 3) ? b : findSite(b.x, b.y, 3, 3, 4); if (site) put(site.x, site.y, type); }
   }
   const lib = blockAt(3, 0);
   if (siteFree(lib.x, lib.y, 3, 3)) {
