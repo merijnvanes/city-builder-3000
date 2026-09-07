@@ -1,8 +1,8 @@
 # Reward architecture
 
 Eight population rewards use original scripted Blender models. They are selected
-by the gameplay catalog's `reward` metadata; business deals and landmarks remain
-separate, unmigrated families.
+by the gameplay catalog's `reward` metadata; business deals and landmarks are separate completed families; see
+[DEALS-ART.md](DEALS-ART.md) and [LANDMARKS-ART.md](LANDMARKS-ART.md).
 
 | Type | Footprint | Identity |
 | --- | --- | --- |

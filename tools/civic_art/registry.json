@@ -438,5 +438,40 @@
         "description": "Anchor stores flank a long glass lantern, with covered entrances and separate rear loading."
       }
     ]
+  },
+  "clocktower": {
+    "family": "landmarks",
+    "module": "landmark_monuments",
+    "tiles": 2,
+    "label": "Clock Tower",
+    "description": "A slender brick campanile with four clock faces, a copper spire and a planted square."
+  },
+  "cathedral": {
+    "family": "landmarks",
+    "module": "landmark_monuments",
+    "tiles": 3,
+    "label": "Cathedral",
+    "description": "Twin stone spires frame a rose window, with a long nave, lower aisles and a projecting transept."
+  },
+  "operahouse": {
+    "family": "landmarks",
+    "module": "landmark_destinations",
+    "tiles": 3,
+    "label": "Opera House",
+    "description": "A copper-domed auditorium, columned foyer and backstage fly tower, crowned by a golden lyre."
+  },
+  "observatory": {
+    "family": "landmarks",
+    "module": "landmark_destinations",
+    "tiles": 2,
+    "label": "Observatory",
+    "description": "An open silver telescope dome above a compact astronomy hall with low shielded lights."
+  },
+  "aquarium": {
+    "family": "landmarks",
+    "module": "landmark_destinations",
+    "tiles": 3,
+    "label": "Aquarium",
+    "description": "Paired wave roofs cover a glazed marine hall, with shallow tidal exhibits beside the entrance."
   }
 }

@@ -2,8 +2,9 @@
 
 The Parks & Land menu contains three standalone leisure lots: Small Park (1×1),
 Large Park (3×3), and Zoo (4×4). Terrain tools and planted tree overlays are not
-building sprites. Rewards such as Stadium and Marina, and landmark attractions,
-remain separate future families.
+building sprites. Rewards such as Stadium and Marina, and landmark attractions, are separate
+completed families; see [REWARDS-ART.md](REWARDS-ART.md) and
+[LANDMARKS-ART.md](LANDMARKS-ART.md).
 
 | Type | Identity |
 | --- | --- |

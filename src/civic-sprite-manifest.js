@@ -121,6 +121,124 @@ export const CIVIC_SPRITES = {
     "label": "Airport",
     "description": "A glazed terminal, control tower, hangar and marked runway on a rectangular airfield."
   },
+  "aquarium": {
+    "tiles": 3,
+    "scale": 3,
+    "height": 47,
+    "frames": {
+      "day-0": {
+        "file": "aquarium-day-0.b708ebce30.webp",
+        "width": 570,
+        "height": 355,
+        "anchor": [
+          285.0,
+          208.6589
+        ]
+      },
+      "day-1": {
+        "file": "aquarium-day-1.06029ab148.webp",
+        "width": 570,
+        "height": 316,
+        "anchor": [
+          285.0,
+          169.6588
+        ]
+      },
+      "day-2": {
+        "file": "aquarium-day-2.54edb0703a.webp",
+        "width": 570,
+        "height": 316,
+        "anchor": [
+          285.0,
+          169.6588
+        ]
+      },
+      "day-3": {
+        "file": "aquarium-day-3.e71e513724.webp",
+        "width": 570,
+        "height": 355,
+        "anchor": [
+          285.0,
+          208.6589
+        ]
+      },
+      "night-0": {
+        "file": "aquarium-night-0.0a32a5f132.webp",
+        "width": 570,
+        "height": 355,
+        "anchor": [
+          285.0,
+          208.6589
+        ]
+      },
+      "night-1": {
+        "file": "aquarium-night-1.b0633ce2f0.webp",
+        "width": 570,
+        "height": 316,
+        "anchor": [
+          285.0,
+          169.6588
+        ]
+      },
+      "night-2": {
+        "file": "aquarium-night-2.17bbda80c0.webp",
+        "width": 570,
+        "height": 316,
+        "anchor": [
+          285.0,
+          169.6588
+        ]
+      },
+      "night-3": {
+        "file": "aquarium-night-3.833a4ec191.webp",
+        "width": 570,
+        "height": 355,
+        "anchor": [
+          285.0,
+          208.6589
+        ]
+      },
+      "unpowered-0": {
+        "file": "aquarium-unpowered-0.c378812ab0.webp",
+        "width": 570,
+        "height": 355,
+        "anchor": [
+          285.0,
+          208.6589
+        ]
+      },
+      "unpowered-1": {
+        "file": "aquarium-unpowered-1.a4b215ca9d.webp",
+        "width": 570,
+        "height": 316,
+        "anchor": [
+          285.0,
+          169.6588
+        ]
+      },
+      "unpowered-2": {
+        "file": "aquarium-unpowered-2.6362d6597a.webp",
+        "width": 570,
+        "height": 316,
+        "anchor": [
+          285.0,
+          169.6588
+        ]
+      },
+      "unpowered-3": {
+        "file": "aquarium-unpowered-3.5462d0c8d2.webp",
+        "width": 570,
+        "height": 355,
+        "anchor": [
+          285.0,
+          208.6589
+        ]
+      }
+    },
+    "family": "landmarks",
+    "label": "Aquarium",
+    "description": "Paired wave roofs cover a glazed marine hall, with shallow tidal exhibits beside the entrance."
+  },
   "armybase": {
     "tiles": 5,
     "scale": 3,
@@ -821,6 +939,124 @@ export const CIVIC_SPRITES = {
       }
     ]
   },
+  "cathedral": {
+    "tiles": 3,
+    "scale": 3,
+    "height": 90,
+    "frames": {
+      "day-0": {
+        "file": "cathedral-day-0.7a8b033a28.webp",
+        "width": 571,
+        "height": 413,
+        "anchor": [
+          285.9999,
+          266.9784
+        ]
+      },
+      "day-1": {
+        "file": "cathedral-day-1.7fda99035e.webp",
+        "width": 571,
+        "height": 486,
+        "anchor": [
+          285.9999,
+          339.9786
+        ]
+      },
+      "day-2": {
+        "file": "cathedral-day-2.0235b748c8.webp",
+        "width": 571,
+        "height": 486,
+        "anchor": [
+          286.0001,
+          339.9786
+        ]
+      },
+      "day-3": {
+        "file": "cathedral-day-3.c72a6bdbcd.webp",
+        "width": 571,
+        "height": 413,
+        "anchor": [
+          286.0001,
+          266.9784
+        ]
+      },
+      "night-0": {
+        "file": "cathedral-night-0.861fa6d1ec.webp",
+        "width": 571,
+        "height": 413,
+        "anchor": [
+          285.9999,
+          266.9784
+        ]
+      },
+      "night-1": {
+        "file": "cathedral-night-1.31c41ac04a.webp",
+        "width": 571,
+        "height": 486,
+        "anchor": [
+          285.9999,
+          339.9786
+        ]
+      },
+      "night-2": {
+        "file": "cathedral-night-2.f77c9439b7.webp",
+        "width": 571,
+        "height": 486,
+        "anchor": [
+          286.0001,
+          339.9786
+        ]
+      },
+      "night-3": {
+        "file": "cathedral-night-3.dfb0d31235.webp",
+        "width": 571,
+        "height": 413,
+        "anchor": [
+          286.0001,
+          266.9784
+        ]
+      },
+      "unpowered-0": {
+        "file": "cathedral-unpowered-0.933f32cacd.webp",
+        "width": 571,
+        "height": 413,
+        "anchor": [
+          285.9999,
+          266.9784
+        ]
+      },
+      "unpowered-1": {
+        "file": "cathedral-unpowered-1.1f3e7fccc9.webp",
+        "width": 571,
+        "height": 486,
+        "anchor": [
+          285.9999,
+          339.9786
+        ]
+      },
+      "unpowered-2": {
+        "file": "cathedral-unpowered-2.4fb2dc3bdd.webp",
+        "width": 571,
+        "height": 486,
+        "anchor": [
+          286.0001,
+          339.9786
+        ]
+      },
+      "unpowered-3": {
+        "file": "cathedral-unpowered-3.fa1df69eeb.webp",
+        "width": 571,
+        "height": 413,
+        "anchor": [
+          286.0001,
+          266.9784
+        ]
+      }
+    },
+    "family": "landmarks",
+    "label": "Cathedral",
+    "description": "Twin stone spires frame a rose window, with a long nave, lower aisles and a projecting transept."
+  },
   "cityhall": {
     "tiles": 3,
     "scale": 3,
@@ -938,6 +1174,124 @@ export const CIVIC_SPRITES = {
     "family": "rewards",
     "label": "City Hall",
     "description": "A limestone municipal hall crowned by a square clock tower and copper lantern."
+  },
+  "clocktower": {
+    "tiles": 2,
+    "scale": 3,
+    "height": 101,
+    "frames": {
+      "day-0": {
+        "file": "clocktower-day-0.77c99291f1.webp",
+        "width": 379,
+        "height": 401,
+        "anchor": [
+          190.0,
+          302.8513
+        ]
+      },
+      "day-1": {
+        "file": "clocktower-day-1.0ec7949c29.webp",
+        "width": 379,
+        "height": 401,
+        "anchor": [
+          190.0,
+          302.8513
+        ]
+      },
+      "day-2": {
+        "file": "clocktower-day-2.1e19c414e2.webp",
+        "width": 379,
+        "height": 401,
+        "anchor": [
+          190.0,
+          302.8513
+        ]
+      },
+      "day-3": {
+        "file": "clocktower-day-3.48b1b03598.webp",
+        "width": 379,
+        "height": 400,
+        "anchor": [
+          190.0,
+          301.8513
+        ]
+      },
+      "night-0": {
+        "file": "clocktower-night-0.5b901cd84f.webp",
+        "width": 379,
+        "height": 401,
+        "anchor": [
+          190.0,
+          302.8513
+        ]
+      },
+      "night-1": {
+        "file": "clocktower-night-1.dfc0555c1f.webp",
+        "width": 379,
+        "height": 401,
+        "anchor": [
+          190.0,
+          302.8513
+        ]
+      },
+      "night-2": {
+        "file": "clocktower-night-2.7fceebd88a.webp",
+        "width": 379,
+        "height": 401,
+        "anchor": [
+          190.0,
+          302.8513
+        ]
+      },
+      "night-3": {
+        "file": "clocktower-night-3.65df861f6c.webp",
+        "width": 379,
+        "height": 400,
+        "anchor": [
+          190.0,
+          301.8513
+        ]
+      },
+      "unpowered-0": {
+        "file": "clocktower-unpowered-0.38943a356b.webp",
+        "width": 379,
+        "height": 401,
+        "anchor": [
+          190.0,
+          302.8513
+        ]
+      },
+      "unpowered-1": {
+        "file": "clocktower-unpowered-1.efd85ea627.webp",
+        "width": 379,
+        "height": 401,
+        "anchor": [
+          190.0,
+          302.8513
+        ]
+      },
+      "unpowered-2": {
+        "file": "clocktower-unpowered-2.001e7a5dfe.webp",
+        "width": 379,
+        "height": 401,
+        "anchor": [
+          190.0,
+          302.8513
+        ]
+      },
+      "unpowered-3": {
+        "file": "clocktower-unpowered-3.4ac1eec151.webp",
+        "width": 379,
+        "height": 400,
+        "anchor": [
+          190.0,
+          301.8513
+        ]
+      }
+    },
+    "family": "landmarks",
+    "label": "Clock Tower",
+    "description": "A slender brick campanile with four clock faces, a copper spire and a planted square."
   },
   "coal": {
     "tiles": 4,
@@ -3758,6 +4112,124 @@ export const CIVIC_SPRITES = {
     "label": "Nuclear plant",
     "description": "Hollow concrete cooling towers, domed containment, and a separate turbine hall."
   },
+  "observatory": {
+    "tiles": 2,
+    "scale": 3,
+    "height": 47,
+    "frames": {
+      "day-0": {
+        "file": "observatory-day-0.5d11801dce.webp",
+        "width": 378,
+        "height": 241,
+        "anchor": [
+          189.0,
+          142.587
+        ]
+      },
+      "day-1": {
+        "file": "observatory-day-1.1bd8d9fdc2.webp",
+        "width": 378,
+        "height": 249,
+        "anchor": [
+          189.0,
+          150.5868
+        ]
+      },
+      "day-2": {
+        "file": "observatory-day-2.d5a1535b51.webp",
+        "width": 378,
+        "height": 257,
+        "anchor": [
+          189.0,
+          158.5868
+        ]
+      },
+      "day-3": {
+        "file": "observatory-day-3.c19a1b2a82.webp",
+        "width": 378,
+        "height": 250,
+        "anchor": [
+          189.0,
+          151.587
+        ]
+      },
+      "night-0": {
+        "file": "observatory-night-0.45f9c53f3f.webp",
+        "width": 378,
+        "height": 241,
+        "anchor": [
+          189.0,
+          142.587
+        ]
+      },
+      "night-1": {
+        "file": "observatory-night-1.4199811162.webp",
+        "width": 378,
+        "height": 249,
+        "anchor": [
+          189.0,
+          150.5868
+        ]
+      },
+      "night-2": {
+        "file": "observatory-night-2.8c8662adaf.webp",
+        "width": 378,
+        "height": 257,
+        "anchor": [
+          189.0,
+          158.5868
+        ]
+      },
+      "night-3": {
+        "file": "observatory-night-3.2474db73b6.webp",
+        "width": 378,
+        "height": 250,
+        "anchor": [
+          189.0,
+          151.587
+        ]
+      },
+      "unpowered-0": {
+        "file": "observatory-unpowered-0.7e3eaee93b.webp",
+        "width": 378,
+        "height": 241,
+        "anchor": [
+          189.0,
+          142.587
+        ]
+      },
+      "unpowered-1": {
+        "file": "observatory-unpowered-1.90e9155e6e.webp",
+        "width": 378,
+        "height": 249,
+        "anchor": [
+          189.0,
+          150.5868
+        ]
+      },
+      "unpowered-2": {
+        "file": "observatory-unpowered-2.f73ec05648.webp",
+        "width": 378,
+        "height": 257,
+        "anchor": [
+          189.0,
+          158.5868
+        ]
+      },
+      "unpowered-3": {
+        "file": "observatory-unpowered-3.d9a3e93e75.webp",
+        "width": 378,
+        "height": 250,
+        "anchor": [
+          189.0,
+          151.587
+        ]
+      }
+    },
+    "family": "landmarks",
+    "label": "Observatory",
+    "description": "An open silver telescope dome above a compact astronomy hall with low shielded lights."
+  },
   "oil": {
     "tiles": 4,
     "scale": 3,
@@ -3875,6 +4347,124 @@ export const CIVIC_SPRITES = {
     "family": "power",
     "label": "Oil plant",
     "description": "Bunded fuel tanks, an ochre boiler house, and a single striped exhaust stack."
+  },
+  "operahouse": {
+    "tiles": 3,
+    "scale": 3,
+    "height": 60,
+    "frames": {
+      "day-0": {
+        "file": "operahouse-day-0.62a9c2206f.webp",
+        "width": 571,
+        "height": 387,
+        "anchor": [
+          286.0,
+          240.3769
+        ]
+      },
+      "day-1": {
+        "file": "operahouse-day-1.30a854e693.webp",
+        "width": 571,
+        "height": 325,
+        "anchor": [
+          286.0,
+          178.3768
+        ]
+      },
+      "day-2": {
+        "file": "operahouse-day-2.2e50d0c5a4.webp",
+        "width": 571,
+        "height": 325,
+        "anchor": [
+          286.0,
+          178.3768
+        ]
+      },
+      "day-3": {
+        "file": "operahouse-day-3.d4bb2464b4.webp",
+        "width": 571,
+        "height": 387,
+        "anchor": [
+          286.0,
+          240.3769
+        ]
+      },
+      "night-0": {
+        "file": "operahouse-night-0.4a6cf90c5f.webp",
+        "width": 571,
+        "height": 387,
+        "anchor": [
+          286.0,
+          240.3769
+        ]
+      },
+      "night-1": {
+        "file": "operahouse-night-1.a4d1a57dcb.webp",
+        "width": 571,
+        "height": 325,
+        "anchor": [
+          286.0,
+          178.3768
+        ]
+      },
+      "night-2": {
+        "file": "operahouse-night-2.9601be964f.webp",
+        "width": 571,
+        "height": 325,
+        "anchor": [
+          286.0,
+          178.3768
+        ]
+      },
+      "night-3": {
+        "file": "operahouse-night-3.c02a8a468e.webp",
+        "width": 571,
+        "height": 387,
+        "anchor": [
+          286.0,
+          240.3769
+        ]
+      },
+      "unpowered-0": {
+        "file": "operahouse-unpowered-0.9414640754.webp",
+        "width": 571,
+        "height": 387,
+        "anchor": [
+          286.0,
+          240.3769
+        ]
+      },
+      "unpowered-1": {
+        "file": "operahouse-unpowered-1.b8996433bb.webp",
+        "width": 571,
+        "height": 325,
+        "anchor": [
+          286.0,
+          178.3768
+        ]
+      },
+      "unpowered-2": {
+        "file": "operahouse-unpowered-2.94e4456215.webp",
+        "width": 571,
+        "height": 325,
+        "anchor": [
+          286.0,
+          178.3768
+        ]
+      },
+      "unpowered-3": {
+        "file": "operahouse-unpowered-3.253c64dae4.webp",
+        "width": 571,
+        "height": 387,
+        "anchor": [
+          286.0,
+          240.3769
+        ]
+      }
+    },
+    "family": "landmarks",
+    "label": "Opera House",
+    "description": "A copper-domed auditorium, columned foyer and backstage fly tower, crowned by a golden lyre."
   },
   "park": {
     "tiles": 1,

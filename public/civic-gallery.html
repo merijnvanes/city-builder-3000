@@ -14,7 +14,7 @@
 <footer>Original architecture · Four camera angles · Three lighting states · Shared, compressed browser assets</footer>
 <script type="module">
 const requestedFamily=new URLSearchParams(location.search).get('family');
-const family=['civic','power','water','parks','transport','rewards','deals'].includes(requestedFamily)?requestedFamily:'civic';
+const family=['civic','power','water','parks','transport','rewards','deals','landmarks'].includes(requestedFamily)?requestedFamily:'civic';
 let catalog,state='day',rotation=0,detail=false;
 const cards=[];
 function update(){
@@ -33,7 +33,7 @@ function update(){
 }
 try{
   const response=await fetch('./assets/civic/catalog.json');if(!response.ok)throw new Error('Asset catalog could not be loaded.');catalog=await response.json();
-  for(const other of ['civic','power','water','parks','transport','rewards','deals'].filter(value=>value!==family)){
+  for(const other of ['civic','power','water','parks','transport','rewards','deals','landmarks'].filter(value=>value!==family)){
     const link=document.createElement('a');link.href=`?family=${other}`;link.textContent=`View ${other} collection →`;link.style.cssText='color:var(--accent);margin-right:12px';document.querySelector('nav').prepend(link);
   }
   if(family==='power'){
@@ -47,6 +47,12 @@ try{
     document.querySelector('.eyebrow').textContent='City Builder 3000 · Asset Collection 03';
     document.querySelector('h1').textContent='Water for a growing city.';
     document.querySelector('header p').textContent='Four purposeful water works: freshwater pumps, elevated storage, membrane filtration, and open treatment basins. Crafted in brick, concrete, and teal metalwork.';
+  }
+  if(family==='landmarks'){
+    document.title='Landmarks · City Builder 3000';
+    document.querySelector('.eyebrow').textContent='City Builder 3000 · Asset Collection 08';
+    document.querySelector('h1').textContent='The places people remember.';
+    document.querySelector('header p').textContent='A clock above the square, music beneath a copper dome, stone spires, a telescope open to the sky, and a hall shaped by waves. Five landmarks for a distinctive skyline.';
   }
   if(family==='deals'){
     document.title='Business Deals · City Builder 3000';

@@ -58,3 +58,5 @@ available, otherwise Blender’s built-in font. Set `CIVIC_ART_FONT` to use anot
 local font. Lettering is baked into image pixels; no font file is distributed.
 
 Business-deal model identities, variants and validation: [DEALS-ART.md](../../DEALS-ART.md).
+
+Landmark architecture and validation: [LANDMARKS-ART.md](../../LANDMARKS-ART.md).

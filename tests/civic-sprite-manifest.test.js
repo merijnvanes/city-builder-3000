@@ -10,7 +10,7 @@ test('every authored building family ships all four angles and three lighting st
   assert.deepEqual(Object.keys(CIVIC_SPRITES).sort(), expected);
   const registry = JSON.parse(readFileSync(new URL('../tools/civic_art/registry.json', import.meta.url)));
   assert.deepEqual(Object.keys(registry).sort(), expected);
-  let compressedBytes = 0, parksBytes = 0, transportBytes = 0, rewardsBytes = 0, dealsBytes = 0;
+  let compressedBytes = 0, parksBytes = 0, transportBytes = 0, rewardsBytes = 0, dealsBytes = 0, landmarksBytes = 0;
   for (const [type, spec] of Object.entries(CIVIC_SPRITES)) {
     assert.equal(spec.label, registry[type].label);
     assert.equal(spec.description, registry[type].description);
@@ -34,7 +34,8 @@ test('every authored building family ships all four angles and three lighting st
       assert.ok(frame.width > 0 && frame.height > 0);
       assert.ok(frame.anchor[0] > 0 && frame.anchor[0] < frame.width);
       assert.ok(frame.anchor[1] > 0 && frame.anchor[1] < frame.height);
-      if (spec.family === 'deals') dealsBytes += statSync(url).size;
+      if (spec.family === 'landmarks') landmarksBytes += statSync(url).size;
+      else if (spec.family === 'deals') dealsBytes += statSync(url).size;
       else if (spec.family === 'rewards') rewardsBytes += statSync(url).size;
       else if (spec.family === 'transport') transportBytes += statSync(url).size;
       else if (spec.family === 'parks') parksBytes += statSync(url).size;
@@ -42,6 +43,7 @@ test('every authored building family ships all four angles and three lighting st
     }
   }
   // Each new family has a separate budget; earlier ceilings remain unchanged.
+  assert.ok(landmarksBytes < 2 * 1024 * 1024, '60 landmark frames stay below 2 MiB');
   assert.ok(dealsBytes < 5 * 1024 * 1024, '168 business deal frames stay below 5 MiB');
   assert.ok(rewardsBytes < 4 * 1024 * 1024, '108 reward frames stay below 4 MiB');
   assert.ok(transportBytes < 4 * 1024 * 1024, '108 transport frames stay below 4 MiB');

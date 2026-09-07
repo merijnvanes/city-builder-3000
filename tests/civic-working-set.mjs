@@ -80,8 +80,8 @@ async function setup(page, portraitHistory = false, zoom = .8) {
 try {
   let page = await browser.newPage();
   const initial = await setup(page);
-  assert.equal(initial.types, 45);
-  assert.equal(initial.requests, 45, 'one load per gameplay type');
+  assert.equal(initial.types, 50);
+  assert.equal(initial.requests, 50, 'one load per gameplay type');
   const upgrade = await page.evaluate(async () => {
     const s = artTest, old = s.hit.canvas, before = s.requests;
     s.r.zoom = 2.4; s.r.paintEpoch++; s.r.pickables = [];
@@ -142,7 +142,7 @@ try {
   await page.close();
   page = await browser.newPage();
   const history = await setup(page, true);
-  assert.equal(history.types, 45);
+  assert.equal(history.types, 50);
   await page.close();
   page = await browser.newPage();
   await setup(page, false, .3);
@@ -151,5 +151,5 @@ try {
     return { actual: s.hit.canvas.width, expected: Math.ceil(frame.width * .3 * 2 / 3) };
   });
   assert.equal(minimum.actual, minimum.expected, 'minimum zoom uses actual screen resolution');
-  console.log('Working set: 45 types, no repaint reloads, reduced alpha picking, full close-ups, failed upgrades and late-result accounting and portrait history pass.', initial);
+  console.log('Working set: 50 types, no repaint reloads, reduced alpha picking, full close-ups, failed upgrades and late-result accounting and portrait history pass.', initial);
 } finally { await browser.close(); }

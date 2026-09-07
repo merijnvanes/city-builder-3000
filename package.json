@@ -27,7 +27,9 @@
     "test:rewards": "node --test tests/architecture-variation.test.js && ART_FAMILY=rewards node tests/power-sprites.mjs && ART_FAMILY=rewards node tests/civic-art.mjs",
     "test:working-set": "node tests/civic-working-set.mjs",
     "art:deals": "blender --background --factory-startup --python tools/civic_art/render.py -- --types deals --states day,night,unpowered --rotations 0,1,2,3 --samples 32 && python3 tools/civic_art/package.py --types deals",
-    "test:deals": "node --test tests/architecture-variation.test.js && ART_FAMILY=deals node tests/power-sprites.mjs && ART_FAMILY=deals node tests/civic-art.mjs"
+    "test:deals": "node --test tests/architecture-variation.test.js && ART_FAMILY=deals node tests/power-sprites.mjs && ART_FAMILY=deals node tests/civic-art.mjs",
+    "art:landmarks": "blender --background --factory-startup --python tools/civic_art/render.py -- --types landmarks --states day,night,unpowered --rotations 0,1,2,3 --samples 32 && python3 tools/civic_art/package.py --types landmarks",
+    "test:landmarks": "node --test tests/architecture-variation.test.js && ART_FAMILY=landmarks node tests/power-sprites.mjs && ART_FAMILY=landmarks node tests/civic-art.mjs"
   },
   "devDependencies": {
     "vite": "^7.0.0",
