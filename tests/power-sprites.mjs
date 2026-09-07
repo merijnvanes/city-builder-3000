@@ -1,10 +1,11 @@
-// Exercise power or water exports through the shared runtime, including tall
+// Exercise power, water or parks exports through the shared runtime, including tall
 // one-tile silhouette picking and portraits at every rotation/state.
 import { chromium } from '@playwright/test';
 import assert from 'node:assert/strict';
+import { FAMILY_COUNTS } from './art-families.mjs';
 const family = process.env.ART_FAMILY || 'power';
-assert.ok(['power','water'].includes(family));
-const expectedFrames = family === 'water' ? 48 : 96;
+assert.ok(['power','water','parks'].includes(family));
+const expectedFrames = FAMILY_COUNTS[family] * 12;
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
 try {
   const page = await browser.newPage({ viewport: { width: 900, height: 800 }, deviceScaleFactor: 2 });
@@ -19,7 +20,8 @@ try {
     const { CIVIC_SPRITES } = await import('/src/civic-sprite-manifest.js');
     const { BUILDINGS } = await import('/src/sim/catalog.js');
     const { createPortrait } = await import('/src/portrait.js');
-    const buildings = Object.entries(BUILDINGS).filter(([, spec]) => spec.group === 'utilities' && (family === 'water' ? spec.waterOut > 0 || spec.cleansWater : spec.powerOut > 0));
+    const { belongsToFamily } = await import('/tests/art-families.mjs');
+    const buildings = Object.entries(BUILDINGS).filter(([, spec]) => belongsToFamily(spec, family));
     const canvas = document.createElement('canvas');canvas.width = canvas.height = 800;
     const r = Object.assign(Object.create(CityRenderer.prototype), { base: canvas.getContext('2d'), w: 800, h: 800, size: 16, zoom: 1.75, minZoom: .3, maxZoom: 2.8, dpr: 2, panX: 0, panY: 0, platform: 0, pickables: [], rotation: 0 });
     r.pick = () => ({ miss: true });

@@ -1180,6 +1180,124 @@ export const CIVIC_SPRITES = {
     "label": "Landfill",
     "description": "Managed earth cells and retaining walls that join into a larger working site."
   },
+  "largepark": {
+    "tiles": 3,
+    "scale": 3,
+    "height": 41,
+    "frames": {
+      "day-0": {
+        "file": "largepark-day-0.d168f3b0e5.webp",
+        "width": 570,
+        "height": 331,
+        "anchor": [
+          285.0,
+          184.5386
+        ]
+      },
+      "day-1": {
+        "file": "largepark-day-1.9cf8855592.webp",
+        "width": 570,
+        "height": 339,
+        "anchor": [
+          285.0,
+          192.5386
+        ]
+      },
+      "day-2": {
+        "file": "largepark-day-2.13d47d7837.webp",
+        "width": 570,
+        "height": 338,
+        "anchor": [
+          285.0,
+          191.5386
+        ]
+      },
+      "day-3": {
+        "file": "largepark-day-3.f066074ed4.webp",
+        "width": 570,
+        "height": 325,
+        "anchor": [
+          285.0,
+          178.5386
+        ]
+      },
+      "night-0": {
+        "file": "largepark-night-0.caea733bfa.webp",
+        "width": 570,
+        "height": 331,
+        "anchor": [
+          285.0,
+          184.5386
+        ]
+      },
+      "night-1": {
+        "file": "largepark-night-1.6db395f882.webp",
+        "width": 570,
+        "height": 339,
+        "anchor": [
+          285.0,
+          192.5386
+        ]
+      },
+      "night-2": {
+        "file": "largepark-night-2.633504e2ea.webp",
+        "width": 570,
+        "height": 338,
+        "anchor": [
+          285.0,
+          191.5386
+        ]
+      },
+      "night-3": {
+        "file": "largepark-night-3.b263018d27.webp",
+        "width": 570,
+        "height": 325,
+        "anchor": [
+          285.0,
+          178.5386
+        ]
+      },
+      "unpowered-0": {
+        "file": "largepark-unpowered-0.dd02136497.webp",
+        "width": 570,
+        "height": 331,
+        "anchor": [
+          285.0,
+          184.5386
+        ]
+      },
+      "unpowered-1": {
+        "file": "largepark-unpowered-1.d4ab4a20f4.webp",
+        "width": 570,
+        "height": 339,
+        "anchor": [
+          285.0,
+          192.5386
+        ]
+      },
+      "unpowered-2": {
+        "file": "largepark-unpowered-2.9404b42a4d.webp",
+        "width": 570,
+        "height": 338,
+        "anchor": [
+          285.0,
+          191.5386
+        ]
+      },
+      "unpowered-3": {
+        "file": "largepark-unpowered-3.5709ba2546.webp",
+        "width": 570,
+        "height": 325,
+        "anchor": [
+          285.0,
+          178.5386
+        ]
+      }
+    },
+    "family": "parks",
+    "label": "Large park",
+    "description": "An octagonal copper bandstand, lily pond, rose pergola, and generous tree-lined lawns."
+  },
   "library": {
     "tiles": 2,
     "scale": 3,
@@ -1769,6 +1887,124 @@ export const CIVIC_SPRITES = {
     "family": "power",
     "label": "Oil plant",
     "description": "Bunded fuel tanks, an ochre boiler house, and a single striped exhaust stack."
+  },
+  "park": {
+    "tiles": 1,
+    "scale": 3,
+    "height": 22,
+    "frames": {
+      "day-0": {
+        "file": "park-day-0.6775f5f0a5.webp",
+        "width": 186,
+        "height": 142,
+        "anchor": [
+          93.0,
+          91.203
+        ]
+      },
+      "day-1": {
+        "file": "park-day-1.76049b2124.webp",
+        "width": 186,
+        "height": 113,
+        "anchor": [
+          93.0,
+          62.2029
+        ]
+      },
+      "day-2": {
+        "file": "park-day-2.aa64ceb3e7.webp",
+        "width": 186,
+        "height": 106,
+        "anchor": [
+          93.0,
+          55.2029
+        ]
+      },
+      "day-3": {
+        "file": "park-day-3.822d107a17.webp",
+        "width": 186,
+        "height": 128,
+        "anchor": [
+          93.0,
+          77.203
+        ]
+      },
+      "night-0": {
+        "file": "park-night-0.6381dcc5af.webp",
+        "width": 186,
+        "height": 142,
+        "anchor": [
+          93.0,
+          91.203
+        ]
+      },
+      "night-1": {
+        "file": "park-night-1.72a5396447.webp",
+        "width": 186,
+        "height": 113,
+        "anchor": [
+          93.0,
+          62.2029
+        ]
+      },
+      "night-2": {
+        "file": "park-night-2.4ac8e0e238.webp",
+        "width": 186,
+        "height": 106,
+        "anchor": [
+          93.0,
+          55.2029
+        ]
+      },
+      "night-3": {
+        "file": "park-night-3.65e7259a43.webp",
+        "width": 186,
+        "height": 128,
+        "anchor": [
+          93.0,
+          77.203
+        ]
+      },
+      "unpowered-0": {
+        "file": "park-unpowered-0.b9c04a48dc.webp",
+        "width": 186,
+        "height": 142,
+        "anchor": [
+          93.0,
+          91.203
+        ]
+      },
+      "unpowered-1": {
+        "file": "park-unpowered-1.2f5bece171.webp",
+        "width": 186,
+        "height": 113,
+        "anchor": [
+          93.0,
+          62.2029
+        ]
+      },
+      "unpowered-2": {
+        "file": "park-unpowered-2.3075604507.webp",
+        "width": 186,
+        "height": 106,
+        "anchor": [
+          93.0,
+          55.2029
+        ]
+      },
+      "unpowered-3": {
+        "file": "park-unpowered-3.2c760bd049.webp",
+        "width": 186,
+        "height": 128,
+        "anchor": [
+          93.0,
+          77.203
+        ]
+      }
+    },
+    "family": "parks",
+    "label": "Small park",
+    "description": "A shaded pocket garden with crossing gravel paths, timber seating, and flowering borders."
   },
   "police": {
     "tiles": 3,
@@ -2831,5 +3067,123 @@ export const CIVIC_SPRITES = {
     "family": "power",
     "label": "Wind turbine",
     "description": "Three sculpted airfoil blades, a tapered white mast, and a compact transformer cabinet."
+  },
+  "zoo": {
+    "tiles": 4,
+    "scale": 3,
+    "height": 30,
+    "frames": {
+      "day-0": {
+        "file": "zoo-day-0.af055fb11f.webp",
+        "width": 762,
+        "height": 421,
+        "anchor": [
+          381.0,
+          226.6149
+        ]
+      },
+      "day-1": {
+        "file": "zoo-day-1.a415b69559.webp",
+        "width": 762,
+        "height": 408,
+        "anchor": [
+          381.0,
+          213.6148
+        ]
+      },
+      "day-2": {
+        "file": "zoo-day-2.637cdaafba.webp",
+        "width": 762,
+        "height": 397,
+        "anchor": [
+          381.0,
+          202.6148
+        ]
+      },
+      "day-3": {
+        "file": "zoo-day-3.4bce5ee206.webp",
+        "width": 762,
+        "height": 420,
+        "anchor": [
+          381.0,
+          225.6149
+        ]
+      },
+      "night-0": {
+        "file": "zoo-night-0.6a5e588fee.webp",
+        "width": 762,
+        "height": 421,
+        "anchor": [
+          381.0,
+          226.6149
+        ]
+      },
+      "night-1": {
+        "file": "zoo-night-1.1d24ca02c0.webp",
+        "width": 762,
+        "height": 408,
+        "anchor": [
+          381.0,
+          213.6148
+        ]
+      },
+      "night-2": {
+        "file": "zoo-night-2.04046daa8b.webp",
+        "width": 762,
+        "height": 397,
+        "anchor": [
+          381.0,
+          202.6148
+        ]
+      },
+      "night-3": {
+        "file": "zoo-night-3.114fbe226a.webp",
+        "width": 762,
+        "height": 420,
+        "anchor": [
+          381.0,
+          225.6149
+        ]
+      },
+      "unpowered-0": {
+        "file": "zoo-unpowered-0.a08b9b4df6.webp",
+        "width": 762,
+        "height": 421,
+        "anchor": [
+          381.0,
+          226.6149
+        ]
+      },
+      "unpowered-1": {
+        "file": "zoo-unpowered-1.e4c9d895be.webp",
+        "width": 762,
+        "height": 408,
+        "anchor": [
+          381.0,
+          213.6148
+        ]
+      },
+      "unpowered-2": {
+        "file": "zoo-unpowered-2.e809787e43.webp",
+        "width": 762,
+        "height": 397,
+        "anchor": [
+          381.0,
+          202.6148
+        ]
+      },
+      "unpowered-3": {
+        "file": "zoo-unpowered-3.2b4e103ba4.webp",
+        "width": 762,
+        "height": 420,
+        "anchor": [
+          381.0,
+          225.6149
+        ]
+      }
+    },
+    "family": "parks",
+    "label": "Zoo",
+    "description": "Twin entrance lodges, an open aviary, elephant and giraffe habitats, and a rocky penguin pool."
   }
 };

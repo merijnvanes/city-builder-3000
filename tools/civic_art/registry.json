@@ -166,5 +166,26 @@
     "family": "water",
     "label": "Water treatment",
     "description": "Twin open clarifiers, bridge-mounted drives, and baffled aeration channels beside a brick blower house."
+  },
+  "park": {
+    "module": "parks",
+    "tiles": 1,
+    "family": "parks",
+    "label": "Small park",
+    "description": "A shaded pocket garden with crossing gravel paths, timber seating, and flowering borders."
+  },
+  "largepark": {
+    "module": "parks",
+    "tiles": 3,
+    "family": "parks",
+    "label": "Large park",
+    "description": "An octagonal copper bandstand, lily pond, rose pergola, and generous tree-lined lawns."
+  },
+  "zoo": {
+    "module": "parks",
+    "tiles": 4,
+    "family": "parks",
+    "label": "Zoo",
+    "description": "Twin entrance lodges, an open aviary, elephant and giraffe habitats, and a rocky penguin pool."
   }
 }

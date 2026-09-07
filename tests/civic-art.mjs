@@ -2,6 +2,7 @@
 // day/night and unpowered state. Run against the worktree's Vite server.
 import { chromium } from '@playwright/test';
 import assert from 'node:assert/strict';
+import { FAMILY_COUNTS } from './art-families.mjs';
 import { mkdir } from 'node:fs/promises';
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
 try {
@@ -21,7 +22,8 @@ try {
       document.documentElement.style.cssText = 'height:auto;overflow:visible';
       document.body.style.cssText = 'display:grid;grid-template-columns:repeat(4,300px);background:#263c46;margin:0;height:auto;overflow:visible';
       let count = 0;
-      for (const [type, spec] of Object.entries(BUILDINGS).filter(([, s]) => family === 'water' ? s.group === 'utilities' && (s.waterOut > 0 || s.cleansWater) : family === 'power' ? s.group === 'utilities' && s.powerOut > 0 : s.group === 'civic')) {
+      const { belongsToFamily } = await import('/tests/art-families.mjs');
+      for (const [type, spec] of Object.entries(BUILDINGS).filter(([, s]) => belongsToFamily(s, family))) {
         for (const rotation of mode === 'overview' ? [0] : [0, 1, 2, 3]) {
           await preloadCivicSprites({ types: [type], rotation, night: mode === 'night' || mode === 'unpowered', powered: mode !== 'unpowered' });
           const canvas = document.createElement('canvas');
@@ -53,7 +55,7 @@ try {
       }
       return count;
     }, {mode, family: process.env.ART_FAMILY || 'civic'});
-    const types = process.env.ART_FAMILY === 'power' ? 8 : process.env.ART_FAMILY === 'water' ? 4 : 12;
+    const types = FAMILY_COUNTS[process.env.ART_FAMILY || 'civic'];
     assert.equal(count, types * (mode === 'overview' ? 1 : 4));
     await page.screenshot({ path: `artifacts/${process.env.ART_FAMILY || 'civic'}-${mode}.png`, fullPage: true });
   }
