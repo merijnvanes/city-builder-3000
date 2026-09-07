@@ -18,6 +18,16 @@ export function generateAdvisors(city, s) {
     out.push({ ...a, mood, message });
   };
   const m = (n) => `$${Math.round(n).toLocaleString()}`;
+  // "Underfunding causes a loss of effectiveness of the branch, and may even
+  // prod the workers into going out on strike."
+  //
+  // A starved department still has its buildings standing, so every symptom
+  // reads as though the city needs more of them. A mayor who has cut the
+  // health budget to nothing was being told to build a hospital, next door to
+  // the one already there. Each advisor checks its own budget first: the
+  // cheapest fix is the one the mayor already owns.
+  const starved = (dept) => (s.funding?.[dept] ?? 100) < 60;
+  const budgetLine = (dept, what) => `The ${dept} budget is at ${s.funding?.[dept] ?? 100}% and ${what} Restore it before building anything new.`;
 
   // Finance
   if (s.money < 0) say("finance", "bad", `We are ${m(-s.money)} in the red. Cut department funding or raise taxes before the city defaults.`);
@@ -29,6 +39,10 @@ export function generateAdvisors(city, s) {
 
   // Transportation
   if (s.strikes?.transit) say("transport", "bad", "Bus drivers and conductors are on strike. Every stop and station in the city is shut. Restore the mass transit budget.");
+  // "Road Budget - pays for road and highway maintenance, and keeps roads from
+  // falling apart." Potholes cost a road its capacity, so a starved road
+  // budget shows up as traffic the mayor cannot build their way out of.
+  else if (starved("road")) say("transport", "bad", budgetLine("road", "the roads are breaking up, which costs them the traffic they can carry."));
   else if (s.unemployment > 25 && s.population > 500) say("transport", "bad", `${s.unemployment}% of workers cannot reach a job. Connect homes to workplaces by road.`);
   else if (s.congestion > 30) say("transport", "bad", `${s.congestion}% of roads are jammed. Add parallel routes, bus stops or rail.`);
   // "Sims aren't willing to drive as far if traffic is bad... you are forced to
@@ -84,14 +98,20 @@ export function generateAdvisors(city, s) {
   else if (s.pollution > 25) say("environment", "warning", "Air quality is slipping. Parks and trees help; keep industry away from homes.");
   else say("environment", "good", "The air is clean and parks are appreciated.");
 
-  // Safety
-  if (s.crime > 50) say("safety", "bad", "Crime is out of control. Build police stations and fund them fully.");
+  // Safety. Maria Montoya: "I'll be around to remind you if they are not."
+  if (starved("police")) say("safety", "bad", budgetLine("police", "precincts have pulled back to the streets around their own stations."));
+  else if (starved("fire")) say("safety", "bad", budgetLine("fire", "there are crews sitting in stations we cannot pay to send out."));
+  else if (s.crime > 50) say("safety", "bad", "Crime is out of control. Build police stations and fund them fully.");
   else if (s.crime > 30) say("safety", "warning", "Crime is rising. Police coverage or a Neighborhood Watch would help.");
   else if (s.fireCover < 30 && s.population > 1000) say("safety", "warning", "Most homes are outside fire station coverage. One fire could spread far.");
   else say("safety", "good", "Streets are safe and fire crews are close by.");
 
   // Health & education
-  if (s.health < 35 && s.population > 500) say("health", "bad", "Life expectancy is falling. Build a hospital and cut pollution.");
+  if (s.strikes?.health) say("health", "bad", "Doctors and nurses are on strike. Hospital efficiency has collapsed and life expectancy with it. Restore the health budget.");
+  else if (s.strikes?.education) say("health", "bad", "Teachers are on strike. The schooling children miss now holds them back for life. Restore the education budget.");
+  else if (starved("health")) say("health", "bad", budgetLine("health", "our hospitals are turning patients away for want of beds and staff."));
+  else if (starved("education")) say("health", "warning", budgetLine("education", "classrooms are short of teachers and equipment."));
+  else if (s.health < 35 && s.population > 500) say("health", "bad", "Life expectancy is falling. Build a hospital and cut pollution.");
   else if (s.education < 35 && s.population > 500) say("health", "warning", "Education is weak. Schools raise land value and attract cleaner jobs.");
   else say("health", "good", "Residents are healthy and schools are within reach.");
   return out;

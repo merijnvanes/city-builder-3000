@@ -221,3 +221,56 @@ describe("convenient transport is worth something", () => {
     assert.equal(at(c, 33, 31).landValue, before);
   });
 });
+
+// "Underfunding causes a loss of effectiveness of the branch, and may even
+// prod the workers into going out on strike."
+//
+// A starved department keeps its buildings, so every symptom of it reads as
+// though the city needs more of them. A mayor who had cut the health budget to
+// nothing used to be told to build a hospital, next door to the unfunded one
+// already standing there.
+describe("advisors name a starved budget before they ask for buildings", () => {
+  const settled = () => {
+    const c = createCity(21, true);
+    for (let i = 0; i < 240; i++) tick(c);
+    return c;
+  };
+  const advice = (c, id) => getStats(c).advisors.find((a) => a.id === id);
+
+  test("a fully funded city is never told to restore a budget", () => {
+    const c = settled();
+    for (const id of ["safety", "health", "transport"]) {
+      assert.doesNotMatch(advice(c, id).message, /budget is at \d+%/, `${id} complained about a budget nobody cut`);
+    }
+  });
+
+  test("Maria names the police budget rather than asking for stations", () => {
+    const c = settled();
+    setPolicy(c, "funding.police", 0);
+    tick(c);
+    const maria = advice(c, "safety");
+    assert.equal(maria.mood, "bad");
+    assert.match(maria.message, /police budget is at 0%/, maria.message);
+  });
+
+  test("the health advisor names the budget rather than asking for a hospital", () => {
+    const c = settled();
+    setPolicy(c, "funding.health", 0);
+    tick(c);
+    const doc = advice(c, "health");
+    assert.match(doc.message, /health budget is at 0%/, doc.message);
+    // The old advice was to build one, beside the hospital already standing.
+    assert.doesNotMatch(doc.message, /Build a hospital/);
+  });
+
+  test("a walkout outranks the budget line that caused it", () => {
+    const c = settled();
+    setPolicy(c, "funding.health", 0);
+    // "If funding levels wallow in inadequacy for an extended period of time,
+    // you not only damage health levels, but risk your healthcare workers
+    // calling a strike."
+    for (let i = 0; i < 30; i++) tick(c);
+    assert.equal(getStats(c).strikes.health > 0, true, "the doctors should have walked out by now");
+    assert.match(advice(c, "health").message, /on strike/);
+  });
+});

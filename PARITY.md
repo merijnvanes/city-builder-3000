@@ -847,6 +847,82 @@ One starter police station reaches about 30% of the population, so the citywide
 mean is dominated by the uncovered majority and moves little. The mean is the
 wrong statistic to judge this system by.
 
+### What service neglect costs, September 7
+
+A city with all six departments at zero funding for fifteen years loses nobody.
+Seed 21, settled twenty years, then frozen:
+
+| | settled | frozen 15y |
+| --- | --- | --- |
+| approval rating | 42 | 7 |
+| aura, p50 over homes | 49 | 13 |
+| life expectancy | 56 | 28 |
+| land value, p50 | 46 | 38 |
+| fire coverage | 12 | 0 |
+| **population** | **15,490** | **15,590** |
+
+The population is not merely stable, it is *exactly* constant for thirteen
+years. Three ways to break that were tried and measured, and all three are
+rejected. Recorded so they are not tried again.
+
+**Strengthening aura → demand.** `res += (m.happiness - 50) * K`. Swept K from
+0.5 to 1.4: the freeze costs 1%, 2%, 6%, 9% of the population, while well-run
+seed 1 slides from 0.83 to 0.67 end/peak. It punishes good cities to reach bad
+ones, and the loop self-limits — a smaller city is easier to house, so the jobs
+term pushes demand straight back up.
+
+**Maria's rule via crime.** Public Safety, page 64, is the one explicit
+statement in the manual about migration: *"Sims expect a certain level of
+safety when they move to a city. If high crime forces them to cower behind
+closed doors, or if no one answers their calls when a fire breaks out, Sims'
+survival instinct takes over and they will leave town."* It cannot be keyed to
+the crime figure, because the citywide crime average cannot tell a neglected
+city from a normal one. A starter town has one police station covering about
+30% of homes, so the mean is the *uncovered* level either way: 37 running
+normally against 44 with every station bulldozed. Rescaling crime and moving
+police to a multiplicative model (which is what *"the likelihood that a
+criminal who commits a crime within a precinct will get caught"* describes)
+made a normal town read 38 and a police-free one 44 — the same six points, at a
+worse baseline.
+
+**Land value.** The manual is emphatic here: *"Land values in Residential zones
+particularly are affected by proximity to desirable buildings or services
+(schools, hospitals, parks)."* Measured, every funded service is worth 3.7
+points of a 42-point address. Scaling that by 4 and 6, with the base constant
+dropped to hold well-run cities in place, takes the frozen city's land value to
+27 and 19 — and its population still does not move, because `updateGrowth` only
+declines lots with `level > 1`. A decayed city bottoms out with every lot at
+stage 1 and holds that population for ever. Adding a bottom rung (a stage-1 lot
+below a floor is abandoned) finally produced a 15-18% loss, at the cost of
+seed 1 falling to 0.60 end/peak with one trough at 0.22 of its peak.
+
+**The conclusion: the floor is structural, and defensible.** Residential demand
+is anchored on jobs —
+
+```js
+res = (wantedPop - pop) / Math.max(900, pop * 0.5) * 100
+```
+
+— which is a strong restoring force. Push the city down by any means and the
+jobs term pushes it back. Depopulating a neglected city means breaking that
+anchor, and the anchor is what correctly empties a city when power, water or
+road access go, which are the failure modes Constance actually names: *"They
+are likely to leave if power, water or transportation to the zone is cut off."*
+Those work. A district cut off from power falls to zero residents and recovers
+to 125% of its old population within three years of the plant going back up.
+
+So neglect costs quality of life, not residents, and the game already charges
+for it: approval 42 → 7, life expectancy 56 → 28, land value down, buildings
+dropping storeys. What was missing was that none of it reached the player.
+
+**What changed.** Every advisor now checks its own budget before it asks for
+buildings. A mayor who had cut the health budget to nothing was told to *"Build
+a hospital and cut pollution"*, next door to the unfunded hospital already
+standing there. Maria says *"I'll be around to remind you if they are not"*,
+and now does: police and fire budgets, health and education budgets, and the
+road budget, each named ahead of the symptom it causes, with a walkout
+outranking the budget line that caused it.
+
 ## Visual and performance work, September 7
 
 - Preserved and verified the previous agent's query-card sizing/rotation work.
