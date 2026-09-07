@@ -9,6 +9,7 @@ import { forRadius, NEIGHBORS4 } from "./grid.js";
 import { ZONE_TYPES, BUILDINGS } from "./catalog.js";
 import { isAnchor, capacityOf, lotTiles } from "./lots.js";
 import { roadCapacity } from "./roads.js";
+import { besideWhatItNeeds } from "./siting.js";
 
 export const MAX_TRIP = 40;
 // Fallback share for callers without a demographic pyramid. The live value
@@ -54,9 +55,11 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
     const t = tiles[i];
     if (t.type === "road") kind[i] = ROAD;
     else if (t.type === "rail") kind[i] = RAIL;
-    else if (t.type === "railstation") kind[i] = STATION;
+    // "You must place Train Stations on tiles that touch the track." A
+    // station with no rail beside it is a building, not an interchange.
+    else if (t.type === "railstation") kind[i] = besideWhatItNeeds(city, t) ? STATION : ROAD;
     else if (t.type === "highway") kind[i] = HIGHWAY;
-    else if (t.type === "substation") kind[i] = SUBSTATION;
+    else if (t.type === "substation") kind[i] = besideWhatItNeeds(city, t) ? SUBSTATION : ROAD;
     else if (t.type === "onramp") kind[i] = RAMP;
     else if (t.tunnel) kind[i] = BORE;
     if (t.subway || t.type === "substation") kind[N + i] = TUNNEL;

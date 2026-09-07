@@ -5,6 +5,7 @@ import { ORDINANCES } from "./city.js";
 import { isAnchor, lotTiles, capacityOf } from "./lots.js";
 import { industryTraits } from "./industry.js";
 import { commerceTraits } from "./commerce.js";
+import { sitingFactor } from "./siting.js";
 import { readPopulation, NATIONAL_EQ, BASE_LIFE_EXPECTANCY } from "./population.js";
 import { ageFactor } from "./wear.js";
 import { DEALS } from "./neighbors.js";
@@ -73,7 +74,7 @@ export function updateServices(city) {
     const s = b.service;
     const budget = pct(b.dept);
     const powered = b.powerUse && !t.powered ? 0.35 : 1;
-    let strength = (s.strength ?? 100) * budget * powered;
+    let strength = (s.strength ?? 100) * budget * powered * sitingFactor(city, t);
     if (s.kind === "police") strength *= jailFactor;
     if (strength <= 0) continue;
     // A well-funded department reaches further; a starved one pulls back to

@@ -4,6 +4,7 @@ import { BUILDINGS, ZONE_TYPES } from "./catalog.js";
 import { isAnchor, capacityOf } from "./lots.js";
 import { INDUSTRY_TYPES, industryOf } from "./industry.js";
 import { COMMERCE_TYPES, commerceOf } from "./commerce.js";
+import { sitingFactor } from "./siting.js";
 import { START_YEAR } from "./city.js";
 import { readPopulation, BASE_LIFE_EXPECTANCY, NATIONAL_EQ } from "./population.js";
 
@@ -59,9 +60,11 @@ export function computeMetrics(city) {
       const b = BUILDINGS[t.type];
       if (b?.powerUse) { needPower++; if (t.powered) havePower++; }
       if (b?.waterUse) { needWater++; if (t.watered) haveWater++; }
-      if (b?.effects?.jobs) specialJobs += b.effects.jobs;
+      // A port or terminal only brings the trade its berth can carry.
+      const siting = b?.effects ? sitingFactor(city, t) : 1;
+      if (b?.effects?.jobs) specialJobs += Math.round(b.effects.jobs * siting);
       if (b?.effects?.happiness) specialHappiness += b.effects.happiness;
-      if (b?.effects?.demand) for (const [k, v] of Object.entries(b.effects.demand)) demandBonus[k] = (demandBonus[k] || 0) + v;
+      if (b?.effects?.demand) for (const [k, v] of Object.entries(b.effects.demand)) demandBonus[k] = (demandBonus[k] || 0) + v * siting;
     }
   }
 

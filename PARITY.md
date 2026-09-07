@@ -22,6 +22,7 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 | Aura | A per-neighbourhood mood map whose average is the mayoral approval rating | **Done.** See below |
 | Public safety | Budget sets precinct size and effectiveness; overlaps are additive; jails cap police effectiveness | **Done.** See below |
 
+| Siting | Stops need roads, stations need track, seaports want a seacoast | **Done.** See below |
 | Neighbour deals | Purchases meter the deficit with a minimum fee; sales are an obligation; cancelling costs a large penalty | **Done.** See below |
 
 Other systems needing controlled comparisons against the original game include growth thresholds, land value, rewards, petitions and disaster severity. The manual describes behaviors but does not expose all numerical formulas. Exact balance requires repeatable reference-game experiments, not guessed constants.
@@ -326,6 +327,25 @@ last in the disposal chain and bills for what was actually hauled away.
 **Cancelling** any deal costs a year of its standing charge, whether the mayor
 walks away or the city simply stops being able to deliver. A city that cannot
 afford the penalty is held to its contract.
+
+## Where a building has to stand, September 7
+
+Three rules the manual gives that the game did not enforce. In each case the
+building could be placed anywhere and worked the same, so a mistake was
+invisible.
+
+- *"Bus stops must be placed along the side of roads to be effective."* A stop
+  with no street beside it now covers nothing.
+- *"Once the track is laid, you must place Train Stations on tiles that touch
+  the track."* A station with no rail beside it is a building, not an
+  interchange, and the same goes for a subway station with no line beneath.
+- *"They must be located along a shoreline to do anything, but if you want to
+  see real results, build one on a seacoast."* A seaport on a river works at
+  40%; one on the sea works fully. The sea-versus-fresh distinction added for
+  the water system is what makes this possible.
+
+None of these refuse the placement. The game lets the mistake happen and then
+quietly does nothing with the building, and the query card says why.
 
 ## Visual and performance work, September 7
 

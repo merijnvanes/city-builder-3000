@@ -45,6 +45,8 @@ export const DRAW = {
 // the department named by dept. service = { kind, radius, strength }.
 // capacity = { kind, seats }: how many students or patients the building can
 // take, which caps education and health however wide its coverage reaches.
+// beside = what the building must touch to work at all; prefers = the kind of
+// water it would rather be on. See siting.js.
 export const BUILDINGS = {
   road:        { label: "Road",            group: "transport", cost: 10,   w: 1, h: 1, upkeep: 0.5, dept: "road", path: true, water: true },
   rail:        { label: "Rail",            group: "transport", cost: 25,   w: 1, h: 1, upkeep: 1,   dept: "transit", path: true },
@@ -55,12 +57,12 @@ export const BUILDINGS = {
   // Bored through high ground, six tiles at least. Cost is per tile of bore.
   tunnel:      { label: "Road Tunnel",     group: "transport", cost: 220,  w: 1, h: 1, upkeep: 2,   dept: "road", bores: "road" },
   railtunnel:  { label: "Rail Tunnel",     group: "transport", cost: 260,  w: 1, h: 1, upkeep: 2,   dept: "transit", bores: "rail" },
-  bus:         { label: "Bus Stop",        group: "transport", cost: 150,  w: 1, h: 1, upkeep: 5,   dept: "transit", service: { kind: "bus", radius: 8 }, powerUse: 1 },
-  railstation: { label: "Rail Station",    group: "transport", cost: 500,  w: 2, h: 2, upkeep: 15,  dept: "transit", service: { kind: "rail", radius: 10 }, powerUse: 4 },
+  bus:         { label: "Bus Stop",        group: "transport", cost: 150,  w: 1, h: 1, upkeep: 5,   dept: "transit", service: { kind: "bus", radius: 8 }, beside: "road", powerUse: 1 },
+  railstation: { label: "Rail Station",    group: "transport", cost: 500,  w: 2, h: 2, upkeep: 15,  dept: "transit", service: { kind: "rail", radius: 10 }, beside: "rail", powerUse: 4 },
   subway:      { label: "Subway",          group: "transport", cost: 40,   w: 1, h: 1, upkeep: 1,   dept: "transit", path: true, overlay: true, underground: true },
-  substation:  { label: "Subway Station",  group: "transport", cost: 400,  w: 1, h: 1, upkeep: 12,  dept: "transit", service: { kind: "rail", radius: 8 }, powerUse: 3 },
+  substation:  { label: "Subway Station",  group: "transport", cost: 400,  w: 1, h: 1, upkeep: 12,  dept: "transit", service: { kind: "rail", radius: 8 }, beside: "subway", powerUse: 3 },
   airport:     { label: "Airport",         group: "transport", cost: 10000, w: 6, h: 5, upkeep: 200, dept: "transit", unique: true, effects: { jobs: 500, traffic: 40, pollution: 25, radius: 8, demand: { commercial: 18 } }, powerUse: 12, waterUse: 6 },
-  seaport:     { label: "Seaport",         group: "transport", cost: 5000, w: 4, h: 4, upkeep: 120, dept: "transit", unique: true, requiresWater: true, effects: { jobs: 350, traffic: 25, pollution: 15, radius: 6, demand: { industrial: 18 } }, powerUse: 8, waterUse: 4 },
+  seaport:     { label: "Seaport",         group: "transport", cost: 5000, w: 4, h: 4, upkeep: 120, dept: "transit", unique: true, requiresWater: true, prefers: "salt", effects: { jobs: 350, traffic: 25, pollution: 15, radius: 6, demand: { industrial: 18 } }, powerUse: 8, waterUse: 4 },
 
   // lifespan is in years: a plant runs at full output for the first 55% of it,
   // then slides to 35% of nameplate capacity. Query one to see the gap.

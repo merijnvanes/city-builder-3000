@@ -25,6 +25,7 @@ import { agePlants, plantOutput, OVERLOAD_MONTHS } from "./power.js";
 import { agePumps, pumpOutput, hasSource, SOURCE_REACH } from "./water.js";
 import { fillLandfills, landfillLoad, landfillNews } from "./waste.js";
 import { advanceRoads, roadCapacity } from "./roads.js";
+import { sitingNote } from "./siting.js";
 import { ageFactor } from "./wear.js";
 
 export { TOOLS, TOOL_MAP, BUILDINGS, ZONE_TYPES, ORDINANCES, ADVISORS, DISASTERS, START_YEAR, DEFAULT_SIZE, FUNDED_DEPARTMENTS, SPECIAL_TYPES, PETITIONS, DEALS, SIDES, serialize, place, evaluate, isZone };
@@ -321,6 +322,8 @@ export function inspectTile(city, x, y) {
       if (!hasSource(city, t)) details.push(`No ${b.source} water within ${SOURCE_REACH} tiles — this pump has no capacity.`);
     }
     if (b.service) details.push(`${b.service.kind} coverage radius ${b.service.radius}`);
+    const note = sitingNote(city, t);
+    if (note) details.push(note);
     // The manual tells players to query a school or hospital for its grade:
     // a good grade means enough places, well enough funded, for everyone who
     // needs one. Bad grades mean more buildings or more budget.
