@@ -85,7 +85,9 @@ describe("save integrity over long games", () => {
   });
 
   test("every disaster leaves a loadable city", () => {
-    for (const id of ["fire", "earthquake", "tornado", "flood", "riot", "toxic", "ufo", "volcano"]) {
+    // Including a meltdown: its cloud once outlived the save format's limit on
+    // effect lifetimes, so the city it left behind could not be reloaded.
+    for (const id of ["fire", "earthquake", "tornado", "flood", "riot", "toxic", "ufo", "volcano", "meltdown"]) {
       const c = createCity(33, true);
       disaster(c, id);
       for (let i = 0; i < 8; i++) tick(c);

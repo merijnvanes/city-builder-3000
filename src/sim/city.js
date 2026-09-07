@@ -7,6 +7,7 @@ import { lotTiles } from "./lots.js";
 import { blankPopulation, serializePopulation, parsePopulation } from "./population.js";
 import { INDUSTRY_TYPES } from "./industry.js";
 import { COMMERCE_TYPES } from "./commerce.js";
+import { blankSiren, parseSiren, serializeSiren } from "./siren.js";
 import { OVERLOAD_MONTHS } from "./power.js";
 
 // Nothing holds more trash than the largest landfill tile.
@@ -53,6 +54,9 @@ export function makeTile(x, y, terrain, trees, variant, elev = 0, salt = 0) {
     fill: 0,
     // A road (1) or rail (2) tunnel bored under this tile.
     tunnel: 0,
+    // Fallout from a meltdown. "The only time Sims won't return is when an
+    // area has been contaminated by radiation from a nuclear explosion."
+    radiation: false,
     powered: false, watered: false, roadAccess: false, powerline: false, pipe: false, subway: false,
     pollution: 0, crime: 0, traffic: 0, landValue: 40, svc: null,
   };
@@ -89,6 +93,7 @@ export function blankCity({ seed = 42, size = DEFAULT_SIZE, layout, name = "New 
     ...defaultPolicies(),
     people: blankPopulation(),
     roadCondition: 100,
+    siren: blankSiren(),
     population: 0, happiness: 50,
     demand: { residential: 0, commercial: 0, industrial: 0 },
     history: [], news: [],
@@ -118,7 +123,7 @@ export function serialize(city) {
     t.powerline ? 1 : 0, t.pipe ? 1 : 0, t.elev | 0, t.subway ? 1 : 0, t.flooded | 0,
     t.industry ? INDUSTRY_TYPES.indexOf(t.industry) + 1 : 0, t.strain | 0, t.salt ? 1 : 0,
     Math.round((t.fill || 0) * 100) / 100, t.tunnel | 0,
-    t.commerce ? COMMERCE_TYPES.indexOf(t.commerce) + 1 : 0,
+    t.commerce ? COMMERCE_TYPES.indexOf(t.commerce) + 1 : 0, t.radiation ? 1 : 0,
   ]);
   return JSON.stringify({
     version: SAVE_VERSION,
@@ -138,6 +143,7 @@ export function serialize(city) {
     deals: city.deals ?? {},
     people: serializePopulation(city.people),
     roadCondition: city.roadCondition ?? 100,
+    siren: serializeSiren(city.siren ?? blankSiren()),
   });
 }
 
@@ -179,8 +185,9 @@ export function deserialize(raw) {
   for (let i = 0; i < d.tiles.length; i++) {
     const r = d.tiles[i];
     const x = i % size, y = (i - x) / size;
-    if (!Array.isArray(r) || r.length < 15 || r.length > 24) throw new Error(`Invalid save: tile ${i} malformed.`);
-    const [terrainCode, trees, typeCode, density, lotX, lotY, lotW, lotH, level, variant, abandoned, age, fire, powerline, pipe, elev = 0, subway = 0, flooded = 0, industry = 0, strain = 0, salt = 0, fill = 0, tunnel = 0, commerce = 0] = r;
+    if (!Array.isArray(r) || r.length < 15 || r.length > 25) throw new Error(`Invalid save: tile ${i} malformed.`);
+    const [terrainCode, trees, typeCode, density, lotX, lotY, lotW, lotH, level, variant, abandoned, age, fire, powerline, pipe, elev = 0, subway = 0, flooded = 0, industry = 0, strain = 0, salt = 0, fill = 0, tunnel = 0, commerce = 0, radiation = 0] = r;
+    if (![0, 1].includes(radiation)) throw new Error(`Invalid save: tile ${i} bad radiation.`);
     if (!Number.isInteger(commerce) || commerce < 0 || commerce > COMMERCE_TYPES.length) throw new Error(`Invalid save: tile ${i} bad commerce.`);
     if (![0, 1, 2].includes(tunnel)) throw new Error(`Invalid save: tile ${i} bad tunnel.`);
     if (!Number.isFinite(fill) || fill < 0 || fill > MAX_FILL) throw new Error(`Invalid save: tile ${i} bad landfill contents.`);
@@ -209,6 +216,7 @@ export function deserialize(raw) {
     t.fill = fill;
     t.tunnel = tunnel;
     t.commerce = commerce ? COMMERCE_TYPES[commerce - 1] : null;
+    t.radiation = !!radiation;
     if (lotW > 0) {
       if (!Number.isInteger(lotX) || !Number.isInteger(lotY) || !Number.isInteger(lotH) || lotW > 8 || lotH > 8 ||
           lotX > x || lotY > y || lotX + lotW <= x || lotY + lotH <= y) throw new Error(`Invalid save: tile ${i} bad lot.`);
@@ -243,6 +251,7 @@ export function deserialize(raw) {
     settings: { yearEndBudget: d.settings?.yearEndBudget !== false },
     people: parsePopulation(d.people),
     roadCondition: Number.isFinite(d.roadCondition) && d.roadCondition >= 0 && d.roadCondition <= 100 ? d.roadCondition : 100,
+    siren: parseSiren(d.siren),
     deals: Object.fromEntries(Object.entries(d.deals || {}).filter(([k, v]) => ["power", "water", "garbage"].includes(k) && v && ["north", "east", "south", "west"].includes(v.side) && ["buy", "sell"].includes(v.kind)).map(([k, v]) => [k, { side: v.side, kind: v.kind, since: Number.isInteger(v.since) ? v.since : 0 }])),
   };
   if (d.scenario && typeof d.scenario === "object") city.scenario = d.scenario;

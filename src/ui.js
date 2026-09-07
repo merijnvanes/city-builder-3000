@@ -1007,6 +1007,28 @@ export function mountUI(actions) {
     disRow.appendChild(b);
   });
   disBody.appendChild(disRow);
+
+  // "If you can get your Sims off the streets and inside before a disaster
+  // strikes, the damage from the disaster will be much less... you should not
+  // abuse the privilege."
+  disBody.appendChild(el("div", "modal-section-title", "Early Warning Siren"));
+  const sirenMsg = el("p");
+  sirenMsg.style.cssText = "font-size:.62rem;color:var(--text-dim);line-height:1.55";
+  disBody.appendChild(sirenMsg);
+  const sirenBtn = btn("btn btn-sm", "Sound the siren", "Warn the city of imminent danger", () => {
+    actions.setPolicy?.("siren", true);
+    disasterDialog.close();
+  });
+  disBody.appendChild(sirenBtn);
+  const refreshSiren = (s) => {
+    const siren = s?.siren;
+    if (!siren) return;
+    const trust = Math.round(siren.trust * 100);
+    sirenMsg.textContent = siren.sounding
+      ? `The siren is sounding. ${trust}% of Sims are taking cover, so a disaster now will do much less damage.`
+      : `Sims indoors take far less harm, but a false alarm costs you their trust. ${trust}% would heed the next warning.`;
+    sirenBtn.disabled = !!siren.sounding;
+  };
   disasterDialog.appendChild(disBody);
 
   const disFooter = el("div", "modal-footer");
@@ -1248,6 +1270,7 @@ export function mountUI(actions) {
   return {
     update(city, stats) {
       _lastStats = stats;
+      refreshSiren(stats);
 
       // Top metrics
       mPop.textContent    = fmtPop(stats.population);

@@ -205,6 +205,8 @@ export function updateServices(city) {
     if (t.powered) v += 5;
     if (t.watered) v += 5;
     if (t.roadAccess) v += 5;
+    // Nobody buys contaminated land.
+    if (t.radiation) v = Math.min(v, 3);
     baseValue[i] = Math.max(0, Math.min(100, v));
   }
 
@@ -261,6 +263,7 @@ export function updateServices(city) {
     a -= t.pollution * 0.30 + t.crime * 0.26 + (t.traffic || 0) * 0.10;
     a += auraBump[i];
     if (t.lot && t.abandoned) a -= 8;
+    if (t.radiation) a -= 45;
     t.aura = Math.max(0, Math.min(100, Math.round(a)));
   }
 

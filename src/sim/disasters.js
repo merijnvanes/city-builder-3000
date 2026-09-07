@@ -5,6 +5,8 @@ import { tileAt, forRadius, NEIGHBORS4 } from "./grid.js";
 import { ZONE_TYPES, BUILDINGS } from "./catalog.js";
 import { isAnchor, anchorOf, clearLot, lotTiles } from "./lots.js";
 import { MAX_ELEVATION } from "./terrain.js";
+import { meltdown } from "./power.js";
+import { shelter } from "./siren.js";
 
 export const DISASTERS = {
   fire:       { label: "Fire",       description: "A building catches fire. Spreads without fire coverage." },
@@ -15,6 +17,7 @@ export const DISASTERS = {
   toxic:      { label: "Toxic Cloud", description: "A leak at a factory or plant. The cloud poisons the air for months and empties nearby homes." },
   ufo:        { label: "Flying Saucer", description: "Visitors from elsewhere vaporize whatever they hover over." },
   volcano:    { label: "Volcano",    description: "A new mountain erupts in the middle of town. Lava clears everything on its slopes." },
+  meltdown:   { label: "Nuclear Meltdown", description: "A reactor fails. The blast flattens the district and leaves it contaminated for good." },
 };
 
 function developedTiles(city) {
@@ -65,6 +68,14 @@ export function advanceEffects(city) {
 }
 
 export function triggerDisaster(city, id, rng) {
+  // "If you can get your Sims off the streets and inside before a disaster
+  // strikes, the damage from the disaster will be much less." A sounding
+  // siren spares a share of everything the disaster would otherwise hit.
+  const spared = shelter(city);
+  // With no siren sounding this consumes exactly the rolls the disaster would
+  // have consumed anyway, so a quiet city behaves precisely as before and the
+  // siren's effect is the only thing being measured.
+  const hits = (chance) => (spared === 0 && chance >= 1 ? true : rng() < chance * (1 - spared));
   const targets = developedTiles(city);
   if (id === "flood") {
     let hit = 0;
@@ -73,7 +84,7 @@ export function triggerDisaster(city, id, rng) {
       forRadius(city, w.x, w.y, 2, (n) => {
         if (n.terrain === "water") return;
         if (n.elev <= 1 && rng() < 0.7) n.flooded = 2;
-        if (!n.lot || rng() > 0.35) return;
+        if (!n.lot || !hits(0.35)) return;
         const a = anchorOf(city, n);
         if (!a || a._flooded) return;
         a._flooded = true; damageLot(city, a, rng); hit++;
@@ -88,8 +99,7 @@ export function triggerDisaster(city, id, rng) {
   if (id === "earthquake") {
     let hit = 0;
     forRadius(city, center.x, center.y, 7, (t, d) => {
-      const p = 0.65 * (1 - d / 8);
-      if (rng() > p) return;
+      if (!hits(0.65 * (1 - d / 8))) return;
       if (t.type === "road" && t.terrain !== "water") { t.type = "empty"; hit++; }
       else if (t.lot) { const a = anchorOf(city, t); if (a && !a._quake) { a._quake = true; damageLot(city, a, rng, rng() < 0.4); hit++; } }
     });
@@ -108,7 +118,7 @@ export function triggerDisaster(city, id, rng) {
       if (!t) break;
       path.push({ x, y });
       forRadius(city, x, y, 1, (n) => {
-        if (n.lot) { const a = anchorOf(city, n); if (a && !a._torn) { a._torn = true; damageLot(city, a, rng, true); hit++; } }
+        if (n.lot) { const a = anchorOf(city, n); if (a && !a._torn && hits(1)) { a._torn = true; damageLot(city, a, rng, true); hit++; } }
         else if (n.trees && rng() < 0.5) n.trees = 0;
       });
       if (rng() < 0.6) x += dx; else y += dy;
@@ -129,7 +139,7 @@ export function triggerDisaster(city, id, rng) {
       path.push({ x, y });
       // Every third stop the saucer fires its beam.
       if (step % 3 === 2) forRadius(city, x, y, 1, (n) => {
-        if (n.lot) { const a = anchorOf(city, n); if (a && !a._zap) { a._zap = true; damageLot(city, a, rng, true); hit++; } }
+        if (n.lot) { const a = anchorOf(city, n); if (a && !a._zap && hits(1)) { a._zap = true; damageLot(city, a, rng, true); hit++; } }
         else if (n.trees) n.trees = 0;
       });
       const r = rng();
@@ -153,6 +163,14 @@ export function triggerDisaster(city, id, rng) {
     addEffect(city, { type: "toxic", x: origin.x, y: origin.y, ttl: 3 });
     city.revision++;
     return `A toxic cloud leaked near (${origin.x}, ${origin.y}). ${hit} homes were evacuated.`;
+  }
+  if (id === "meltdown") {
+    const reactors = city.tiles.filter((t) => isAnchor(t) && t.type === "nuclear");
+    if (!reactors.length) return "There is no nuclear plant to fail.";
+    const plant = reactors[Math.floor(rng() * reactors.length)];
+    const { x, y } = plant;
+    clearLot(city, plant, { keepZone: false });
+    return meltdown(city, x, y, rng, "has suffered a catastrophic failure");
   }
   if (id === "volcano") {
     const peak = Math.min(MAX_ELEVATION, (center.elev || 0) + 6), R = peak - 1;

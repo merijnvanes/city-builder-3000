@@ -364,6 +364,33 @@ plant, the dark ones 52.
 That makes a brownout legible. The dark ring shows where the next plant
 belongs.
 
+## Meltdowns and the siren, September 7
+
+Two mechanics the manual describes and the game lacked.
+
+**Radiation is permanent.** *"Sims will abandon buildings in a developed zone
+when conditions warrant it... The only time Sims won't return is when an area
+has been contaminated by radiation from a nuclear explosion. Too dangerous."*
+A meltdown now leaves the ground contaminated for the life of the city:
+nothing develops there again, land value falls to nothing, and the
+neighbourhood's aura collapses. A **Nuclear Meltdown** joins the disaster
+menu, and an overloaded reactor causes the same thing. Contaminated ground
+shows as sickly green on the pollution map.
+
+**The early warning siren.** *"If you can get your Sims off the streets and
+inside before a disaster strikes, the damage from the disaster will be much
+less... If you activate the siren when no emergency is imminent, Sims will
+start to doubt you and may not respond when the need is real."* Sounding it
+shelters people for three months and spares up to 55% of a disaster's damage.
+A warning that comes to nothing costs a quarter of the mayor's credibility,
+and a doubted siren shelters proportionally fewer people. Trust recovers when
+a warning is followed by a real emergency.
+
+One latent bug fixed with them: the nuclear explosion left a smoke cloud with
+a twelve-month lifetime, but the save format caps effects at six, so the city
+left behind could not be reloaded. Permanence now lives in the radiation flag,
+where it belongs, and the disaster save-integrity test covers meltdowns.
+
 ## Visual and performance work, September 7
 
 - Preserved and verified the previous agent's query-card sizing/rotation work.

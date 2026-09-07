@@ -101,6 +101,9 @@ export function desirability(t) {
 // A lot can develop (or keep its level) only with road access and power.
 // Low density gets by without water up to level 2.
 export function conditionsOk(t) {
+  // "The only time Sims won't return is when an area has been contaminated by
+  // radiation from a nuclear explosion. Too dangerous."
+  if (t.radiation) return false;
   if (!t.roadAccess || !t.powered) return false;
   if (!t.watered && (t.density >= 2 || t.level >= 3)) return false;
   return true;

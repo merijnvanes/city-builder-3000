@@ -64,6 +64,33 @@ export function agePlants(city, rng) {
   return news;
 }
 
+// A meltdown wrecks the neighbourhood and leaves it contaminated for good.
+// "The only time Sims won't return is when an area has been contaminated by
+// radiation from a nuclear explosion. Too dangerous."
+export const FALLOUT_RADIUS = 7;
+
+export function meltdown(city, x, y, rng, cause) {
+  let poisoned = 0;
+  forRadius(city, x, y, FALLOUT_RADIUS, (n, d) => {
+    if (n.terrain === "water") return;
+    if (n.lot && rng() < 0.75 * (1 - d / (FALLOUT_RADIUS + 1))) {
+      const a = city.tiles[n.lot.y * city.size + n.lot.x];
+      if (a?.lot) clearLot(city, a, { keepZone: true });
+    }
+    if (rng() < 0.5) n.trees = 0;
+    // Fallout is heaviest at the core and patchy at the rim, and it never
+    // fades: this ground is finished.
+    if (rng() < 1 - d / (FALLOUT_RADIUS + 1)) { n.radiation = true; poisoned++; }
+  });
+  if (!city.effects) city.effects = [];
+  // The visible cloud is short-lived; the contamination it leaves is not.
+  // Effect lifetimes are capped by the save format, so permanence lives in
+  // the radiation flag rather than in a long-running effect.
+  city.effects.push({ type: "toxic", x, y, ttl: 6 });
+  city.revision++;
+  return `MELTDOWN. The nuclear plant at (${x}, ${y}) ${cause}. ${poisoned} tiles are contaminated for good.`;
+}
+
 // The plant fails. A nuclear one takes the neighbourhood with it.
 export function destroyPlant(city, t, rng) {
   const b = BUILDINGS[t.type];
@@ -71,20 +98,7 @@ export function destroyPlant(city, t, rng) {
   const nuclear = t.type === "nuclear";
   clearLot(city, t, { keepZone: false });
   t.strain = 0;
-  if (nuclear) {
-    forRadius(city, x, y, 7, (n, d) => {
-      if (n.terrain === "water") return;
-      if (n.lot && rng() < 0.75 * (1 - d / 8)) {
-        const a = city.tiles[n.lot.y * city.size + n.lot.x];
-        if (a?.lot) clearLot(city, a, { keepZone: true });
-      }
-      if (rng() < 0.5) n.trees = 0;
-    });
-    if (!city.effects) city.effects = [];
-    city.effects.push({ type: "toxic", x, y, ttl: 12 });
-    city.revision++;
-    return `MELTDOWN. The nuclear plant at (${x}, ${y}) was run past capacity for a year and has exploded.`;
-  }
+  if (nuclear) return meltdown(city, x, y, rng, "was run past capacity for a year and has exploded");
   city.revision++;
   return `The ${b.label.toLowerCase()} at (${x}, ${y}) was run past capacity for a year and has exploded.`;
 }

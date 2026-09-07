@@ -26,6 +26,7 @@ import { agePumps, pumpOutput, hasSource, SOURCE_REACH } from "./water.js";
 import { fillLandfills, landfillLoad, landfillNews } from "./waste.js";
 import { advanceRoads, roadCapacity } from "./roads.js";
 import { sitingNote } from "./siting.js";
+import { sound, advanceSiren, sirenSounding, blankSiren } from "./siren.js";
 import { ageFactor } from "./wear.js";
 
 export { TOOLS, TOOL_MAP, BUILDINGS, ZONE_TYPES, ORDINANCES, ADVISORS, DISASTERS, START_YEAR, DEFAULT_SIZE, FUNDED_DEPARTMENTS, SPECIAL_TYPES, PETITIONS, DEALS, SIDES, serialize, place, evaluate, isZone };
@@ -118,6 +119,8 @@ export function tick(city) {
   const disaster = randomDisaster(city, m, rng);
   if (disaster) news.push(disaster);
   if (fireMessage) news.push(fireMessage);
+  // A warning that came to nothing costs the mayor credibility.
+  news.push(...advanceSiren(city, !!(disaster || fireMessage)));
   if (news.length) city.news = [...city.news, ...news].slice(-30);
   city._prev = { population: m.population, balance: budget.balance, money: city.money, crime: m.crime, pollution: m.pollution, garbage: m.garbage, power: m.power, unemployment: m.unemployment, abandonedLots: m.abandonedLots };
 
@@ -206,6 +209,7 @@ export function getStats(city) {
         met: r === "garbage" ? true : city._util?.[r]?.deal?.met !== false,
       }];
     })),
+    siren: { sounding: sirenSounding(city), trust: city.siren?.trust ?? 1, until: city.siren?.until ?? 0 },
     advice: "",
   };
   stats.advisors = generateAdvisors(city, stats);
@@ -245,6 +249,9 @@ export function setPolicy(city, key, value) {
       if (!["yearEndBudget"].includes(field)) return { ok: false, message: `Unknown setting: ${field}.` };
       city.settings[field] = Boolean(value);
       result = { ok: true, message: "" };
+    } else if (key === "siren") {
+      if (!city.siren) city.siren = blankSiren();
+      result = sound(city);
     } else if (key === "petition") {
       result = respondPetition(city, value?.id, !!value?.accept);
     } else if (key === "deal") {
