@@ -19,6 +19,12 @@ import { ageFactor, lifespanOf, WORN } from "./wear.js";
 
 // Consecutive months of an overdrawn network before a plant on it gives way.
 export const OVERLOAD_MONTHS = 12;
+// "Run your plants at beyond full capacity for a little while and you can
+// expect to see blackouts." The blackouts are the warning the manual promises,
+// but they show up as dark buildings somewhere out on the edge of a grid, and
+// a mayor watching the totals will never connect the two. Say it out loud
+// after "a little while", with nine months still to act.
+export const OVERLOAD_WARNING = 3;
 // How overdrawn the network has to be to count as abuse rather than a rough
 // patch: the manual distinguishes "a little while" from "months on end".
 export const OVERLOAD_RATIO = 1.02;
@@ -57,6 +63,7 @@ export function agePlants(city, rng) {
     const net = netOf ? netOf[t.y * city.size + t.x] : -1;
     const strained = overdrawn && net >= 0 && overdrawn.has(net);
     t.strain = strained ? (t.strain || 0) + 1 : 0;
+    if (t.strain === OVERLOAD_WARNING) news.push(`The ${label.toLowerCase()} at (${t.x}, ${t.y}) has run past capacity for ${OVERLOAD_WARNING} months. It explodes at ${OVERLOAD_MONTHS} unless its grid gets more power.`);
     if (t.strain >= OVERLOAD_MONTHS) failed.push(t);
   }
   // Only one plant per month, so a city under strain gets a warning shot.

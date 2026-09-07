@@ -50,12 +50,31 @@ export function generateAdvisors(city, s) {
   else if (d.commercial < -30 || d.industrial < -30) say("planning", "warning", "Businesses see no customers. Residential growth drives commerce and industry.");
   else say("planning", "good", "Zoning is balanced. Mix densities as land value rises.");
 
-  // Utilities
+  // Utilities.
+  //
+  // Read the worst-off network, never the city-wide total. "Areas of your city
+  // that draw power from an aging power plant may experience blackouts": one
+  // grid can sit past capacity while another idles with thousands to spare,
+  // and the sum of the two reads as comfortable right up to the explosion.
+  // Gus tells the player to tell two causes apart — plants too small, or a
+  // break in the line — so name which one it is and where to go and look.
   const u = s.utilities;
-  if (s.power < 60) say("utilities", "bad", `Only ${s.power}% of the city has power. Connect zones with power lines or add a plant.`);
-  else if (u.power.demand > u.power.supply * 0.9 && u.power.supply > 0) say("utilities", "warning", `Power demand is ${Math.round(100 * u.power.demand / u.power.supply)}% of capacity. Build another plant soon.`);
+  const pw = u.power.worst, wt = u.water.worst;
+  const at = (n) => (n.x != null ? ` around (${n.x}, ${n.y})` : "");
+  const load = (n) => Math.round(100 * n.demand / n.supply);
+  // A stray zoned tile off the end of the grid is not news; a district is.
+  const heard = (n) => n && n.share >= 0.02;
+  const mood = (n) => (n.share >= 0.15 ? "bad" : "warning");
+  // Cause before symptom: "only 48% of the city has power" is what the mayor
+  // can already see, and it does not say which grid to go and stand on.
+  if (heard(pw) && pw.supply === 0) say("utilities", mood(pw), `A district${at(pw)} draws ${pw.demand.toLocaleString()} of power with no plant behind it. Look for a break in the line, or build a plant there.`);
+  else if (heard(pw) && pw.demand > pw.supply) say("utilities", "bad", `The grid${at(pw)} is drawing ${load(pw)}% of what its plants can make. Run past capacity for a year and they explode.`);
+  else if (s.power < 60) say("utilities", "bad", `Only ${s.power}% of the city has power. Connect zones with power lines or add a plant.`);
+  else if (heard(pw) && pw.demand > pw.supply * 0.9) say("utilities", "warning", `The grid${at(pw)} is at ${load(pw)}% of capacity. Build another plant on it before it is overdrawn.`);
+  else if (heard(wt) && wt.supply === 0) say("utilities", mood(wt), `Pipes${at(wt)} serve ${wt.demand.toLocaleString()} of demand with no pump on them. Connect them to a pump or build one.`);
+  else if (heard(wt) && wt.demand > wt.supply) say("utilities", "bad", `Pumps${at(wt)} are asked for ${load(wt)}% of what they can draw. Zones without water will not develop.`);
   else if (s.water < 60 && s.population > 300) say("utilities", "bad", `Only ${s.water}% of dense zones have water. Lay pipes and add pumps near water.`);
-  else if (u.water.demand > u.water.supply * 0.9 && u.water.supply > 0) say("utilities", "warning", "Water supply is nearly exhausted. Add pumps or a treatment plant.");
+  else if (heard(wt) && wt.demand > wt.supply * 0.9) say("utilities", "warning", `Pumps${at(wt)} are at ${load(wt)}% of what they can draw. Add pumps, or a treatment plant if the water is dirty.`);
   else say("utilities", "good", "Power and water are keeping up with demand.");
 
   // Environment

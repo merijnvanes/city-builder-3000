@@ -8,7 +8,7 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 | --- | --- | --- |
 | Highways | Elevated routes; ramps provide road access | **Done.** They interchange only at on-ramps, and one may be built over a street, which keeps running underneath. The deck is drawn raised at crossings; the rest of a highway is still drawn flat |
 | Tunnels | Transport can pass through terrain | **Done.** Road and rail bores through high ground, six tiles minimum |
-| Power | Eight plant types; aging reduces capacity; prolonged overload can destroy plants | **Done.** All eight types with the manual's invention years; output slides after 55% of a plant's life; a year of overdraw destroys one |
+| Power | Eight plant types; aging reduces capacity; prolonged overload can destroy plants; blackouts are local to a grid | **Done.** All eight types with the manual's invention years; output slides after 55% of a plant's life; a year of overdraw destroys one; the advisor reads the worst-off network rather than the city-wide total |
 | Water | Freshwater pumps, towers, coastal desalinization; pumps age | **Done.** Sea and fresh water are distinct; three sources with the manual's weaknesses; pumps age and slow in dirty water; pipes reach seven tiles |
 | Education | Childhood learning and adult knowledge retention; strikes from sustained underfunding (transit too) | **Done.** EQ is taught to children aged 5-17, colleges take 18-22, adults decay without libraries or museums, and teachers strike after 18 months below 40% funding |
 | Health | Average city reaches 59 years, a well-run one 90; hospitals need beds and funding; pollution and traffic pull it down | **Done.** Life expectancy is a cohort statistic on the same anchors, with healthcare strikes |
@@ -729,6 +729,50 @@ on load than in a running city.
 
 A 5x6 airport employs 540 Sims and a 2x8 seaport 352, which is within a few
 percent of the 500 and 350 the placed buildings carried. Save version 5.
+
+## A grid is only as good as its own plants, September 7
+
+The manual describes blackouts as a local thing:
+
+> *"Areas of your city that draw power from an aging power plant may experience
+> blackouts as the power plant loses capacity."*
+
+The simulation already worked that way. Supply, demand and strain were all
+computed per network. The figures handed to the player and to the advisors were
+not: they were sums across every network in the city.
+
+Seed 44, run forty years with the utilities kept in repair, shows what that
+costs. At year 31 the town's one grid held 2,610 of supply against 2,552 of
+demand, 98% and climbing as the gas plant aged. An orphan coal plant sat on its
+own island network with 6,000 spare and nothing drawing on it. The headline read
+8,610 against 2,552, so `u.power.demand > u.power.supply * 0.9` never fired and
+Gus said everything was fine. Year 32 the grid crossed 101%, year 33 the plant
+had been overdrawn for a year, and it exploded. Population went 18,390 → 4,490 →
+750 → 140 → 0 with $5M in the bank and residential demand pegged at 100.
+
+`updateUtilities` now reports the worst-off network alongside the totals: its
+supply, its demand, its share of the city's draw, and a tile to go and look at.
+Ranking is by shortfall, so the district that lost its plant outranks a small
+grid running hot; with nothing short anywhere it falls back to whichever network
+is closest to its limit. The advisor reads that instead of the sum, and names
+the two causes Gus tells the player to tell apart:
+
+> *"First, query the power plants to see how close to maximum capacity they have
+> been running. You may need to place more power plants. If the plants seem
+> fine, query tiles between the power plant and the location of the blackout to
+> find a break in the line."*
+
+A network with demand and no source is the break in the line; one over its
+supply is the plant being too small. Cause is reported before symptom, so
+"the grid around (4, 20) is drawing 103% of what its plants can make" comes
+ahead of "only 48% of the city has power", which the mayor can already see and
+which says nothing about where to stand.
+
+The same city now gets five years of advisor warnings from year 29, and a news
+line naming the plant nine months before it explodes: three months past capacity
+is "a little while", twelve is "months on end". The mark is on the plant's own
+`strain` counter, which already persisted, so it fires once per run of strain
+and resets when the load comes off.
 
 ## Visual and performance work, September 7
 

@@ -3,7 +3,7 @@ import { test, describe } from "node:test";
 import assert from "node:assert/strict";
 import { createCity, tick, getStats, place, refresh, serialize, deserialize, evaluate } from "../src/sim.js";
 import { BUILDINGS, TECH_YEAR } from "../src/sim/catalog.js";
-import { plantOutput, OVERLOAD_MONTHS, isPlant } from "../src/sim/power.js";
+import { plantOutput, OVERLOAD_MONTHS, OVERLOAD_WARNING, isPlant } from "../src/sim/power.js";
 import { ageFactor, lifespanOf, WORN } from "../src/sim/wear.js";
 
 const blank = (options = {}) => createCity({ seed: 5, starter: false, layout: "flat", ...options });
@@ -138,6 +138,75 @@ describe("overload", () => {
     const bad = JSON.parse(serialize(c));
     bad.tiles[4 * c.size + 4][19] = OVERLOAD_MONTHS + 5;
     assert.throws(() => deserialize(JSON.stringify(bad)), /bad plant strain/);
+  });
+});
+
+describe("a grid is only as good as its own plants", () => {
+  // "Areas of your city that draw power from an aging power plant may
+  // experience blackouts." Areas, not the city. A total across every network
+  // hides the one that is in trouble, and a city can run itself to a standstill
+  // while the headline figure says it has thousands of megawatts to spare.
+  //
+  // Starve the town's own grid, then drop a big plant on an island of its own
+  // so the totals look comfortable. That is the shape the seed-44 collapse had.
+  function splitGrid(seed) {
+    const c = createCity(seed, true);
+    const plant = c.tiles.find((t) => t.lot?.x === t.x && t.lot?.y === t.y && isPlant(t));
+    c.money = 5_000_000;
+    place(c, plant.x, plant.y, "bulldoze");
+    place(c, plant.x, plant.y, "solar");
+    // Somewhere nothing else reaches: a clear 6x6 with no lot, zone or line.
+    const clear = (x, y) => {
+      for (let dy = -1; dy <= 4; dy++) for (let dx = -1; dx <= 4; dx++) {
+        const t = c.tiles[(y + dy) * c.size + (x + dx)];
+        if (!t || t.terrain === "water" || t.lot || t.powerline || t.type !== "empty") return false;
+      }
+      return true;
+    };
+    let island = null;
+    for (let y = 1; y < c.size - 5 && !island; y++) for (let x = 1; x < c.size - 5; x++) if (clear(x, y)) { island = { x, y }; break; }
+    assert.ok(island, "the map should have room for an isolated plant");
+    assert.equal(place(c, island.x, island.y, "coal").ok, true);
+    refresh(c);
+    return { c, island };
+  }
+
+  test("an idle grid does not hide an overdrawn one", () => {
+    const { c } = splitGrid(21);
+    const { supply, demand, worst } = getStats(c).utilities.power;
+    assert.ok(supply > demand * 2, `the totals should look healthy: ${supply} vs ${demand}`);
+    assert.ok(worst, "the worst-off network should be reported");
+    assert.ok(worst.demand > worst.supply, `the town's own grid is overdrawn: ${worst.demand} vs ${worst.supply}`);
+    assert.ok(worst.x != null, "the report should say where to look");
+  });
+
+  test("the advisor points at the strained grid, not at the total", () => {
+    const { c } = splitGrid(21);
+    const gus = getStats(c).advisors.find((a) => a.id === "utilities");
+    assert.equal(gus.mood, "bad", gus.message);
+    assert.match(gus.message, /\(\d+, \d+\)/, "Gus should name a place to query");
+  });
+
+  test("a plant past capacity is announced months before it explodes", () => {
+    const { c } = splitGrid(42);
+    for (let i = 0; i < OVERLOAD_WARNING + 1; i++) tick(c);
+    assert.ok(c.news.some((n) => /run past capacity for \d+ months/.test(n)), c.news.slice(-6).join(" | "));
+    assert.ok(!c.news.some((n) => /has exploded/.test(n)), "far too early to explode");
+  });
+
+  // Gus's other cause: "query tiles between the power plant and the location of
+  // the blackout to find a break in the line."
+  test("a district cut off from every plant reads as a break in the line", () => {
+    const c = createCity(21, true);
+    const plant = c.tiles.find((t) => t.lot?.x === t.x && t.lot?.y === t.y && isPlant(t));
+    c.money = 5_000_000;
+    place(c, plant.x, plant.y, "bulldoze");
+    refresh(c);
+    const { worst } = getStats(c).utilities.power;
+    assert.equal(worst.supply, 0);
+    assert.ok(worst.demand > 0);
+    const gus = getStats(c).advisors.find((a) => a.id === "utilities");
+    assert.match(gus.message, /no plant behind it|break in the line/);
   });
 });
 

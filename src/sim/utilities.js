@@ -134,7 +134,48 @@ function allocate(city, netIds, count, supply, consumers) {
   }
   let totalSupply = 0, totalDemand = 0;
   for (let n = 0; n < count; n++) { totalSupply += supply[n]; totalDemand += demand[n]; strain[n] = supply[n] > 0 ? demand[n] / supply[n] : 0; }
-  return { full, served, totalSupply, totalDemand, strain };
+  return { full, served, totalSupply, totalDemand, strain, demand };
+}
+
+// The worst-off network, and where to go and look at it.
+//
+// Totals hide the thing that actually causes a blackout. "Areas of your city
+// that draw power from an aging power plant may experience blackouts as the
+// power plant loses capacity" — areas, not the city. One grid can sit at 110%
+// while another idles with thousands to spare, and the sum of the two reads
+// as comfortable. Gus names both causes a player has to tell apart: plants too
+// small for what they serve, or a break in the line that leaves a district
+// with no plant behind it at all. Ranking by shortfall covers both, and puts
+// the district that lost its plant above a small grid running a little hot.
+function worstNetwork(city, sourceIds, sourceKey, supply, demand, totalDemand, consumers) {
+  // Shortfall first, so the district that lost its plant outranks a small grid
+  // running a little hot. With nothing short anywhere, fall back to the
+  // network closest to its limit, which is the one to warn about next.
+  let short = -1, gap = 0, tight = -1, load = -1;
+  for (let n = 0; n < demand.length; n++) {
+    if (demand[n] <= 0) continue;
+    if (demand[n] - supply[n] > gap) { gap = demand[n] - supply[n]; short = n; }
+    if (demand[n] / supply[n] > load) { load = demand[n] / supply[n]; tight = n; }
+  }
+  const worst = short >= 0 ? short : tight;
+  if (worst < 0) return null;
+  // Somewhere to send the player. A plant or pump on the network if it has
+  // one, since that is what the manual says to query; otherwise its largest
+  // consumer, which is where the lights are going out.
+  let mark = null;
+  for (const t of city.tiles) {
+    if (!isAnchor(t) || !BUILDINGS[t.type]?.[sourceKey]) continue;
+    if (sourceIds[t.y * city.size + t.x] === worst) { mark = t; break; }
+  }
+  let biggest = 0;
+  if (!mark) for (const c of consumers) {
+    if (c.net === worst && c.draw > biggest && c.anchor?.x != null) { biggest = c.draw; mark = c.anchor; }
+  }
+  return {
+    supply: Math.round(supply[worst]), demand: Math.round(demand[worst]),
+    share: totalDemand > 0 ? demand[worst] / totalDemand : 1,
+    x: mark?.x ?? null, y: mark?.y ?? null,
+  };
 }
 
 export function updateUtilities(city) {
@@ -248,7 +289,15 @@ export function updateUtilities(city) {
     netOf: power.ids,
     overdrawn,
     waterPollution,
-    power: { supply: Math.round(p.totalSupply), demand: Math.round(p.totalDemand), deal: powerDeal ? { ...powerDeal, met: sold(powerDeal, p.served) } : null },
-    water: { supply: Math.round(w.totalSupply), demand: Math.round(w.totalDemand), deal: waterDeal ? { ...waterDeal, met: sold(waterDeal, w.served) } : null },
+    power: {
+      supply: Math.round(p.totalSupply), demand: Math.round(p.totalDemand),
+      worst: worstNetwork(city, power.ids, "powerOut", powerSupply, p.demand, p.totalDemand, powerConsumers),
+      deal: powerDeal ? { ...powerDeal, met: sold(powerDeal, p.served) } : null,
+    },
+    water: {
+      supply: Math.round(w.totalSupply), demand: Math.round(w.totalDemand),
+      worst: worstNetwork(city, water.ids, "waterOut", waterSupply, w.demand, w.totalDemand, waterConsumers),
+      deal: waterDeal ? { ...waterDeal, met: sold(waterDeal, w.served) } : null,
+    },
   };
 }
