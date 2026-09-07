@@ -1100,6 +1100,46 @@ on the current conditions in the city"* falling out of the model rather than
 being written into it: 20% earns less than 14% because it empties the city.
 Both are now pinned in `tests/budget-effect.test.js`.
 
+### Auditing the promises, September 7
+
+Two ordinances were charging for effects that appeared nowhere in the
+simulation. A catalog entry is the same kind of promise — `service: { kind:
+"police", radius: 12 }` says a precinct reaches twelve tiles — and nothing
+forces anybody to read it, so the same sweep was run over every building that
+declares a service radius or an area effect. Each is placed on cleared ground in
+the middle of a settled town and the tiles around it compared before and after a
+single refresh, with no ticks in between so growth cannot drift the comparison.
+
+All thirty deliver. The only three that read as inert are the bus stop, rail
+station and subway station, and that is the manual's own rule: *"Bus stops must
+be placed along the side of roads to be effective"*, *"you must place Train
+Stations on tiles that touch the track"*, *"subway stations must be placed next
+to subway rails to be effective."* Given what each needs, all three provide 35
+points of coverage at their own tile. `tests/catalog-effects.test.js` keeps it
+that way.
+
+The five business deals were checked the same way and all pay exactly what they
+offer — prison $600, casino $450, toxic dump $550, army base $350, gigamall
+$400 — with the drawbacks their cards name: a prison puts 11 points of crime and
+10 of land value onto the worst-hit tile near it, the toxic dump 36 of pollution
+and 26 of land value, the gigamall 4 points off commercial demand. Reading those
+took three attempts, because a city-wide mean buries a radius effect, a "lots
+near it" average compares two different sets of tiles once the building brings
+development the control does not have, and a like-for-like filter quietly drops
+the tiles hit hardest. The instrument that works is the same coordinates in both
+cities with no ticks at all.
+
+**Neighbour deals** already honour the connection rules, including the one the
+manual gives for garbage: *"you will need a road, highway, rail or seaport
+connection."*
+
+**Scenarios** were checked for whether their goals are reachable. Approval tops
+out around 60–67 in a city given every school, hospital, park, ordinance and
+full funding at 0% tax, so Boomtown's "above 50%" and Riverton renewal's "60%"
+are both inside what the model can produce. Riverton renewal wants its 60% in
+five years from $12,000 and a $25,000 loan, which is hard, but that is what a
+scenario is for.
+
 ## Visual and performance work, September 7
 
 - Preserved and verified the previous agent's query-card sizing/rotation work.
