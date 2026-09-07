@@ -23,7 +23,7 @@ export function heightOf(t) {
   if (t.type === "commercial") return t.density === 1 ? 10 + level * 2 : t.density === 2 ? 20 + level * 7 : 40 + level * 24;
   if (t.type === "industrial") return t.density === 1 ? 12 : t.density === 2 ? 18 : 26;
   return { coal: 46, oil: 34, gas: 30, nuclear: 60, wind: 42, solar: 6, microwave: 45, fusion: 40, waterpump: 10, watertower: 47, treatment: 14, desalination: 20,
-    police: 38, fire: 44, jail: 30, hospital: 37, school: 27, college: 52, library: 24, museum: 36, landfill: 8, incinerator: 46, wasteenergy: 51, recycling: 20,
+    police: 38, fire: 44, jail: 30, hospital: 37, school: 27, college: 52, library: 25, museum: 36, landfill: 8, incinerator: 46, wasteenergy: 51, recycling: 20,
     park: 14, largepark: 16, zoo: 14, bus: 9, railstation: 16, airport: 18, seaport: 16, substation: 8,
     mayorhouse: 24, cityhall: 46, courthouse: 27, stadium: 30, statue: 25, prison: 20, casino: 36, toxicdump: 10, armybase: 14,
     marina: 14, university: 34, medcenter: 40, gigamall: 20,
@@ -38,6 +38,7 @@ function scoped(r, lot, dim, powered = true) {
   const tone = (c) => (k !== 1 ? shadeHex(c, k) : c);
   return {
     w, h, x, y,
+    visible: (side) => [["south", "east"], ["east", "north"], ["north", "west"], ["west", "south"]][r.rotation || 0].includes(side),
     // Keep each solid and its surface details together as the camera rotates.
     parts: (parts) => parts.map(([a, b, draw]) => {
       const p = r.orient(...s(a, b));

@@ -30,7 +30,9 @@ export function vehicle(d, x, y, color, kind = 'car') {
   d.box(x, y, w, 0.115, h, color, 1);
   d.box(x + 0.025, y + 0.012, 0.065, 0.09, 1.8, CIVIC.glass, h + 1);
   if (kind === 'bus') {
-    for (let i = 0; i < 5; i++) d.box(x + 0.105 + i * 0.035, y, 0.025, 0.116, 1.5, CIVIC.slate, 3);
+    for (const [side, dy] of [['north', -0.002], ['south', 0.116]]) if (d.visible(side)) {
+      for (let i = 0; i < 5; i++) d.box(x + 0.105 + i * 0.035, y + dy, 0.025, 0.002, 1.5, CIVIC.slate, 3);
+    }
   } else if (kind === 'fire') {
     for (const dy of [0.025, 0.085]) d.line(x + 0.1, y + dy, h + 1.3, x + w - 0.01, y + dy, h + 1.3, CIVIC.trim, 1);
     for (let i = 0; i < 4; i++) d.line(x + 0.11 + i * 0.03, y + 0.025, h + 1.3, x + 0.11 + i * 0.03, y + 0.085, h + 1.3, CIVIC.trim, 0.7);
@@ -48,12 +50,14 @@ export function cross(d, x, y, size, z, color) {
 
 export function clockFaces(d, x, y, w, h, z) {
   // Four vertical clock faces; unlike a roof decal these survive rotation.
-  for (const fy of [y - 0.002, y + h + 0.002]) {
+  for (const [side, fy] of [['north', y - 0.002], ['south', y + h + 0.002]]) {
+    if (!d.visible(side)) continue;
     d.box(x + w * 0.25, fy, w * 0.5, 0.002, 6, CIVIC.trim, z);
     d.line(x + w * 0.5, fy, z + 3, x + w * 0.5, fy, z + 5, CIVIC.slate, 0.8);
     d.line(x + w * 0.5, fy, z + 3, x + w * 0.7, fy, z + 3, CIVIC.slate, 0.8);
   }
-  for (const fx of [x - 0.002, x + w + 0.002]) {
+  for (const [side, fx] of [['west', x - 0.002], ['east', x + w + 0.002]]) {
+    if (!d.visible(side)) continue;
     d.box(fx, y + h * 0.25, 0.002, h * 0.5, 6, CIVIC.trim, z);
     d.line(fx, y + h * 0.5, z + 3, fx, y + h * 0.5, z + 5, CIVIC.slate, 0.8);
     d.line(fx, y + h * 0.5, z + 3, fx, y + h * 0.7, z + 3, CIVIC.slate, 0.8);
