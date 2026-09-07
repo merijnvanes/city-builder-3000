@@ -12,7 +12,24 @@ import { roadCapacity } from "./roads.js";
 import { besideWhatItNeeds } from "./siting.js";
 import { portJobs } from "./ports.js";
 
+// How far a Sim will go to work on empty roads, and how far once the roads
+// are full. "Sims aren't willing to drive as far if traffic is bad. That means
+// that you are forced to make a tiny congested city with no real hope for
+// expansion... Fewer cars means less traffic and less traffic means Sims are
+// willing to travel further."
 export const MAX_TRIP = 40;
+export const MIN_TRIP = 20;
+// Traffic a driver puts up with without thinking about it, and the level at
+// which patience has run all the way out. The manual's condition is "if
+// traffic is bad", so a quiet city loses nothing.
+export const PATIENCE = 30;
+export const GRIDLOCK = 80;
+
+export function tripRange(traffic) {
+  const bad = Math.max(0, Math.min(1, ((traffic || 0) - PATIENCE) / (GRIDLOCK - PATIENCE)));
+  return Math.round(MAX_TRIP - (MAX_TRIP - MIN_TRIP) * bad);
+}
+
 // Fallback share for callers without a demographic pyramid. The live value
 // comes from the city's age structure; see population.js.
 export const WORKFORCE_SHARE = 0.4;
@@ -34,6 +51,9 @@ STEP_COST[RAMP] = 2;
 // A bore runs flat under the hill, so it never pays the climbing penalty.
 STEP_COST[BORE] = 2;
 const MAX_COST = MAX_TRIP * 2;
+// Sims reach the network from up to this far off it; the same rule gives a
+// lot its road access. See ROAD_REACH in services.js.
+const OFF_ROAD = 3;
 
 // Nearest road tile index within reach of a lot, or -1.
 function entryOf(city, anchor, kind) {
@@ -154,8 +174,32 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
     return out;
   };
 
+  // Cheapest cost from any of `sources` to every node, capped at maxCost.
+  // Used for "is there anything within a reasonable commute of here", which
+  // is a different question from where each block's workers actually went.
+  const reachFrom = (sources, maxCost) => {
+    const cost = new Int32Array(N * 2).fill(-1);
+    for (const b of buckets) b.length = 0;
+    for (const s of sources) { if (cost[s] === -1) { cost[s] = 0; buckets[0].push(s); } }
+    for (let d = 0; d <= maxCost; d++) {
+      const bucket = buckets[d];
+      for (let q = 0; q < bucket.length; q++) {
+        const i = bucket[q];
+        if (cost[i] !== d) continue;
+        for (const ni of neighborsOf(i)) {
+          const climb = ni < N && i < N && kind[i] !== BORE && kind[ni] !== BORE
+            ? Math.abs((tiles[ni].elev || 0) - (tiles[i].elev || 0)) : 0;
+          const nd = d + STEP_COST[kind[ni]] + climb;
+          if (nd > maxCost) continue;
+          if (cost[ni] === -1 || nd < cost[ni]) { cost[ni] = nd; buckets[nd].push(ni); }
+        }
+      }
+    }
+    return cost;
+  };
+
   // One assignment pass. `jam` marks tiles that cost an extra step.
-  const assign = (jam) => {
+  const assign = (jam, maxCost = MAX_COST) => {
     const load = new Float64Array(N * 2);
     for (const j of jobList) { j.open = j.cap; j.anchor.filled = 0; }
     let employed = 0, commuters = 0;
@@ -164,7 +208,7 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
       for (const b of buckets) b.length = 0;
       buckets[0].push(home.entry);
       dist[home.entry] = 0; parent[home.entry] = -1; touched.push(home.entry);
-      for (let d = 0; d <= MAX_COST && remaining > 0; d++) {
+      for (let d = 0; d <= maxCost && remaining > 0; d++) {
         const bucket = buckets[d];
         for (let q = 0; q < bucket.length && remaining > 0; q++) {
           const i = bucket[q];
@@ -189,7 +233,7 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
             const climb = ni < N && i < N && kind[i] !== BORE && kind[ni] !== BORE
               ? Math.abs((tiles[ni].elev || 0) - (tiles[i].elev || 0)) : 0;
             const nd = d + STEP_COST[kind[ni]] + climb + (jam && jam[ni] ? 1 : 0);
-            if (nd > MAX_COST) continue;
+            if (nd > maxCost) continue;
             if (dist[ni] === -1 || nd < dist[ni]) {
               if (dist[ni] === -1) touched.push(ni);
               dist[ni] = nd; parent[ni] = i; buckets[nd].push(ni);
@@ -217,11 +261,21 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
     return 0;
   };
 
+  // Pass one finds the routes on an empty map. What it measures then decides
+  // pass two: which streets are jammed, and how far a Sim is still willing to
+  // drive. "Sims aren't willing to drive as far if traffic is bad."
   const first = assign(null);
   const jam = new Uint8Array(N * 2);
-  let jams = 0;
-  for (let i = 0; i < N; i++) if ((kind[i] === ROAD || kind[i] === HIGHWAY || kind[i] === RAMP) && trafficOf(i, first.load) >= 80) { jam[i] = 1; jams++; }
-  const { load, employed, commuters } = jams ? assign(jam) : first;
+  let jams = 0, sum1 = 0, roads1 = 0;
+  for (let i = 0; i < N; i++) {
+    if (kind[i] !== ROAD && kind[i] !== HIGHWAY && kind[i] !== RAMP) continue;
+    const v = trafficOf(i, first.load);
+    if (v >= 80) { jam[i] = 1; jams++; }
+    if (kind[i] !== HIGHWAY) { sum1 += Math.min(100, v); roads1++; }
+  }
+  const range = tripRange(roads1 ? sum1 / roads1 : 0);
+  const maxCost = range * 2;
+  const { load, employed, commuters } = jams || range < MAX_TRIP ? assign(jam, maxCost) : first;
 
   let sum = 0, roads = 0, congested = 0, railRiders = 0, subwayRiders = 0;
   for (let i = N; i < N * 2; i++) if (kind[i] === TUNNEL) subwayRiders += load[i];
@@ -249,8 +303,47 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
     t.traffic = max;
   }
 
+  // "Sims don't like to travel too far. A Residential or Commercial zone won't
+  // develop if it's beyond a reasonable commute distance from other zones. But
+  // an Industrial zone on the outskirts of town could develop into a farm."
+  //
+  // So every zone tile gets the cost of reaching what its kind needs: work for
+  // homes, customers for shops. Both are measured over the same network the
+  // commuters use, at the same range, so a jammed city shrinks in on itself.
+  const workAt = [...jobsAt.keys()];
+  const homeAt = [...new Set(homes.map((h) => h.entry))];
+  // "Inter-city connections help your Commercial sector as well, by opening up
+  // the borders so new customers can visit and shop."
+  for (const side of Object.values(city._connections || {})) {
+    for (const t of side.roadTiles || []) homeAt.push(t.y * size + t.x);
+  }
+  const spread = (sources) => {
+    const out = new Int32Array(N).fill(-1);
+    if (!sources.length) return out;
+    const cost = reachFrom(sources, maxCost);
+    for (let i = 0; i < N; i++) {
+      if (cost[i] < 0 || (kind[i] !== ROAD && kind[i] !== RAMP)) continue;
+      const x = i % size, y = (i - x) / size;
+      forRadius(city, x, y, OFF_ROAD, (n) => {
+        const j = n.y * size + n.x;
+        if (out[j] === -1 || cost[i] < out[j]) out[j] = cost[i];
+      });
+    }
+    return out;
+  };
+  const toWork = spread(workAt), toHome = spread(homeAt);
+  for (const t of tiles) {
+    if (!ZONE_TYPES.has(t.type)) { t.reach = 0; continue; }
+    // With nothing of the kind anywhere on the map the rule has nothing to
+    // say yet, so a first neighbourhood is never blocked from starting.
+    if (t.type === "residential") t.reach = workAt.length ? toWork[t.y * size + t.x] : 0;
+    else if (t.type === "commercial") t.reach = homeAt.length ? toHome[t.y * size + t.x] : 0;
+    else t.reach = 0;
+  }
+
   const unemployment = workers > 0 ? Math.round(100 * (1 - employed / workers)) : 0;
   return {
+    range,
     workers, employed, jobs: jobsTotal, unemployment, externalJobs, commuters,
     railRiders: Math.round(railRiders), subwayRiders: Math.round(subwayRiders),
     traffic: roads ? Math.round(sum / roads) : 0,

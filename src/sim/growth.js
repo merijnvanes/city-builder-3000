@@ -6,7 +6,7 @@
 // shift each curve.
 import { ZONE_TYPES, PORT_TYPES } from "./catalog.js";
 import { isAnchor, findLot, assignLot, clearLot } from "./lots.js";
-import { WORKFORCE_SHARE } from "./traffic.js";
+import { WORKFORCE_SHARE, MAX_TRIP } from "./traffic.js";
 import { pickIndustry, convertIndustry, industryOf } from "./industry.js";
 import { pickCommerce, convertCommerce, commerceOf } from "./commerce.js";
 import { yearOf } from "./metrics.js";
@@ -83,13 +83,17 @@ export function desirability(t) {
     // People move where the neighbourhood feels good. Aura already folds in
     // pollution, crime, traffic, parks and the city's schooling and lifespan,
     // so the street's mood is most of the story.
-    d = 0.35 + (t.aura ?? 50) / 90 + lv / 260 + (s.education + s.health) / 900;
+    // "Sims don't like to travel too far", so the trip to work is part of how
+    // the address feels, alongside the neighbourhood's mood.
+    d = (0.35 + (t.aura ?? 50) / 90 + lv / 260 + (s.education + s.health) / 900) * commuteAppeal(t);
   } else if (t.type === "commercial") {
-    // Shops want passing trade; offices want an address and a station.
+    // Shops want passing trade; offices want an address and a station. Both
+    // want customers who can get there.
     const desks = commerceOf(t) === "offices";
-    d = desks
+    d = (desks
       ? 0.45 + lv / 95 - t.crime / 170 - t.pollution / 300 + (s.bus + s.rail) / 340
-      : 0.5 + lv / 120 - t.crime / 150 - t.pollution / 320 + Math.min(t.traffic, 50) / 350 + (s.bus + s.rail) / 500;
+      : 0.5 + lv / 120 - t.crime / 150 - t.pollution / 320 + Math.min(t.traffic, 50) / 350 + (s.bus + s.rail) / 500)
+      * commuteAppeal(t);
   } else {
     // Smokestacks want cheap land; laboratories want a good address.
     const clean = industryOf(t) === "hightech";
@@ -111,6 +115,29 @@ export function conditionsOk(t) {
   return true;
 }
 
+// "Sims don't like to travel too far. A Residential or Commercial zone won't
+// develop if it's beyond a reasonable commute distance from other zones...
+// Transportation is the key; Sims may move in, but if the commute becomes
+// tiresome they'll move right back out."
+//
+// traffic.js writes `reach`: the travel cost to the nearest workplace for a
+// home, or to the nearest customers for a shop, -1 when there is nothing in
+// range. An industrial zone on the outskirts is exempt, because the manual
+// exempts it.
+export const connected = (t) => (t.reach ?? 0) >= 0;
+
+// And short of that, how much the trip puts Sims off. Next door is best, the
+// far edge of what anyone will drive is worst. This rides on the distance
+// rather than on how many jobs a block's workers actually landed, because the
+// latter depends on who was served first and would empty out neighbourhoods
+// by tile order rather than by geography.
+const REACH_LIMIT = MAX_TRIP * 2;
+export function commuteAppeal(t) {
+  const r = t.reach ?? 0;
+  if (r < 0) return 0;
+  return clamp(1.15 - (r / REACH_LIMIT) * 0.9, 0.25, 1.15);
+}
+
 export function updateGrowth(city, demand, rng) {
   const { tiles } = city;
   const year = yearOf(city.month, city.startYear);
@@ -122,7 +149,9 @@ export function updateGrowth(city, demand, rng) {
     if (!isAnchor(t) || !ZONE_TYPES.has(t.type)) continue;
     const d = demand[t.type];
     t.age = (t.age || 0) + 1;
-    const ok = conditionsOk(t);
+    // Cut off from work or from customers counts as conditions not met: the
+    // Sims "move right back out".
+    const ok = conditionsOk(t) && connected(t);
     const des = desirability(t);
     // A working plant re-tools when the era and the city's schooling move on,
     // and a shopfront becomes offices when the neighbourhood does.
@@ -170,7 +199,7 @@ export function updateGrowth(city, demand, rng) {
   for (const t of tiles) {
     if (!ZONE_TYPES.has(t.type) || t.lot) continue;
     const d = demand[t.type];
-    if (d <= 0 || !conditionsOk(t)) continue;
+    if (d <= 0 || !conditionsOk(t) || !connected(t)) continue;
     const p = Math.min(0.6, (d / 100) * 0.4 * desirability(t));
     if (rng() >= p) continue;
     const lot = findLot(city, t);

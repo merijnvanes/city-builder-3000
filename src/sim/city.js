@@ -60,6 +60,9 @@ export function makeTile(x, y, terrain, trees, variant, elev = 0, salt = 0) {
     // area has been contaminated by radiation from a nuclear explosion."
     radiation: false,
     powered: false, watered: false, roadAccess: false, powerline: false, pipe: false, subway: false,
+    // Travel cost to the nearest workplace (homes) or customers (shops), -1
+    // when nothing is within a reasonable commute. Derived; see traffic.js.
+    reach: 0,
     pollution: 0, crime: 0, traffic: 0, landValue: 40, svc: null,
   };
 }

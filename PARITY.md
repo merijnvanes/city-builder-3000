@@ -28,6 +28,7 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 | Ports | Airports and seaports are zones the Sims develop, with a minimum footprint | **Done.** See below |
 | Neighbour deals | Purchases meter the deficit with a minimum fee; sales are an obligation; cancelling costs a large penalty | **Done.** See below |
 | Petitioners | Neighbours bring deals to the Meet window on terms that change; a rejected petitioner may never return | **Done.** See below |
+| Commuting | Zones beyond a reasonable commute do not develop; bad traffic shortens how far Sims will go | **Done.** See below |
 
 Other systems needing controlled comparisons against the original game include growth thresholds, land value, rewards, petitions and disaster severity. The manual describes behaviors but does not expose all numerical formulas. Exact balance requires repeatable reference-game experiments, not guessed constants.
 
@@ -413,6 +414,54 @@ take it upon themselves to assist you in the clean up costs. Be forewarned, a
 Mayor that is well prepared generally receives better treatment."* Losing six
 or more lots to a disaster now draws a relief grant, and a city with funded
 fire and police coverage receives about twice what a neglectful one gets.
+
+## The commute decides where a city grows, September 7
+
+Two rules from the advisors' Q&A, neither of which the game had.
+
+**A zone too far from what it needs does not develop.** Constance Lee, City
+Planning: *"Sims don't like to travel too far. A Residential or Commercial zone
+won't develop if it's beyond a reasonable commute distance from other zones.
+But an Industrial zone on the outskirts of town could develop into a farm.
+Transportation is the key; Sims may move in, but if the commute becomes
+tiresome they'll move right back out."*
+
+`traffic.js` already measured, every month, what share of each block's workers
+found a job. Nothing read it. A block twenty tiles from the nearest workplace
+grew exactly as fast as one across the street from the factories.
+
+It now runs two extra searches over the same network the commuters use: from
+every workplace outward, and from every home and border crossing outward. Each
+zone tile keeps the cost of reaching what its kind needs - work for homes,
+customers for shops, and the manual exempts industry, so industry is exempt.
+Nothing in range at all is a hard stop, and the query card says which: *"No
+work within a reasonable commute: nothing will be built here."* Within range
+the distance is part of how good the address feels, so a far block builds out
+slowly rather than not at all.
+
+That signal is the distance, not the share of workers who landed a job. The
+share depends on which block the assignment pass reached first, so gating on it
+emptied neighbourhoods by tile index rather than by geography. The first
+attempt did exactly that and the tunnel tests caught it.
+
+**Bad traffic shortens the trip.** Moe Furstein, Transportation: *"Sims aren't
+willing to drive as far if traffic is bad. That means that you are forced to
+make a tiny congested city with no real hope for expansion... When mass transit
+is introduced, Sims tend to get their cars off the road. Fewer cars means less
+traffic and less traffic means Sims are willing to travel further."*
+
+The trip limit was a fixed 40 tiles. It now runs from 40 down to 20, sliding
+between average road traffic of 30 and 80: below 30 nobody notices, above 80
+nobody will go far. The measurement is free, because the commuting model
+already ran two passes - the first pass finds the routes on an empty map, and
+what it measures then sets both the jams and the range for the second. Mass
+transit needs no special case: riders on rail and subway are not on the roads,
+so the traffic they do not make lengthens everyone's range.
+
+Measured over 40 years from the sample town on three seeds, populations at year
+40 were 17,070 / 15,690 against 17,050 / 15,470 before the change. A compact,
+well-planned city loses nothing; the rule only bites on sprawl. A month on a
+128x128 city costs 19.5ms.
 
 ## Petitioners bring the deals, September 7
 

@@ -5,7 +5,7 @@ import { place, evaluate, techAvailable } from "./place.js";
 import { refreshCity } from "./refresh.js";
 import { updateTraffic } from "./traffic.js";
 import { computeMetrics, dateOf, yearOf } from "./metrics.js";
-import { computeDemand, updateGrowth, conditionsOk } from "./growth.js";
+import { computeDemand, updateGrowth, conditionsOk, connected } from "./growth.js";
 import { computeBudget, amortize, takeLoan, repayLoan } from "./economy.js";
 import { generateAdvisors, generateNews, ADVISORS } from "./advisors.js";
 import { triggerDisaster, advanceFires, randomDisaster, advanceEffects, DISASTERS } from "./disasters.js";
@@ -334,6 +334,14 @@ export function inspectTile(city, x, y) {
     if (t.type === "residential" && a.commute != null && cap) details.push(`Workers with a job: ${Math.round(a.commute * 100)}%`);
     if (a.lot) { const d = drawOf(a); details.push(`Power draw: ${Math.round(d.power)} · Water draw: ${Math.round(d.water)}`); }
     details.push(`Conditions: ${conditionsOk(a) ? "OK" : "Not met"}`);
+    // "A Residential or Commercial zone won't develop if it's beyond a
+    // reasonable commute distance from other zones."
+    if (t.type === "residential" || t.type === "commercial") {
+      const want = t.type === "residential" ? "work" : "customers";
+      details.push(!connected(t)
+        ? `No ${want} within a reasonable commute: nothing will be built here.`
+        : `Nearest ${want}: ${Math.round((t.reach ?? 0) / 2)} tiles of travel.`);
+    }
     if (a.lot) details.push(`Flammability: ${flammability(city, a)}/100${a.watered ? " (watered)" : ""}`);
   } else if (PORT_TYPES.has(t.type)) {
     const spec = PORTS[t.type];
