@@ -16,7 +16,9 @@ export function hall(d, t, x, y, w, h, height, wall, roof = CIVIC.slate, base = 
 }
 
 export function steps(d, x, y, w, count = 3) {
-  for (let i = 0; i < count; i++) d.box(x, y + i * 0.035, w, 0.035, count - i, CIVIC.stone);
+  d.parts(Array.from({ length: count }, (_, i) => [x + w / 2, y + i * 0.035 + 0.0175, () => {
+    d.box(x, y + i * 0.035, w, 0.035, count - i, CIVIC.stone);
+  }]));
 }
 
 export function flag(d, x, y, height, color) {
@@ -53,13 +55,15 @@ export function clockFaces(d, x, y, w, h, z) {
   for (const [side, fy] of [['north', y - 0.002], ['south', y + h + 0.002]]) {
     if (!d.visible(side)) continue;
     d.box(x + w * 0.25, fy, w * 0.5, 0.002, 6, CIVIC.trim, z);
-    d.line(x + w * 0.5, fy, z + 3, x + w * 0.5, fy, z + 5, CIVIC.slate, 0.8);
-    d.line(x + w * 0.5, fy, z + 3, x + w * 0.7, fy, z + 3, CIVIC.slate, 0.8);
+    const faceY = fy + (side === 'south' ? 0.002 : -0.001);
+    d.line(x + w * 0.5, faceY, z + 3, x + w * 0.5, faceY, z + 5, CIVIC.slate, 0.8);
+    d.line(x + w * 0.5, faceY, z + 3, x + w * 0.7, faceY, z + 3, CIVIC.slate, 0.8);
   }
   for (const [side, fx] of [['west', x - 0.002], ['east', x + w + 0.002]]) {
     if (!d.visible(side)) continue;
     d.box(fx, y + h * 0.25, 0.002, h * 0.5, 6, CIVIC.trim, z);
-    d.line(fx, y + h * 0.5, z + 3, fx, y + h * 0.5, z + 5, CIVIC.slate, 0.8);
-    d.line(fx, y + h * 0.5, z + 3, fx, y + h * 0.7, z + 3, CIVIC.slate, 0.8);
+    const faceX = fx + (side === 'east' ? 0.002 : -0.001);
+    d.line(faceX, y + h * 0.5, z + 3, faceX, y + h * 0.5, z + 5, CIVIC.slate, 0.8);
+    d.line(faceX, y + h * 0.5, z + 3, faceX, y + h * 0.7, z + 3, CIVIC.slate, 0.8);
   }
 }

@@ -15,14 +15,15 @@ function stack(d, x, y, height, band) {
 }
 
 export function drawLandfill(d, t) {
+  const variation = Math.abs(t.x * 17 + t.y * 31) % 3;
   d.flat(0.025, 0.025, 0.95, 0.95, 0.2, '#8a9970');
   d.flat(0.06, 0.09, 0.88, 0.61, 0.3, '#82735e');
   d.flat(0.07, 0.75, 0.86, 0.17, 0.4, '#b5a482');
   d.parts([
     ...[[0.13, 0.14], [0.54, 0.18], [0.31, 0.43]].map(([x, y], i) => [x + 0.14, y + 0.1, () => {
       d.box(x, y, 0.28, 0.2, 2.5, '#a39575');
-      d.hip(x, y, 0.28, 0.2, 2.5, 3 + i, '#a7a084');
-      for (let j = 0; j < 4; j++) d.box(x + 0.04 + (j % 2) * 0.12, y + 0.025 + Math.floor(j / 2) * 0.09, 0.045, 0.04, 1.3, ['#d4c9a0', '#6d8b8e', '#b89b77', '#bdbda7'][(j + i) % 4], 3);
+      d.hip(x, y, 0.28, 0.2, 2.5, 3 + (i + variation) % 3, '#a7a084');
+      for (let j = 0; j < 4; j++) d.box(x + 0.04 + (j % 2) * 0.12, y + 0.025 + Math.floor(j / 2) * 0.09, 0.045, 0.04, 1.3, ['#d4c9a0', '#6d8b8e', '#b89b77', '#bdbda7'][(j + i + variation) % 4], 3);
     }]),
     [0.74, 0.83, () => {
       // Yellow compactor with a broad roller and exhaust.
@@ -62,6 +63,9 @@ export function drawRecycling(d, t) {
     [0.5, 0.3, () => {
       hall(d, t, 0.09, 0.1, 0.82, 0.4, 13, '#b8d1ac', '#388b78');
       for (const x of [0.1, 0.37, 0.64]) d.roof(x, 0.09, 0.26, 0.42, 14.5, 5, '#459c85');
+      // A framed roof sign rests on posts above the sawtooth valleys.
+      for (const x of [0.35, 0.6]) d.box(x, 0.24, 0.025, 0.17, 5, '#317364', 14.5);
+      d.box(0.33, 0.22, 0.31, 0.22, 0.4, '#317364', 19.5);
       // Three large bent arrows form the material-reuse loop on the roof.
       const arrows = [[0.36, 0.25, 0.6, 0.25], [0.6, 0.25, 0.53, 0.41], [0.53, 0.41, 0.36, 0.25]];
       for (const [x, y, a, b] of arrows) {
