@@ -1894,7 +1894,7 @@ export const CIVIC_SPRITES = {
     "height": 23,
     "frames": {
       "day-0": {
-        "file": "park-day-0.dc00e9e127.webp",
+        "file": "park-day-0.c48dd9145f.webp",
         "width": 186,
         "height": 135,
         "anchor": [
@@ -1903,7 +1903,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "day-1": {
-        "file": "park-day-1.3ae1eb3719.webp",
+        "file": "park-day-1.e97cb2fe2d.webp",
         "width": 186,
         "height": 111,
         "anchor": [
@@ -1912,7 +1912,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "day-2": {
-        "file": "park-day-2.d860a621ed.webp",
+        "file": "park-day-2.3584b3d21e.webp",
         "width": 186,
         "height": 130,
         "anchor": [
@@ -1921,7 +1921,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "day-3": {
-        "file": "park-day-3.8d5f0540d7.webp",
+        "file": "park-day-3.0c420b9c2b.webp",
         "width": 186,
         "height": 112,
         "anchor": [
@@ -1930,7 +1930,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "night-0": {
-        "file": "park-night-0.0b20510085.webp",
+        "file": "park-night-0.45631076db.webp",
         "width": 186,
         "height": 135,
         "anchor": [
@@ -1939,7 +1939,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "night-1": {
-        "file": "park-night-1.dd16d4824a.webp",
+        "file": "park-night-1.4368c0cc14.webp",
         "width": 186,
         "height": 111,
         "anchor": [
@@ -1948,7 +1948,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "night-2": {
-        "file": "park-night-2.08b01c80d3.webp",
+        "file": "park-night-2.bc645c29f8.webp",
         "width": 186,
         "height": 130,
         "anchor": [
@@ -1957,7 +1957,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "night-3": {
-        "file": "park-night-3.d555c20306.webp",
+        "file": "park-night-3.2a7323c8c1.webp",
         "width": 186,
         "height": 112,
         "anchor": [
@@ -1966,7 +1966,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "unpowered-0": {
-        "file": "park-unpowered-0.9aaa8d7a98.webp",
+        "file": "park-unpowered-0.02e8c15ef0.webp",
         "width": 186,
         "height": 135,
         "anchor": [
@@ -1975,7 +1975,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "unpowered-1": {
-        "file": "park-unpowered-1.f533dbabee.webp",
+        "file": "park-unpowered-1.603b4c42df.webp",
         "width": 186,
         "height": 111,
         "anchor": [
@@ -1984,7 +1984,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "unpowered-2": {
-        "file": "park-unpowered-2.f3815e2c18.webp",
+        "file": "park-unpowered-2.d3b508bb71.webp",
         "width": 186,
         "height": 130,
         "anchor": [
@@ -1993,7 +1993,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "unpowered-3": {
-        "file": "park-unpowered-3.759d9f3b88.webp",
+        "file": "park-unpowered-3.3edbf68a5d.webp",
         "width": 186,
         "height": 112,
         "anchor": [
@@ -2002,7 +2002,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "day-0-v1": {
-        "file": "park-day-0-v1.23be66112a.webp",
+        "file": "park-day-0-v1.49d860d19a.webp",
         "width": 186,
         "height": 145,
         "anchor": [
@@ -2011,7 +2011,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "day-1-v1": {
-        "file": "park-day-1-v1.31ef6196d0.webp",
+        "file": "park-day-1-v1.dcaacb754b.webp",
         "width": 186,
         "height": 120,
         "anchor": [
@@ -2020,7 +2020,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "day-2-v1": {
-        "file": "park-day-2-v1.052c30416d.webp",
+        "file": "park-day-2-v1.96158ea5c7.webp",
         "width": 186,
         "height": 125,
         "anchor": [
@@ -2029,16 +2029,16 @@ export const CIVIC_SPRITES = {
         ]
       },
       "day-3-v1": {
-        "file": "park-day-3-v1.4524f364f5.webp",
+        "file": "park-day-3-v1.78c677f202.webp",
         "width": 186,
-        "height": 136,
+        "height": 125,
         "anchor": [
           93.0001,
-          85.9658
+          74.9658
         ]
       },
       "night-0-v1": {
-        "file": "park-night-0-v1.cfb78815f6.webp",
+        "file": "park-night-0-v1.8dabff50e6.webp",
         "width": 186,
         "height": 145,
         "anchor": [
@@ -2047,7 +2047,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "night-1-v1": {
-        "file": "park-night-1-v1.b1a93534b6.webp",
+        "file": "park-night-1-v1.2727d42f5c.webp",
         "width": 186,
         "height": 120,
         "anchor": [
@@ -2056,7 +2056,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "night-2-v1": {
-        "file": "park-night-2-v1.4f5841fdf1.webp",
+        "file": "park-night-2-v1.ed954596eb.webp",
         "width": 186,
         "height": 125,
         "anchor": [
@@ -2065,16 +2065,16 @@ export const CIVIC_SPRITES = {
         ]
       },
       "night-3-v1": {
-        "file": "park-night-3-v1.17cb6cc66b.webp",
+        "file": "park-night-3-v1.ca2235b20c.webp",
         "width": 186,
-        "height": 136,
+        "height": 125,
         "anchor": [
           93.0001,
-          85.9658
+          74.9658
         ]
       },
       "unpowered-0-v1": {
-        "file": "park-unpowered-0-v1.260b2d7be3.webp",
+        "file": "park-unpowered-0-v1.b7748b2e95.webp",
         "width": 186,
         "height": 145,
         "anchor": [
@@ -2083,7 +2083,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "unpowered-1-v1": {
-        "file": "park-unpowered-1-v1.b28409942e.webp",
+        "file": "park-unpowered-1-v1.978e538934.webp",
         "width": 186,
         "height": 120,
         "anchor": [
@@ -2092,7 +2092,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "unpowered-2-v1": {
-        "file": "park-unpowered-2-v1.ad69543e6c.webp",
+        "file": "park-unpowered-2-v1.48da4ade70.webp",
         "width": 186,
         "height": 125,
         "anchor": [
@@ -2101,120 +2101,120 @@ export const CIVIC_SPRITES = {
         ]
       },
       "unpowered-3-v1": {
-        "file": "park-unpowered-3-v1.6d59789c6b.webp",
+        "file": "park-unpowered-3-v1.b0453c52ec.webp",
         "width": 186,
-        "height": 136,
+        "height": 125,
         "anchor": [
           93.0001,
-          85.9658
+          74.9658
         ]
       },
       "day-0-v2": {
-        "file": "park-day-0-v2.8b2a07f06a.webp",
+        "file": "park-day-0-v2.ec2bd82dc3.webp",
         "width": 186,
-        "height": 132,
+        "height": 133,
         "anchor": [
           93.0,
-          81.6737
+          82.0711
         ]
       },
       "day-1-v2": {
-        "file": "park-day-1-v2.5ac7fd940e.webp",
+        "file": "park-day-1-v2.ad72aa85d0.webp",
         "width": 186,
         "height": 126,
         "anchor": [
           93.0,
-          75.6735
+          75.0709
         ]
       },
       "day-2-v2": {
-        "file": "park-day-2-v2.22577a53c9.webp",
+        "file": "park-day-2-v2.b4fccd84a5.webp",
         "width": 186,
-        "height": 120,
+        "height": 109,
         "anchor": [
           93.0,
-          69.6735
+          58.0709
         ]
       },
       "day-3-v2": {
-        "file": "park-day-3-v2.5afc35c4f8.webp",
+        "file": "park-day-3-v2.5b10429ba6.webp",
         "width": 186,
-        "height": 142,
+        "height": 130,
         "anchor": [
           93.0,
-          91.6737
+          79.0711
         ]
       },
       "night-0-v2": {
-        "file": "park-night-0-v2.870bbbdf31.webp",
+        "file": "park-night-0-v2.2ceebc0cb4.webp",
         "width": 186,
-        "height": 132,
+        "height": 133,
         "anchor": [
           93.0,
-          81.6737
+          82.0711
         ]
       },
       "night-1-v2": {
-        "file": "park-night-1-v2.48a9b7bf7f.webp",
+        "file": "park-night-1-v2.53656c716b.webp",
         "width": 186,
         "height": 126,
         "anchor": [
           93.0,
-          75.6735
+          75.0709
         ]
       },
       "night-2-v2": {
-        "file": "park-night-2-v2.c4d3ddb3b3.webp",
+        "file": "park-night-2-v2.85093fa38d.webp",
         "width": 186,
-        "height": 120,
+        "height": 109,
         "anchor": [
           93.0,
-          69.6735
+          58.0709
         ]
       },
       "night-3-v2": {
-        "file": "park-night-3-v2.de283cf656.webp",
+        "file": "park-night-3-v2.02b7d1c82c.webp",
         "width": 186,
-        "height": 142,
+        "height": 130,
         "anchor": [
           93.0,
-          91.6737
+          79.0711
         ]
       },
       "unpowered-0-v2": {
-        "file": "park-unpowered-0-v2.2663c5f2ea.webp",
+        "file": "park-unpowered-0-v2.f872740973.webp",
         "width": 186,
-        "height": 132,
+        "height": 133,
         "anchor": [
           93.0,
-          81.6737
+          82.0711
         ]
       },
       "unpowered-1-v2": {
-        "file": "park-unpowered-1-v2.22b4e09708.webp",
+        "file": "park-unpowered-1-v2.efd1f5779a.webp",
         "width": 186,
         "height": 126,
         "anchor": [
           93.0,
-          75.6735
+          75.0709
         ]
       },
       "unpowered-2-v2": {
-        "file": "park-unpowered-2-v2.9c3fff82b7.webp",
+        "file": "park-unpowered-2-v2.5087f0d626.webp",
         "width": 186,
-        "height": 120,
+        "height": 109,
         "anchor": [
           93.0,
-          69.6735
+          58.0709
         ]
       },
       "unpowered-3-v2": {
-        "file": "park-unpowered-3-v2.08ad881a2d.webp",
+        "file": "park-unpowered-3-v2.5fe945f20c.webp",
         "width": 186,
-        "height": 142,
+        "height": 130,
         "anchor": [
           93.0,
-          91.6737
+          79.0711
         ]
       }
     },

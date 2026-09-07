@@ -97,3 +97,10 @@ Independent review: Gemini found no blocking issues. Both optional suggestions
 were addressed: mixed explicit-variant preloads include single-layout types, and
 the browser harness now checks coordinate-only parks against the original hash.
 Targeted parks/civic checks and the production build passed after those changes.
+
+Bench placement correction: all three small-park layouts now place the outdoor
+bench on a recessed seating pad, facing the walk with its full footprint clear
+of the through-path. Nearby flowers/trees were shifted to preserve seating space.
+All 36 small-park frames were rebaked and inspected in all four views. Parks
+lifecycle checks (60 frames), manifest validation and the production build passed;
+all other building exports remain unchanged.

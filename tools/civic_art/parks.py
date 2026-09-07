@@ -19,12 +19,19 @@ def pocket_ground():
     paving(-1.79,-.32,3.58,.64,'path')
 
 
+def pocket_seat():
+    # The bench faces the walk from a recessed pad. Its full depth stays north
+    # of the path edge (y=.32), leaving the through-route unobstructed.
+    paving(.42,.32,1.14,.64,'path')
+    bench(.99,.48)
+
+
 def park():
     pocket_ground()
     tree(-1.08,1.04,size=.8,seed=51)
     tree(1.1,-1.06,size=.66,seed=52)
     planter(-1.56,-1.5,1.05,.72,True)
-    planter(.54,.75,1.0,.64,True)
+    planter(.54,1.14,1.0,.5,True)
     # A raised stone bowl with recessed water and a small upper dish.
     cyl(0,0,.2,.59,.14,'ivory',40)
     cyl(0,0,.34,.49,.045,'water',40)
@@ -34,7 +41,7 @@ def park():
     cyl(0,0,.84,.27,.08,'ivory',32,r2=.31)
     cyl(0,0,.92,.23,.018,'water',32)
     cyl(0,0,.94,.035,.18,'cream',16)
-    bench(.95,.35,math.pi)
+    pocket_seat()
     lamp(-.6,-.45,1.15)
 
 
@@ -47,10 +54,10 @@ def park_gazebo():
     hip(-1.69,.32,1.61,1.47,1.42,.62,'copper')
     ball(-.955,1.03,2.25,.045,'gold')
     bench(-.96,1.1)
-    tree(1.02,.97,size=.8,seed=54)
+    tree(1.12,1.42,size=.55,seed=54)
     tree(1.12,-1.07,size=.62,seed=55)
     planter(-1.57,-1.5,1.05,.65,True)
-    bench(.92,.37,math.pi)
+    pocket_seat()
     lamp(-.56,-.53,1.15)
 
 
@@ -72,9 +79,9 @@ def park_playground():
     for x in [.61,1.16]:beam((x,-.81,1.03),(x,-1.52,.36),.035,'red')
     for x in [.7,1.06]:beam((x,-.39,.23),(x,-.65,.95),.025,'wood')
     for i in range(3):beam((.7,-.44-i*.06,.39+i*.19),(1.06,-.44-i*.06,.39+i*.19),.018,'wood')
-    tree(1.04,1.02,size=.86,seed=56)
+    tree(1.1,1.4,size=.6,seed=56)
     tree(-1.12,-1.13,size=.58,seed=57)
-    bench(.95,.4,math.pi)
+    pocket_seat()
     lamp(-.57,-.48,1.15)
 
 
