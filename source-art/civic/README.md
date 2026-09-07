@@ -60,3 +60,5 @@ local font. Lettering is baked into image pixels; no font file is distributed.
 Business-deal model identities, variants and validation: [DEALS-ART.md](../../DEALS-ART.md).
 
 Landmark architecture and validation: [LANDMARKS-ART.md](../../LANDMARKS-ART.md).
+
+Residential state coverage and zone pipeline: [RESIDENTIAL-ART.md](../../RESIDENTIAL-ART.md).

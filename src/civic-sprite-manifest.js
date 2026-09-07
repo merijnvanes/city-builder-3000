@@ -5289,6 +5289,11714 @@ export const CIVIC_SPRITES = {
     "label": "Recycling center",
     "description": "A folded green roof, clerestory glazing, and four clearly separated sorting bays."
   },
+  "residential-d1-l1-s1": {
+    "tiles": 1,
+    "scale": 3,
+    "height": 25,
+    "frames": {
+      "day-0": {
+        "file": "residential-d1-l1-s1-day-0.7ce524e64f.webp",
+        "width": 187,
+        "height": 145,
+        "anchor": [
+          94.0,
+          94.6848
+        ]
+      },
+      "day-1": {
+        "file": "residential-d1-l1-s1-day-1.b371730d84.webp",
+        "width": 186,
+        "height": 139,
+        "anchor": [
+          93.0,
+          88.6847
+        ]
+      },
+      "day-2": {
+        "file": "residential-d1-l1-s1-day-2.afc15e26e2.webp",
+        "width": 187,
+        "height": 119,
+        "anchor": [
+          93.0,
+          68.6847
+        ]
+      },
+      "day-3": {
+        "file": "residential-d1-l1-s1-day-3.b31703f166.webp",
+        "width": 186,
+        "height": 124,
+        "anchor": [
+          93.0,
+          73.6848
+        ]
+      },
+      "night-0": {
+        "file": "residential-d1-l1-s1-night-0.edaf4125a5.webp",
+        "width": 187,
+        "height": 145,
+        "anchor": [
+          94.0,
+          94.6848
+        ]
+      },
+      "night-1": {
+        "file": "residential-d1-l1-s1-night-1.c891e36b18.webp",
+        "width": 186,
+        "height": 139,
+        "anchor": [
+          93.0,
+          88.6847
+        ]
+      },
+      "night-2": {
+        "file": "residential-d1-l1-s1-night-2.473538dd95.webp",
+        "width": 187,
+        "height": 119,
+        "anchor": [
+          93.0,
+          68.6847
+        ]
+      },
+      "night-3": {
+        "file": "residential-d1-l1-s1-night-3.f80989c1d9.webp",
+        "width": 186,
+        "height": 124,
+        "anchor": [
+          93.0,
+          73.6848
+        ]
+      },
+      "unpowered-0": {
+        "file": "residential-d1-l1-s1-unpowered-0.fd28dbd937.webp",
+        "width": 187,
+        "height": 145,
+        "anchor": [
+          94.0,
+          94.6848
+        ]
+      },
+      "unpowered-1": {
+        "file": "residential-d1-l1-s1-unpowered-1.4dce602409.webp",
+        "width": 186,
+        "height": 139,
+        "anchor": [
+          93.0,
+          88.6847
+        ]
+      },
+      "unpowered-2": {
+        "file": "residential-d1-l1-s1-unpowered-2.2acbbde3b8.webp",
+        "width": 187,
+        "height": 119,
+        "anchor": [
+          93.0,
+          68.6847
+        ]
+      },
+      "unpowered-3": {
+        "file": "residential-d1-l1-s1-unpowered-3.bcd070c068.webp",
+        "width": 186,
+        "height": 124,
+        "anchor": [
+          93.0,
+          73.6848
+        ]
+      },
+      "day-0-v1": {
+        "file": "residential-d1-l1-s1-day-0-v1.12e5ee3ac3.webp",
+        "width": 187,
+        "height": 129,
+        "anchor": [
+          94.0,
+          78.3651
+        ]
+      },
+      "day-1-v1": {
+        "file": "residential-d1-l1-s1-day-1-v1.a9fc95e6dd.webp",
+        "width": 186,
+        "height": 125,
+        "anchor": [
+          93.0,
+          74.365
+        ]
+      },
+      "day-2-v1": {
+        "file": "residential-d1-l1-s1-day-2-v1.c913aa6a94.webp",
+        "width": 187,
+        "height": 113,
+        "anchor": [
+          93.0,
+          62.365
+        ]
+      },
+      "day-3-v1": {
+        "file": "residential-d1-l1-s1-day-3-v1.4feaf7dfec.webp",
+        "width": 186,
+        "height": 117,
+        "anchor": [
+          93.0,
+          66.3651
+        ]
+      },
+      "night-0-v1": {
+        "file": "residential-d1-l1-s1-night-0-v1.b67dfae382.webp",
+        "width": 187,
+        "height": 129,
+        "anchor": [
+          94.0,
+          78.3651
+        ]
+      },
+      "night-1-v1": {
+        "file": "residential-d1-l1-s1-night-1-v1.41ed0877f7.webp",
+        "width": 186,
+        "height": 125,
+        "anchor": [
+          93.0,
+          74.365
+        ]
+      },
+      "night-2-v1": {
+        "file": "residential-d1-l1-s1-night-2-v1.5cebe5921f.webp",
+        "width": 187,
+        "height": 113,
+        "anchor": [
+          93.0,
+          62.365
+        ]
+      },
+      "night-3-v1": {
+        "file": "residential-d1-l1-s1-night-3-v1.c8a4695dd1.webp",
+        "width": 186,
+        "height": 117,
+        "anchor": [
+          93.0,
+          66.3651
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "residential-d1-l1-s1-unpowered-0-v1.9cdde4a20f.webp",
+        "width": 187,
+        "height": 129,
+        "anchor": [
+          94.0,
+          78.3651
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "residential-d1-l1-s1-unpowered-1-v1.4381801283.webp",
+        "width": 186,
+        "height": 125,
+        "anchor": [
+          93.0,
+          74.365
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "residential-d1-l1-s1-unpowered-2-v1.88a4ffb598.webp",
+        "width": 187,
+        "height": 113,
+        "anchor": [
+          93.0,
+          62.365
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "residential-d1-l1-s1-unpowered-3-v1.b29682e376.webp",
+        "width": 186,
+        "height": 117,
+        "anchor": [
+          93.0,
+          66.3651
+        ]
+      },
+      "day-0-v2": {
+        "file": "residential-d1-l1-s1-day-0-v2.13c8633bef.webp",
+        "width": 187,
+        "height": 145,
+        "anchor": [
+          94.0,
+          94.6848
+        ]
+      },
+      "day-1-v2": {
+        "file": "residential-d1-l1-s1-day-1-v2.f6ec80de55.webp",
+        "width": 186,
+        "height": 139,
+        "anchor": [
+          93.0,
+          88.6847
+        ]
+      },
+      "day-2-v2": {
+        "file": "residential-d1-l1-s1-day-2-v2.ef10424c1c.webp",
+        "width": 187,
+        "height": 127,
+        "anchor": [
+          93.0,
+          76.6847
+        ]
+      },
+      "day-3-v2": {
+        "file": "residential-d1-l1-s1-day-3-v2.a7a64dbcf2.webp",
+        "width": 186,
+        "height": 131,
+        "anchor": [
+          93.0,
+          80.6848
+        ]
+      },
+      "night-0-v2": {
+        "file": "residential-d1-l1-s1-night-0-v2.e475f6d4ac.webp",
+        "width": 187,
+        "height": 145,
+        "anchor": [
+          94.0,
+          94.6848
+        ]
+      },
+      "night-1-v2": {
+        "file": "residential-d1-l1-s1-night-1-v2.4a34563db5.webp",
+        "width": 186,
+        "height": 139,
+        "anchor": [
+          93.0,
+          88.6847
+        ]
+      },
+      "night-2-v2": {
+        "file": "residential-d1-l1-s1-night-2-v2.dda1c73c97.webp",
+        "width": 187,
+        "height": 127,
+        "anchor": [
+          93.0,
+          76.6847
+        ]
+      },
+      "night-3-v2": {
+        "file": "residential-d1-l1-s1-night-3-v2.575294ca2c.webp",
+        "width": 186,
+        "height": 131,
+        "anchor": [
+          93.0,
+          80.6848
+        ]
+      },
+      "unpowered-0-v2": {
+        "file": "residential-d1-l1-s1-unpowered-0-v2.7d3ab747dd.webp",
+        "width": 187,
+        "height": 145,
+        "anchor": [
+          94.0,
+          94.6848
+        ]
+      },
+      "unpowered-1-v2": {
+        "file": "residential-d1-l1-s1-unpowered-1-v2.455c5b5696.webp",
+        "width": 186,
+        "height": 139,
+        "anchor": [
+          93.0,
+          88.6847
+        ]
+      },
+      "unpowered-2-v2": {
+        "file": "residential-d1-l1-s1-unpowered-2-v2.cdd4838380.webp",
+        "width": 187,
+        "height": 127,
+        "anchor": [
+          93.0,
+          76.6847
+        ]
+      },
+      "unpowered-3-v2": {
+        "file": "residential-d1-l1-s1-unpowered-3-v2.1b66a96fc5.webp",
+        "width": 186,
+        "height": 131,
+        "anchor": [
+          93.0,
+          80.6848
+        ]
+      },
+      "day-0-v3": {
+        "file": "residential-d1-l1-s1-day-0-v3.76c1338263.webp",
+        "width": 188,
+        "height": 134,
+        "anchor": [
+          94.0,
+          83.2212
+        ]
+      },
+      "day-1-v3": {
+        "file": "residential-d1-l1-s1-day-1-v3.b23d82d3a9.webp",
+        "width": 187,
+        "height": 129,
+        "anchor": [
+          93.0,
+          78.2211
+        ]
+      },
+      "day-2-v3": {
+        "file": "residential-d1-l1-s1-day-2-v3.618de31a9a.webp",
+        "width": 187,
+        "height": 117,
+        "anchor": [
+          93.0,
+          66.2211
+        ]
+      },
+      "day-3-v3": {
+        "file": "residential-d1-l1-s1-day-3-v3.dfc7500990.webp",
+        "width": 186,
+        "height": 121,
+        "anchor": [
+          93.0,
+          70.2212
+        ]
+      },
+      "night-0-v3": {
+        "file": "residential-d1-l1-s1-night-0-v3.b583062759.webp",
+        "width": 188,
+        "height": 134,
+        "anchor": [
+          94.0,
+          83.2212
+        ]
+      },
+      "night-1-v3": {
+        "file": "residential-d1-l1-s1-night-1-v3.b72cb46485.webp",
+        "width": 187,
+        "height": 129,
+        "anchor": [
+          93.0,
+          78.2211
+        ]
+      },
+      "night-2-v3": {
+        "file": "residential-d1-l1-s1-night-2-v3.06ac6a4000.webp",
+        "width": 187,
+        "height": 117,
+        "anchor": [
+          93.0,
+          66.2211
+        ]
+      },
+      "night-3-v3": {
+        "file": "residential-d1-l1-s1-night-3-v3.54319775ef.webp",
+        "width": 186,
+        "height": 121,
+        "anchor": [
+          93.0,
+          70.2212
+        ]
+      },
+      "unpowered-0-v3": {
+        "file": "residential-d1-l1-s1-unpowered-0-v3.88012b3670.webp",
+        "width": 188,
+        "height": 134,
+        "anchor": [
+          94.0,
+          83.2212
+        ]
+      },
+      "unpowered-1-v3": {
+        "file": "residential-d1-l1-s1-unpowered-1-v3.738e5a7b1a.webp",
+        "width": 187,
+        "height": 129,
+        "anchor": [
+          93.0,
+          78.2211
+        ]
+      },
+      "unpowered-2-v3": {
+        "file": "residential-d1-l1-s1-unpowered-2-v3.298493a6b4.webp",
+        "width": 187,
+        "height": 117,
+        "anchor": [
+          93.0,
+          66.2211
+        ]
+      },
+      "unpowered-3-v3": {
+        "file": "residential-d1-l1-s1-unpowered-3-v3.6c2c2bb7e4.webp",
+        "width": 186,
+        "height": 121,
+        "anchor": [
+          93.0,
+          70.2212
+        ]
+      }
+    },
+    "family": "residential",
+    "zone": {
+      "type": "residential",
+      "density": 1,
+      "level": 1
+    },
+    "label": "Residential \u00b7 density 1 \u00b7 stage 1 \u00b7 1\u00d71",
+    "description": "Residential density 1, growth stage 1, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d1-l1-s1",
+        "label": "Gabled cottage",
+        "description": "Residential density 1, growth stage 1, authored specifically for a 1\u00d71 lot. Gabled cottage."
+      },
+      {
+        "model": "residential-d1-l1-s1_v1",
+        "label": "Hipped home",
+        "description": "Residential density 1, growth stage 1, authored specifically for a 1\u00d71 lot. Hipped home."
+      },
+      {
+        "model": "residential-d1-l1-s1_v2",
+        "label": "Craftsman veranda",
+        "description": "Residential density 1, growth stage 1, authored specifically for a 1\u00d71 lot. Craftsman veranda."
+      },
+      {
+        "model": "residential-d1-l1-s1_v3",
+        "label": "Garden-roof modern",
+        "description": "Residential density 1, growth stage 1, authored specifically for a 1\u00d71 lot. Garden-roof modern."
+      }
+    ]
+  },
+  "residential-d1-l2-s1": {
+    "tiles": 1,
+    "scale": 3,
+    "height": 25,
+    "frames": {
+      "day-0": {
+        "file": "residential-d1-l2-s1-day-0.019996f39c.webp",
+        "width": 187,
+        "height": 145,
+        "anchor": [
+          94.0,
+          94.6848
+        ]
+      },
+      "day-1": {
+        "file": "residential-d1-l2-s1-day-1.4454caa338.webp",
+        "width": 186,
+        "height": 139,
+        "anchor": [
+          93.0,
+          88.6847
+        ]
+      },
+      "day-2": {
+        "file": "residential-d1-l2-s1-day-2.ffc00e7740.webp",
+        "width": 187,
+        "height": 120,
+        "anchor": [
+          93.0,
+          69.6847
+        ]
+      },
+      "day-3": {
+        "file": "residential-d1-l2-s1-day-3.e0935e9189.webp",
+        "width": 186,
+        "height": 126,
+        "anchor": [
+          93.0,
+          75.6848
+        ]
+      },
+      "night-0": {
+        "file": "residential-d1-l2-s1-night-0.334a46384f.webp",
+        "width": 187,
+        "height": 145,
+        "anchor": [
+          94.0,
+          94.6848
+        ]
+      },
+      "night-1": {
+        "file": "residential-d1-l2-s1-night-1.027d284367.webp",
+        "width": 186,
+        "height": 139,
+        "anchor": [
+          93.0,
+          88.6847
+        ]
+      },
+      "night-2": {
+        "file": "residential-d1-l2-s1-night-2.641ad08eb1.webp",
+        "width": 187,
+        "height": 120,
+        "anchor": [
+          93.0,
+          69.6847
+        ]
+      },
+      "night-3": {
+        "file": "residential-d1-l2-s1-night-3.1e19bce0a1.webp",
+        "width": 186,
+        "height": 126,
+        "anchor": [
+          93.0,
+          75.6848
+        ]
+      },
+      "unpowered-0": {
+        "file": "residential-d1-l2-s1-unpowered-0.e75d6565a8.webp",
+        "width": 187,
+        "height": 145,
+        "anchor": [
+          94.0,
+          94.6848
+        ]
+      },
+      "unpowered-1": {
+        "file": "residential-d1-l2-s1-unpowered-1.00b4d94cfb.webp",
+        "width": 186,
+        "height": 139,
+        "anchor": [
+          93.0,
+          88.6847
+        ]
+      },
+      "unpowered-2": {
+        "file": "residential-d1-l2-s1-unpowered-2.2eb874800a.webp",
+        "width": 187,
+        "height": 120,
+        "anchor": [
+          93.0,
+          69.6847
+        ]
+      },
+      "unpowered-3": {
+        "file": "residential-d1-l2-s1-unpowered-3.b88ab7134d.webp",
+        "width": 186,
+        "height": 126,
+        "anchor": [
+          93.0,
+          75.6848
+        ]
+      },
+      "day-0-v1": {
+        "file": "residential-d1-l2-s1-day-0-v1.dd5e50558e.webp",
+        "width": 187,
+        "height": 131,
+        "anchor": [
+          94.0,
+          80.3651
+        ]
+      },
+      "day-1-v1": {
+        "file": "residential-d1-l2-s1-day-1-v1.949597b28e.webp",
+        "width": 186,
+        "height": 125,
+        "anchor": [
+          93.0,
+          74.365
+        ]
+      },
+      "day-2-v1": {
+        "file": "residential-d1-l2-s1-day-2-v1.9b96a07adf.webp",
+        "width": 187,
+        "height": 113,
+        "anchor": [
+          93.0,
+          62.365
+        ]
+      },
+      "day-3-v1": {
+        "file": "residential-d1-l2-s1-day-3-v1.3da68c639f.webp",
+        "width": 186,
+        "height": 120,
+        "anchor": [
+          93.0,
+          69.3651
+        ]
+      },
+      "night-0-v1": {
+        "file": "residential-d1-l2-s1-night-0-v1.b6bd0208a0.webp",
+        "width": 187,
+        "height": 131,
+        "anchor": [
+          94.0,
+          80.3651
+        ]
+      },
+      "night-1-v1": {
+        "file": "residential-d1-l2-s1-night-1-v1.1018f219e7.webp",
+        "width": 186,
+        "height": 125,
+        "anchor": [
+          93.0,
+          74.365
+        ]
+      },
+      "night-2-v1": {
+        "file": "residential-d1-l2-s1-night-2-v1.2ab39a0d8a.webp",
+        "width": 187,
+        "height": 113,
+        "anchor": [
+          93.0,
+          62.365
+        ]
+      },
+      "night-3-v1": {
+        "file": "residential-d1-l2-s1-night-3-v1.07ff76e5f7.webp",
+        "width": 186,
+        "height": 120,
+        "anchor": [
+          93.0,
+          69.3651
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "residential-d1-l2-s1-unpowered-0-v1.257d863125.webp",
+        "width": 187,
+        "height": 131,
+        "anchor": [
+          94.0,
+          80.3651
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "residential-d1-l2-s1-unpowered-1-v1.625a36a1af.webp",
+        "width": 186,
+        "height": 125,
+        "anchor": [
+          93.0,
+          74.365
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "residential-d1-l2-s1-unpowered-2-v1.16f45b9cf6.webp",
+        "width": 187,
+        "height": 113,
+        "anchor": [
+          93.0,
+          62.365
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "residential-d1-l2-s1-unpowered-3-v1.2b00f8d1d0.webp",
+        "width": 186,
+        "height": 120,
+        "anchor": [
+          93.0,
+          69.3651
+        ]
+      },
+      "day-0-v2": {
+        "file": "residential-d1-l2-s1-day-0-v2.a767713f7d.webp",
+        "width": 187,
+        "height": 145,
+        "anchor": [
+          94.0,
+          94.6848
+        ]
+      },
+      "day-1-v2": {
+        "file": "residential-d1-l2-s1-day-1-v2.75cf3d4d71.webp",
+        "width": 186,
+        "height": 139,
+        "anchor": [
+          93.0,
+          88.6847
+        ]
+      },
+      "day-2-v2": {
+        "file": "residential-d1-l2-s1-day-2-v2.b951fbd39d.webp",
+        "width": 187,
+        "height": 127,
+        "anchor": [
+          93.0,
+          76.6847
+        ]
+      },
+      "day-3-v2": {
+        "file": "residential-d1-l2-s1-day-3-v2.50760eb870.webp",
+        "width": 186,
+        "height": 133,
+        "anchor": [
+          93.0,
+          82.6848
+        ]
+      },
+      "night-0-v2": {
+        "file": "residential-d1-l2-s1-night-0-v2.d55a18cf06.webp",
+        "width": 187,
+        "height": 145,
+        "anchor": [
+          94.0,
+          94.6848
+        ]
+      },
+      "night-1-v2": {
+        "file": "residential-d1-l2-s1-night-1-v2.11f112b296.webp",
+        "width": 186,
+        "height": 139,
+        "anchor": [
+          93.0,
+          88.6847
+        ]
+      },
+      "night-2-v2": {
+        "file": "residential-d1-l2-s1-night-2-v2.1f082d6f0d.webp",
+        "width": 187,
+        "height": 127,
+        "anchor": [
+          93.0,
+          76.6847
+        ]
+      },
+      "night-3-v2": {
+        "file": "residential-d1-l2-s1-night-3-v2.2b7c08f22e.webp",
+        "width": 186,
+        "height": 133,
+        "anchor": [
+          93.0,
+          82.6848
+        ]
+      },
+      "unpowered-0-v2": {
+        "file": "residential-d1-l2-s1-unpowered-0-v2.fe71ec319f.webp",
+        "width": 187,
+        "height": 145,
+        "anchor": [
+          94.0,
+          94.6848
+        ]
+      },
+      "unpowered-1-v2": {
+        "file": "residential-d1-l2-s1-unpowered-1-v2.04facbeba8.webp",
+        "width": 186,
+        "height": 139,
+        "anchor": [
+          93.0,
+          88.6847
+        ]
+      },
+      "unpowered-2-v2": {
+        "file": "residential-d1-l2-s1-unpowered-2-v2.76533500f1.webp",
+        "width": 187,
+        "height": 127,
+        "anchor": [
+          93.0,
+          76.6847
+        ]
+      },
+      "unpowered-3-v2": {
+        "file": "residential-d1-l2-s1-unpowered-3-v2.6d8e86e846.webp",
+        "width": 186,
+        "height": 133,
+        "anchor": [
+          93.0,
+          82.6848
+        ]
+      },
+      "day-0-v3": {
+        "file": "residential-d1-l2-s1-day-0-v3.88825f6552.webp",
+        "width": 188,
+        "height": 135,
+        "anchor": [
+          94.0,
+          84.2212
+        ]
+      },
+      "day-1-v3": {
+        "file": "residential-d1-l2-s1-day-1-v3.64188e9b9d.webp",
+        "width": 187,
+        "height": 129,
+        "anchor": [
+          93.0,
+          78.2211
+        ]
+      },
+      "day-2-v3": {
+        "file": "residential-d1-l2-s1-day-2-v3.1f1d4a39d9.webp",
+        "width": 187,
+        "height": 118,
+        "anchor": [
+          93.0,
+          67.2211
+        ]
+      },
+      "day-3-v3": {
+        "file": "residential-d1-l2-s1-day-3-v3.bc90abbb95.webp",
+        "width": 186,
+        "height": 124,
+        "anchor": [
+          93.0,
+          73.2212
+        ]
+      },
+      "night-0-v3": {
+        "file": "residential-d1-l2-s1-night-0-v3.e3bb0b1ad3.webp",
+        "width": 188,
+        "height": 135,
+        "anchor": [
+          94.0,
+          84.2212
+        ]
+      },
+      "night-1-v3": {
+        "file": "residential-d1-l2-s1-night-1-v3.cd2586c7bb.webp",
+        "width": 187,
+        "height": 129,
+        "anchor": [
+          93.0,
+          78.2211
+        ]
+      },
+      "night-2-v3": {
+        "file": "residential-d1-l2-s1-night-2-v3.1f234ac9fe.webp",
+        "width": 187,
+        "height": 118,
+        "anchor": [
+          93.0,
+          67.2211
+        ]
+      },
+      "night-3-v3": {
+        "file": "residential-d1-l2-s1-night-3-v3.c6cd7bb464.webp",
+        "width": 186,
+        "height": 124,
+        "anchor": [
+          93.0,
+          73.2212
+        ]
+      },
+      "unpowered-0-v3": {
+        "file": "residential-d1-l2-s1-unpowered-0-v3.378a5c48e3.webp",
+        "width": 188,
+        "height": 135,
+        "anchor": [
+          94.0,
+          84.2212
+        ]
+      },
+      "unpowered-1-v3": {
+        "file": "residential-d1-l2-s1-unpowered-1-v3.478be5cec7.webp",
+        "width": 187,
+        "height": 129,
+        "anchor": [
+          93.0,
+          78.2211
+        ]
+      },
+      "unpowered-2-v3": {
+        "file": "residential-d1-l2-s1-unpowered-2-v3.9f70cd3701.webp",
+        "width": 187,
+        "height": 118,
+        "anchor": [
+          93.0,
+          67.2211
+        ]
+      },
+      "unpowered-3-v3": {
+        "file": "residential-d1-l2-s1-unpowered-3-v3.cdaa0a7231.webp",
+        "width": 186,
+        "height": 124,
+        "anchor": [
+          93.0,
+          73.2212
+        ]
+      }
+    },
+    "family": "residential",
+    "zone": {
+      "type": "residential",
+      "density": 1,
+      "level": 2
+    },
+    "label": "Residential \u00b7 density 1 \u00b7 stage 2 \u00b7 1\u00d71",
+    "description": "Residential density 1, growth stage 2, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d1-l2-s1",
+        "label": "Gabled cottage",
+        "description": "Residential density 1, growth stage 2, authored specifically for a 1\u00d71 lot. Gabled cottage."
+      },
+      {
+        "model": "residential-d1-l2-s1_v1",
+        "label": "Hipped home",
+        "description": "Residential density 1, growth stage 2, authored specifically for a 1\u00d71 lot. Hipped home."
+      },
+      {
+        "model": "residential-d1-l2-s1_v2",
+        "label": "Craftsman veranda",
+        "description": "Residential density 1, growth stage 2, authored specifically for a 1\u00d71 lot. Craftsman veranda."
+      },
+      {
+        "model": "residential-d1-l2-s1_v3",
+        "label": "Garden-roof modern",
+        "description": "Residential density 1, growth stage 2, authored specifically for a 1\u00d71 lot. Garden-roof modern."
+      }
+    ]
+  },
+  "residential-d1-l3-s1": {
+    "tiles": 1,
+    "scale": 3,
+    "height": 36,
+    "frames": {
+      "day-0": {
+        "file": "residential-d1-l3-s1-day-0.84606bf8f7.webp",
+        "width": 188,
+        "height": 176,
+        "anchor": [
+          93.9999,
+          126.1165
+        ]
+      },
+      "day-1": {
+        "file": "residential-d1-l3-s1-day-1.a5aff803e1.webp",
+        "width": 187,
+        "height": 169,
+        "anchor": [
+          92.9999,
+          119.1166
+        ]
+      },
+      "day-2": {
+        "file": "residential-d1-l3-s1-day-2.c469db2c7b.webp",
+        "width": 187,
+        "height": 151,
+        "anchor": [
+          93.0001,
+          101.1166
+        ]
+      },
+      "day-3": {
+        "file": "residential-d1-l3-s1-day-3.7ca7e65867.webp",
+        "width": 186,
+        "height": 158,
+        "anchor": [
+          93.0001,
+          108.1165
+        ]
+      },
+      "night-0": {
+        "file": "residential-d1-l3-s1-night-0.f2789bfe66.webp",
+        "width": 188,
+        "height": 176,
+        "anchor": [
+          93.9999,
+          126.1165
+        ]
+      },
+      "night-1": {
+        "file": "residential-d1-l3-s1-night-1.801dbed8ea.webp",
+        "width": 187,
+        "height": 169,
+        "anchor": [
+          92.9999,
+          119.1166
+        ]
+      },
+      "night-2": {
+        "file": "residential-d1-l3-s1-night-2.03939d2920.webp",
+        "width": 187,
+        "height": 151,
+        "anchor": [
+          93.0001,
+          101.1166
+        ]
+      },
+      "night-3": {
+        "file": "residential-d1-l3-s1-night-3.7295d96878.webp",
+        "width": 186,
+        "height": 158,
+        "anchor": [
+          93.0001,
+          108.1165
+        ]
+      },
+      "unpowered-0": {
+        "file": "residential-d1-l3-s1-unpowered-0.bdd1ddd616.webp",
+        "width": 188,
+        "height": 176,
+        "anchor": [
+          93.9999,
+          126.1165
+        ]
+      },
+      "unpowered-1": {
+        "file": "residential-d1-l3-s1-unpowered-1.d5af34de48.webp",
+        "width": 187,
+        "height": 169,
+        "anchor": [
+          92.9999,
+          119.1166
+        ]
+      },
+      "unpowered-2": {
+        "file": "residential-d1-l3-s1-unpowered-2.870393dd86.webp",
+        "width": 187,
+        "height": 151,
+        "anchor": [
+          93.0001,
+          101.1166
+        ]
+      },
+      "unpowered-3": {
+        "file": "residential-d1-l3-s1-unpowered-3.51bdf9413e.webp",
+        "width": 186,
+        "height": 158,
+        "anchor": [
+          93.0001,
+          108.1165
+        ]
+      },
+      "day-0-v1": {
+        "file": "residential-d1-l3-s1-day-0-v1.62a023fe64.webp",
+        "width": 187,
+        "height": 163,
+        "anchor": [
+          94.0,
+          112.797
+        ]
+      },
+      "day-1-v1": {
+        "file": "residential-d1-l3-s1-day-1-v1.d93b4708a1.webp",
+        "width": 186,
+        "height": 155,
+        "anchor": [
+          93.0,
+          104.7968
+        ]
+      },
+      "day-2-v1": {
+        "file": "residential-d1-l3-s1-day-2-v1.98c445f247.webp",
+        "width": 187,
+        "height": 145,
+        "anchor": [
+          93.0,
+          94.7968
+        ]
+      },
+      "day-3-v1": {
+        "file": "residential-d1-l3-s1-day-3-v1.bbb249d1d1.webp",
+        "width": 186,
+        "height": 152,
+        "anchor": [
+          93.0,
+          101.797
+        ]
+      },
+      "night-0-v1": {
+        "file": "residential-d1-l3-s1-night-0-v1.7f61b40c0a.webp",
+        "width": 187,
+        "height": 163,
+        "anchor": [
+          94.0,
+          112.797
+        ]
+      },
+      "night-1-v1": {
+        "file": "residential-d1-l3-s1-night-1-v1.21eeb8884e.webp",
+        "width": 186,
+        "height": 155,
+        "anchor": [
+          93.0,
+          104.7968
+        ]
+      },
+      "night-2-v1": {
+        "file": "residential-d1-l3-s1-night-2-v1.401acd0270.webp",
+        "width": 187,
+        "height": 145,
+        "anchor": [
+          93.0,
+          94.7968
+        ]
+      },
+      "night-3-v1": {
+        "file": "residential-d1-l3-s1-night-3-v1.2d4a86cd1c.webp",
+        "width": 186,
+        "height": 152,
+        "anchor": [
+          93.0,
+          101.797
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "residential-d1-l3-s1-unpowered-0-v1.22b160ad54.webp",
+        "width": 187,
+        "height": 163,
+        "anchor": [
+          94.0,
+          112.797
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "residential-d1-l3-s1-unpowered-1-v1.e5cc909902.webp",
+        "width": 186,
+        "height": 155,
+        "anchor": [
+          93.0,
+          104.7968
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "residential-d1-l3-s1-unpowered-2-v1.53fb952736.webp",
+        "width": 187,
+        "height": 145,
+        "anchor": [
+          93.0,
+          94.7968
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "residential-d1-l3-s1-unpowered-3-v1.f94bfb4c4c.webp",
+        "width": 186,
+        "height": 152,
+        "anchor": [
+          93.0,
+          101.797
+        ]
+      },
+      "day-0-v2": {
+        "file": "residential-d1-l3-s1-day-0-v2.7231b9e526.webp",
+        "width": 188,
+        "height": 176,
+        "anchor": [
+          93.9999,
+          126.1165
+        ]
+      },
+      "day-1-v2": {
+        "file": "residential-d1-l3-s1-day-1-v2.6a293e06ff.webp",
+        "width": 187,
+        "height": 169,
+        "anchor": [
+          92.9999,
+          119.1166
+        ]
+      },
+      "day-2-v2": {
+        "file": "residential-d1-l3-s1-day-2-v2.791e4e5303.webp",
+        "width": 187,
+        "height": 158,
+        "anchor": [
+          93.0001,
+          108.1166
+        ]
+      },
+      "day-3-v2": {
+        "file": "residential-d1-l3-s1-day-3-v2.3015a856b0.webp",
+        "width": 186,
+        "height": 165,
+        "anchor": [
+          93.0001,
+          115.1165
+        ]
+      },
+      "night-0-v2": {
+        "file": "residential-d1-l3-s1-night-0-v2.2084a2de28.webp",
+        "width": 188,
+        "height": 176,
+        "anchor": [
+          93.9999,
+          126.1165
+        ]
+      },
+      "night-1-v2": {
+        "file": "residential-d1-l3-s1-night-1-v2.b9088f2300.webp",
+        "width": 187,
+        "height": 169,
+        "anchor": [
+          92.9999,
+          119.1166
+        ]
+      },
+      "night-2-v2": {
+        "file": "residential-d1-l3-s1-night-2-v2.d9b883d287.webp",
+        "width": 187,
+        "height": 158,
+        "anchor": [
+          93.0001,
+          108.1166
+        ]
+      },
+      "night-3-v2": {
+        "file": "residential-d1-l3-s1-night-3-v2.b7049d1ab1.webp",
+        "width": 186,
+        "height": 165,
+        "anchor": [
+          93.0001,
+          115.1165
+        ]
+      },
+      "unpowered-0-v2": {
+        "file": "residential-d1-l3-s1-unpowered-0-v2.f7f633c575.webp",
+        "width": 188,
+        "height": 176,
+        "anchor": [
+          93.9999,
+          126.1165
+        ]
+      },
+      "unpowered-1-v2": {
+        "file": "residential-d1-l3-s1-unpowered-1-v2.05f6dcf2e9.webp",
+        "width": 187,
+        "height": 169,
+        "anchor": [
+          92.9999,
+          119.1166
+        ]
+      },
+      "unpowered-2-v2": {
+        "file": "residential-d1-l3-s1-unpowered-2-v2.48f76decbf.webp",
+        "width": 187,
+        "height": 158,
+        "anchor": [
+          93.0001,
+          108.1166
+        ]
+      },
+      "unpowered-3-v2": {
+        "file": "residential-d1-l3-s1-unpowered-3-v2.5af2ee6a83.webp",
+        "width": 186,
+        "height": 165,
+        "anchor": [
+          93.0001,
+          115.1165
+        ]
+      },
+      "day-0-v3": {
+        "file": "residential-d1-l3-s1-day-0-v3.6816abfe0c.webp",
+        "width": 187,
+        "height": 167,
+        "anchor": [
+          94.0,
+          116.653
+        ]
+      },
+      "day-1-v3": {
+        "file": "residential-d1-l3-s1-day-1-v3.8cfea1a75d.webp",
+        "width": 186,
+        "height": 160,
+        "anchor": [
+          93.0,
+          109.653
+        ]
+      },
+      "day-2-v3": {
+        "file": "residential-d1-l3-s1-day-2-v3.57b2a35059.webp",
+        "width": 187,
+        "height": 149,
+        "anchor": [
+          93.0,
+          98.653
+        ]
+      },
+      "day-3-v3": {
+        "file": "residential-d1-l3-s1-day-3-v3.75a6ae61a1.webp",
+        "width": 186,
+        "height": 157,
+        "anchor": [
+          93.0,
+          106.653
+        ]
+      },
+      "night-0-v3": {
+        "file": "residential-d1-l3-s1-night-0-v3.c883278be8.webp",
+        "width": 187,
+        "height": 167,
+        "anchor": [
+          94.0,
+          116.653
+        ]
+      },
+      "night-1-v3": {
+        "file": "residential-d1-l3-s1-night-1-v3.2a2264e206.webp",
+        "width": 186,
+        "height": 160,
+        "anchor": [
+          93.0,
+          109.653
+        ]
+      },
+      "night-2-v3": {
+        "file": "residential-d1-l3-s1-night-2-v3.4c32d09af5.webp",
+        "width": 187,
+        "height": 149,
+        "anchor": [
+          93.0,
+          98.653
+        ]
+      },
+      "night-3-v3": {
+        "file": "residential-d1-l3-s1-night-3-v3.f778e1bfa0.webp",
+        "width": 186,
+        "height": 157,
+        "anchor": [
+          93.0,
+          106.653
+        ]
+      },
+      "unpowered-0-v3": {
+        "file": "residential-d1-l3-s1-unpowered-0-v3.0c50312ec0.webp",
+        "width": 187,
+        "height": 167,
+        "anchor": [
+          94.0,
+          116.653
+        ]
+      },
+      "unpowered-1-v3": {
+        "file": "residential-d1-l3-s1-unpowered-1-v3.0c24ce55c1.webp",
+        "width": 186,
+        "height": 160,
+        "anchor": [
+          93.0,
+          109.653
+        ]
+      },
+      "unpowered-2-v3": {
+        "file": "residential-d1-l3-s1-unpowered-2-v3.374b7561a2.webp",
+        "width": 187,
+        "height": 149,
+        "anchor": [
+          93.0,
+          98.653
+        ]
+      },
+      "unpowered-3-v3": {
+        "file": "residential-d1-l3-s1-unpowered-3-v3.f4c2b3f6e7.webp",
+        "width": 186,
+        "height": 157,
+        "anchor": [
+          93.0,
+          106.653
+        ]
+      }
+    },
+    "family": "residential",
+    "zone": {
+      "type": "residential",
+      "density": 1,
+      "level": 3
+    },
+    "label": "Residential \u00b7 density 1 \u00b7 stage 3 \u00b7 1\u00d71",
+    "description": "Residential density 1, growth stage 3, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d1-l3-s1",
+        "label": "Gabled cottage",
+        "description": "Residential density 1, growth stage 3, authored specifically for a 1\u00d71 lot. Gabled cottage."
+      },
+      {
+        "model": "residential-d1-l3-s1_v1",
+        "label": "Hipped home",
+        "description": "Residential density 1, growth stage 3, authored specifically for a 1\u00d71 lot. Hipped home."
+      },
+      {
+        "model": "residential-d1-l3-s1_v2",
+        "label": "Craftsman veranda",
+        "description": "Residential density 1, growth stage 3, authored specifically for a 1\u00d71 lot. Craftsman veranda."
+      },
+      {
+        "model": "residential-d1-l3-s1_v3",
+        "label": "Garden-roof modern",
+        "description": "Residential density 1, growth stage 3, authored specifically for a 1\u00d71 lot. Garden-roof modern."
+      }
+    ]
+  },
+  "residential-d1-l4-s1": {
+    "tiles": 1,
+    "scale": 3,
+    "height": 36,
+    "frames": {
+      "day-0": {
+        "file": "residential-d1-l4-s1-day-0.c323e1b6b2.webp",
+        "width": 188,
+        "height": 176,
+        "anchor": [
+          93.9999,
+          126.1165
+        ]
+      },
+      "day-1": {
+        "file": "residential-d1-l4-s1-day-1.29af768017.webp",
+        "width": 187,
+        "height": 169,
+        "anchor": [
+          92.9999,
+          119.1166
+        ]
+      },
+      "day-2": {
+        "file": "residential-d1-l4-s1-day-2.0aac29a67e.webp",
+        "width": 187,
+        "height": 152,
+        "anchor": [
+          93.0001,
+          102.1166
+        ]
+      },
+      "day-3": {
+        "file": "residential-d1-l4-s1-day-3.f6a025a887.webp",
+        "width": 186,
+        "height": 160,
+        "anchor": [
+          93.0001,
+          110.1165
+        ]
+      },
+      "night-0": {
+        "file": "residential-d1-l4-s1-night-0.d62bbb7eb6.webp",
+        "width": 188,
+        "height": 176,
+        "anchor": [
+          93.9999,
+          126.1165
+        ]
+      },
+      "night-1": {
+        "file": "residential-d1-l4-s1-night-1.eb85d570ce.webp",
+        "width": 187,
+        "height": 169,
+        "anchor": [
+          92.9999,
+          119.1166
+        ]
+      },
+      "night-2": {
+        "file": "residential-d1-l4-s1-night-2.bd78f313b2.webp",
+        "width": 187,
+        "height": 152,
+        "anchor": [
+          93.0001,
+          102.1166
+        ]
+      },
+      "night-3": {
+        "file": "residential-d1-l4-s1-night-3.a0d6a6732b.webp",
+        "width": 186,
+        "height": 160,
+        "anchor": [
+          93.0001,
+          110.1165
+        ]
+      },
+      "unpowered-0": {
+        "file": "residential-d1-l4-s1-unpowered-0.c1f7e52aaf.webp",
+        "width": 188,
+        "height": 176,
+        "anchor": [
+          93.9999,
+          126.1165
+        ]
+      },
+      "unpowered-1": {
+        "file": "residential-d1-l4-s1-unpowered-1.15000e79aa.webp",
+        "width": 187,
+        "height": 169,
+        "anchor": [
+          92.9999,
+          119.1166
+        ]
+      },
+      "unpowered-2": {
+        "file": "residential-d1-l4-s1-unpowered-2.7d3bf5fa82.webp",
+        "width": 187,
+        "height": 152,
+        "anchor": [
+          93.0001,
+          102.1166
+        ]
+      },
+      "unpowered-3": {
+        "file": "residential-d1-l4-s1-unpowered-3.a585dc6bbc.webp",
+        "width": 186,
+        "height": 160,
+        "anchor": [
+          93.0001,
+          110.1165
+        ]
+      },
+      "day-0-v1": {
+        "file": "residential-d1-l4-s1-day-0-v1.b12f13a888.webp",
+        "width": 187,
+        "height": 164,
+        "anchor": [
+          94.0,
+          113.797
+        ]
+      },
+      "day-1-v1": {
+        "file": "residential-d1-l4-s1-day-1-v1.13f9884f47.webp",
+        "width": 186,
+        "height": 155,
+        "anchor": [
+          93.0,
+          104.7968
+        ]
+      },
+      "day-2-v1": {
+        "file": "residential-d1-l4-s1-day-2-v1.e31b299ff7.webp",
+        "width": 187,
+        "height": 146,
+        "anchor": [
+          93.0,
+          95.7968
+        ]
+      },
+      "day-3-v1": {
+        "file": "residential-d1-l4-s1-day-3-v1.5ac1ef4a82.webp",
+        "width": 186,
+        "height": 155,
+        "anchor": [
+          93.0,
+          104.797
+        ]
+      },
+      "night-0-v1": {
+        "file": "residential-d1-l4-s1-night-0-v1.a0d5134f19.webp",
+        "width": 187,
+        "height": 164,
+        "anchor": [
+          94.0,
+          113.797
+        ]
+      },
+      "night-1-v1": {
+        "file": "residential-d1-l4-s1-night-1-v1.e44c0a34de.webp",
+        "width": 186,
+        "height": 155,
+        "anchor": [
+          93.0,
+          104.7968
+        ]
+      },
+      "night-2-v1": {
+        "file": "residential-d1-l4-s1-night-2-v1.160cc37ca8.webp",
+        "width": 187,
+        "height": 146,
+        "anchor": [
+          93.0,
+          95.7968
+        ]
+      },
+      "night-3-v1": {
+        "file": "residential-d1-l4-s1-night-3-v1.03f658222c.webp",
+        "width": 186,
+        "height": 155,
+        "anchor": [
+          93.0,
+          104.797
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "residential-d1-l4-s1-unpowered-0-v1.698c993e02.webp",
+        "width": 187,
+        "height": 164,
+        "anchor": [
+          94.0,
+          113.797
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "residential-d1-l4-s1-unpowered-1-v1.ee3e19efba.webp",
+        "width": 186,
+        "height": 155,
+        "anchor": [
+          93.0,
+          104.7968
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "residential-d1-l4-s1-unpowered-2-v1.ed2277b9ca.webp",
+        "width": 187,
+        "height": 146,
+        "anchor": [
+          93.0,
+          95.7968
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "residential-d1-l4-s1-unpowered-3-v1.97368e414c.webp",
+        "width": 186,
+        "height": 155,
+        "anchor": [
+          93.0,
+          104.797
+        ]
+      },
+      "day-0-v2": {
+        "file": "residential-d1-l4-s1-day-0-v2.345d041426.webp",
+        "width": 188,
+        "height": 177,
+        "anchor": [
+          93.9999,
+          127.1165
+        ]
+      },
+      "day-1-v2": {
+        "file": "residential-d1-l4-s1-day-1-v2.f321f0627f.webp",
+        "width": 187,
+        "height": 169,
+        "anchor": [
+          92.9999,
+          119.1166
+        ]
+      },
+      "day-2-v2": {
+        "file": "residential-d1-l4-s1-day-2-v2.acfc4c6d08.webp",
+        "width": 187,
+        "height": 158,
+        "anchor": [
+          93.0001,
+          108.1166
+        ]
+      },
+      "day-3-v2": {
+        "file": "residential-d1-l4-s1-day-3-v2.25e4d33812.webp",
+        "width": 186,
+        "height": 167,
+        "anchor": [
+          93.0001,
+          117.1165
+        ]
+      },
+      "night-0-v2": {
+        "file": "residential-d1-l4-s1-night-0-v2.19be0725be.webp",
+        "width": 188,
+        "height": 177,
+        "anchor": [
+          93.9999,
+          127.1165
+        ]
+      },
+      "night-1-v2": {
+        "file": "residential-d1-l4-s1-night-1-v2.48162994dc.webp",
+        "width": 187,
+        "height": 169,
+        "anchor": [
+          92.9999,
+          119.1166
+        ]
+      },
+      "night-2-v2": {
+        "file": "residential-d1-l4-s1-night-2-v2.09cd45ac39.webp",
+        "width": 187,
+        "height": 158,
+        "anchor": [
+          93.0001,
+          108.1166
+        ]
+      },
+      "night-3-v2": {
+        "file": "residential-d1-l4-s1-night-3-v2.00c4f6f887.webp",
+        "width": 186,
+        "height": 167,
+        "anchor": [
+          93.0001,
+          117.1165
+        ]
+      },
+      "unpowered-0-v2": {
+        "file": "residential-d1-l4-s1-unpowered-0-v2.341a1beafb.webp",
+        "width": 188,
+        "height": 177,
+        "anchor": [
+          93.9999,
+          127.1165
+        ]
+      },
+      "unpowered-1-v2": {
+        "file": "residential-d1-l4-s1-unpowered-1-v2.508643f5a2.webp",
+        "width": 187,
+        "height": 169,
+        "anchor": [
+          92.9999,
+          119.1166
+        ]
+      },
+      "unpowered-2-v2": {
+        "file": "residential-d1-l4-s1-unpowered-2-v2.cbc49849f9.webp",
+        "width": 187,
+        "height": 158,
+        "anchor": [
+          93.0001,
+          108.1166
+        ]
+      },
+      "unpowered-3-v2": {
+        "file": "residential-d1-l4-s1-unpowered-3-v2.160ed90a02.webp",
+        "width": 186,
+        "height": 167,
+        "anchor": [
+          93.0001,
+          117.1165
+        ]
+      },
+      "day-0-v3": {
+        "file": "residential-d1-l4-s1-day-0-v3.b3bc835e9b.webp",
+        "width": 187,
+        "height": 168,
+        "anchor": [
+          94.0,
+          117.653
+        ]
+      },
+      "day-1-v3": {
+        "file": "residential-d1-l4-s1-day-1-v3.ad058e382e.webp",
+        "width": 186,
+        "height": 160,
+        "anchor": [
+          93.0,
+          109.653
+        ]
+      },
+      "day-2-v3": {
+        "file": "residential-d1-l4-s1-day-2-v3.eb1d6a8681.webp",
+        "width": 187,
+        "height": 150,
+        "anchor": [
+          93.0,
+          99.653
+        ]
+      },
+      "day-3-v3": {
+        "file": "residential-d1-l4-s1-day-3-v3.bcb739d93c.webp",
+        "width": 186,
+        "height": 159,
+        "anchor": [
+          93.0,
+          108.653
+        ]
+      },
+      "night-0-v3": {
+        "file": "residential-d1-l4-s1-night-0-v3.2f206199c2.webp",
+        "width": 187,
+        "height": 168,
+        "anchor": [
+          94.0,
+          117.653
+        ]
+      },
+      "night-1-v3": {
+        "file": "residential-d1-l4-s1-night-1-v3.42e4d31ba6.webp",
+        "width": 186,
+        "height": 160,
+        "anchor": [
+          93.0,
+          109.653
+        ]
+      },
+      "night-2-v3": {
+        "file": "residential-d1-l4-s1-night-2-v3.09e6a82788.webp",
+        "width": 187,
+        "height": 150,
+        "anchor": [
+          93.0,
+          99.653
+        ]
+      },
+      "night-3-v3": {
+        "file": "residential-d1-l4-s1-night-3-v3.d900f37fc2.webp",
+        "width": 186,
+        "height": 159,
+        "anchor": [
+          93.0,
+          108.653
+        ]
+      },
+      "unpowered-0-v3": {
+        "file": "residential-d1-l4-s1-unpowered-0-v3.934b745d5d.webp",
+        "width": 187,
+        "height": 168,
+        "anchor": [
+          94.0,
+          117.653
+        ]
+      },
+      "unpowered-1-v3": {
+        "file": "residential-d1-l4-s1-unpowered-1-v3.ca96f93668.webp",
+        "width": 186,
+        "height": 160,
+        "anchor": [
+          93.0,
+          109.653
+        ]
+      },
+      "unpowered-2-v3": {
+        "file": "residential-d1-l4-s1-unpowered-2-v3.2254a75b7b.webp",
+        "width": 187,
+        "height": 150,
+        "anchor": [
+          93.0,
+          99.653
+        ]
+      },
+      "unpowered-3-v3": {
+        "file": "residential-d1-l4-s1-unpowered-3-v3.cf9514847a.webp",
+        "width": 186,
+        "height": 159,
+        "anchor": [
+          93.0,
+          108.653
+        ]
+      }
+    },
+    "family": "residential",
+    "zone": {
+      "type": "residential",
+      "density": 1,
+      "level": 4
+    },
+    "label": "Residential \u00b7 density 1 \u00b7 stage 4 \u00b7 1\u00d71",
+    "description": "Residential density 1, growth stage 4, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d1-l4-s1",
+        "label": "Gabled cottage",
+        "description": "Residential density 1, growth stage 4, authored specifically for a 1\u00d71 lot. Gabled cottage."
+      },
+      {
+        "model": "residential-d1-l4-s1_v1",
+        "label": "Hipped home",
+        "description": "Residential density 1, growth stage 4, authored specifically for a 1\u00d71 lot. Hipped home."
+      },
+      {
+        "model": "residential-d1-l4-s1_v2",
+        "label": "Craftsman veranda",
+        "description": "Residential density 1, growth stage 4, authored specifically for a 1\u00d71 lot. Craftsman veranda."
+      },
+      {
+        "model": "residential-d1-l4-s1_v3",
+        "label": "Garden-roof modern",
+        "description": "Residential density 1, growth stage 4, authored specifically for a 1\u00d71 lot. Garden-roof modern."
+      }
+    ]
+  },
+  "residential-d2-l1-s1": {
+    "tiles": 1,
+    "scale": 3,
+    "height": 32,
+    "frames": {
+      "day-0": {
+        "file": "residential-d2-l1-s1-day-0.903943edaa.webp",
+        "width": 186,
+        "height": 180,
+        "anchor": [
+          93.0,
+          129.5318
+        ]
+      },
+      "day-1": {
+        "file": "residential-d2-l1-s1-day-1.985e1e5d9b.webp",
+        "width": 186,
+        "height": 172,
+        "anchor": [
+          93.0,
+          121.5316
+        ]
+      },
+      "day-2": {
+        "file": "residential-d2-l1-s1-day-2.88079cb578.webp",
+        "width": 186,
+        "height": 172,
+        "anchor": [
+          93.0,
+          121.5316
+        ]
+      },
+      "day-3": {
+        "file": "residential-d2-l1-s1-day-3.6aa2538fb5.webp",
+        "width": 186,
+        "height": 179,
+        "anchor": [
+          93.0,
+          128.5318
+        ]
+      },
+      "night-0": {
+        "file": "residential-d2-l1-s1-night-0.6793665879.webp",
+        "width": 186,
+        "height": 180,
+        "anchor": [
+          93.0,
+          129.5318
+        ]
+      },
+      "night-1": {
+        "file": "residential-d2-l1-s1-night-1.bcfbba922d.webp",
+        "width": 186,
+        "height": 172,
+        "anchor": [
+          93.0,
+          121.5316
+        ]
+      },
+      "night-2": {
+        "file": "residential-d2-l1-s1-night-2.e61a8ce0e1.webp",
+        "width": 186,
+        "height": 172,
+        "anchor": [
+          93.0,
+          121.5316
+        ]
+      },
+      "night-3": {
+        "file": "residential-d2-l1-s1-night-3.be715eee4e.webp",
+        "width": 186,
+        "height": 179,
+        "anchor": [
+          93.0,
+          128.5318
+        ]
+      },
+      "unpowered-0": {
+        "file": "residential-d2-l1-s1-unpowered-0.30e778cefc.webp",
+        "width": 186,
+        "height": 180,
+        "anchor": [
+          93.0,
+          129.5318
+        ]
+      },
+      "unpowered-1": {
+        "file": "residential-d2-l1-s1-unpowered-1.1aa61d8146.webp",
+        "width": 186,
+        "height": 172,
+        "anchor": [
+          93.0,
+          121.5316
+        ]
+      },
+      "unpowered-2": {
+        "file": "residential-d2-l1-s1-unpowered-2.839e05f179.webp",
+        "width": 186,
+        "height": 172,
+        "anchor": [
+          93.0,
+          121.5316
+        ]
+      },
+      "unpowered-3": {
+        "file": "residential-d2-l1-s1-unpowered-3.0ab7c18528.webp",
+        "width": 186,
+        "height": 179,
+        "anchor": [
+          93.0,
+          128.5318
+        ]
+      },
+      "day-0-v1": {
+        "file": "residential-d2-l1-s1-day-0-v1.0a2e868dbe.webp",
+        "width": 186,
+        "height": 179,
+        "anchor": [
+          93.0,
+          128.9439
+        ]
+      },
+      "day-1-v1": {
+        "file": "residential-d2-l1-s1-day-1-v1.8103b3f197.webp",
+        "width": 186,
+        "height": 171,
+        "anchor": [
+          93.0,
+          120.9437
+        ]
+      },
+      "day-2-v1": {
+        "file": "residential-d2-l1-s1-day-2-v1.566fac483c.webp",
+        "width": 186,
+        "height": 172,
+        "anchor": [
+          93.0,
+          121.9437
+        ]
+      },
+      "day-3-v1": {
+        "file": "residential-d2-l1-s1-day-3-v1.977689b280.webp",
+        "width": 186,
+        "height": 179,
+        "anchor": [
+          93.0,
+          128.9439
+        ]
+      },
+      "night-0-v1": {
+        "file": "residential-d2-l1-s1-night-0-v1.f986b2068a.webp",
+        "width": 186,
+        "height": 179,
+        "anchor": [
+          93.0,
+          128.9439
+        ]
+      },
+      "night-1-v1": {
+        "file": "residential-d2-l1-s1-night-1-v1.fea99724ca.webp",
+        "width": 186,
+        "height": 171,
+        "anchor": [
+          93.0,
+          120.9437
+        ]
+      },
+      "night-2-v1": {
+        "file": "residential-d2-l1-s1-night-2-v1.49318a4850.webp",
+        "width": 186,
+        "height": 172,
+        "anchor": [
+          93.0,
+          121.9437
+        ]
+      },
+      "night-3-v1": {
+        "file": "residential-d2-l1-s1-night-3-v1.5ebc2a7783.webp",
+        "width": 186,
+        "height": 179,
+        "anchor": [
+          93.0,
+          128.9439
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "residential-d2-l1-s1-unpowered-0-v1.a05dc81420.webp",
+        "width": 186,
+        "height": 179,
+        "anchor": [
+          93.0,
+          128.9439
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "residential-d2-l1-s1-unpowered-1-v1.fef205b019.webp",
+        "width": 186,
+        "height": 171,
+        "anchor": [
+          93.0,
+          120.9437
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "residential-d2-l1-s1-unpowered-2-v1.98f47d711f.webp",
+        "width": 186,
+        "height": 172,
+        "anchor": [
+          93.0,
+          121.9437
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "residential-d2-l1-s1-unpowered-3-v1.44ed2ce986.webp",
+        "width": 186,
+        "height": 179,
+        "anchor": [
+          93.0,
+          128.9439
+        ]
+      },
+      "day-0-v2": {
+        "file": "residential-d2-l1-s1-day-0-v2.42b36b3bf4.webp",
+        "width": 186,
+        "height": 179,
+        "anchor": [
+          93.0,
+          128.9439
+        ]
+      },
+      "day-1-v2": {
+        "file": "residential-d2-l1-s1-day-1-v2.2db1e12922.webp",
+        "width": 186,
+        "height": 171,
+        "anchor": [
+          93.0,
+          120.9437
+        ]
+      },
+      "day-2-v2": {
+        "file": "residential-d2-l1-s1-day-2-v2.5c348be889.webp",
+        "width": 186,
+        "height": 172,
+        "anchor": [
+          93.0,
+          121.9437
+        ]
+      },
+      "day-3-v2": {
+        "file": "residential-d2-l1-s1-day-3-v2.5bd25949db.webp",
+        "width": 186,
+        "height": 179,
+        "anchor": [
+          93.0,
+          128.9439
+        ]
+      },
+      "night-0-v2": {
+        "file": "residential-d2-l1-s1-night-0-v2.6e0788b750.webp",
+        "width": 186,
+        "height": 179,
+        "anchor": [
+          93.0,
+          128.9439
+        ]
+      },
+      "night-1-v2": {
+        "file": "residential-d2-l1-s1-night-1-v2.ed852a4e77.webp",
+        "width": 186,
+        "height": 171,
+        "anchor": [
+          93.0,
+          120.9437
+        ]
+      },
+      "night-2-v2": {
+        "file": "residential-d2-l1-s1-night-2-v2.38abed2014.webp",
+        "width": 186,
+        "height": 172,
+        "anchor": [
+          93.0,
+          121.9437
+        ]
+      },
+      "night-3-v2": {
+        "file": "residential-d2-l1-s1-night-3-v2.505608da29.webp",
+        "width": 186,
+        "height": 179,
+        "anchor": [
+          93.0,
+          128.9439
+        ]
+      },
+      "unpowered-0-v2": {
+        "file": "residential-d2-l1-s1-unpowered-0-v2.23fbf0c990.webp",
+        "width": 186,
+        "height": 179,
+        "anchor": [
+          93.0,
+          128.9439
+        ]
+      },
+      "unpowered-1-v2": {
+        "file": "residential-d2-l1-s1-unpowered-1-v2.092c61466e.webp",
+        "width": 186,
+        "height": 171,
+        "anchor": [
+          93.0,
+          120.9437
+        ]
+      },
+      "unpowered-2-v2": {
+        "file": "residential-d2-l1-s1-unpowered-2-v2.8b4e4f47ad.webp",
+        "width": 186,
+        "height": 172,
+        "anchor": [
+          93.0,
+          121.9437
+        ]
+      },
+      "unpowered-3-v2": {
+        "file": "residential-d2-l1-s1-unpowered-3-v2.4a21d75007.webp",
+        "width": 186,
+        "height": 179,
+        "anchor": [
+          93.0,
+          128.9439
+        ]
+      }
+    },
+    "family": "residential",
+    "zone": {
+      "type": "residential",
+      "density": 2,
+      "level": 1
+    },
+    "label": "Residential \u00b7 density 2 \u00b7 stage 1 \u00b7 1\u00d71",
+    "description": "Residential density 2, growth stage 1, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d2-l1-s1",
+        "label": "Masonry apartments",
+        "description": "Residential density 2, growth stage 1, authored specifically for a 1\u00d71 lot. Masonry apartments."
+      },
+      {
+        "model": "residential-d2-l1-s1_v1",
+        "label": "Brick brownstones",
+        "description": "Residential density 2, growth stage 1, authored specifically for a 1\u00d71 lot. Brick brownstones."
+      },
+      {
+        "model": "residential-d2-l1-s1_v2",
+        "label": "Balcony apartments",
+        "description": "Residential density 2, growth stage 1, authored specifically for a 1\u00d71 lot. Balcony apartments."
+      }
+    ]
+  },
+  "residential-d2-l1-s2": {
+    "tiles": 2,
+    "scale": 3,
+    "height": 40,
+    "frames": {
+      "day-0": {
+        "file": "residential-d2-l1-s2-day-0.6349abd415.webp",
+        "width": 379,
+        "height": 272,
+        "anchor": [
+          189.0,
+          173.9439
+        ]
+      },
+      "day-1": {
+        "file": "residential-d2-l1-s2-day-1.df620062b9.webp",
+        "width": 379,
+        "height": 252,
+        "anchor": [
+          189.0,
+          153.9437
+        ]
+      },
+      "day-2": {
+        "file": "residential-d2-l1-s2-day-2.4555f99df8.webp",
+        "width": 379,
+        "height": 252,
+        "anchor": [
+          189.0,
+          153.9437
+        ]
+      },
+      "day-3": {
+        "file": "residential-d2-l1-s2-day-3.d4cb2162a2.webp",
+        "width": 379,
+        "height": 272,
+        "anchor": [
+          189.0,
+          173.9439
+        ]
+      },
+      "night-0": {
+        "file": "residential-d2-l1-s2-night-0.3965b65782.webp",
+        "width": 379,
+        "height": 272,
+        "anchor": [
+          189.0,
+          173.9439
+        ]
+      },
+      "night-1": {
+        "file": "residential-d2-l1-s2-night-1.f957e1f80b.webp",
+        "width": 379,
+        "height": 252,
+        "anchor": [
+          189.0,
+          153.9437
+        ]
+      },
+      "night-2": {
+        "file": "residential-d2-l1-s2-night-2.17cdbdab3c.webp",
+        "width": 379,
+        "height": 252,
+        "anchor": [
+          189.0,
+          153.9437
+        ]
+      },
+      "night-3": {
+        "file": "residential-d2-l1-s2-night-3.87e2577fb5.webp",
+        "width": 379,
+        "height": 272,
+        "anchor": [
+          189.0,
+          173.9439
+        ]
+      },
+      "unpowered-0": {
+        "file": "residential-d2-l1-s2-unpowered-0.b2588e8224.webp",
+        "width": 379,
+        "height": 272,
+        "anchor": [
+          189.0,
+          173.9439
+        ]
+      },
+      "unpowered-1": {
+        "file": "residential-d2-l1-s2-unpowered-1.9a9d7f7354.webp",
+        "width": 379,
+        "height": 252,
+        "anchor": [
+          189.0,
+          153.9437
+        ]
+      },
+      "unpowered-2": {
+        "file": "residential-d2-l1-s2-unpowered-2.200dd922c4.webp",
+        "width": 379,
+        "height": 252,
+        "anchor": [
+          189.0,
+          153.9437
+        ]
+      },
+      "unpowered-3": {
+        "file": "residential-d2-l1-s2-unpowered-3.8f19628bc0.webp",
+        "width": 379,
+        "height": 272,
+        "anchor": [
+          189.0,
+          173.9439
+        ]
+      },
+      "day-0-v1": {
+        "file": "residential-d2-l1-s2-day-0-v1.5132012cd8.webp",
+        "width": 379,
+        "height": 272,
+        "anchor": [
+          189.0,
+          173.9439
+        ]
+      },
+      "day-1-v1": {
+        "file": "residential-d2-l1-s2-day-1-v1.093d35a2bd.webp",
+        "width": 379,
+        "height": 252,
+        "anchor": [
+          189.0,
+          153.9437
+        ]
+      },
+      "day-2-v1": {
+        "file": "residential-d2-l1-s2-day-2-v1.0f16040542.webp",
+        "width": 379,
+        "height": 252,
+        "anchor": [
+          189.0,
+          153.9437
+        ]
+      },
+      "day-3-v1": {
+        "file": "residential-d2-l1-s2-day-3-v1.a368b34326.webp",
+        "width": 379,
+        "height": 272,
+        "anchor": [
+          189.0,
+          173.9439
+        ]
+      },
+      "night-0-v1": {
+        "file": "residential-d2-l1-s2-night-0-v1.441f8516f8.webp",
+        "width": 379,
+        "height": 272,
+        "anchor": [
+          189.0,
+          173.9439
+        ]
+      },
+      "night-1-v1": {
+        "file": "residential-d2-l1-s2-night-1-v1.090e1ce6f3.webp",
+        "width": 379,
+        "height": 252,
+        "anchor": [
+          189.0,
+          153.9437
+        ]
+      },
+      "night-2-v1": {
+        "file": "residential-d2-l1-s2-night-2-v1.baa63faf2d.webp",
+        "width": 379,
+        "height": 252,
+        "anchor": [
+          189.0,
+          153.9437
+        ]
+      },
+      "night-3-v1": {
+        "file": "residential-d2-l1-s2-night-3-v1.a57ab20957.webp",
+        "width": 379,
+        "height": 272,
+        "anchor": [
+          189.0,
+          173.9439
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "residential-d2-l1-s2-unpowered-0-v1.4e1b7ea85b.webp",
+        "width": 379,
+        "height": 272,
+        "anchor": [
+          189.0,
+          173.9439
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "residential-d2-l1-s2-unpowered-1-v1.67a0961373.webp",
+        "width": 379,
+        "height": 252,
+        "anchor": [
+          189.0,
+          153.9437
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "residential-d2-l1-s2-unpowered-2-v1.3099b80165.webp",
+        "width": 379,
+        "height": 252,
+        "anchor": [
+          189.0,
+          153.9437
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "residential-d2-l1-s2-unpowered-3-v1.0f810f22d8.webp",
+        "width": 379,
+        "height": 272,
+        "anchor": [
+          189.0,
+          173.9439
+        ]
+      },
+      "day-0-v2": {
+        "file": "residential-d2-l1-s2-day-0-v2.e4ce1a62f5.webp",
+        "width": 378,
+        "height": 297,
+        "anchor": [
+          189.0,
+          198.4363
+        ]
+      },
+      "day-1-v2": {
+        "file": "residential-d2-l1-s2-day-1-v2.2c210eb23c.webp",
+        "width": 378,
+        "height": 258,
+        "anchor": [
+          189.0,
+          159.4363
+        ]
+      },
+      "day-2-v2": {
+        "file": "residential-d2-l1-s2-day-2-v2.7db732caa6.webp",
+        "width": 378,
+        "height": 258,
+        "anchor": [
+          189.0,
+          159.4363
+        ]
+      },
+      "day-3-v2": {
+        "file": "residential-d2-l1-s2-day-3-v2.637e69d8c4.webp",
+        "width": 378,
+        "height": 297,
+        "anchor": [
+          189.0,
+          198.4363
+        ]
+      },
+      "night-0-v2": {
+        "file": "residential-d2-l1-s2-night-0-v2.fcb57e51e2.webp",
+        "width": 378,
+        "height": 297,
+        "anchor": [
+          189.0,
+          198.4363
+        ]
+      },
+      "night-1-v2": {
+        "file": "residential-d2-l1-s2-night-1-v2.eaeeb587ea.webp",
+        "width": 378,
+        "height": 258,
+        "anchor": [
+          189.0,
+          159.4363
+        ]
+      },
+      "night-2-v2": {
+        "file": "residential-d2-l1-s2-night-2-v2.5895b2c31b.webp",
+        "width": 378,
+        "height": 258,
+        "anchor": [
+          189.0,
+          159.4363
+        ]
+      },
+      "night-3-v2": {
+        "file": "residential-d2-l1-s2-night-3-v2.f0597f7235.webp",
+        "width": 378,
+        "height": 297,
+        "anchor": [
+          189.0,
+          198.4363
+        ]
+      },
+      "unpowered-0-v2": {
+        "file": "residential-d2-l1-s2-unpowered-0-v2.2ec95852a5.webp",
+        "width": 378,
+        "height": 297,
+        "anchor": [
+          189.0,
+          198.4363
+        ]
+      },
+      "unpowered-1-v2": {
+        "file": "residential-d2-l1-s2-unpowered-1-v2.06ecd5c132.webp",
+        "width": 378,
+        "height": 258,
+        "anchor": [
+          189.0,
+          159.4363
+        ]
+      },
+      "unpowered-2-v2": {
+        "file": "residential-d2-l1-s2-unpowered-2-v2.02dbdad2ec.webp",
+        "width": 378,
+        "height": 258,
+        "anchor": [
+          189.0,
+          159.4363
+        ]
+      },
+      "unpowered-3-v2": {
+        "file": "residential-d2-l1-s2-unpowered-3-v2.1f3be278de.webp",
+        "width": 378,
+        "height": 297,
+        "anchor": [
+          189.0,
+          198.4363
+        ]
+      }
+    },
+    "family": "residential",
+    "zone": {
+      "type": "residential",
+      "density": 2,
+      "level": 1
+    },
+    "label": "Residential \u00b7 density 2 \u00b7 stage 1 \u00b7 2\u00d72",
+    "description": "Residential density 2, growth stage 1, authored specifically for a 2\u00d72 lot.",
+    "variants": [
+      {
+        "model": "residential-d2-l1-s2",
+        "label": "Masonry apartments",
+        "description": "Residential density 2, growth stage 1, authored specifically for a 2\u00d72 lot. Masonry apartments."
+      },
+      {
+        "model": "residential-d2-l1-s2_v1",
+        "label": "Brick brownstones",
+        "description": "Residential density 2, growth stage 1, authored specifically for a 2\u00d72 lot. Brick brownstones."
+      },
+      {
+        "model": "residential-d2-l1-s2_v2",
+        "label": "Balcony apartments",
+        "description": "Residential density 2, growth stage 1, authored specifically for a 2\u00d72 lot. Balcony apartments."
+      }
+    ]
+  },
+  "residential-d2-l2-s1": {
+    "tiles": 1,
+    "scale": 3,
+    "height": 40,
+    "frames": {
+      "day-0": {
+        "file": "residential-d2-l2-s1-day-0.de6fb6e00d.webp",
+        "width": 186,
+        "height": 204,
+        "anchor": [
+          93.0,
+          154.0242
+        ]
+      },
+      "day-1": {
+        "file": "residential-d2-l2-s1-day-1.01610d88e2.webp",
+        "width": 186,
+        "height": 196,
+        "anchor": [
+          93.0,
+          146.0242
+        ]
+      },
+      "day-2": {
+        "file": "residential-d2-l2-s1-day-2.15ee4d7fd2.webp",
+        "width": 186,
+        "height": 197,
+        "anchor": [
+          93.0,
+          147.0242
+        ]
+      },
+      "day-3": {
+        "file": "residential-d2-l2-s1-day-3.c1efe3a964.webp",
+        "width": 186,
+        "height": 204,
+        "anchor": [
+          93.0,
+          154.0242
+        ]
+      },
+      "night-0": {
+        "file": "residential-d2-l2-s1-night-0.cb6ae5cca2.webp",
+        "width": 186,
+        "height": 204,
+        "anchor": [
+          93.0,
+          154.0242
+        ]
+      },
+      "night-1": {
+        "file": "residential-d2-l2-s1-night-1.7ba52e09b0.webp",
+        "width": 186,
+        "height": 196,
+        "anchor": [
+          93.0,
+          146.0242
+        ]
+      },
+      "night-2": {
+        "file": "residential-d2-l2-s1-night-2.075b4a476e.webp",
+        "width": 186,
+        "height": 197,
+        "anchor": [
+          93.0,
+          147.0242
+        ]
+      },
+      "night-3": {
+        "file": "residential-d2-l2-s1-night-3.090cb1b4d1.webp",
+        "width": 186,
+        "height": 204,
+        "anchor": [
+          93.0,
+          154.0242
+        ]
+      },
+      "unpowered-0": {
+        "file": "residential-d2-l2-s1-unpowered-0.fa71f091c1.webp",
+        "width": 186,
+        "height": 204,
+        "anchor": [
+          93.0,
+          154.0242
+        ]
+      },
+      "unpowered-1": {
+        "file": "residential-d2-l2-s1-unpowered-1.9632f6daa4.webp",
+        "width": 186,
+        "height": 196,
+        "anchor": [
+          93.0,
+          146.0242
+        ]
+      },
+      "unpowered-2": {
+        "file": "residential-d2-l2-s1-unpowered-2.aa36f54a17.webp",
+        "width": 186,
+        "height": 197,
+        "anchor": [
+          93.0,
+          147.0242
+        ]
+      },
+      "unpowered-3": {
+        "file": "residential-d2-l2-s1-unpowered-3.4d0a1925c8.webp",
+        "width": 186,
+        "height": 204,
+        "anchor": [
+          93.0,
+          154.0242
+        ]
+      },
+      "day-0-v1": {
+        "file": "residential-d2-l2-s1-day-0-v1.11153c8559.webp",
+        "width": 186,
+        "height": 205,
+        "anchor": [
+          93.0,
+          154.4363
+        ]
+      },
+      "day-1-v1": {
+        "file": "residential-d2-l2-s1-day-1-v1.4f4c736345.webp",
+        "width": 186,
+        "height": 197,
+        "anchor": [
+          93.0,
+          146.4363
+        ]
+      },
+      "day-2-v1": {
+        "file": "residential-d2-l2-s1-day-2-v1.8b651dedad.webp",
+        "width": 186,
+        "height": 197,
+        "anchor": [
+          93.0,
+          146.4363
+        ]
+      },
+      "day-3-v1": {
+        "file": "residential-d2-l2-s1-day-3-v1.cca2258256.webp",
+        "width": 186,
+        "height": 205,
+        "anchor": [
+          93.0,
+          154.4363
+        ]
+      },
+      "night-0-v1": {
+        "file": "residential-d2-l2-s1-night-0-v1.dc05f7af13.webp",
+        "width": 186,
+        "height": 205,
+        "anchor": [
+          93.0,
+          154.4363
+        ]
+      },
+      "night-1-v1": {
+        "file": "residential-d2-l2-s1-night-1-v1.acfa7cbcd0.webp",
+        "width": 186,
+        "height": 197,
+        "anchor": [
+          93.0,
+          146.4363
+        ]
+      },
+      "night-2-v1": {
+        "file": "residential-d2-l2-s1-night-2-v1.49b9480876.webp",
+        "width": 186,
+        "height": 197,
+        "anchor": [
+          93.0,
+          146.4363
+        ]
+      },
+      "night-3-v1": {
+        "file": "residential-d2-l2-s1-night-3-v1.9cca296aaf.webp",
+        "width": 186,
+        "height": 205,
+        "anchor": [
+          93.0,
+          154.4363
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "residential-d2-l2-s1-unpowered-0-v1.0e0244875c.webp",
+        "width": 186,
+        "height": 205,
+        "anchor": [
+          93.0,
+          154.4363
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "residential-d2-l2-s1-unpowered-1-v1.502a32d69e.webp",
+        "width": 186,
+        "height": 197,
+        "anchor": [
+          93.0,
+          146.4363
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "residential-d2-l2-s1-unpowered-2-v1.2002b11450.webp",
+        "width": 186,
+        "height": 197,
+        "anchor": [
+          93.0,
+          146.4363
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "residential-d2-l2-s1-unpowered-3-v1.7ee6ffe60a.webp",
+        "width": 186,
+        "height": 205,
+        "anchor": [
+          93.0,
+          154.4363
+        ]
+      },
+      "day-0-v2": {
+        "file": "residential-d2-l2-s1-day-0-v2.44022d81c6.webp",
+        "width": 186,
+        "height": 205,
+        "anchor": [
+          93.0,
+          154.4363
+        ]
+      },
+      "day-1-v2": {
+        "file": "residential-d2-l2-s1-day-1-v2.2bbb95a809.webp",
+        "width": 186,
+        "height": 197,
+        "anchor": [
+          93.0,
+          146.4363
+        ]
+      },
+      "day-2-v2": {
+        "file": "residential-d2-l2-s1-day-2-v2.5ab428a417.webp",
+        "width": 186,
+        "height": 197,
+        "anchor": [
+          93.0,
+          146.4363
+        ]
+      },
+      "day-3-v2": {
+        "file": "residential-d2-l2-s1-day-3-v2.f4f911cdee.webp",
+        "width": 186,
+        "height": 205,
+        "anchor": [
+          93.0,
+          154.4363
+        ]
+      },
+      "night-0-v2": {
+        "file": "residential-d2-l2-s1-night-0-v2.f3a6bb98fd.webp",
+        "width": 186,
+        "height": 205,
+        "anchor": [
+          93.0,
+          154.4363
+        ]
+      },
+      "night-1-v2": {
+        "file": "residential-d2-l2-s1-night-1-v2.931d6a184b.webp",
+        "width": 186,
+        "height": 197,
+        "anchor": [
+          93.0,
+          146.4363
+        ]
+      },
+      "night-2-v2": {
+        "file": "residential-d2-l2-s1-night-2-v2.c871ae5e4b.webp",
+        "width": 186,
+        "height": 197,
+        "anchor": [
+          93.0,
+          146.4363
+        ]
+      },
+      "night-3-v2": {
+        "file": "residential-d2-l2-s1-night-3-v2.19b99edab0.webp",
+        "width": 186,
+        "height": 205,
+        "anchor": [
+          93.0,
+          154.4363
+        ]
+      },
+      "unpowered-0-v2": {
+        "file": "residential-d2-l2-s1-unpowered-0-v2.eccadcf2f7.webp",
+        "width": 186,
+        "height": 205,
+        "anchor": [
+          93.0,
+          154.4363
+        ]
+      },
+      "unpowered-1-v2": {
+        "file": "residential-d2-l2-s1-unpowered-1-v2.4132dc5471.webp",
+        "width": 186,
+        "height": 197,
+        "anchor": [
+          93.0,
+          146.4363
+        ]
+      },
+      "unpowered-2-v2": {
+        "file": "residential-d2-l2-s1-unpowered-2-v2.353a1ee853.webp",
+        "width": 186,
+        "height": 197,
+        "anchor": [
+          93.0,
+          146.4363
+        ]
+      },
+      "unpowered-3-v2": {
+        "file": "residential-d2-l2-s1-unpowered-3-v2.ee25425456.webp",
+        "width": 186,
+        "height": 205,
+        "anchor": [
+          93.0,
+          154.4363
+        ]
+      }
+    },
+    "family": "residential",
+    "zone": {
+      "type": "residential",
+      "density": 2,
+      "level": 2
+    },
+    "label": "Residential \u00b7 density 2 \u00b7 stage 2 \u00b7 1\u00d71",
+    "description": "Residential density 2, growth stage 2, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d2-l2-s1",
+        "label": "Masonry apartments",
+        "description": "Residential density 2, growth stage 2, authored specifically for a 1\u00d71 lot. Masonry apartments."
+      },
+      {
+        "model": "residential-d2-l2-s1_v1",
+        "label": "Brick brownstones",
+        "description": "Residential density 2, growth stage 2, authored specifically for a 1\u00d71 lot. Brick brownstones."
+      },
+      {
+        "model": "residential-d2-l2-s1_v2",
+        "label": "Balcony apartments",
+        "description": "Residential density 2, growth stage 2, authored specifically for a 1\u00d71 lot. Balcony apartments."
+      }
+    ]
+  },
+  "residential-d2-l2-s2": {
+    "tiles": 2,
+    "scale": 3,
+    "height": 48,
+    "frames": {
+      "day-0": {
+        "file": "residential-d2-l2-s2-day-0.6324da43f8.webp",
+        "width": 378,
+        "height": 298,
+        "anchor": [
+          189.0,
+          199.4363
+        ]
+      },
+      "day-1": {
+        "file": "residential-d2-l2-s2-day-1.b08b54aa6f.webp",
+        "width": 378,
+        "height": 277,
+        "anchor": [
+          189.0,
+          178.4363
+        ]
+      },
+      "day-2": {
+        "file": "residential-d2-l2-s2-day-2.ee7ead25a4.webp",
+        "width": 378,
+        "height": 277,
+        "anchor": [
+          189.0,
+          178.4363
+        ]
+      },
+      "day-3": {
+        "file": "residential-d2-l2-s2-day-3.a9e803fae5.webp",
+        "width": 378,
+        "height": 297,
+        "anchor": [
+          189.0,
+          198.4363
+        ]
+      },
+      "night-0": {
+        "file": "residential-d2-l2-s2-night-0.59e9b4b43a.webp",
+        "width": 378,
+        "height": 298,
+        "anchor": [
+          189.0,
+          199.4363
+        ]
+      },
+      "night-1": {
+        "file": "residential-d2-l2-s2-night-1.1c097dd8fe.webp",
+        "width": 378,
+        "height": 277,
+        "anchor": [
+          189.0,
+          178.4363
+        ]
+      },
+      "night-2": {
+        "file": "residential-d2-l2-s2-night-2.a6f0b496e8.webp",
+        "width": 378,
+        "height": 277,
+        "anchor": [
+          189.0,
+          178.4363
+        ]
+      },
+      "night-3": {
+        "file": "residential-d2-l2-s2-night-3.6da7b76009.webp",
+        "width": 378,
+        "height": 297,
+        "anchor": [
+          189.0,
+          198.4363
+        ]
+      },
+      "unpowered-0": {
+        "file": "residential-d2-l2-s2-unpowered-0.c88c534b8f.webp",
+        "width": 378,
+        "height": 298,
+        "anchor": [
+          189.0,
+          199.4363
+        ]
+      },
+      "unpowered-1": {
+        "file": "residential-d2-l2-s2-unpowered-1.cdd8149d63.webp",
+        "width": 378,
+        "height": 277,
+        "anchor": [
+          189.0,
+          178.4363
+        ]
+      },
+      "unpowered-2": {
+        "file": "residential-d2-l2-s2-unpowered-2.88589efef0.webp",
+        "width": 378,
+        "height": 277,
+        "anchor": [
+          189.0,
+          178.4363
+        ]
+      },
+      "unpowered-3": {
+        "file": "residential-d2-l2-s2-unpowered-3.8615034a37.webp",
+        "width": 378,
+        "height": 297,
+        "anchor": [
+          189.0,
+          198.4363
+        ]
+      },
+      "day-0-v1": {
+        "file": "residential-d2-l2-s2-day-0-v1.640fbeb68d.webp",
+        "width": 378,
+        "height": 298,
+        "anchor": [
+          189.0,
+          199.4363
+        ]
+      },
+      "day-1-v1": {
+        "file": "residential-d2-l2-s2-day-1-v1.af7a3843b0.webp",
+        "width": 378,
+        "height": 277,
+        "anchor": [
+          189.0,
+          178.4363
+        ]
+      },
+      "day-2-v1": {
+        "file": "residential-d2-l2-s2-day-2-v1.46cfdf6b25.webp",
+        "width": 378,
+        "height": 277,
+        "anchor": [
+          189.0,
+          178.4363
+        ]
+      },
+      "day-3-v1": {
+        "file": "residential-d2-l2-s2-day-3-v1.0374bfeb0c.webp",
+        "width": 378,
+        "height": 297,
+        "anchor": [
+          189.0,
+          198.4363
+        ]
+      },
+      "night-0-v1": {
+        "file": "residential-d2-l2-s2-night-0-v1.c7f5592bd1.webp",
+        "width": 378,
+        "height": 298,
+        "anchor": [
+          189.0,
+          199.4363
+        ]
+      },
+      "night-1-v1": {
+        "file": "residential-d2-l2-s2-night-1-v1.c537c65071.webp",
+        "width": 378,
+        "height": 277,
+        "anchor": [
+          189.0,
+          178.4363
+        ]
+      },
+      "night-2-v1": {
+        "file": "residential-d2-l2-s2-night-2-v1.565a6960e3.webp",
+        "width": 378,
+        "height": 277,
+        "anchor": [
+          189.0,
+          178.4363
+        ]
+      },
+      "night-3-v1": {
+        "file": "residential-d2-l2-s2-night-3-v1.b2c1c3178f.webp",
+        "width": 378,
+        "height": 297,
+        "anchor": [
+          189.0,
+          198.4363
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "residential-d2-l2-s2-unpowered-0-v1.848e2fb9d4.webp",
+        "width": 378,
+        "height": 298,
+        "anchor": [
+          189.0,
+          199.4363
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "residential-d2-l2-s2-unpowered-1-v1.5903dd8293.webp",
+        "width": 378,
+        "height": 277,
+        "anchor": [
+          189.0,
+          178.4363
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "residential-d2-l2-s2-unpowered-2-v1.af087898a3.webp",
+        "width": 378,
+        "height": 277,
+        "anchor": [
+          189.0,
+          178.4363
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "residential-d2-l2-s2-unpowered-3-v1.625b03dd96.webp",
+        "width": 378,
+        "height": 297,
+        "anchor": [
+          189.0,
+          198.4363
+        ]
+      },
+      "day-0-v2": {
+        "file": "residential-d2-l2-s2-day-0-v2.a4bec80ce3.webp",
+        "width": 378,
+        "height": 321,
+        "anchor": [
+          189.0,
+          222.9287
+        ]
+      },
+      "day-1-v2": {
+        "file": "residential-d2-l2-s2-day-1-v2.420e5d8ee1.webp",
+        "width": 378,
+        "height": 282,
+        "anchor": [
+          189.0,
+          183.9286
+        ]
+      },
+      "day-2-v2": {
+        "file": "residential-d2-l2-s2-day-2-v2.77142a73fe.webp",
+        "width": 378,
+        "height": 283,
+        "anchor": [
+          189.0,
+          184.9286
+        ]
+      },
+      "day-3-v2": {
+        "file": "residential-d2-l2-s2-day-3-v2.43ff366fdf.webp",
+        "width": 378,
+        "height": 322,
+        "anchor": [
+          189.0,
+          223.9287
+        ]
+      },
+      "night-0-v2": {
+        "file": "residential-d2-l2-s2-night-0-v2.ed740b6e12.webp",
+        "width": 378,
+        "height": 321,
+        "anchor": [
+          189.0,
+          222.9287
+        ]
+      },
+      "night-1-v2": {
+        "file": "residential-d2-l2-s2-night-1-v2.a894e36c50.webp",
+        "width": 378,
+        "height": 282,
+        "anchor": [
+          189.0,
+          183.9286
+        ]
+      },
+      "night-2-v2": {
+        "file": "residential-d2-l2-s2-night-2-v2.bc59451dd8.webp",
+        "width": 378,
+        "height": 283,
+        "anchor": [
+          189.0,
+          184.9286
+        ]
+      },
+      "night-3-v2": {
+        "file": "residential-d2-l2-s2-night-3-v2.b758f1787f.webp",
+        "width": 378,
+        "height": 322,
+        "anchor": [
+          189.0,
+          223.9287
+        ]
+      },
+      "unpowered-0-v2": {
+        "file": "residential-d2-l2-s2-unpowered-0-v2.32d66637f7.webp",
+        "width": 378,
+        "height": 321,
+        "anchor": [
+          189.0,
+          222.9287
+        ]
+      },
+      "unpowered-1-v2": {
+        "file": "residential-d2-l2-s2-unpowered-1-v2.c2b0a560d8.webp",
+        "width": 378,
+        "height": 282,
+        "anchor": [
+          189.0,
+          183.9286
+        ]
+      },
+      "unpowered-2-v2": {
+        "file": "residential-d2-l2-s2-unpowered-2-v2.24351e9daa.webp",
+        "width": 378,
+        "height": 283,
+        "anchor": [
+          189.0,
+          184.9286
+        ]
+      },
+      "unpowered-3-v2": {
+        "file": "residential-d2-l2-s2-unpowered-3-v2.b09c6c1fb0.webp",
+        "width": 378,
+        "height": 322,
+        "anchor": [
+          189.0,
+          223.9287
+        ]
+      }
+    },
+    "family": "residential",
+    "zone": {
+      "type": "residential",
+      "density": 2,
+      "level": 2
+    },
+    "label": "Residential \u00b7 density 2 \u00b7 stage 2 \u00b7 2\u00d72",
+    "description": "Residential density 2, growth stage 2, authored specifically for a 2\u00d72 lot.",
+    "variants": [
+      {
+        "model": "residential-d2-l2-s2",
+        "label": "Masonry apartments",
+        "description": "Residential density 2, growth stage 2, authored specifically for a 2\u00d72 lot. Masonry apartments."
+      },
+      {
+        "model": "residential-d2-l2-s2_v1",
+        "label": "Brick brownstones",
+        "description": "Residential density 2, growth stage 2, authored specifically for a 2\u00d72 lot. Brick brownstones."
+      },
+      {
+        "model": "residential-d2-l2-s2_v2",
+        "label": "Balcony apartments",
+        "description": "Residential density 2, growth stage 2, authored specifically for a 2\u00d72 lot. Balcony apartments."
+      }
+    ]
+  },
+  "residential-d2-l3-s1": {
+    "tiles": 1,
+    "scale": 3,
+    "height": 49,
+    "frames": {
+      "day-0": {
+        "file": "residential-d2-l3-s1-day-0.5994ac3f41.webp",
+        "width": 186,
+        "height": 230,
+        "anchor": [
+          92.9999,
+          179.5165
+        ]
+      },
+      "day-1": {
+        "file": "residential-d2-l3-s1-day-1.0eaea35387.webp",
+        "width": 186,
+        "height": 222,
+        "anchor": [
+          92.9999,
+          171.5166
+        ]
+      },
+      "day-2": {
+        "file": "residential-d2-l3-s1-day-2.bb33f10a1f.webp",
+        "width": 186,
+        "height": 222,
+        "anchor": [
+          93.0001,
+          171.5166
+        ]
+      },
+      "day-3": {
+        "file": "residential-d2-l3-s1-day-3.a8279d6373.webp",
+        "width": 186,
+        "height": 230,
+        "anchor": [
+          93.0001,
+          179.5165
+        ]
+      },
+      "night-0": {
+        "file": "residential-d2-l3-s1-night-0.c384b7c729.webp",
+        "width": 186,
+        "height": 230,
+        "anchor": [
+          92.9999,
+          179.5165
+        ]
+      },
+      "night-1": {
+        "file": "residential-d2-l3-s1-night-1.3334955294.webp",
+        "width": 186,
+        "height": 222,
+        "anchor": [
+          92.9999,
+          171.5166
+        ]
+      },
+      "night-2": {
+        "file": "residential-d2-l3-s1-night-2.e6f9ae1072.webp",
+        "width": 186,
+        "height": 222,
+        "anchor": [
+          93.0001,
+          171.5166
+        ]
+      },
+      "night-3": {
+        "file": "residential-d2-l3-s1-night-3.29abc8c684.webp",
+        "width": 186,
+        "height": 230,
+        "anchor": [
+          93.0001,
+          179.5165
+        ]
+      },
+      "unpowered-0": {
+        "file": "residential-d2-l3-s1-unpowered-0.bb6fee6c1f.webp",
+        "width": 186,
+        "height": 230,
+        "anchor": [
+          92.9999,
+          179.5165
+        ]
+      },
+      "unpowered-1": {
+        "file": "residential-d2-l3-s1-unpowered-1.6d3ea1974a.webp",
+        "width": 186,
+        "height": 222,
+        "anchor": [
+          92.9999,
+          171.5166
+        ]
+      },
+      "unpowered-2": {
+        "file": "residential-d2-l3-s1-unpowered-2.5da293d033.webp",
+        "width": 186,
+        "height": 222,
+        "anchor": [
+          93.0001,
+          171.5166
+        ]
+      },
+      "unpowered-3": {
+        "file": "residential-d2-l3-s1-unpowered-3.e5223a8f04.webp",
+        "width": 186,
+        "height": 230,
+        "anchor": [
+          93.0001,
+          179.5165
+        ]
+      },
+      "day-0-v1": {
+        "file": "residential-d2-l3-s1-day-0-v1.ef36abf956.webp",
+        "width": 186,
+        "height": 229,
+        "anchor": [
+          93.0,
+          178.9287
+        ]
+      },
+      "day-1-v1": {
+        "file": "residential-d2-l3-s1-day-1-v1.2ba711488f.webp",
+        "width": 186,
+        "height": 221,
+        "anchor": [
+          93.0,
+          170.9286
+        ]
+      },
+      "day-2-v1": {
+        "file": "residential-d2-l3-s1-day-2-v1.f1a0fcf7e3.webp",
+        "width": 186,
+        "height": 221,
+        "anchor": [
+          93.0,
+          170.9286
+        ]
+      },
+      "day-3-v1": {
+        "file": "residential-d2-l3-s1-day-3-v1.0efbb0b19a.webp",
+        "width": 186,
+        "height": 229,
+        "anchor": [
+          93.0,
+          178.9287
+        ]
+      },
+      "night-0-v1": {
+        "file": "residential-d2-l3-s1-night-0-v1.235ac1f68c.webp",
+        "width": 186,
+        "height": 229,
+        "anchor": [
+          93.0,
+          178.9287
+        ]
+      },
+      "night-1-v1": {
+        "file": "residential-d2-l3-s1-night-1-v1.05008df1d1.webp",
+        "width": 186,
+        "height": 221,
+        "anchor": [
+          93.0,
+          170.9286
+        ]
+      },
+      "night-2-v1": {
+        "file": "residential-d2-l3-s1-night-2-v1.354b9f5f85.webp",
+        "width": 186,
+        "height": 221,
+        "anchor": [
+          93.0,
+          170.9286
+        ]
+      },
+      "night-3-v1": {
+        "file": "residential-d2-l3-s1-night-3-v1.8195cc3833.webp",
+        "width": 186,
+        "height": 229,
+        "anchor": [
+          93.0,
+          178.9287
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "residential-d2-l3-s1-unpowered-0-v1.0890fa54cf.webp",
+        "width": 186,
+        "height": 229,
+        "anchor": [
+          93.0,
+          178.9287
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "residential-d2-l3-s1-unpowered-1-v1.0967f2be3f.webp",
+        "width": 186,
+        "height": 221,
+        "anchor": [
+          93.0,
+          170.9286
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "residential-d2-l3-s1-unpowered-2-v1.ab712b159b.webp",
+        "width": 186,
+        "height": 221,
+        "anchor": [
+          93.0,
+          170.9286
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "residential-d2-l3-s1-unpowered-3-v1.6f3ff13c38.webp",
+        "width": 186,
+        "height": 229,
+        "anchor": [
+          93.0,
+          178.9287
+        ]
+      },
+      "day-0-v2": {
+        "file": "residential-d2-l3-s1-day-0-v2.62be34c5a5.webp",
+        "width": 186,
+        "height": 229,
+        "anchor": [
+          93.0,
+          178.9287
+        ]
+      },
+      "day-1-v2": {
+        "file": "residential-d2-l3-s1-day-1-v2.5c7d7a09f0.webp",
+        "width": 186,
+        "height": 221,
+        "anchor": [
+          93.0,
+          170.9286
+        ]
+      },
+      "day-2-v2": {
+        "file": "residential-d2-l3-s1-day-2-v2.63b4332e49.webp",
+        "width": 186,
+        "height": 221,
+        "anchor": [
+          93.0,
+          170.9286
+        ]
+      },
+      "day-3-v2": {
+        "file": "residential-d2-l3-s1-day-3-v2.4980426baa.webp",
+        "width": 186,
+        "height": 229,
+        "anchor": [
+          93.0,
+          178.9287
+        ]
+      },
+      "night-0-v2": {
+        "file": "residential-d2-l3-s1-night-0-v2.7ef128ea5e.webp",
+        "width": 186,
+        "height": 229,
+        "anchor": [
+          93.0,
+          178.9287
+        ]
+      },
+      "night-1-v2": {
+        "file": "residential-d2-l3-s1-night-1-v2.68455d4439.webp",
+        "width": 186,
+        "height": 221,
+        "anchor": [
+          93.0,
+          170.9286
+        ]
+      },
+      "night-2-v2": {
+        "file": "residential-d2-l3-s1-night-2-v2.f4d376bc46.webp",
+        "width": 186,
+        "height": 221,
+        "anchor": [
+          93.0,
+          170.9286
+        ]
+      },
+      "night-3-v2": {
+        "file": "residential-d2-l3-s1-night-3-v2.d1cb38eb69.webp",
+        "width": 186,
+        "height": 229,
+        "anchor": [
+          93.0,
+          178.9287
+        ]
+      },
+      "unpowered-0-v2": {
+        "file": "residential-d2-l3-s1-unpowered-0-v2.ffe8cbe6a7.webp",
+        "width": 186,
+        "height": 229,
+        "anchor": [
+          93.0,
+          178.9287
+        ]
+      },
+      "unpowered-1-v2": {
+        "file": "residential-d2-l3-s1-unpowered-1-v2.812e0042f1.webp",
+        "width": 186,
+        "height": 221,
+        "anchor": [
+          93.0,
+          170.9286
+        ]
+      },
+      "unpowered-2-v2": {
+        "file": "residential-d2-l3-s1-unpowered-2-v2.4a8a74f594.webp",
+        "width": 186,
+        "height": 221,
+        "anchor": [
+          93.0,
+          170.9286
+        ]
+      },
+      "unpowered-3-v2": {
+        "file": "residential-d2-l3-s1-unpowered-3-v2.80aac72f1a.webp",
+        "width": 186,
+        "height": 229,
+        "anchor": [
+          93.0,
+          178.9287
+        ]
+      }
+    },
+    "family": "residential",
+    "zone": {
+      "type": "residential",
+      "density": 2,
+      "level": 3
+    },
+    "label": "Residential \u00b7 density 2 \u00b7 stage 3 \u00b7 1\u00d71",
+    "description": "Residential density 2, growth stage 3, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d2-l3-s1",
+        "label": "Masonry apartments",
+        "description": "Residential density 2, growth stage 3, authored specifically for a 1\u00d71 lot. Masonry apartments."
+      },
+      {
+        "model": "residential-d2-l3-s1_v1",
+        "label": "Brick brownstones",
+        "description": "Residential density 2, growth stage 3, authored specifically for a 1\u00d71 lot. Brick brownstones."
+      },
+      {
+        "model": "residential-d2-l3-s1_v2",
+        "label": "Balcony apartments",
+        "description": "Residential density 2, growth stage 3, authored specifically for a 1\u00d71 lot. Balcony apartments."
+      }
+    ]
+  },
+  "residential-d2-l3-s2": {
+    "tiles": 2,
+    "scale": 3,
+    "height": 56,
+    "frames": {
+      "day-0": {
+        "file": "residential-d2-l3-s2-day-0.e15a67bdf5.webp",
+        "width": 378,
+        "height": 322,
+        "anchor": [
+          189.0,
+          223.9287
+        ]
+      },
+      "day-1": {
+        "file": "residential-d2-l3-s2-day-1.c096edf4c8.webp",
+        "width": 378,
+        "height": 302,
+        "anchor": [
+          189.0,
+          203.9286
+        ]
+      },
+      "day-2": {
+        "file": "residential-d2-l3-s2-day-2.ebe43902b2.webp",
+        "width": 378,
+        "height": 302,
+        "anchor": [
+          189.0,
+          203.9286
+        ]
+      },
+      "day-3": {
+        "file": "residential-d2-l3-s2-day-3.fc15a10cfd.webp",
+        "width": 378,
+        "height": 322,
+        "anchor": [
+          189.0,
+          223.9287
+        ]
+      },
+      "night-0": {
+        "file": "residential-d2-l3-s2-night-0.b44a6d5468.webp",
+        "width": 378,
+        "height": 322,
+        "anchor": [
+          189.0,
+          223.9287
+        ]
+      },
+      "night-1": {
+        "file": "residential-d2-l3-s2-night-1.3e3f3effb7.webp",
+        "width": 378,
+        "height": 302,
+        "anchor": [
+          189.0,
+          203.9286
+        ]
+      },
+      "night-2": {
+        "file": "residential-d2-l3-s2-night-2.91dd7b5c67.webp",
+        "width": 378,
+        "height": 302,
+        "anchor": [
+          189.0,
+          203.9286
+        ]
+      },
+      "night-3": {
+        "file": "residential-d2-l3-s2-night-3.405a01fe2b.webp",
+        "width": 378,
+        "height": 322,
+        "anchor": [
+          189.0,
+          223.9287
+        ]
+      },
+      "unpowered-0": {
+        "file": "residential-d2-l3-s2-unpowered-0.caa3be0a5e.webp",
+        "width": 378,
+        "height": 322,
+        "anchor": [
+          189.0,
+          223.9287
+        ]
+      },
+      "unpowered-1": {
+        "file": "residential-d2-l3-s2-unpowered-1.f260ff8892.webp",
+        "width": 378,
+        "height": 302,
+        "anchor": [
+          189.0,
+          203.9286
+        ]
+      },
+      "unpowered-2": {
+        "file": "residential-d2-l3-s2-unpowered-2.4512f805a6.webp",
+        "width": 378,
+        "height": 302,
+        "anchor": [
+          189.0,
+          203.9286
+        ]
+      },
+      "unpowered-3": {
+        "file": "residential-d2-l3-s2-unpowered-3.774943da6c.webp",
+        "width": 378,
+        "height": 322,
+        "anchor": [
+          189.0,
+          223.9287
+        ]
+      },
+      "day-0-v1": {
+        "file": "residential-d2-l3-s2-day-0-v1.e9c75136b7.webp",
+        "width": 378,
+        "height": 322,
+        "anchor": [
+          189.0,
+          223.9287
+        ]
+      },
+      "day-1-v1": {
+        "file": "residential-d2-l3-s2-day-1-v1.7cc10ec58d.webp",
+        "width": 378,
+        "height": 302,
+        "anchor": [
+          189.0,
+          203.9286
+        ]
+      },
+      "day-2-v1": {
+        "file": "residential-d2-l3-s2-day-2-v1.dfd9f8ea10.webp",
+        "width": 378,
+        "height": 302,
+        "anchor": [
+          189.0,
+          203.9286
+        ]
+      },
+      "day-3-v1": {
+        "file": "residential-d2-l3-s2-day-3-v1.0ea054e504.webp",
+        "width": 378,
+        "height": 322,
+        "anchor": [
+          189.0,
+          223.9287
+        ]
+      },
+      "night-0-v1": {
+        "file": "residential-d2-l3-s2-night-0-v1.53aa2be0dc.webp",
+        "width": 378,
+        "height": 322,
+        "anchor": [
+          189.0,
+          223.9287
+        ]
+      },
+      "night-1-v1": {
+        "file": "residential-d2-l3-s2-night-1-v1.56f8477048.webp",
+        "width": 378,
+        "height": 302,
+        "anchor": [
+          189.0,
+          203.9286
+        ]
+      },
+      "night-2-v1": {
+        "file": "residential-d2-l3-s2-night-2-v1.a839f7f79e.webp",
+        "width": 378,
+        "height": 302,
+        "anchor": [
+          189.0,
+          203.9286
+        ]
+      },
+      "night-3-v1": {
+        "file": "residential-d2-l3-s2-night-3-v1.62567cdf72.webp",
+        "width": 378,
+        "height": 322,
+        "anchor": [
+          189.0,
+          223.9287
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "residential-d2-l3-s2-unpowered-0-v1.4953562ff7.webp",
+        "width": 378,
+        "height": 322,
+        "anchor": [
+          189.0,
+          223.9287
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "residential-d2-l3-s2-unpowered-1-v1.2732caebc6.webp",
+        "width": 378,
+        "height": 302,
+        "anchor": [
+          189.0,
+          203.9286
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "residential-d2-l3-s2-unpowered-2-v1.464823e05c.webp",
+        "width": 378,
+        "height": 302,
+        "anchor": [
+          189.0,
+          203.9286
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "residential-d2-l3-s2-unpowered-3-v1.a6e5a24b44.webp",
+        "width": 378,
+        "height": 322,
+        "anchor": [
+          189.0,
+          223.9287
+        ]
+      },
+      "day-0-v2": {
+        "file": "residential-d2-l3-s2-day-0-v2.137e2f365d.webp",
+        "width": 379,
+        "height": 347,
+        "anchor": [
+          190.0,
+          248.4211
+        ]
+      },
+      "day-1-v2": {
+        "file": "residential-d2-l3-s2-day-1-v2.a220285f6c.webp",
+        "width": 379,
+        "height": 308,
+        "anchor": [
+          190.0,
+          209.4211
+        ]
+      },
+      "day-2-v2": {
+        "file": "residential-d2-l3-s2-day-2-v2.229e12514c.webp",
+        "width": 379,
+        "height": 308,
+        "anchor": [
+          190.0,
+          209.4211
+        ]
+      },
+      "day-3-v2": {
+        "file": "residential-d2-l3-s2-day-3-v2.93c3a6935b.webp",
+        "width": 379,
+        "height": 347,
+        "anchor": [
+          190.0,
+          248.4211
+        ]
+      },
+      "night-0-v2": {
+        "file": "residential-d2-l3-s2-night-0-v2.3a4174bf3a.webp",
+        "width": 379,
+        "height": 347,
+        "anchor": [
+          190.0,
+          248.4211
+        ]
+      },
+      "night-1-v2": {
+        "file": "residential-d2-l3-s2-night-1-v2.0086c81285.webp",
+        "width": 379,
+        "height": 308,
+        "anchor": [
+          190.0,
+          209.4211
+        ]
+      },
+      "night-2-v2": {
+        "file": "residential-d2-l3-s2-night-2-v2.0010d17dd3.webp",
+        "width": 379,
+        "height": 308,
+        "anchor": [
+          190.0,
+          209.4211
+        ]
+      },
+      "night-3-v2": {
+        "file": "residential-d2-l3-s2-night-3-v2.8879c3a4b3.webp",
+        "width": 379,
+        "height": 347,
+        "anchor": [
+          190.0,
+          248.4211
+        ]
+      },
+      "unpowered-0-v2": {
+        "file": "residential-d2-l3-s2-unpowered-0-v2.336ea7935f.webp",
+        "width": 379,
+        "height": 347,
+        "anchor": [
+          190.0,
+          248.4211
+        ]
+      },
+      "unpowered-1-v2": {
+        "file": "residential-d2-l3-s2-unpowered-1-v2.31c854c856.webp",
+        "width": 379,
+        "height": 308,
+        "anchor": [
+          190.0,
+          209.4211
+        ]
+      },
+      "unpowered-2-v2": {
+        "file": "residential-d2-l3-s2-unpowered-2-v2.b43ecaa15a.webp",
+        "width": 379,
+        "height": 308,
+        "anchor": [
+          190.0,
+          209.4211
+        ]
+      },
+      "unpowered-3-v2": {
+        "file": "residential-d2-l3-s2-unpowered-3-v2.e6cd43c610.webp",
+        "width": 379,
+        "height": 347,
+        "anchor": [
+          190.0,
+          248.4211
+        ]
+      }
+    },
+    "family": "residential",
+    "zone": {
+      "type": "residential",
+      "density": 2,
+      "level": 3
+    },
+    "label": "Residential \u00b7 density 2 \u00b7 stage 3 \u00b7 2\u00d72",
+    "description": "Residential density 2, growth stage 3, authored specifically for a 2\u00d72 lot.",
+    "variants": [
+      {
+        "model": "residential-d2-l3-s2",
+        "label": "Masonry apartments",
+        "description": "Residential density 2, growth stage 3, authored specifically for a 2\u00d72 lot. Masonry apartments."
+      },
+      {
+        "model": "residential-d2-l3-s2_v1",
+        "label": "Brick brownstones",
+        "description": "Residential density 2, growth stage 3, authored specifically for a 2\u00d72 lot. Brick brownstones."
+      },
+      {
+        "model": "residential-d2-l3-s2_v2",
+        "label": "Balcony apartments",
+        "description": "Residential density 2, growth stage 3, authored specifically for a 2\u00d72 lot. Balcony apartments."
+      }
+    ]
+  },
+  "residential-d2-l4-s1": {
+    "tiles": 1,
+    "scale": 3,
+    "height": 57,
+    "frames": {
+      "day-0": {
+        "file": "residential-d2-l4-s1-day-0.45540f4008.webp",
+        "width": 186,
+        "height": 254,
+        "anchor": [
+          93.0,
+          204.009
+        ]
+      },
+      "day-1": {
+        "file": "residential-d2-l4-s1-day-1.e97a87f747.webp",
+        "width": 186,
+        "height": 246,
+        "anchor": [
+          93.0,
+          196.0089
+        ]
+      },
+      "day-2": {
+        "file": "residential-d2-l4-s1-day-2.7747e1f8f2.webp",
+        "width": 186,
+        "height": 246,
+        "anchor": [
+          93.0,
+          196.0089
+        ]
+      },
+      "day-3": {
+        "file": "residential-d2-l4-s1-day-3.602d714db2.webp",
+        "width": 186,
+        "height": 254,
+        "anchor": [
+          93.0,
+          204.009
+        ]
+      },
+      "night-0": {
+        "file": "residential-d2-l4-s1-night-0.cb47fe3e5f.webp",
+        "width": 186,
+        "height": 254,
+        "anchor": [
+          93.0,
+          204.009
+        ]
+      },
+      "night-1": {
+        "file": "residential-d2-l4-s1-night-1.25a7fbd8ef.webp",
+        "width": 186,
+        "height": 246,
+        "anchor": [
+          93.0,
+          196.0089
+        ]
+      },
+      "night-2": {
+        "file": "residential-d2-l4-s1-night-2.b25cdd5286.webp",
+        "width": 186,
+        "height": 246,
+        "anchor": [
+          93.0,
+          196.0089
+        ]
+      },
+      "night-3": {
+        "file": "residential-d2-l4-s1-night-3.446a25212a.webp",
+        "width": 186,
+        "height": 254,
+        "anchor": [
+          93.0,
+          204.009
+        ]
+      },
+      "unpowered-0": {
+        "file": "residential-d2-l4-s1-unpowered-0.6d8c430215.webp",
+        "width": 186,
+        "height": 254,
+        "anchor": [
+          93.0,
+          204.009
+        ]
+      },
+      "unpowered-1": {
+        "file": "residential-d2-l4-s1-unpowered-1.82edf361eb.webp",
+        "width": 186,
+        "height": 246,
+        "anchor": [
+          93.0,
+          196.0089
+        ]
+      },
+      "unpowered-2": {
+        "file": "residential-d2-l4-s1-unpowered-2.7715353fb2.webp",
+        "width": 186,
+        "height": 246,
+        "anchor": [
+          93.0,
+          196.0089
+        ]
+      },
+      "unpowered-3": {
+        "file": "residential-d2-l4-s1-unpowered-3.6f352bfd51.webp",
+        "width": 186,
+        "height": 254,
+        "anchor": [
+          93.0,
+          204.009
+        ]
+      },
+      "day-0-v1": {
+        "file": "residential-d2-l4-s1-day-0-v1.1faa49f608.webp",
+        "width": 186,
+        "height": 255,
+        "anchor": [
+          93.0,
+          204.4211
+        ]
+      },
+      "day-1-v1": {
+        "file": "residential-d2-l4-s1-day-1-v1.02c32e028e.webp",
+        "width": 186,
+        "height": 247,
+        "anchor": [
+          93.0,
+          196.4211
+        ]
+      },
+      "day-2-v1": {
+        "file": "residential-d2-l4-s1-day-2-v1.6d422c9e37.webp",
+        "width": 186,
+        "height": 247,
+        "anchor": [
+          93.0,
+          196.4211
+        ]
+      },
+      "day-3-v1": {
+        "file": "residential-d2-l4-s1-day-3-v1.39d8591817.webp",
+        "width": 186,
+        "height": 255,
+        "anchor": [
+          93.0,
+          204.4211
+        ]
+      },
+      "night-0-v1": {
+        "file": "residential-d2-l4-s1-night-0-v1.9f80446392.webp",
+        "width": 186,
+        "height": 255,
+        "anchor": [
+          93.0,
+          204.4211
+        ]
+      },
+      "night-1-v1": {
+        "file": "residential-d2-l4-s1-night-1-v1.908f7c930e.webp",
+        "width": 186,
+        "height": 247,
+        "anchor": [
+          93.0,
+          196.4211
+        ]
+      },
+      "night-2-v1": {
+        "file": "residential-d2-l4-s1-night-2-v1.6575005867.webp",
+        "width": 186,
+        "height": 247,
+        "anchor": [
+          93.0,
+          196.4211
+        ]
+      },
+      "night-3-v1": {
+        "file": "residential-d2-l4-s1-night-3-v1.b1537a61d3.webp",
+        "width": 186,
+        "height": 255,
+        "anchor": [
+          93.0,
+          204.4211
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "residential-d2-l4-s1-unpowered-0-v1.78dc498691.webp",
+        "width": 186,
+        "height": 255,
+        "anchor": [
+          93.0,
+          204.4211
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "residential-d2-l4-s1-unpowered-1-v1.25e6b2f3fa.webp",
+        "width": 186,
+        "height": 247,
+        "anchor": [
+          93.0,
+          196.4211
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "residential-d2-l4-s1-unpowered-2-v1.4b356a4f9d.webp",
+        "width": 186,
+        "height": 247,
+        "anchor": [
+          93.0,
+          196.4211
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "residential-d2-l4-s1-unpowered-3-v1.adffc76be2.webp",
+        "width": 186,
+        "height": 255,
+        "anchor": [
+          93.0,
+          204.4211
+        ]
+      },
+      "day-0-v2": {
+        "file": "residential-d2-l4-s1-day-0-v2.9ed79b1053.webp",
+        "width": 186,
+        "height": 255,
+        "anchor": [
+          93.0,
+          204.4211
+        ]
+      },
+      "day-1-v2": {
+        "file": "residential-d2-l4-s1-day-1-v2.73df67219c.webp",
+        "width": 186,
+        "height": 247,
+        "anchor": [
+          93.0,
+          196.4211
+        ]
+      },
+      "day-2-v2": {
+        "file": "residential-d2-l4-s1-day-2-v2.39f7153fb8.webp",
+        "width": 186,
+        "height": 247,
+        "anchor": [
+          93.0,
+          196.4211
+        ]
+      },
+      "day-3-v2": {
+        "file": "residential-d2-l4-s1-day-3-v2.963631df80.webp",
+        "width": 186,
+        "height": 255,
+        "anchor": [
+          93.0,
+          204.4211
+        ]
+      },
+      "night-0-v2": {
+        "file": "residential-d2-l4-s1-night-0-v2.da47e5cbc2.webp",
+        "width": 186,
+        "height": 255,
+        "anchor": [
+          93.0,
+          204.4211
+        ]
+      },
+      "night-1-v2": {
+        "file": "residential-d2-l4-s1-night-1-v2.ca1bc6d9a2.webp",
+        "width": 186,
+        "height": 247,
+        "anchor": [
+          93.0,
+          196.4211
+        ]
+      },
+      "night-2-v2": {
+        "file": "residential-d2-l4-s1-night-2-v2.472bf4c54d.webp",
+        "width": 186,
+        "height": 247,
+        "anchor": [
+          93.0,
+          196.4211
+        ]
+      },
+      "night-3-v2": {
+        "file": "residential-d2-l4-s1-night-3-v2.3f0581890b.webp",
+        "width": 186,
+        "height": 255,
+        "anchor": [
+          93.0,
+          204.4211
+        ]
+      },
+      "unpowered-0-v2": {
+        "file": "residential-d2-l4-s1-unpowered-0-v2.ae21f37f09.webp",
+        "width": 186,
+        "height": 255,
+        "anchor": [
+          93.0,
+          204.4211
+        ]
+      },
+      "unpowered-1-v2": {
+        "file": "residential-d2-l4-s1-unpowered-1-v2.64cbbfeefe.webp",
+        "width": 186,
+        "height": 247,
+        "anchor": [
+          93.0,
+          196.4211
+        ]
+      },
+      "unpowered-2-v2": {
+        "file": "residential-d2-l4-s1-unpowered-2-v2.00745da964.webp",
+        "width": 186,
+        "height": 247,
+        "anchor": [
+          93.0,
+          196.4211
+        ]
+      },
+      "unpowered-3-v2": {
+        "file": "residential-d2-l4-s1-unpowered-3-v2.6d93a02abd.webp",
+        "width": 186,
+        "height": 255,
+        "anchor": [
+          93.0,
+          204.4211
+        ]
+      }
+    },
+    "family": "residential",
+    "zone": {
+      "type": "residential",
+      "density": 2,
+      "level": 4
+    },
+    "label": "Residential \u00b7 density 2 \u00b7 stage 4 \u00b7 1\u00d71",
+    "description": "Residential density 2, growth stage 4, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d2-l4-s1",
+        "label": "Masonry apartments",
+        "description": "Residential density 2, growth stage 4, authored specifically for a 1\u00d71 lot. Masonry apartments."
+      },
+      {
+        "model": "residential-d2-l4-s1_v1",
+        "label": "Brick brownstones",
+        "description": "Residential density 2, growth stage 4, authored specifically for a 1\u00d71 lot. Brick brownstones."
+      },
+      {
+        "model": "residential-d2-l4-s1_v2",
+        "label": "Balcony apartments",
+        "description": "Residential density 2, growth stage 4, authored specifically for a 1\u00d71 lot. Balcony apartments."
+      }
+    ]
+  },
+  "residential-d2-l4-s2": {
+    "tiles": 2,
+    "scale": 3,
+    "height": 65,
+    "frames": {
+      "day-0": {
+        "file": "residential-d2-l4-s2-day-0.d7ea6d1cb2.webp",
+        "width": 379,
+        "height": 348,
+        "anchor": [
+          190.0,
+          249.4211
+        ]
+      },
+      "day-1": {
+        "file": "residential-d2-l4-s2-day-1.d495ddc30e.webp",
+        "width": 379,
+        "height": 327,
+        "anchor": [
+          190.0,
+          228.4211
+        ]
+      },
+      "day-2": {
+        "file": "residential-d2-l4-s2-day-2.5a3ad8545c.webp",
+        "width": 379,
+        "height": 328,
+        "anchor": [
+          190.0,
+          229.4211
+        ]
+      },
+      "day-3": {
+        "file": "residential-d2-l4-s2-day-3.541e12d854.webp",
+        "width": 379,
+        "height": 348,
+        "anchor": [
+          190.0,
+          249.4211
+        ]
+      },
+      "night-0": {
+        "file": "residential-d2-l4-s2-night-0.9cf6fa13d0.webp",
+        "width": 379,
+        "height": 348,
+        "anchor": [
+          190.0,
+          249.4211
+        ]
+      },
+      "night-1": {
+        "file": "residential-d2-l4-s2-night-1.855664dd91.webp",
+        "width": 379,
+        "height": 327,
+        "anchor": [
+          190.0,
+          228.4211
+        ]
+      },
+      "night-2": {
+        "file": "residential-d2-l4-s2-night-2.d54089cd14.webp",
+        "width": 379,
+        "height": 328,
+        "anchor": [
+          190.0,
+          229.4211
+        ]
+      },
+      "night-3": {
+        "file": "residential-d2-l4-s2-night-3.5b10a12756.webp",
+        "width": 379,
+        "height": 348,
+        "anchor": [
+          190.0,
+          249.4211
+        ]
+      },
+      "unpowered-0": {
+        "file": "residential-d2-l4-s2-unpowered-0.cc7f25f9b0.webp",
+        "width": 379,
+        "height": 348,
+        "anchor": [
+          190.0,
+          249.4211
+        ]
+      },
+      "unpowered-1": {
+        "file": "residential-d2-l4-s2-unpowered-1.0af37df5d1.webp",
+        "width": 379,
+        "height": 327,
+        "anchor": [
+          190.0,
+          228.4211
+        ]
+      },
+      "unpowered-2": {
+        "file": "residential-d2-l4-s2-unpowered-2.626624311a.webp",
+        "width": 379,
+        "height": 328,
+        "anchor": [
+          190.0,
+          229.4211
+        ]
+      },
+      "unpowered-3": {
+        "file": "residential-d2-l4-s2-unpowered-3.191c1ebd0a.webp",
+        "width": 379,
+        "height": 348,
+        "anchor": [
+          190.0,
+          249.4211
+        ]
+      },
+      "day-0-v1": {
+        "file": "residential-d2-l4-s2-day-0-v1.cfbf27c10d.webp",
+        "width": 379,
+        "height": 348,
+        "anchor": [
+          190.0,
+          249.4211
+        ]
+      },
+      "day-1-v1": {
+        "file": "residential-d2-l4-s2-day-1-v1.a8fff43fef.webp",
+        "width": 379,
+        "height": 327,
+        "anchor": [
+          190.0,
+          228.4211
+        ]
+      },
+      "day-2-v1": {
+        "file": "residential-d2-l4-s2-day-2-v1.cc45c43cd1.webp",
+        "width": 379,
+        "height": 328,
+        "anchor": [
+          190.0,
+          229.4211
+        ]
+      },
+      "day-3-v1": {
+        "file": "residential-d2-l4-s2-day-3-v1.b62240303e.webp",
+        "width": 379,
+        "height": 348,
+        "anchor": [
+          190.0,
+          249.4211
+        ]
+      },
+      "night-0-v1": {
+        "file": "residential-d2-l4-s2-night-0-v1.0661f8707b.webp",
+        "width": 379,
+        "height": 348,
+        "anchor": [
+          190.0,
+          249.4211
+        ]
+      },
+      "night-1-v1": {
+        "file": "residential-d2-l4-s2-night-1-v1.592954efd1.webp",
+        "width": 379,
+        "height": 327,
+        "anchor": [
+          190.0,
+          228.4211
+        ]
+      },
+      "night-2-v1": {
+        "file": "residential-d2-l4-s2-night-2-v1.db5d6496af.webp",
+        "width": 379,
+        "height": 328,
+        "anchor": [
+          190.0,
+          229.4211
+        ]
+      },
+      "night-3-v1": {
+        "file": "residential-d2-l4-s2-night-3-v1.de57e3d613.webp",
+        "width": 379,
+        "height": 348,
+        "anchor": [
+          190.0,
+          249.4211
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "residential-d2-l4-s2-unpowered-0-v1.f1592dbba2.webp",
+        "width": 379,
+        "height": 348,
+        "anchor": [
+          190.0,
+          249.4211
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "residential-d2-l4-s2-unpowered-1-v1.ec50caf348.webp",
+        "width": 379,
+        "height": 327,
+        "anchor": [
+          190.0,
+          228.4211
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "residential-d2-l4-s2-unpowered-2-v1.a9ed45e1b6.webp",
+        "width": 379,
+        "height": 328,
+        "anchor": [
+          190.0,
+          229.4211
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "residential-d2-l4-s2-unpowered-3-v1.4ee60e35ce.webp",
+        "width": 379,
+        "height": 348,
+        "anchor": [
+          190.0,
+          249.4211
+        ]
+      },
+      "day-0-v2": {
+        "file": "residential-d2-l4-s2-day-0-v2.0758154fbd.webp",
+        "width": 378,
+        "height": 372,
+        "anchor": [
+          188.9999,
+          273.9134
+        ]
+      },
+      "day-1-v2": {
+        "file": "residential-d2-l4-s2-day-1-v2.ec1f8a231e.webp",
+        "width": 378,
+        "height": 332,
+        "anchor": [
+          188.9999,
+          233.9135
+        ]
+      },
+      "day-2-v2": {
+        "file": "residential-d2-l4-s2-day-2-v2.f581876477.webp",
+        "width": 378,
+        "height": 333,
+        "anchor": [
+          189.0001,
+          234.9135
+        ]
+      },
+      "day-3-v2": {
+        "file": "residential-d2-l4-s2-day-3-v2.c06f6a7459.webp",
+        "width": 378,
+        "height": 372,
+        "anchor": [
+          189.0001,
+          273.9134
+        ]
+      },
+      "night-0-v2": {
+        "file": "residential-d2-l4-s2-night-0-v2.27d788173b.webp",
+        "width": 378,
+        "height": 372,
+        "anchor": [
+          188.9999,
+          273.9134
+        ]
+      },
+      "night-1-v2": {
+        "file": "residential-d2-l4-s2-night-1-v2.213b4b1474.webp",
+        "width": 378,
+        "height": 332,
+        "anchor": [
+          188.9999,
+          233.9135
+        ]
+      },
+      "night-2-v2": {
+        "file": "residential-d2-l4-s2-night-2-v2.844828dd06.webp",
+        "width": 378,
+        "height": 333,
+        "anchor": [
+          189.0001,
+          234.9135
+        ]
+      },
+      "night-3-v2": {
+        "file": "residential-d2-l4-s2-night-3-v2.0ba36ca528.webp",
+        "width": 378,
+        "height": 372,
+        "anchor": [
+          189.0001,
+          273.9134
+        ]
+      },
+      "unpowered-0-v2": {
+        "file": "residential-d2-l4-s2-unpowered-0-v2.2f83b524df.webp",
+        "width": 378,
+        "height": 372,
+        "anchor": [
+          188.9999,
+          273.9134
+        ]
+      },
+      "unpowered-1-v2": {
+        "file": "residential-d2-l4-s2-unpowered-1-v2.192cc40cc8.webp",
+        "width": 378,
+        "height": 332,
+        "anchor": [
+          188.9999,
+          233.9135
+        ]
+      },
+      "unpowered-2-v2": {
+        "file": "residential-d2-l4-s2-unpowered-2-v2.d94be68288.webp",
+        "width": 378,
+        "height": 333,
+        "anchor": [
+          189.0001,
+          234.9135
+        ]
+      },
+      "unpowered-3-v2": {
+        "file": "residential-d2-l4-s2-unpowered-3-v2.8b42130919.webp",
+        "width": 378,
+        "height": 372,
+        "anchor": [
+          189.0001,
+          273.9134
+        ]
+      }
+    },
+    "family": "residential",
+    "zone": {
+      "type": "residential",
+      "density": 2,
+      "level": 4
+    },
+    "label": "Residential \u00b7 density 2 \u00b7 stage 4 \u00b7 2\u00d72",
+    "description": "Residential density 2, growth stage 4, authored specifically for a 2\u00d72 lot.",
+    "variants": [
+      {
+        "model": "residential-d2-l4-s2",
+        "label": "Masonry apartments",
+        "description": "Residential density 2, growth stage 4, authored specifically for a 2\u00d72 lot. Masonry apartments."
+      },
+      {
+        "model": "residential-d2-l4-s2_v1",
+        "label": "Brick brownstones",
+        "description": "Residential density 2, growth stage 4, authored specifically for a 2\u00d72 lot. Brick brownstones."
+      },
+      {
+        "model": "residential-d2-l4-s2_v2",
+        "label": "Balcony apartments",
+        "description": "Residential density 2, growth stage 4, authored specifically for a 2\u00d72 lot. Balcony apartments."
+      }
+    ]
+  },
+  "residential-d3-l1-s1": {
+    "tiles": 1,
+    "scale": 3,
+    "height": 72,
+    "frames": {
+      "day-0": {
+        "file": "residential-d3-l1-s1-day-0.f790f0a4f8.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          92.9999,
+          220.5301
+        ]
+      },
+      "day-1": {
+        "file": "residential-d3-l1-s1-day-1.40f09ea8aa.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          92.9999,
+          220.5302
+        ]
+      },
+      "day-2": {
+        "file": "residential-d3-l1-s1-day-2.951bc19791.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          93.0001,
+          220.5302
+        ]
+      },
+      "day-3": {
+        "file": "residential-d3-l1-s1-day-3.d4d74582af.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          93.0001,
+          220.5301
+        ]
+      },
+      "night-0": {
+        "file": "residential-d3-l1-s1-night-0.f148433be5.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          92.9999,
+          220.5301
+        ]
+      },
+      "night-1": {
+        "file": "residential-d3-l1-s1-night-1.3ce0a9d289.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          92.9999,
+          220.5302
+        ]
+      },
+      "night-2": {
+        "file": "residential-d3-l1-s1-night-2.2e36b2cf4c.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          93.0001,
+          220.5302
+        ]
+      },
+      "night-3": {
+        "file": "residential-d3-l1-s1-night-3.409e1dd426.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          93.0001,
+          220.5301
+        ]
+      },
+      "unpowered-0": {
+        "file": "residential-d3-l1-s1-unpowered-0.835f011815.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          92.9999,
+          220.5301
+        ]
+      },
+      "unpowered-1": {
+        "file": "residential-d3-l1-s1-unpowered-1.60f484d9f6.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          92.9999,
+          220.5302
+        ]
+      },
+      "unpowered-2": {
+        "file": "residential-d3-l1-s1-unpowered-2.af558bf878.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          93.0001,
+          220.5302
+        ]
+      },
+      "unpowered-3": {
+        "file": "residential-d3-l1-s1-unpowered-3.0a102b426e.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          93.0001,
+          220.5301
+        ]
+      },
+      "day-0-v1": {
+        "file": "residential-d3-l1-s1-day-0-v1.72d0ce218e.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          92.9999,
+          220.5301
+        ]
+      },
+      "day-1-v1": {
+        "file": "residential-d3-l1-s1-day-1-v1.caaa4014fb.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          92.9999,
+          220.5302
+        ]
+      },
+      "day-2-v1": {
+        "file": "residential-d3-l1-s1-day-2-v1.2e2aecb9bf.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          93.0001,
+          220.5302
+        ]
+      },
+      "day-3-v1": {
+        "file": "residential-d3-l1-s1-day-3-v1.9cde899d2e.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          93.0001,
+          220.5301
+        ]
+      },
+      "night-0-v1": {
+        "file": "residential-d3-l1-s1-night-0-v1.d9e76d03d7.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          92.9999,
+          220.5301
+        ]
+      },
+      "night-1-v1": {
+        "file": "residential-d3-l1-s1-night-1-v1.74ab7c4a5f.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          92.9999,
+          220.5302
+        ]
+      },
+      "night-2-v1": {
+        "file": "residential-d3-l1-s1-night-2-v1.8fae53f111.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          93.0001,
+          220.5302
+        ]
+      },
+      "night-3-v1": {
+        "file": "residential-d3-l1-s1-night-3-v1.ff9584514d.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          93.0001,
+          220.5301
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "residential-d3-l1-s1-unpowered-0-v1.1a4ebb981a.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          92.9999,
+          220.5301
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "residential-d3-l1-s1-unpowered-1-v1.52f8d94131.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          92.9999,
+          220.5302
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "residential-d3-l1-s1-unpowered-2-v1.0dcfe990b4.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          93.0001,
+          220.5302
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "residential-d3-l1-s1-unpowered-3-v1.57d4888ccc.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          93.0001,
+          220.5301
+        ]
+      },
+      "day-0-v2": {
+        "file": "residential-d3-l1-s1-day-0-v2.b819716f95.webp",
+        "width": 186,
+        "height": 296,
+        "anchor": [
+          93.0,
+          245.7893
+        ]
+      },
+      "day-1-v2": {
+        "file": "residential-d3-l1-s1-day-1-v2.ef4dfcb76c.webp",
+        "width": 186,
+        "height": 292,
+        "anchor": [
+          93.0,
+          241.7893
+        ]
+      },
+      "day-2-v2": {
+        "file": "residential-d3-l1-s1-day-2-v2.9520cdbe1d.webp",
+        "width": 186,
+        "height": 291,
+        "anchor": [
+          93.0,
+          240.7893
+        ]
+      },
+      "day-3-v2": {
+        "file": "residential-d3-l1-s1-day-3-v2.1a755e7468.webp",
+        "width": 186,
+        "height": 296,
+        "anchor": [
+          93.0,
+          245.7893
+        ]
+      },
+      "night-0-v2": {
+        "file": "residential-d3-l1-s1-night-0-v2.d73257f9c7.webp",
+        "width": 186,
+        "height": 296,
+        "anchor": [
+          93.0,
+          245.7893
+        ]
+      },
+      "night-1-v2": {
+        "file": "residential-d3-l1-s1-night-1-v2.80fce36617.webp",
+        "width": 186,
+        "height": 292,
+        "anchor": [
+          93.0,
+          241.7893
+        ]
+      },
+      "night-2-v2": {
+        "file": "residential-d3-l1-s1-night-2-v2.5f0d14871b.webp",
+        "width": 186,
+        "height": 291,
+        "anchor": [
+          93.0,
+          240.7893
+        ]
+      },
+      "night-3-v2": {
+        "file": "residential-d3-l1-s1-night-3-v2.4e9677388d.webp",
+        "width": 186,
+        "height": 296,
+        "anchor": [
+          93.0,
+          245.7893
+        ]
+      },
+      "unpowered-0-v2": {
+        "file": "residential-d3-l1-s1-unpowered-0-v2.bb402af3c3.webp",
+        "width": 186,
+        "height": 296,
+        "anchor": [
+          93.0,
+          245.7893
+        ]
+      },
+      "unpowered-1-v2": {
+        "file": "residential-d3-l1-s1-unpowered-1-v2.30d59ddae6.webp",
+        "width": 186,
+        "height": 292,
+        "anchor": [
+          93.0,
+          241.7893
+        ]
+      },
+      "unpowered-2-v2": {
+        "file": "residential-d3-l1-s1-unpowered-2-v2.557acff891.webp",
+        "width": 186,
+        "height": 291,
+        "anchor": [
+          93.0,
+          240.7893
+        ]
+      },
+      "unpowered-3-v2": {
+        "file": "residential-d3-l1-s1-unpowered-3-v2.629d7ade55.webp",
+        "width": 186,
+        "height": 296,
+        "anchor": [
+          93.0,
+          245.7893
+        ]
+      },
+      "day-0-v3": {
+        "file": "residential-d3-l1-s1-day-0-v3.27cdecf1a4.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          92.9999,
+          220.5301
+        ]
+      },
+      "day-1-v3": {
+        "file": "residential-d3-l1-s1-day-1-v3.a05c125d61.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          92.9999,
+          220.5302
+        ]
+      },
+      "day-2-v3": {
+        "file": "residential-d3-l1-s1-day-2-v3.d4e22dfbd5.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          93.0001,
+          220.5302
+        ]
+      },
+      "day-3-v3": {
+        "file": "residential-d3-l1-s1-day-3-v3.c9415cccb6.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          93.0001,
+          220.5301
+        ]
+      },
+      "night-0-v3": {
+        "file": "residential-d3-l1-s1-night-0-v3.585285d589.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          92.9999,
+          220.5301
+        ]
+      },
+      "night-1-v3": {
+        "file": "residential-d3-l1-s1-night-1-v3.13bfa5686f.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          92.9999,
+          220.5302
+        ]
+      },
+      "night-2-v3": {
+        "file": "residential-d3-l1-s1-night-2-v3.6436acbdd7.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          93.0001,
+          220.5302
+        ]
+      },
+      "night-3-v3": {
+        "file": "residential-d3-l1-s1-night-3-v3.e8f1e02179.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          93.0001,
+          220.5301
+        ]
+      },
+      "unpowered-0-v3": {
+        "file": "residential-d3-l1-s1-unpowered-0-v3.23fde76a25.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          92.9999,
+          220.5301
+        ]
+      },
+      "unpowered-1-v3": {
+        "file": "residential-d3-l1-s1-unpowered-1-v3.4a52aba0e7.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          92.9999,
+          220.5302
+        ]
+      },
+      "unpowered-2-v3": {
+        "file": "residential-d3-l1-s1-unpowered-2-v3.f244bbcb49.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          93.0001,
+          220.5302
+        ]
+      },
+      "unpowered-3-v3": {
+        "file": "residential-d3-l1-s1-unpowered-3-v3.c52978757f.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          93.0001,
+          220.5301
+        ]
+      },
+      "day-0-v4": {
+        "file": "residential-d3-l1-s1-day-0-v4.34871da29d.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          92.9999,
+          220.5301
+        ]
+      },
+      "day-1-v4": {
+        "file": "residential-d3-l1-s1-day-1-v4.52fc63d897.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          92.9999,
+          220.5302
+        ]
+      },
+      "day-2-v4": {
+        "file": "residential-d3-l1-s1-day-2-v4.4abb2a7224.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          93.0001,
+          220.5302
+        ]
+      },
+      "day-3-v4": {
+        "file": "residential-d3-l1-s1-day-3-v4.933d968350.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          93.0001,
+          220.5301
+        ]
+      },
+      "night-0-v4": {
+        "file": "residential-d3-l1-s1-night-0-v4.086307432f.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          92.9999,
+          220.5301
+        ]
+      },
+      "night-1-v4": {
+        "file": "residential-d3-l1-s1-night-1-v4.57f0ee21bf.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          92.9999,
+          220.5302
+        ]
+      },
+      "night-2-v4": {
+        "file": "residential-d3-l1-s1-night-2-v4.aae4a98892.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          93.0001,
+          220.5302
+        ]
+      },
+      "night-3-v4": {
+        "file": "residential-d3-l1-s1-night-3-v4.0d7a678f04.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          93.0001,
+          220.5301
+        ]
+      },
+      "unpowered-0-v4": {
+        "file": "residential-d3-l1-s1-unpowered-0-v4.fdc301fdf4.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          92.9999,
+          220.5301
+        ]
+      },
+      "unpowered-1-v4": {
+        "file": "residential-d3-l1-s1-unpowered-1-v4.9bcd1e3d4a.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          92.9999,
+          220.5302
+        ]
+      },
+      "unpowered-2-v4": {
+        "file": "residential-d3-l1-s1-unpowered-2-v4.0b823c95be.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          93.0001,
+          220.5302
+        ]
+      },
+      "unpowered-3-v4": {
+        "file": "residential-d3-l1-s1-unpowered-3-v4.6134653bd3.webp",
+        "width": 186,
+        "height": 271,
+        "anchor": [
+          93.0001,
+          220.5301
+        ]
+      }
+    },
+    "family": "residential",
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 1
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 1 \u00b7 1\u00d71",
+    "description": "Residential density 3, growth stage 1, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l1-s1",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 1\u00d71 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l1-s1_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 1\u00d71 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l1-s1_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 1\u00d71 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l1-s1_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 1\u00d71 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l1-s1_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 1\u00d71 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l1-s2": {
+    "tiles": 2,
+    "scale": 3,
+    "height": 72,
+    "frames": {
+      "day-0": {
+        "file": "residential-d3-l1-s2-day-0.ee85119175.webp",
+        "width": 378,
+        "height": 346,
+        "anchor": [
+          188.9999,
+          247.53
+        ]
+      },
+      "day-1": {
+        "file": "residential-d3-l1-s2-day-1.10d4718c7e.webp",
+        "width": 378,
+        "height": 346,
+        "anchor": [
+          188.9999,
+          247.5302
+        ]
+      },
+      "day-2": {
+        "file": "residential-d3-l1-s2-day-2.dadf94f990.webp",
+        "width": 378,
+        "height": 346,
+        "anchor": [
+          189.0001,
+          247.5302
+        ]
+      },
+      "day-3": {
+        "file": "residential-d3-l1-s2-day-3.53a15fa654.webp",
+        "width": 378,
+        "height": 346,
+        "anchor": [
+          189.0001,
+          247.53
+        ]
+      },
+      "night-0": {
+        "file": "residential-d3-l1-s2-night-0.9e3182d776.webp",
+        "width": 378,
+        "height": 346,
+        "anchor": [
+          188.9999,
+          247.53
+        ]
+      },
+      "night-1": {
+        "file": "residential-d3-l1-s2-night-1.1c0a8499e9.webp",
+        "width": 378,
+        "height": 346,
+        "anchor": [
+          188.9999,
+          247.5302
+        ]
+      },
+      "night-2": {
+        "file": "residential-d3-l1-s2-night-2.a423db333b.webp",
+        "width": 378,
+        "height": 346,
+        "anchor": [
+          189.0001,
+          247.5302
+        ]
+      },
+      "night-3": {
+        "file": "residential-d3-l1-s2-night-3.7cc5cd7230.webp",
+        "width": 378,
+        "height": 346,
+        "anchor": [
+          189.0001,
+          247.53
+        ]
+      },
+      "unpowered-0": {
+        "file": "residential-d3-l1-s2-unpowered-0.9cf3c20a8a.webp",
+        "width": 378,
+        "height": 346,
+        "anchor": [
+          188.9999,
+          247.53
+        ]
+      },
+      "unpowered-1": {
+        "file": "residential-d3-l1-s2-unpowered-1.d0f1fa1899.webp",
+        "width": 378,
+        "height": 346,
+        "anchor": [
+          188.9999,
+          247.5302
+        ]
+      },
+      "unpowered-2": {
+        "file": "residential-d3-l1-s2-unpowered-2.4e11d2df6f.webp",
+        "width": 378,
+        "height": 346,
+        "anchor": [
+          189.0001,
+          247.5302
+        ]
+      },
+      "unpowered-3": {
+        "file": "residential-d3-l1-s2-unpowered-3.c742ed7738.webp",
+        "width": 378,
+        "height": 346,
+        "anchor": [
+          189.0001,
+          247.53
+        ]
+      },
+      "day-0-v1": {
+        "file": "residential-d3-l1-s2-day-0-v1.89dad4a660.webp",
+        "width": 378,
+        "height": 338,
+        "anchor": [
+          189.0,
+          239.8627
+        ]
+      },
+      "day-1-v1": {
+        "file": "residential-d3-l1-s2-day-1-v1.473825b8e0.webp",
+        "width": 378,
+        "height": 338,
+        "anchor": [
+          189.0,
+          239.8626
+        ]
+      },
+      "day-2-v1": {
+        "file": "residential-d3-l1-s2-day-2-v1.80e310fc2a.webp",
+        "width": 378,
+        "height": 338,
+        "anchor": [
+          189.0,
+          239.8626
+        ]
+      },
+      "day-3-v1": {
+        "file": "residential-d3-l1-s2-day-3-v1.a65aaa4eaf.webp",
+        "width": 378,
+        "height": 338,
+        "anchor": [
+          189.0,
+          239.8627
+        ]
+      },
+      "night-0-v1": {
+        "file": "residential-d3-l1-s2-night-0-v1.7ed9269ac3.webp",
+        "width": 378,
+        "height": 338,
+        "anchor": [
+          189.0,
+          239.8627
+        ]
+      },
+      "night-1-v1": {
+        "file": "residential-d3-l1-s2-night-1-v1.ca206657ed.webp",
+        "width": 378,
+        "height": 338,
+        "anchor": [
+          189.0,
+          239.8626
+        ]
+      },
+      "night-2-v1": {
+        "file": "residential-d3-l1-s2-night-2-v1.5bdb83957a.webp",
+        "width": 378,
+        "height": 338,
+        "anchor": [
+          189.0,
+          239.8626
+        ]
+      },
+      "night-3-v1": {
+        "file": "residential-d3-l1-s2-night-3-v1.738c2a92cc.webp",
+        "width": 378,
+        "height": 338,
+        "anchor": [
+          189.0,
+          239.8627
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "residential-d3-l1-s2-unpowered-0-v1.0578308f50.webp",
+        "width": 378,
+        "height": 338,
+        "anchor": [
+          189.0,
+          239.8627
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "residential-d3-l1-s2-unpowered-1-v1.80647a75b7.webp",
+        "width": 378,
+        "height": 338,
+        "anchor": [
+          189.0,
+          239.8626
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "residential-d3-l1-s2-unpowered-2-v1.a4100df63d.webp",
+        "width": 378,
+        "height": 338,
+        "anchor": [
+          189.0,
+          239.8626
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "residential-d3-l1-s2-unpowered-3-v1.0df795b32d.webp",
+        "width": 378,
+        "height": 338,
+        "anchor": [
+          189.0,
+          239.8627
+        ]
+      },
+      "day-0-v2": {
+        "file": "residential-d3-l1-s2-day-0-v2.2d4d2bbb04.webp",
+        "width": 378,
+        "height": 377,
+        "anchor": [
+          189.0,
+          278.7893
+        ]
+      },
+      "day-1-v2": {
+        "file": "residential-d3-l1-s2-day-1-v2.06f00a053c.webp",
+        "width": 378,
+        "height": 368,
+        "anchor": [
+          189.0,
+          269.7893
+        ]
+      },
+      "day-2-v2": {
+        "file": "residential-d3-l1-s2-day-2-v2.f73e683ea9.webp",
+        "width": 378,
+        "height": 368,
+        "anchor": [
+          189.0,
+          269.7893
+        ]
+      },
+      "day-3-v2": {
+        "file": "residential-d3-l1-s2-day-3-v2.97ea94a15a.webp",
+        "width": 378,
+        "height": 377,
+        "anchor": [
+          189.0,
+          278.7893
+        ]
+      },
+      "night-0-v2": {
+        "file": "residential-d3-l1-s2-night-0-v2.440ed53408.webp",
+        "width": 378,
+        "height": 377,
+        "anchor": [
+          189.0,
+          278.7893
+        ]
+      },
+      "night-1-v2": {
+        "file": "residential-d3-l1-s2-night-1-v2.57668a28ca.webp",
+        "width": 378,
+        "height": 368,
+        "anchor": [
+          189.0,
+          269.7893
+        ]
+      },
+      "night-2-v2": {
+        "file": "residential-d3-l1-s2-night-2-v2.f9e78729b4.webp",
+        "width": 378,
+        "height": 368,
+        "anchor": [
+          189.0,
+          269.7893
+        ]
+      },
+      "night-3-v2": {
+        "file": "residential-d3-l1-s2-night-3-v2.5431fbf19f.webp",
+        "width": 378,
+        "height": 377,
+        "anchor": [
+          189.0,
+          278.7893
+        ]
+      },
+      "unpowered-0-v2": {
+        "file": "residential-d3-l1-s2-unpowered-0-v2.246e62d826.webp",
+        "width": 378,
+        "height": 377,
+        "anchor": [
+          189.0,
+          278.7893
+        ]
+      },
+      "unpowered-1-v2": {
+        "file": "residential-d3-l1-s2-unpowered-1-v2.07f31f0265.webp",
+        "width": 378,
+        "height": 368,
+        "anchor": [
+          189.0,
+          269.7893
+        ]
+      },
+      "unpowered-2-v2": {
+        "file": "residential-d3-l1-s2-unpowered-2-v2.d09dba599c.webp",
+        "width": 378,
+        "height": 368,
+        "anchor": [
+          189.0,
+          269.7893
+        ]
+      },
+      "unpowered-3-v2": {
+        "file": "residential-d3-l1-s2-unpowered-3-v2.bc7b32811f.webp",
+        "width": 378,
+        "height": 377,
+        "anchor": [
+          189.0,
+          278.7893
+        ]
+      },
+      "day-0-v3": {
+        "file": "residential-d3-l1-s2-day-0-v3.8ff2098db6.webp",
+        "width": 378,
+        "height": 346,
+        "anchor": [
+          188.9999,
+          247.53
+        ]
+      },
+      "day-1-v3": {
+        "file": "residential-d3-l1-s2-day-1-v3.fbb586b76c.webp",
+        "width": 378,
+        "height": 346,
+        "anchor": [
+          188.9999,
+          247.5302
+        ]
+      },
+      "day-2-v3": {
+        "file": "residential-d3-l1-s2-day-2-v3.75b8a07126.webp",
+        "width": 378,
+        "height": 346,
+        "anchor": [
+          189.0001,
+          247.5302
+        ]
+      },
+      "day-3-v3": {
+        "file": "residential-d3-l1-s2-day-3-v3.66b8fdbec5.webp",
+        "width": 378,
+        "height": 346,
+        "anchor": [
+          189.0001,
+          247.53
+        ]
+      },
+      "night-0-v3": {
+        "file": "residential-d3-l1-s2-night-0-v3.be86bc27c5.webp",
+        "width": 378,
+        "height": 346,
+        "anchor": [
+          188.9999,
+          247.53
+        ]
+      },
+      "night-1-v3": {
+        "file": "residential-d3-l1-s2-night-1-v3.875868acfe.webp",
+        "width": 378,
+        "height": 346,
+        "anchor": [
+          188.9999,
+          247.5302
+        ]
+      },
+      "night-2-v3": {
+        "file": "residential-d3-l1-s2-night-2-v3.5095eb67df.webp",
+        "width": 378,
+        "height": 346,
+        "anchor": [
+          189.0001,
+          247.5302
+        ]
+      },
+      "night-3-v3": {
+        "file": "residential-d3-l1-s2-night-3-v3.1c6738ab4c.webp",
+        "width": 378,
+        "height": 346,
+        "anchor": [
+          189.0001,
+          247.53
+        ]
+      },
+      "unpowered-0-v3": {
+        "file": "residential-d3-l1-s2-unpowered-0-v3.38fb198f56.webp",
+        "width": 378,
+        "height": 346,
+        "anchor": [
+          188.9999,
+          247.53
+        ]
+      },
+      "unpowered-1-v3": {
+        "file": "residential-d3-l1-s2-unpowered-1-v3.168dc233b7.webp",
+        "width": 378,
+        "height": 346,
+        "anchor": [
+          188.9999,
+          247.5302
+        ]
+      },
+      "unpowered-2-v3": {
+        "file": "residential-d3-l1-s2-unpowered-2-v3.63ab7e7246.webp",
+        "width": 378,
+        "height": 346,
+        "anchor": [
+          189.0001,
+          247.5302
+        ]
+      },
+      "unpowered-3-v3": {
+        "file": "residential-d3-l1-s2-unpowered-3-v3.227d2bd31b.webp",
+        "width": 378,
+        "height": 346,
+        "anchor": [
+          189.0001,
+          247.53
+        ]
+      },
+      "day-0-v4": {
+        "file": "residential-d3-l1-s2-day-0-v4.b3851851ab.webp",
+        "width": 378,
+        "height": 338,
+        "anchor": [
+          189.0,
+          239.8627
+        ]
+      },
+      "day-1-v4": {
+        "file": "residential-d3-l1-s2-day-1-v4.b75943754b.webp",
+        "width": 378,
+        "height": 338,
+        "anchor": [
+          189.0,
+          239.8626
+        ]
+      },
+      "day-2-v4": {
+        "file": "residential-d3-l1-s2-day-2-v4.6c8ff74c69.webp",
+        "width": 378,
+        "height": 338,
+        "anchor": [
+          189.0,
+          239.8626
+        ]
+      },
+      "day-3-v4": {
+        "file": "residential-d3-l1-s2-day-3-v4.d995ff5656.webp",
+        "width": 378,
+        "height": 338,
+        "anchor": [
+          189.0,
+          239.8627
+        ]
+      },
+      "night-0-v4": {
+        "file": "residential-d3-l1-s2-night-0-v4.7799ef7e76.webp",
+        "width": 378,
+        "height": 338,
+        "anchor": [
+          189.0,
+          239.8627
+        ]
+      },
+      "night-1-v4": {
+        "file": "residential-d3-l1-s2-night-1-v4.281376acb3.webp",
+        "width": 378,
+        "height": 338,
+        "anchor": [
+          189.0,
+          239.8626
+        ]
+      },
+      "night-2-v4": {
+        "file": "residential-d3-l1-s2-night-2-v4.46e8053df5.webp",
+        "width": 378,
+        "height": 338,
+        "anchor": [
+          189.0,
+          239.8626
+        ]
+      },
+      "night-3-v4": {
+        "file": "residential-d3-l1-s2-night-3-v4.11c5178977.webp",
+        "width": 378,
+        "height": 338,
+        "anchor": [
+          189.0,
+          239.8627
+        ]
+      },
+      "unpowered-0-v4": {
+        "file": "residential-d3-l1-s2-unpowered-0-v4.0fc5617ff6.webp",
+        "width": 378,
+        "height": 338,
+        "anchor": [
+          189.0,
+          239.8627
+        ]
+      },
+      "unpowered-1-v4": {
+        "file": "residential-d3-l1-s2-unpowered-1-v4.d9dd5020ee.webp",
+        "width": 378,
+        "height": 338,
+        "anchor": [
+          189.0,
+          239.8626
+        ]
+      },
+      "unpowered-2-v4": {
+        "file": "residential-d3-l1-s2-unpowered-2-v4.f9e1a29105.webp",
+        "width": 378,
+        "height": 338,
+        "anchor": [
+          189.0,
+          239.8626
+        ]
+      },
+      "unpowered-3-v4": {
+        "file": "residential-d3-l1-s2-unpowered-3-v4.488afc07d2.webp",
+        "width": 378,
+        "height": 338,
+        "anchor": [
+          189.0,
+          239.8627
+        ]
+      }
+    },
+    "family": "residential",
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 1
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 1 \u00b7 2\u00d72",
+    "description": "Residential density 3, growth stage 1, authored specifically for a 2\u00d72 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l1-s2",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 2\u00d72 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l1-s2_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 2\u00d72 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l1-s2_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 2\u00d72 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l1-s2_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 2\u00d72 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l1-s2_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 2\u00d72 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l1-s3": {
+    "tiles": 3,
+    "scale": 3,
+    "height": 72,
+    "frames": {
+      "day-0": {
+        "file": "residential-d3-l1-s3-day-0.8f1e404f05.webp",
+        "width": 570,
+        "height": 421,
+        "anchor": [
+          284.9999,
+          274.5301
+        ]
+      },
+      "day-1": {
+        "file": "residential-d3-l1-s3-day-1.77f65f73fa.webp",
+        "width": 570,
+        "height": 421,
+        "anchor": [
+          284.9999,
+          274.5302
+        ]
+      },
+      "day-2": {
+        "file": "residential-d3-l1-s3-day-2.5d2c20bb16.webp",
+        "width": 570,
+        "height": 421,
+        "anchor": [
+          285.0001,
+          274.5302
+        ]
+      },
+      "day-3": {
+        "file": "residential-d3-l1-s3-day-3.c8b650eac4.webp",
+        "width": 570,
+        "height": 421,
+        "anchor": [
+          285.0001,
+          274.5301
+        ]
+      },
+      "night-0": {
+        "file": "residential-d3-l1-s3-night-0.027d24d659.webp",
+        "width": 570,
+        "height": 421,
+        "anchor": [
+          284.9999,
+          274.5301
+        ]
+      },
+      "night-1": {
+        "file": "residential-d3-l1-s3-night-1.848e7701fd.webp",
+        "width": 570,
+        "height": 421,
+        "anchor": [
+          284.9999,
+          274.5302
+        ]
+      },
+      "night-2": {
+        "file": "residential-d3-l1-s3-night-2.f48c555f17.webp",
+        "width": 570,
+        "height": 421,
+        "anchor": [
+          285.0001,
+          274.5302
+        ]
+      },
+      "night-3": {
+        "file": "residential-d3-l1-s3-night-3.a809b4d36e.webp",
+        "width": 570,
+        "height": 421,
+        "anchor": [
+          285.0001,
+          274.5301
+        ]
+      },
+      "unpowered-0": {
+        "file": "residential-d3-l1-s3-unpowered-0.007cb21fc4.webp",
+        "width": 570,
+        "height": 421,
+        "anchor": [
+          284.9999,
+          274.5301
+        ]
+      },
+      "unpowered-1": {
+        "file": "residential-d3-l1-s3-unpowered-1.7610f78f36.webp",
+        "width": 570,
+        "height": 421,
+        "anchor": [
+          284.9999,
+          274.5302
+        ]
+      },
+      "unpowered-2": {
+        "file": "residential-d3-l1-s3-unpowered-2.71cbb45654.webp",
+        "width": 570,
+        "height": 421,
+        "anchor": [
+          285.0001,
+          274.5302
+        ]
+      },
+      "unpowered-3": {
+        "file": "residential-d3-l1-s3-unpowered-3.17525ae5db.webp",
+        "width": 570,
+        "height": 421,
+        "anchor": [
+          285.0001,
+          274.5301
+        ]
+      },
+      "day-0-v1": {
+        "file": "residential-d3-l1-s3-day-0-v1.948f5b3917.webp",
+        "width": 570,
+        "height": 405,
+        "anchor": [
+          285.0,
+          258.8627
+        ]
+      },
+      "day-1-v1": {
+        "file": "residential-d3-l1-s3-day-1-v1.ac87d3dcc8.webp",
+        "width": 570,
+        "height": 405,
+        "anchor": [
+          285.0,
+          258.8626
+        ]
+      },
+      "day-2-v1": {
+        "file": "residential-d3-l1-s3-day-2-v1.9ea98837a5.webp",
+        "width": 570,
+        "height": 405,
+        "anchor": [
+          285.0,
+          258.8626
+        ]
+      },
+      "day-3-v1": {
+        "file": "residential-d3-l1-s3-day-3-v1.d0a8090bd2.webp",
+        "width": 570,
+        "height": 405,
+        "anchor": [
+          285.0,
+          258.8627
+        ]
+      },
+      "night-0-v1": {
+        "file": "residential-d3-l1-s3-night-0-v1.7fd8f250ac.webp",
+        "width": 570,
+        "height": 405,
+        "anchor": [
+          285.0,
+          258.8627
+        ]
+      },
+      "night-1-v1": {
+        "file": "residential-d3-l1-s3-night-1-v1.03eee9936d.webp",
+        "width": 570,
+        "height": 405,
+        "anchor": [
+          285.0,
+          258.8626
+        ]
+      },
+      "night-2-v1": {
+        "file": "residential-d3-l1-s3-night-2-v1.fe1bd3b4ca.webp",
+        "width": 570,
+        "height": 405,
+        "anchor": [
+          285.0,
+          258.8626
+        ]
+      },
+      "night-3-v1": {
+        "file": "residential-d3-l1-s3-night-3-v1.68e362b028.webp",
+        "width": 570,
+        "height": 405,
+        "anchor": [
+          285.0,
+          258.8627
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "residential-d3-l1-s3-unpowered-0-v1.a3a04947cd.webp",
+        "width": 570,
+        "height": 405,
+        "anchor": [
+          285.0,
+          258.8627
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "residential-d3-l1-s3-unpowered-1-v1.17285e9384.webp",
+        "width": 570,
+        "height": 405,
+        "anchor": [
+          285.0,
+          258.8626
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "residential-d3-l1-s3-unpowered-2-v1.4e2249c1d7.webp",
+        "width": 570,
+        "height": 405,
+        "anchor": [
+          285.0,
+          258.8626
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "residential-d3-l1-s3-unpowered-3-v1.5e7688d180.webp",
+        "width": 570,
+        "height": 405,
+        "anchor": [
+          285.0,
+          258.8627
+        ]
+      },
+      "day-0-v2": {
+        "file": "residential-d3-l1-s3-day-0-v2.60dacbf70a.webp",
+        "width": 570,
+        "height": 458,
+        "anchor": [
+          285.0,
+          311.7892
+        ]
+      },
+      "day-1-v2": {
+        "file": "residential-d3-l1-s3-day-1-v2.19776956c8.webp",
+        "width": 570,
+        "height": 444,
+        "anchor": [
+          285.0,
+          297.7892
+        ]
+      },
+      "day-2-v2": {
+        "file": "residential-d3-l1-s3-day-2-v2.50c1a37621.webp",
+        "width": 570,
+        "height": 444,
+        "anchor": [
+          285.0,
+          297.7892
+        ]
+      },
+      "day-3-v2": {
+        "file": "residential-d3-l1-s3-day-3-v2.799d983fbf.webp",
+        "width": 570,
+        "height": 458,
+        "anchor": [
+          285.0,
+          311.7892
+        ]
+      },
+      "night-0-v2": {
+        "file": "residential-d3-l1-s3-night-0-v2.b766985a3c.webp",
+        "width": 570,
+        "height": 458,
+        "anchor": [
+          285.0,
+          311.7892
+        ]
+      },
+      "night-1-v2": {
+        "file": "residential-d3-l1-s3-night-1-v2.ea222b6888.webp",
+        "width": 570,
+        "height": 444,
+        "anchor": [
+          285.0,
+          297.7892
+        ]
+      },
+      "night-2-v2": {
+        "file": "residential-d3-l1-s3-night-2-v2.b2d1e05598.webp",
+        "width": 570,
+        "height": 444,
+        "anchor": [
+          285.0,
+          297.7892
+        ]
+      },
+      "night-3-v2": {
+        "file": "residential-d3-l1-s3-night-3-v2.7ed7916ae7.webp",
+        "width": 570,
+        "height": 458,
+        "anchor": [
+          285.0,
+          311.7892
+        ]
+      },
+      "unpowered-0-v2": {
+        "file": "residential-d3-l1-s3-unpowered-0-v2.e6e7b0b838.webp",
+        "width": 570,
+        "height": 458,
+        "anchor": [
+          285.0,
+          311.7892
+        ]
+      },
+      "unpowered-1-v2": {
+        "file": "residential-d3-l1-s3-unpowered-1-v2.dbec3dad8e.webp",
+        "width": 570,
+        "height": 444,
+        "anchor": [
+          285.0,
+          297.7892
+        ]
+      },
+      "unpowered-2-v2": {
+        "file": "residential-d3-l1-s3-unpowered-2-v2.9234d223c4.webp",
+        "width": 570,
+        "height": 444,
+        "anchor": [
+          285.0,
+          297.7892
+        ]
+      },
+      "unpowered-3-v2": {
+        "file": "residential-d3-l1-s3-unpowered-3-v2.3340d03a89.webp",
+        "width": 570,
+        "height": 458,
+        "anchor": [
+          285.0,
+          311.7892
+        ]
+      },
+      "day-0-v3": {
+        "file": "residential-d3-l1-s3-day-0-v3.3ce8c9722e.webp",
+        "width": 570,
+        "height": 421,
+        "anchor": [
+          284.9999,
+          274.5301
+        ]
+      },
+      "day-1-v3": {
+        "file": "residential-d3-l1-s3-day-1-v3.6dbc1a7a8f.webp",
+        "width": 570,
+        "height": 421,
+        "anchor": [
+          284.9999,
+          274.5302
+        ]
+      },
+      "day-2-v3": {
+        "file": "residential-d3-l1-s3-day-2-v3.cbe5e45d5d.webp",
+        "width": 570,
+        "height": 421,
+        "anchor": [
+          285.0001,
+          274.5302
+        ]
+      },
+      "day-3-v3": {
+        "file": "residential-d3-l1-s3-day-3-v3.b4c4bc18cd.webp",
+        "width": 570,
+        "height": 421,
+        "anchor": [
+          285.0001,
+          274.5301
+        ]
+      },
+      "night-0-v3": {
+        "file": "residential-d3-l1-s3-night-0-v3.9d896abf89.webp",
+        "width": 570,
+        "height": 421,
+        "anchor": [
+          284.9999,
+          274.5301
+        ]
+      },
+      "night-1-v3": {
+        "file": "residential-d3-l1-s3-night-1-v3.86062ba729.webp",
+        "width": 570,
+        "height": 421,
+        "anchor": [
+          284.9999,
+          274.5302
+        ]
+      },
+      "night-2-v3": {
+        "file": "residential-d3-l1-s3-night-2-v3.aefdb09584.webp",
+        "width": 570,
+        "height": 421,
+        "anchor": [
+          285.0001,
+          274.5302
+        ]
+      },
+      "night-3-v3": {
+        "file": "residential-d3-l1-s3-night-3-v3.57bb29dc26.webp",
+        "width": 570,
+        "height": 421,
+        "anchor": [
+          285.0001,
+          274.5301
+        ]
+      },
+      "unpowered-0-v3": {
+        "file": "residential-d3-l1-s3-unpowered-0-v3.9778108b21.webp",
+        "width": 570,
+        "height": 421,
+        "anchor": [
+          284.9999,
+          274.5301
+        ]
+      },
+      "unpowered-1-v3": {
+        "file": "residential-d3-l1-s3-unpowered-1-v3.c0307df002.webp",
+        "width": 570,
+        "height": 421,
+        "anchor": [
+          284.9999,
+          274.5302
+        ]
+      },
+      "unpowered-2-v3": {
+        "file": "residential-d3-l1-s3-unpowered-2-v3.164a9af055.webp",
+        "width": 570,
+        "height": 421,
+        "anchor": [
+          285.0001,
+          274.5302
+        ]
+      },
+      "unpowered-3-v3": {
+        "file": "residential-d3-l1-s3-unpowered-3-v3.4b66ab45d6.webp",
+        "width": 570,
+        "height": 421,
+        "anchor": [
+          285.0001,
+          274.5301
+        ]
+      },
+      "day-0-v4": {
+        "file": "residential-d3-l1-s3-day-0-v4.5f1e002093.webp",
+        "width": 570,
+        "height": 405,
+        "anchor": [
+          285.0,
+          258.8627
+        ]
+      },
+      "day-1-v4": {
+        "file": "residential-d3-l1-s3-day-1-v4.821db36416.webp",
+        "width": 570,
+        "height": 405,
+        "anchor": [
+          285.0,
+          258.8626
+        ]
+      },
+      "day-2-v4": {
+        "file": "residential-d3-l1-s3-day-2-v4.2297f0db09.webp",
+        "width": 570,
+        "height": 405,
+        "anchor": [
+          285.0,
+          258.8626
+        ]
+      },
+      "day-3-v4": {
+        "file": "residential-d3-l1-s3-day-3-v4.58ce46176e.webp",
+        "width": 570,
+        "height": 405,
+        "anchor": [
+          285.0,
+          258.8627
+        ]
+      },
+      "night-0-v4": {
+        "file": "residential-d3-l1-s3-night-0-v4.bd957c4a5b.webp",
+        "width": 570,
+        "height": 405,
+        "anchor": [
+          285.0,
+          258.8627
+        ]
+      },
+      "night-1-v4": {
+        "file": "residential-d3-l1-s3-night-1-v4.647d1a1d3f.webp",
+        "width": 570,
+        "height": 405,
+        "anchor": [
+          285.0,
+          258.8626
+        ]
+      },
+      "night-2-v4": {
+        "file": "residential-d3-l1-s3-night-2-v4.6f72d9d09b.webp",
+        "width": 570,
+        "height": 405,
+        "anchor": [
+          285.0,
+          258.8626
+        ]
+      },
+      "night-3-v4": {
+        "file": "residential-d3-l1-s3-night-3-v4.492c87e0f9.webp",
+        "width": 570,
+        "height": 405,
+        "anchor": [
+          285.0,
+          258.8627
+        ]
+      },
+      "unpowered-0-v4": {
+        "file": "residential-d3-l1-s3-unpowered-0-v4.bf3ed44309.webp",
+        "width": 570,
+        "height": 405,
+        "anchor": [
+          285.0,
+          258.8627
+        ]
+      },
+      "unpowered-1-v4": {
+        "file": "residential-d3-l1-s3-unpowered-1-v4.bbcc1f847d.webp",
+        "width": 570,
+        "height": 405,
+        "anchor": [
+          285.0,
+          258.8626
+        ]
+      },
+      "unpowered-2-v4": {
+        "file": "residential-d3-l1-s3-unpowered-2-v4.393bb3d321.webp",
+        "width": 570,
+        "height": 405,
+        "anchor": [
+          285.0,
+          258.8626
+        ]
+      },
+      "unpowered-3-v4": {
+        "file": "residential-d3-l1-s3-unpowered-3-v4.7585c2d56a.webp",
+        "width": 570,
+        "height": 405,
+        "anchor": [
+          285.0,
+          258.8627
+        ]
+      }
+    },
+    "family": "residential",
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 1
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 1 \u00b7 3\u00d73",
+    "description": "Residential density 3, growth stage 1, authored specifically for a 3\u00d73 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l1-s3",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 3\u00d73 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l1-s3_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 3\u00d73 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l1-s3_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 3\u00d73 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l1-s3_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 3\u00d73 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l1-s3_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 3\u00d73 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l2-s1": {
+    "tiles": 1,
+    "scale": 3,
+    "height": 89,
+    "frames": {
+      "day-0": {
+        "file": "residential-d3-l2-s1-day-0.751975385f.webp",
+        "width": 187,
+        "height": 322,
+        "anchor": [
+          94.0,
+          271.5149
+        ]
+      },
+      "day-1": {
+        "file": "residential-d3-l2-s1-day-1.4f3304a93e.webp",
+        "width": 187,
+        "height": 321,
+        "anchor": [
+          94.0,
+          270.5149
+        ]
+      },
+      "day-2": {
+        "file": "residential-d3-l2-s1-day-2.5866048d56.webp",
+        "width": 187,
+        "height": 322,
+        "anchor": [
+          94.0,
+          271.5149
+        ]
+      },
+      "day-3": {
+        "file": "residential-d3-l2-s1-day-3.6e969d96fa.webp",
+        "width": 187,
+        "height": 321,
+        "anchor": [
+          94.0,
+          270.5149
+        ]
+      },
+      "night-0": {
+        "file": "residential-d3-l2-s1-night-0.798ba91261.webp",
+        "width": 187,
+        "height": 322,
+        "anchor": [
+          94.0,
+          271.5149
+        ]
+      },
+      "night-1": {
+        "file": "residential-d3-l2-s1-night-1.70d8e9bfc6.webp",
+        "width": 187,
+        "height": 321,
+        "anchor": [
+          94.0,
+          270.5149
+        ]
+      },
+      "night-2": {
+        "file": "residential-d3-l2-s1-night-2.919e7c989a.webp",
+        "width": 187,
+        "height": 322,
+        "anchor": [
+          94.0,
+          271.5149
+        ]
+      },
+      "night-3": {
+        "file": "residential-d3-l2-s1-night-3.6dc0487e90.webp",
+        "width": 187,
+        "height": 321,
+        "anchor": [
+          94.0,
+          270.5149
+        ]
+      },
+      "unpowered-0": {
+        "file": "residential-d3-l2-s1-unpowered-0.ea43c582a1.webp",
+        "width": 187,
+        "height": 322,
+        "anchor": [
+          94.0,
+          271.5149
+        ]
+      },
+      "unpowered-1": {
+        "file": "residential-d3-l2-s1-unpowered-1.4938dd89e0.webp",
+        "width": 187,
+        "height": 321,
+        "anchor": [
+          94.0,
+          270.5149
+        ]
+      },
+      "unpowered-2": {
+        "file": "residential-d3-l2-s1-unpowered-2.6ee14da2ec.webp",
+        "width": 187,
+        "height": 322,
+        "anchor": [
+          94.0,
+          271.5149
+        ]
+      },
+      "unpowered-3": {
+        "file": "residential-d3-l2-s1-unpowered-3.388c7a7062.webp",
+        "width": 187,
+        "height": 321,
+        "anchor": [
+          94.0,
+          270.5149
+        ]
+      },
+      "day-0-v1": {
+        "file": "residential-d3-l2-s1-day-0-v1.d06c95a613.webp",
+        "width": 187,
+        "height": 322,
+        "anchor": [
+          94.0,
+          271.5149
+        ]
+      },
+      "day-1-v1": {
+        "file": "residential-d3-l2-s1-day-1-v1.147aaac7f3.webp",
+        "width": 187,
+        "height": 321,
+        "anchor": [
+          94.0,
+          270.5149
+        ]
+      },
+      "day-2-v1": {
+        "file": "residential-d3-l2-s1-day-2-v1.9418700906.webp",
+        "width": 187,
+        "height": 322,
+        "anchor": [
+          94.0,
+          271.5149
+        ]
+      },
+      "day-3-v1": {
+        "file": "residential-d3-l2-s1-day-3-v1.68681ff31f.webp",
+        "width": 187,
+        "height": 321,
+        "anchor": [
+          94.0,
+          270.5149
+        ]
+      },
+      "night-0-v1": {
+        "file": "residential-d3-l2-s1-night-0-v1.b490f3beca.webp",
+        "width": 187,
+        "height": 322,
+        "anchor": [
+          94.0,
+          271.5149
+        ]
+      },
+      "night-1-v1": {
+        "file": "residential-d3-l2-s1-night-1-v1.b333592460.webp",
+        "width": 187,
+        "height": 321,
+        "anchor": [
+          94.0,
+          270.5149
+        ]
+      },
+      "night-2-v1": {
+        "file": "residential-d3-l2-s1-night-2-v1.1d918a7058.webp",
+        "width": 187,
+        "height": 322,
+        "anchor": [
+          94.0,
+          271.5149
+        ]
+      },
+      "night-3-v1": {
+        "file": "residential-d3-l2-s1-night-3-v1.f4c50dabdc.webp",
+        "width": 187,
+        "height": 321,
+        "anchor": [
+          94.0,
+          270.5149
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "residential-d3-l2-s1-unpowered-0-v1.932c15c997.webp",
+        "width": 187,
+        "height": 322,
+        "anchor": [
+          94.0,
+          271.5149
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "residential-d3-l2-s1-unpowered-1-v1.e9006a4d53.webp",
+        "width": 187,
+        "height": 321,
+        "anchor": [
+          94.0,
+          270.5149
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "residential-d3-l2-s1-unpowered-2-v1.4c492f5820.webp",
+        "width": 187,
+        "height": 322,
+        "anchor": [
+          94.0,
+          271.5149
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "residential-d3-l2-s1-unpowered-3-v1.cd3bead8bd.webp",
+        "width": 187,
+        "height": 321,
+        "anchor": [
+          94.0,
+          270.5149
+        ]
+      },
+      "day-0-v2": {
+        "file": "residential-d3-l2-s1-day-0-v2.cda2e263db.webp",
+        "width": 187,
+        "height": 346,
+        "anchor": [
+          94.0,
+          295.774
+        ]
+      },
+      "day-1-v2": {
+        "file": "residential-d3-l2-s1-day-1-v2.1c3ad022c5.webp",
+        "width": 187,
+        "height": 341,
+        "anchor": [
+          94.0,
+          290.7739
+        ]
+      },
+      "day-2-v2": {
+        "file": "residential-d3-l2-s1-day-2-v2.23719812e8.webp",
+        "width": 187,
+        "height": 341,
+        "anchor": [
+          94.0,
+          290.7739
+        ]
+      },
+      "day-3-v2": {
+        "file": "residential-d3-l2-s1-day-3-v2.34d8daeb11.webp",
+        "width": 187,
+        "height": 346,
+        "anchor": [
+          94.0,
+          295.774
+        ]
+      },
+      "night-0-v2": {
+        "file": "residential-d3-l2-s1-night-0-v2.4b4801cc93.webp",
+        "width": 187,
+        "height": 346,
+        "anchor": [
+          94.0,
+          295.774
+        ]
+      },
+      "night-1-v2": {
+        "file": "residential-d3-l2-s1-night-1-v2.8e84961b38.webp",
+        "width": 187,
+        "height": 341,
+        "anchor": [
+          94.0,
+          290.7739
+        ]
+      },
+      "night-2-v2": {
+        "file": "residential-d3-l2-s1-night-2-v2.5370e41429.webp",
+        "width": 187,
+        "height": 341,
+        "anchor": [
+          94.0,
+          290.7739
+        ]
+      },
+      "night-3-v2": {
+        "file": "residential-d3-l2-s1-night-3-v2.f9b998d12d.webp",
+        "width": 187,
+        "height": 346,
+        "anchor": [
+          94.0,
+          295.774
+        ]
+      },
+      "unpowered-0-v2": {
+        "file": "residential-d3-l2-s1-unpowered-0-v2.730a6a63ee.webp",
+        "width": 187,
+        "height": 346,
+        "anchor": [
+          94.0,
+          295.774
+        ]
+      },
+      "unpowered-1-v2": {
+        "file": "residential-d3-l2-s1-unpowered-1-v2.b1a3c15027.webp",
+        "width": 187,
+        "height": 341,
+        "anchor": [
+          94.0,
+          290.7739
+        ]
+      },
+      "unpowered-2-v2": {
+        "file": "residential-d3-l2-s1-unpowered-2-v2.7b1d6c6278.webp",
+        "width": 187,
+        "height": 341,
+        "anchor": [
+          94.0,
+          290.7739
+        ]
+      },
+      "unpowered-3-v2": {
+        "file": "residential-d3-l2-s1-unpowered-3-v2.7803e0b8a8.webp",
+        "width": 187,
+        "height": 346,
+        "anchor": [
+          94.0,
+          295.774
+        ]
+      },
+      "day-0-v3": {
+        "file": "residential-d3-l2-s1-day-0-v3.6a94d432f2.webp",
+        "width": 187,
+        "height": 322,
+        "anchor": [
+          94.0,
+          271.5149
+        ]
+      },
+      "day-1-v3": {
+        "file": "residential-d3-l2-s1-day-1-v3.de7925a736.webp",
+        "width": 187,
+        "height": 321,
+        "anchor": [
+          94.0,
+          270.5149
+        ]
+      },
+      "day-2-v3": {
+        "file": "residential-d3-l2-s1-day-2-v3.ad5ebdf137.webp",
+        "width": 187,
+        "height": 322,
+        "anchor": [
+          94.0,
+          271.5149
+        ]
+      },
+      "day-3-v3": {
+        "file": "residential-d3-l2-s1-day-3-v3.d4418138be.webp",
+        "width": 187,
+        "height": 321,
+        "anchor": [
+          94.0,
+          270.5149
+        ]
+      },
+      "night-0-v3": {
+        "file": "residential-d3-l2-s1-night-0-v3.b5ecbcbf33.webp",
+        "width": 187,
+        "height": 322,
+        "anchor": [
+          94.0,
+          271.5149
+        ]
+      },
+      "night-1-v3": {
+        "file": "residential-d3-l2-s1-night-1-v3.46900887b4.webp",
+        "width": 187,
+        "height": 321,
+        "anchor": [
+          94.0,
+          270.5149
+        ]
+      },
+      "night-2-v3": {
+        "file": "residential-d3-l2-s1-night-2-v3.a39ee5fde9.webp",
+        "width": 187,
+        "height": 322,
+        "anchor": [
+          94.0,
+          271.5149
+        ]
+      },
+      "night-3-v3": {
+        "file": "residential-d3-l2-s1-night-3-v3.2331ff8673.webp",
+        "width": 187,
+        "height": 321,
+        "anchor": [
+          94.0,
+          270.5149
+        ]
+      },
+      "unpowered-0-v3": {
+        "file": "residential-d3-l2-s1-unpowered-0-v3.efd4f3a60e.webp",
+        "width": 187,
+        "height": 322,
+        "anchor": [
+          94.0,
+          271.5149
+        ]
+      },
+      "unpowered-1-v3": {
+        "file": "residential-d3-l2-s1-unpowered-1-v3.14c7e8a87e.webp",
+        "width": 187,
+        "height": 321,
+        "anchor": [
+          94.0,
+          270.5149
+        ]
+      },
+      "unpowered-2-v3": {
+        "file": "residential-d3-l2-s1-unpowered-2-v3.74bd1a8c0f.webp",
+        "width": 187,
+        "height": 322,
+        "anchor": [
+          94.0,
+          271.5149
+        ]
+      },
+      "unpowered-3-v3": {
+        "file": "residential-d3-l2-s1-unpowered-3-v3.a5b4e8f268.webp",
+        "width": 187,
+        "height": 321,
+        "anchor": [
+          94.0,
+          270.5149
+        ]
+      },
+      "day-0-v4": {
+        "file": "residential-d3-l2-s1-day-0-v4.84864846a5.webp",
+        "width": 187,
+        "height": 322,
+        "anchor": [
+          94.0,
+          271.5149
+        ]
+      },
+      "day-1-v4": {
+        "file": "residential-d3-l2-s1-day-1-v4.c6d612c492.webp",
+        "width": 187,
+        "height": 321,
+        "anchor": [
+          94.0,
+          270.5149
+        ]
+      },
+      "day-2-v4": {
+        "file": "residential-d3-l2-s1-day-2-v4.1d6e6974ff.webp",
+        "width": 187,
+        "height": 322,
+        "anchor": [
+          94.0,
+          271.5149
+        ]
+      },
+      "day-3-v4": {
+        "file": "residential-d3-l2-s1-day-3-v4.7864eacfb3.webp",
+        "width": 187,
+        "height": 321,
+        "anchor": [
+          94.0,
+          270.5149
+        ]
+      },
+      "night-0-v4": {
+        "file": "residential-d3-l2-s1-night-0-v4.74c1139edc.webp",
+        "width": 187,
+        "height": 322,
+        "anchor": [
+          94.0,
+          271.5149
+        ]
+      },
+      "night-1-v4": {
+        "file": "residential-d3-l2-s1-night-1-v4.314c3d9d83.webp",
+        "width": 187,
+        "height": 321,
+        "anchor": [
+          94.0,
+          270.5149
+        ]
+      },
+      "night-2-v4": {
+        "file": "residential-d3-l2-s1-night-2-v4.c7618f9ac1.webp",
+        "width": 187,
+        "height": 322,
+        "anchor": [
+          94.0,
+          271.5149
+        ]
+      },
+      "night-3-v4": {
+        "file": "residential-d3-l2-s1-night-3-v4.923d0ffcdc.webp",
+        "width": 187,
+        "height": 321,
+        "anchor": [
+          94.0,
+          270.5149
+        ]
+      },
+      "unpowered-0-v4": {
+        "file": "residential-d3-l2-s1-unpowered-0-v4.426f0ffb30.webp",
+        "width": 187,
+        "height": 322,
+        "anchor": [
+          94.0,
+          271.5149
+        ]
+      },
+      "unpowered-1-v4": {
+        "file": "residential-d3-l2-s1-unpowered-1-v4.1ad2aa800a.webp",
+        "width": 187,
+        "height": 321,
+        "anchor": [
+          94.0,
+          270.5149
+        ]
+      },
+      "unpowered-2-v4": {
+        "file": "residential-d3-l2-s1-unpowered-2-v4.cef61a854a.webp",
+        "width": 187,
+        "height": 322,
+        "anchor": [
+          94.0,
+          271.5149
+        ]
+      },
+      "unpowered-3-v4": {
+        "file": "residential-d3-l2-s1-unpowered-3-v4.98cff7b5ed.webp",
+        "width": 187,
+        "height": 321,
+        "anchor": [
+          94.0,
+          270.5149
+        ]
+      }
+    },
+    "family": "residential",
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 2
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 2 \u00b7 1\u00d71",
+    "description": "Residential density 3, growth stage 2, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l2-s1",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 1\u00d71 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l2-s1_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 1\u00d71 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l2-s1_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 1\u00d71 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l2-s1_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 1\u00d71 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l2-s1_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 1\u00d71 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l2-s2": {
+    "tiles": 2,
+    "scale": 3,
+    "height": 90,
+    "frames": {
+      "day-0": {
+        "file": "residential-d3-l2-s2-day-0.8ead9515b7.webp",
+        "width": 378,
+        "height": 396,
+        "anchor": [
+          189.0,
+          297.5149
+        ]
+      },
+      "day-1": {
+        "file": "residential-d3-l2-s2-day-1.9ba66593fe.webp",
+        "width": 378,
+        "height": 396,
+        "anchor": [
+          189.0,
+          297.5149
+        ]
+      },
+      "day-2": {
+        "file": "residential-d3-l2-s2-day-2.716b850e2d.webp",
+        "width": 378,
+        "height": 396,
+        "anchor": [
+          189.0,
+          297.5149
+        ]
+      },
+      "day-3": {
+        "file": "residential-d3-l2-s2-day-3.bcde28f767.webp",
+        "width": 378,
+        "height": 396,
+        "anchor": [
+          189.0,
+          297.5149
+        ]
+      },
+      "night-0": {
+        "file": "residential-d3-l2-s2-night-0.6a3be172c0.webp",
+        "width": 378,
+        "height": 396,
+        "anchor": [
+          189.0,
+          297.5149
+        ]
+      },
+      "night-1": {
+        "file": "residential-d3-l2-s2-night-1.d91b486f55.webp",
+        "width": 378,
+        "height": 396,
+        "anchor": [
+          189.0,
+          297.5149
+        ]
+      },
+      "night-2": {
+        "file": "residential-d3-l2-s2-night-2.d257939a6c.webp",
+        "width": 378,
+        "height": 396,
+        "anchor": [
+          189.0,
+          297.5149
+        ]
+      },
+      "night-3": {
+        "file": "residential-d3-l2-s2-night-3.5f74bc99c8.webp",
+        "width": 378,
+        "height": 396,
+        "anchor": [
+          189.0,
+          297.5149
+        ]
+      },
+      "unpowered-0": {
+        "file": "residential-d3-l2-s2-unpowered-0.e1ac94eea8.webp",
+        "width": 378,
+        "height": 396,
+        "anchor": [
+          189.0,
+          297.5149
+        ]
+      },
+      "unpowered-1": {
+        "file": "residential-d3-l2-s2-unpowered-1.6bd8d452d4.webp",
+        "width": 378,
+        "height": 396,
+        "anchor": [
+          189.0,
+          297.5149
+        ]
+      },
+      "unpowered-2": {
+        "file": "residential-d3-l2-s2-unpowered-2.5d4b9f7f3e.webp",
+        "width": 378,
+        "height": 396,
+        "anchor": [
+          189.0,
+          297.5149
+        ]
+      },
+      "unpowered-3": {
+        "file": "residential-d3-l2-s2-unpowered-3.16a6ab15d6.webp",
+        "width": 378,
+        "height": 396,
+        "anchor": [
+          189.0,
+          297.5149
+        ]
+      },
+      "day-0-v1": {
+        "file": "residential-d3-l2-s2-day-0-v1.47cf53190d.webp",
+        "width": 378,
+        "height": 391,
+        "anchor": [
+          189.0,
+          292.0967
+        ]
+      },
+      "day-1-v1": {
+        "file": "residential-d3-l2-s2-day-1-v1.cb33d2b86f.webp",
+        "width": 378,
+        "height": 391,
+        "anchor": [
+          189.0,
+          292.0966
+        ]
+      },
+      "day-2-v1": {
+        "file": "residential-d3-l2-s2-day-2-v1.74f2bbb3cd.webp",
+        "width": 378,
+        "height": 391,
+        "anchor": [
+          189.0,
+          292.0966
+        ]
+      },
+      "day-3-v1": {
+        "file": "residential-d3-l2-s2-day-3-v1.0daa21e8a7.webp",
+        "width": 378,
+        "height": 391,
+        "anchor": [
+          189.0,
+          292.0967
+        ]
+      },
+      "night-0-v1": {
+        "file": "residential-d3-l2-s2-night-0-v1.4266b3a01b.webp",
+        "width": 378,
+        "height": 391,
+        "anchor": [
+          189.0,
+          292.0967
+        ]
+      },
+      "night-1-v1": {
+        "file": "residential-d3-l2-s2-night-1-v1.7c1e80619c.webp",
+        "width": 378,
+        "height": 391,
+        "anchor": [
+          189.0,
+          292.0966
+        ]
+      },
+      "night-2-v1": {
+        "file": "residential-d3-l2-s2-night-2-v1.334898f01f.webp",
+        "width": 378,
+        "height": 391,
+        "anchor": [
+          189.0,
+          292.0966
+        ]
+      },
+      "night-3-v1": {
+        "file": "residential-d3-l2-s2-night-3-v1.2e80ef5f22.webp",
+        "width": 378,
+        "height": 391,
+        "anchor": [
+          189.0,
+          292.0967
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "residential-d3-l2-s2-unpowered-0-v1.e59b4a8e9b.webp",
+        "width": 378,
+        "height": 391,
+        "anchor": [
+          189.0,
+          292.0967
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "residential-d3-l2-s2-unpowered-1-v1.0cc1235cca.webp",
+        "width": 378,
+        "height": 391,
+        "anchor": [
+          189.0,
+          292.0966
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "residential-d3-l2-s2-unpowered-2-v1.9cca02e278.webp",
+        "width": 378,
+        "height": 391,
+        "anchor": [
+          189.0,
+          292.0966
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "residential-d3-l2-s2-unpowered-3-v1.6660938a0e.webp",
+        "width": 378,
+        "height": 391,
+        "anchor": [
+          189.0,
+          292.0967
+        ]
+      },
+      "day-0-v2": {
+        "file": "residential-d3-l2-s2-day-0-v2.032341e354.webp",
+        "width": 378,
+        "height": 428,
+        "anchor": [
+          189.0,
+          329.774
+        ]
+      },
+      "day-1-v2": {
+        "file": "residential-d3-l2-s2-day-1-v2.005a4b6022.webp",
+        "width": 378,
+        "height": 418,
+        "anchor": [
+          189.0,
+          319.7739
+        ]
+      },
+      "day-2-v2": {
+        "file": "residential-d3-l2-s2-day-2-v2.6602c3d0d1.webp",
+        "width": 378,
+        "height": 418,
+        "anchor": [
+          189.0,
+          319.7739
+        ]
+      },
+      "day-3-v2": {
+        "file": "residential-d3-l2-s2-day-3-v2.755bab2ecd.webp",
+        "width": 378,
+        "height": 427,
+        "anchor": [
+          189.0,
+          328.774
+        ]
+      },
+      "night-0-v2": {
+        "file": "residential-d3-l2-s2-night-0-v2.d48daa8a58.webp",
+        "width": 378,
+        "height": 428,
+        "anchor": [
+          189.0,
+          329.774
+        ]
+      },
+      "night-1-v2": {
+        "file": "residential-d3-l2-s2-night-1-v2.28336c1a2c.webp",
+        "width": 378,
+        "height": 418,
+        "anchor": [
+          189.0,
+          319.7739
+        ]
+      },
+      "night-2-v2": {
+        "file": "residential-d3-l2-s2-night-2-v2.211ca247e0.webp",
+        "width": 378,
+        "height": 418,
+        "anchor": [
+          189.0,
+          319.7739
+        ]
+      },
+      "night-3-v2": {
+        "file": "residential-d3-l2-s2-night-3-v2.282f36698c.webp",
+        "width": 378,
+        "height": 427,
+        "anchor": [
+          189.0,
+          328.774
+        ]
+      },
+      "unpowered-0-v2": {
+        "file": "residential-d3-l2-s2-unpowered-0-v2.643638dccd.webp",
+        "width": 378,
+        "height": 428,
+        "anchor": [
+          189.0,
+          329.774
+        ]
+      },
+      "unpowered-1-v2": {
+        "file": "residential-d3-l2-s2-unpowered-1-v2.e570e6995e.webp",
+        "width": 378,
+        "height": 418,
+        "anchor": [
+          189.0,
+          319.7739
+        ]
+      },
+      "unpowered-2-v2": {
+        "file": "residential-d3-l2-s2-unpowered-2-v2.01f90afcaa.webp",
+        "width": 378,
+        "height": 418,
+        "anchor": [
+          189.0,
+          319.7739
+        ]
+      },
+      "unpowered-3-v2": {
+        "file": "residential-d3-l2-s2-unpowered-3-v2.05ae4b9797.webp",
+        "width": 378,
+        "height": 427,
+        "anchor": [
+          189.0,
+          328.774
+        ]
+      },
+      "day-0-v3": {
+        "file": "residential-d3-l2-s2-day-0-v3.b8fbaeadce.webp",
+        "width": 378,
+        "height": 396,
+        "anchor": [
+          189.0,
+          297.5149
+        ]
+      },
+      "day-1-v3": {
+        "file": "residential-d3-l2-s2-day-1-v3.bc0826ac72.webp",
+        "width": 378,
+        "height": 396,
+        "anchor": [
+          189.0,
+          297.5149
+        ]
+      },
+      "day-2-v3": {
+        "file": "residential-d3-l2-s2-day-2-v3.55ae4151c8.webp",
+        "width": 378,
+        "height": 396,
+        "anchor": [
+          189.0,
+          297.5149
+        ]
+      },
+      "day-3-v3": {
+        "file": "residential-d3-l2-s2-day-3-v3.dd53d2c9cc.webp",
+        "width": 378,
+        "height": 396,
+        "anchor": [
+          189.0,
+          297.5149
+        ]
+      },
+      "night-0-v3": {
+        "file": "residential-d3-l2-s2-night-0-v3.f61675bf72.webp",
+        "width": 378,
+        "height": 396,
+        "anchor": [
+          189.0,
+          297.5149
+        ]
+      },
+      "night-1-v3": {
+        "file": "residential-d3-l2-s2-night-1-v3.dc2f819dbe.webp",
+        "width": 378,
+        "height": 396,
+        "anchor": [
+          189.0,
+          297.5149
+        ]
+      },
+      "night-2-v3": {
+        "file": "residential-d3-l2-s2-night-2-v3.47bdbc3a0c.webp",
+        "width": 378,
+        "height": 396,
+        "anchor": [
+          189.0,
+          297.5149
+        ]
+      },
+      "night-3-v3": {
+        "file": "residential-d3-l2-s2-night-3-v3.caabc5e1ff.webp",
+        "width": 378,
+        "height": 396,
+        "anchor": [
+          189.0,
+          297.5149
+        ]
+      },
+      "unpowered-0-v3": {
+        "file": "residential-d3-l2-s2-unpowered-0-v3.cf42457d53.webp",
+        "width": 378,
+        "height": 396,
+        "anchor": [
+          189.0,
+          297.5149
+        ]
+      },
+      "unpowered-1-v3": {
+        "file": "residential-d3-l2-s2-unpowered-1-v3.4f024ec3aa.webp",
+        "width": 378,
+        "height": 396,
+        "anchor": [
+          189.0,
+          297.5149
+        ]
+      },
+      "unpowered-2-v3": {
+        "file": "residential-d3-l2-s2-unpowered-2-v3.2f802e65a0.webp",
+        "width": 378,
+        "height": 396,
+        "anchor": [
+          189.0,
+          297.5149
+        ]
+      },
+      "unpowered-3-v3": {
+        "file": "residential-d3-l2-s2-unpowered-3-v3.c0643a95b2.webp",
+        "width": 378,
+        "height": 396,
+        "anchor": [
+          189.0,
+          297.5149
+        ]
+      },
+      "day-0-v4": {
+        "file": "residential-d3-l2-s2-day-0-v4.f60123a42d.webp",
+        "width": 378,
+        "height": 391,
+        "anchor": [
+          189.0,
+          292.0967
+        ]
+      },
+      "day-1-v4": {
+        "file": "residential-d3-l2-s2-day-1-v4.e0c7b6fc88.webp",
+        "width": 378,
+        "height": 391,
+        "anchor": [
+          189.0,
+          292.0966
+        ]
+      },
+      "day-2-v4": {
+        "file": "residential-d3-l2-s2-day-2-v4.06a08e0557.webp",
+        "width": 378,
+        "height": 391,
+        "anchor": [
+          189.0,
+          292.0966
+        ]
+      },
+      "day-3-v4": {
+        "file": "residential-d3-l2-s2-day-3-v4.be1dae8dbc.webp",
+        "width": 378,
+        "height": 391,
+        "anchor": [
+          189.0,
+          292.0967
+        ]
+      },
+      "night-0-v4": {
+        "file": "residential-d3-l2-s2-night-0-v4.0929ef3359.webp",
+        "width": 378,
+        "height": 391,
+        "anchor": [
+          189.0,
+          292.0967
+        ]
+      },
+      "night-1-v4": {
+        "file": "residential-d3-l2-s2-night-1-v4.ec80fe2978.webp",
+        "width": 378,
+        "height": 391,
+        "anchor": [
+          189.0,
+          292.0966
+        ]
+      },
+      "night-2-v4": {
+        "file": "residential-d3-l2-s2-night-2-v4.2901ad5fb4.webp",
+        "width": 378,
+        "height": 391,
+        "anchor": [
+          189.0,
+          292.0966
+        ]
+      },
+      "night-3-v4": {
+        "file": "residential-d3-l2-s2-night-3-v4.56612a1d5d.webp",
+        "width": 378,
+        "height": 391,
+        "anchor": [
+          189.0,
+          292.0967
+        ]
+      },
+      "unpowered-0-v4": {
+        "file": "residential-d3-l2-s2-unpowered-0-v4.929722ffbe.webp",
+        "width": 378,
+        "height": 391,
+        "anchor": [
+          189.0,
+          292.0967
+        ]
+      },
+      "unpowered-1-v4": {
+        "file": "residential-d3-l2-s2-unpowered-1-v4.6604cda969.webp",
+        "width": 378,
+        "height": 391,
+        "anchor": [
+          189.0,
+          292.0966
+        ]
+      },
+      "unpowered-2-v4": {
+        "file": "residential-d3-l2-s2-unpowered-2-v4.08707411bc.webp",
+        "width": 378,
+        "height": 391,
+        "anchor": [
+          189.0,
+          292.0966
+        ]
+      },
+      "unpowered-3-v4": {
+        "file": "residential-d3-l2-s2-unpowered-3-v4.966fb12319.webp",
+        "width": 378,
+        "height": 391,
+        "anchor": [
+          189.0,
+          292.0967
+        ]
+      }
+    },
+    "family": "residential",
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 2
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 2 \u00b7 2\u00d72",
+    "description": "Residential density 3, growth stage 2, authored specifically for a 2\u00d72 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l2-s2",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 2\u00d72 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l2-s2_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 2\u00d72 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l2-s2_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 2\u00d72 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l2-s2_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 2\u00d72 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l2-s2_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 2\u00d72 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l2-s3": {
+    "tiles": 3,
+    "scale": 3,
+    "height": 90,
+    "frames": {
+      "day-0": {
+        "file": "residential-d3-l2-s3-day-0.43c838339f.webp",
+        "width": 570,
+        "height": 471,
+        "anchor": [
+          285.0,
+          324.5149
+        ]
+      },
+      "day-1": {
+        "file": "residential-d3-l2-s3-day-1.ebefa3f1c3.webp",
+        "width": 570,
+        "height": 471,
+        "anchor": [
+          285.0,
+          324.5149
+        ]
+      },
+      "day-2": {
+        "file": "residential-d3-l2-s3-day-2.745040f928.webp",
+        "width": 570,
+        "height": 471,
+        "anchor": [
+          285.0,
+          324.5149
+        ]
+      },
+      "day-3": {
+        "file": "residential-d3-l2-s3-day-3.0a159c0a1a.webp",
+        "width": 570,
+        "height": 471,
+        "anchor": [
+          285.0,
+          324.5149
+        ]
+      },
+      "night-0": {
+        "file": "residential-d3-l2-s3-night-0.4389a1cb73.webp",
+        "width": 570,
+        "height": 471,
+        "anchor": [
+          285.0,
+          324.5149
+        ]
+      },
+      "night-1": {
+        "file": "residential-d3-l2-s3-night-1.b4d0b67370.webp",
+        "width": 570,
+        "height": 471,
+        "anchor": [
+          285.0,
+          324.5149
+        ]
+      },
+      "night-2": {
+        "file": "residential-d3-l2-s3-night-2.fa6b4466da.webp",
+        "width": 570,
+        "height": 471,
+        "anchor": [
+          285.0,
+          324.5149
+        ]
+      },
+      "night-3": {
+        "file": "residential-d3-l2-s3-night-3.3aae7e2b0a.webp",
+        "width": 570,
+        "height": 471,
+        "anchor": [
+          285.0,
+          324.5149
+        ]
+      },
+      "unpowered-0": {
+        "file": "residential-d3-l2-s3-unpowered-0.e37f91c40b.webp",
+        "width": 570,
+        "height": 471,
+        "anchor": [
+          285.0,
+          324.5149
+        ]
+      },
+      "unpowered-1": {
+        "file": "residential-d3-l2-s3-unpowered-1.4a01d5af4f.webp",
+        "width": 570,
+        "height": 471,
+        "anchor": [
+          285.0,
+          324.5149
+        ]
+      },
+      "unpowered-2": {
+        "file": "residential-d3-l2-s3-unpowered-2.deb9d5c8e4.webp",
+        "width": 570,
+        "height": 471,
+        "anchor": [
+          285.0,
+          324.5149
+        ]
+      },
+      "unpowered-3": {
+        "file": "residential-d3-l2-s3-unpowered-3.4db647496f.webp",
+        "width": 570,
+        "height": 471,
+        "anchor": [
+          285.0,
+          324.5149
+        ]
+      },
+      "day-0-v1": {
+        "file": "residential-d3-l2-s3-day-0-v1.176b941781.webp",
+        "width": 570,
+        "height": 457,
+        "anchor": [
+          285.0,
+          311.0967
+        ]
+      },
+      "day-1-v1": {
+        "file": "residential-d3-l2-s3-day-1-v1.952e225ddb.webp",
+        "width": 570,
+        "height": 457,
+        "anchor": [
+          285.0,
+          311.0966
+        ]
+      },
+      "day-2-v1": {
+        "file": "residential-d3-l2-s3-day-2-v1.6b43a34fc5.webp",
+        "width": 570,
+        "height": 457,
+        "anchor": [
+          285.0,
+          311.0966
+        ]
+      },
+      "day-3-v1": {
+        "file": "residential-d3-l2-s3-day-3-v1.b21a36012e.webp",
+        "width": 570,
+        "height": 457,
+        "anchor": [
+          285.0,
+          311.0967
+        ]
+      },
+      "night-0-v1": {
+        "file": "residential-d3-l2-s3-night-0-v1.c1674490aa.webp",
+        "width": 570,
+        "height": 457,
+        "anchor": [
+          285.0,
+          311.0967
+        ]
+      },
+      "night-1-v1": {
+        "file": "residential-d3-l2-s3-night-1-v1.e6e78bc499.webp",
+        "width": 570,
+        "height": 457,
+        "anchor": [
+          285.0,
+          311.0966
+        ]
+      },
+      "night-2-v1": {
+        "file": "residential-d3-l2-s3-night-2-v1.fff025589e.webp",
+        "width": 570,
+        "height": 457,
+        "anchor": [
+          285.0,
+          311.0966
+        ]
+      },
+      "night-3-v1": {
+        "file": "residential-d3-l2-s3-night-3-v1.973a1ef4ec.webp",
+        "width": 570,
+        "height": 457,
+        "anchor": [
+          285.0,
+          311.0967
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "residential-d3-l2-s3-unpowered-0-v1.ab42f3d0eb.webp",
+        "width": 570,
+        "height": 457,
+        "anchor": [
+          285.0,
+          311.0967
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "residential-d3-l2-s3-unpowered-1-v1.e3b8fc7d5f.webp",
+        "width": 570,
+        "height": 457,
+        "anchor": [
+          285.0,
+          311.0966
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "residential-d3-l2-s3-unpowered-2-v1.da548c3181.webp",
+        "width": 570,
+        "height": 457,
+        "anchor": [
+          285.0,
+          311.0966
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "residential-d3-l2-s3-unpowered-3-v1.243b51a369.webp",
+        "width": 570,
+        "height": 457,
+        "anchor": [
+          285.0,
+          311.0967
+        ]
+      },
+      "day-0-v2": {
+        "file": "residential-d3-l2-s3-day-0-v2.2b1ecc69e7.webp",
+        "width": 570,
+        "height": 508,
+        "anchor": [
+          285.0,
+          361.774
+        ]
+      },
+      "day-1-v2": {
+        "file": "residential-d3-l2-s3-day-1-v2.d33e7b1388.webp",
+        "width": 570,
+        "height": 494,
+        "anchor": [
+          285.0,
+          347.7739
+        ]
+      },
+      "day-2-v2": {
+        "file": "residential-d3-l2-s3-day-2-v2.f3aa82cd4a.webp",
+        "width": 570,
+        "height": 494,
+        "anchor": [
+          285.0,
+          347.7739
+        ]
+      },
+      "day-3-v2": {
+        "file": "residential-d3-l2-s3-day-3-v2.4a681d4870.webp",
+        "width": 570,
+        "height": 508,
+        "anchor": [
+          285.0,
+          361.774
+        ]
+      },
+      "night-0-v2": {
+        "file": "residential-d3-l2-s3-night-0-v2.e3ae615c69.webp",
+        "width": 570,
+        "height": 508,
+        "anchor": [
+          285.0,
+          361.774
+        ]
+      },
+      "night-1-v2": {
+        "file": "residential-d3-l2-s3-night-1-v2.0fe71448fc.webp",
+        "width": 570,
+        "height": 494,
+        "anchor": [
+          285.0,
+          347.7739
+        ]
+      },
+      "night-2-v2": {
+        "file": "residential-d3-l2-s3-night-2-v2.f9586f493a.webp",
+        "width": 570,
+        "height": 494,
+        "anchor": [
+          285.0,
+          347.7739
+        ]
+      },
+      "night-3-v2": {
+        "file": "residential-d3-l2-s3-night-3-v2.73d59dc714.webp",
+        "width": 570,
+        "height": 508,
+        "anchor": [
+          285.0,
+          361.774
+        ]
+      },
+      "unpowered-0-v2": {
+        "file": "residential-d3-l2-s3-unpowered-0-v2.a5458002b9.webp",
+        "width": 570,
+        "height": 508,
+        "anchor": [
+          285.0,
+          361.774
+        ]
+      },
+      "unpowered-1-v2": {
+        "file": "residential-d3-l2-s3-unpowered-1-v2.0ac97c30b8.webp",
+        "width": 570,
+        "height": 494,
+        "anchor": [
+          285.0,
+          347.7739
+        ]
+      },
+      "unpowered-2-v2": {
+        "file": "residential-d3-l2-s3-unpowered-2-v2.9df6bb43b6.webp",
+        "width": 570,
+        "height": 494,
+        "anchor": [
+          285.0,
+          347.7739
+        ]
+      },
+      "unpowered-3-v2": {
+        "file": "residential-d3-l2-s3-unpowered-3-v2.60674def71.webp",
+        "width": 570,
+        "height": 508,
+        "anchor": [
+          285.0,
+          361.774
+        ]
+      },
+      "day-0-v3": {
+        "file": "residential-d3-l2-s3-day-0-v3.1acb675cdc.webp",
+        "width": 570,
+        "height": 471,
+        "anchor": [
+          285.0,
+          324.5149
+        ]
+      },
+      "day-1-v3": {
+        "file": "residential-d3-l2-s3-day-1-v3.8bd267d208.webp",
+        "width": 570,
+        "height": 471,
+        "anchor": [
+          285.0,
+          324.5149
+        ]
+      },
+      "day-2-v3": {
+        "file": "residential-d3-l2-s3-day-2-v3.ddd0a557a9.webp",
+        "width": 570,
+        "height": 471,
+        "anchor": [
+          285.0,
+          324.5149
+        ]
+      },
+      "day-3-v3": {
+        "file": "residential-d3-l2-s3-day-3-v3.9521d70713.webp",
+        "width": 570,
+        "height": 471,
+        "anchor": [
+          285.0,
+          324.5149
+        ]
+      },
+      "night-0-v3": {
+        "file": "residential-d3-l2-s3-night-0-v3.8017a574f5.webp",
+        "width": 570,
+        "height": 471,
+        "anchor": [
+          285.0,
+          324.5149
+        ]
+      },
+      "night-1-v3": {
+        "file": "residential-d3-l2-s3-night-1-v3.7bde051c7f.webp",
+        "width": 570,
+        "height": 471,
+        "anchor": [
+          285.0,
+          324.5149
+        ]
+      },
+      "night-2-v3": {
+        "file": "residential-d3-l2-s3-night-2-v3.c7166fb102.webp",
+        "width": 570,
+        "height": 471,
+        "anchor": [
+          285.0,
+          324.5149
+        ]
+      },
+      "night-3-v3": {
+        "file": "residential-d3-l2-s3-night-3-v3.2092454508.webp",
+        "width": 570,
+        "height": 471,
+        "anchor": [
+          285.0,
+          324.5149
+        ]
+      },
+      "unpowered-0-v3": {
+        "file": "residential-d3-l2-s3-unpowered-0-v3.c66ac0fbe1.webp",
+        "width": 570,
+        "height": 471,
+        "anchor": [
+          285.0,
+          324.5149
+        ]
+      },
+      "unpowered-1-v3": {
+        "file": "residential-d3-l2-s3-unpowered-1-v3.2d90f01a1d.webp",
+        "width": 570,
+        "height": 471,
+        "anchor": [
+          285.0,
+          324.5149
+        ]
+      },
+      "unpowered-2-v3": {
+        "file": "residential-d3-l2-s3-unpowered-2-v3.20e8a40688.webp",
+        "width": 570,
+        "height": 471,
+        "anchor": [
+          285.0,
+          324.5149
+        ]
+      },
+      "unpowered-3-v3": {
+        "file": "residential-d3-l2-s3-unpowered-3-v3.327edf6a65.webp",
+        "width": 570,
+        "height": 471,
+        "anchor": [
+          285.0,
+          324.5149
+        ]
+      },
+      "day-0-v4": {
+        "file": "residential-d3-l2-s3-day-0-v4.1314278e4d.webp",
+        "width": 570,
+        "height": 457,
+        "anchor": [
+          285.0,
+          311.0967
+        ]
+      },
+      "day-1-v4": {
+        "file": "residential-d3-l2-s3-day-1-v4.b8e18aadc9.webp",
+        "width": 570,
+        "height": 457,
+        "anchor": [
+          285.0,
+          311.0966
+        ]
+      },
+      "day-2-v4": {
+        "file": "residential-d3-l2-s3-day-2-v4.7c4537583c.webp",
+        "width": 570,
+        "height": 457,
+        "anchor": [
+          285.0,
+          311.0966
+        ]
+      },
+      "day-3-v4": {
+        "file": "residential-d3-l2-s3-day-3-v4.2be6c2bc35.webp",
+        "width": 570,
+        "height": 457,
+        "anchor": [
+          285.0,
+          311.0967
+        ]
+      },
+      "night-0-v4": {
+        "file": "residential-d3-l2-s3-night-0-v4.7bb9103e0c.webp",
+        "width": 570,
+        "height": 457,
+        "anchor": [
+          285.0,
+          311.0967
+        ]
+      },
+      "night-1-v4": {
+        "file": "residential-d3-l2-s3-night-1-v4.ed3cd48efe.webp",
+        "width": 570,
+        "height": 457,
+        "anchor": [
+          285.0,
+          311.0966
+        ]
+      },
+      "night-2-v4": {
+        "file": "residential-d3-l2-s3-night-2-v4.dc7fffd3e8.webp",
+        "width": 570,
+        "height": 457,
+        "anchor": [
+          285.0,
+          311.0966
+        ]
+      },
+      "night-3-v4": {
+        "file": "residential-d3-l2-s3-night-3-v4.8c1e0226b8.webp",
+        "width": 570,
+        "height": 457,
+        "anchor": [
+          285.0,
+          311.0967
+        ]
+      },
+      "unpowered-0-v4": {
+        "file": "residential-d3-l2-s3-unpowered-0-v4.b496ef58b0.webp",
+        "width": 570,
+        "height": 457,
+        "anchor": [
+          285.0,
+          311.0967
+        ]
+      },
+      "unpowered-1-v4": {
+        "file": "residential-d3-l2-s3-unpowered-1-v4.403043a3c8.webp",
+        "width": 570,
+        "height": 457,
+        "anchor": [
+          285.0,
+          311.0966
+        ]
+      },
+      "unpowered-2-v4": {
+        "file": "residential-d3-l2-s3-unpowered-2-v4.1d675c3592.webp",
+        "width": 570,
+        "height": 457,
+        "anchor": [
+          285.0,
+          311.0966
+        ]
+      },
+      "unpowered-3-v4": {
+        "file": "residential-d3-l2-s3-unpowered-3-v4.e0eb7231b1.webp",
+        "width": 570,
+        "height": 457,
+        "anchor": [
+          285.0,
+          311.0967
+        ]
+      }
+    },
+    "family": "residential",
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 2
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 2 \u00b7 3\u00d73",
+    "description": "Residential density 3, growth stage 2, authored specifically for a 3\u00d73 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l2-s3",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 3\u00d73 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l2-s3_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 3\u00d73 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l2-s3_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 3\u00d73 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l2-s3_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 3\u00d73 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l2-s3_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 3\u00d73 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l3-s1": {
+    "tiles": 1,
+    "scale": 3,
+    "height": 105,
+    "frames": {
+      "day-0": {
+        "file": "residential-d3-l3-s1-day-0.095753bf74.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4998
+        ]
+      },
+      "day-1": {
+        "file": "residential-d3-l3-s1-day-1.bc11969ac5.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4996
+        ]
+      },
+      "day-2": {
+        "file": "residential-d3-l3-s1-day-2.0dd46925a5.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4996
+        ]
+      },
+      "day-3": {
+        "file": "residential-d3-l3-s1-day-3.04f04e7c5b.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4998
+        ]
+      },
+      "night-0": {
+        "file": "residential-d3-l3-s1-night-0.03f5bb1354.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4998
+        ]
+      },
+      "night-1": {
+        "file": "residential-d3-l3-s1-night-1.971320ebef.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4996
+        ]
+      },
+      "night-2": {
+        "file": "residential-d3-l3-s1-night-2.335ebc7fad.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4996
+        ]
+      },
+      "night-3": {
+        "file": "residential-d3-l3-s1-night-3.2f3d8598aa.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4998
+        ]
+      },
+      "unpowered-0": {
+        "file": "residential-d3-l3-s1-unpowered-0.b349994750.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4998
+        ]
+      },
+      "unpowered-1": {
+        "file": "residential-d3-l3-s1-unpowered-1.f5de110ce3.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4996
+        ]
+      },
+      "unpowered-2": {
+        "file": "residential-d3-l3-s1-unpowered-2.bd9bc370ee.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4996
+        ]
+      },
+      "unpowered-3": {
+        "file": "residential-d3-l3-s1-unpowered-3.c861ce051d.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4998
+        ]
+      },
+      "day-0-v1": {
+        "file": "residential-d3-l3-s1-day-0-v1.d093059557.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4998
+        ]
+      },
+      "day-1-v1": {
+        "file": "residential-d3-l3-s1-day-1-v1.55719d3be8.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4996
+        ]
+      },
+      "day-2-v1": {
+        "file": "residential-d3-l3-s1-day-2-v1.af6e488be7.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4996
+        ]
+      },
+      "day-3-v1": {
+        "file": "residential-d3-l3-s1-day-3-v1.33b4610a8c.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4998
+        ]
+      },
+      "night-0-v1": {
+        "file": "residential-d3-l3-s1-night-0-v1.78f715fdca.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4998
+        ]
+      },
+      "night-1-v1": {
+        "file": "residential-d3-l3-s1-night-1-v1.0e4c4ee42d.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4996
+        ]
+      },
+      "night-2-v1": {
+        "file": "residential-d3-l3-s1-night-2-v1.d08d1593ff.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4996
+        ]
+      },
+      "night-3-v1": {
+        "file": "residential-d3-l3-s1-night-3-v1.f4b09f38bd.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4998
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "residential-d3-l3-s1-unpowered-0-v1.f3fd9117e0.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4998
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "residential-d3-l3-s1-unpowered-1-v1.6ea711add2.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4996
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "residential-d3-l3-s1-unpowered-2-v1.34a7a90de8.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4996
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "residential-d3-l3-s1-unpowered-3-v1.b4c092eeaf.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4998
+        ]
+      },
+      "day-0-v2": {
+        "file": "residential-d3-l3-s1-day-0-v2.3717e3d28c.webp",
+        "width": 186,
+        "height": 396,
+        "anchor": [
+          93.0,
+          345.7588
+        ]
+      },
+      "day-1-v2": {
+        "file": "residential-d3-l3-s1-day-1-v2.86bfdd2da2.webp",
+        "width": 186,
+        "height": 391,
+        "anchor": [
+          93.0,
+          340.7587
+        ]
+      },
+      "day-2-v2": {
+        "file": "residential-d3-l3-s1-day-2-v2.31088ea9b8.webp",
+        "width": 186,
+        "height": 391,
+        "anchor": [
+          93.0,
+          340.7587
+        ]
+      },
+      "day-3-v2": {
+        "file": "residential-d3-l3-s1-day-3-v2.b6031d9ef4.webp",
+        "width": 186,
+        "height": 396,
+        "anchor": [
+          93.0,
+          345.7588
+        ]
+      },
+      "night-0-v2": {
+        "file": "residential-d3-l3-s1-night-0-v2.029adfb8b8.webp",
+        "width": 186,
+        "height": 396,
+        "anchor": [
+          93.0,
+          345.7588
+        ]
+      },
+      "night-1-v2": {
+        "file": "residential-d3-l3-s1-night-1-v2.5bf85dd0e6.webp",
+        "width": 186,
+        "height": 391,
+        "anchor": [
+          93.0,
+          340.7587
+        ]
+      },
+      "night-2-v2": {
+        "file": "residential-d3-l3-s1-night-2-v2.3fabc85c13.webp",
+        "width": 186,
+        "height": 391,
+        "anchor": [
+          93.0,
+          340.7587
+        ]
+      },
+      "night-3-v2": {
+        "file": "residential-d3-l3-s1-night-3-v2.190d334c67.webp",
+        "width": 186,
+        "height": 396,
+        "anchor": [
+          93.0,
+          345.7588
+        ]
+      },
+      "unpowered-0-v2": {
+        "file": "residential-d3-l3-s1-unpowered-0-v2.c807f2c2fa.webp",
+        "width": 186,
+        "height": 396,
+        "anchor": [
+          93.0,
+          345.7588
+        ]
+      },
+      "unpowered-1-v2": {
+        "file": "residential-d3-l3-s1-unpowered-1-v2.f7bf3fb554.webp",
+        "width": 186,
+        "height": 391,
+        "anchor": [
+          93.0,
+          340.7587
+        ]
+      },
+      "unpowered-2-v2": {
+        "file": "residential-d3-l3-s1-unpowered-2-v2.1c9f016f61.webp",
+        "width": 186,
+        "height": 391,
+        "anchor": [
+          93.0,
+          340.7587
+        ]
+      },
+      "unpowered-3-v2": {
+        "file": "residential-d3-l3-s1-unpowered-3-v2.8451e9631d.webp",
+        "width": 186,
+        "height": 396,
+        "anchor": [
+          93.0,
+          345.7588
+        ]
+      },
+      "day-0-v3": {
+        "file": "residential-d3-l3-s1-day-0-v3.165f676573.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4998
+        ]
+      },
+      "day-1-v3": {
+        "file": "residential-d3-l3-s1-day-1-v3.14c85feff1.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4996
+        ]
+      },
+      "day-2-v3": {
+        "file": "residential-d3-l3-s1-day-2-v3.efaa0e8e11.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4996
+        ]
+      },
+      "day-3-v3": {
+        "file": "residential-d3-l3-s1-day-3-v3.3599fd9d42.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4998
+        ]
+      },
+      "night-0-v3": {
+        "file": "residential-d3-l3-s1-night-0-v3.b7910fa2bb.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4998
+        ]
+      },
+      "night-1-v3": {
+        "file": "residential-d3-l3-s1-night-1-v3.7d25b25312.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4996
+        ]
+      },
+      "night-2-v3": {
+        "file": "residential-d3-l3-s1-night-2-v3.472e3deb3a.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4996
+        ]
+      },
+      "night-3-v3": {
+        "file": "residential-d3-l3-s1-night-3-v3.24dd8426da.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4998
+        ]
+      },
+      "unpowered-0-v3": {
+        "file": "residential-d3-l3-s1-unpowered-0-v3.1f7c3e00ca.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4998
+        ]
+      },
+      "unpowered-1-v3": {
+        "file": "residential-d3-l3-s1-unpowered-1-v3.cf6c86cac0.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4996
+        ]
+      },
+      "unpowered-2-v3": {
+        "file": "residential-d3-l3-s1-unpowered-2-v3.6460d5d925.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4996
+        ]
+      },
+      "unpowered-3-v3": {
+        "file": "residential-d3-l3-s1-unpowered-3-v3.71ca9cab78.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4998
+        ]
+      },
+      "day-0-v4": {
+        "file": "residential-d3-l3-s1-day-0-v4.76506fe934.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4998
+        ]
+      },
+      "day-1-v4": {
+        "file": "residential-d3-l3-s1-day-1-v4.a685f7f489.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4996
+        ]
+      },
+      "day-2-v4": {
+        "file": "residential-d3-l3-s1-day-2-v4.7b8610ba5b.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4996
+        ]
+      },
+      "day-3-v4": {
+        "file": "residential-d3-l3-s1-day-3-v4.853d2b9eee.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4998
+        ]
+      },
+      "night-0-v4": {
+        "file": "residential-d3-l3-s1-night-0-v4.d173acca71.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4998
+        ]
+      },
+      "night-1-v4": {
+        "file": "residential-d3-l3-s1-night-1-v4.df67b4f4ae.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4996
+        ]
+      },
+      "night-2-v4": {
+        "file": "residential-d3-l3-s1-night-2-v4.c8b345d9d4.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4996
+        ]
+      },
+      "night-3-v4": {
+        "file": "residential-d3-l3-s1-night-3-v4.5ed8267164.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4998
+        ]
+      },
+      "unpowered-0-v4": {
+        "file": "residential-d3-l3-s1-unpowered-0-v4.f1d609bb26.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4998
+        ]
+      },
+      "unpowered-1-v4": {
+        "file": "residential-d3-l3-s1-unpowered-1-v4.88bab0dd8d.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4996
+        ]
+      },
+      "unpowered-2-v4": {
+        "file": "residential-d3-l3-s1-unpowered-2-v4.6759e672c7.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4996
+        ]
+      },
+      "unpowered-3-v4": {
+        "file": "residential-d3-l3-s1-unpowered-3-v4.87696d2893.webp",
+        "width": 186,
+        "height": 371,
+        "anchor": [
+          93.0,
+          320.4998
+        ]
+      }
+    },
+    "family": "residential",
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 3
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 3 \u00b7 1\u00d71",
+    "description": "Residential density 3, growth stage 3, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l3-s1",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 1\u00d71 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l3-s1_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 1\u00d71 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l3-s1_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 1\u00d71 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l3-s1_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 1\u00d71 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l3-s1_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 1\u00d71 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l3-s2": {
+    "tiles": 2,
+    "scale": 3,
+    "height": 107,
+    "frames": {
+      "day-0": {
+        "file": "residential-d3-l3-s2-day-0.9cdf771964.webp",
+        "width": 378,
+        "height": 446,
+        "anchor": [
+          189.0,
+          347.4998
+        ]
+      },
+      "day-1": {
+        "file": "residential-d3-l3-s2-day-1.41827c8985.webp",
+        "width": 378,
+        "height": 446,
+        "anchor": [
+          189.0,
+          347.4996
+        ]
+      },
+      "day-2": {
+        "file": "residential-d3-l3-s2-day-2.996a33a27e.webp",
+        "width": 378,
+        "height": 446,
+        "anchor": [
+          189.0,
+          347.4996
+        ]
+      },
+      "day-3": {
+        "file": "residential-d3-l3-s2-day-3.3d6b952f53.webp",
+        "width": 378,
+        "height": 446,
+        "anchor": [
+          189.0,
+          347.4998
+        ]
+      },
+      "night-0": {
+        "file": "residential-d3-l3-s2-night-0.c4ff458d80.webp",
+        "width": 378,
+        "height": 446,
+        "anchor": [
+          189.0,
+          347.4998
+        ]
+      },
+      "night-1": {
+        "file": "residential-d3-l3-s2-night-1.435c10b8f4.webp",
+        "width": 378,
+        "height": 446,
+        "anchor": [
+          189.0,
+          347.4996
+        ]
+      },
+      "night-2": {
+        "file": "residential-d3-l3-s2-night-2.72dcae2008.webp",
+        "width": 378,
+        "height": 446,
+        "anchor": [
+          189.0,
+          347.4996
+        ]
+      },
+      "night-3": {
+        "file": "residential-d3-l3-s2-night-3.b47a9359d6.webp",
+        "width": 378,
+        "height": 446,
+        "anchor": [
+          189.0,
+          347.4998
+        ]
+      },
+      "unpowered-0": {
+        "file": "residential-d3-l3-s2-unpowered-0.16ef9ec276.webp",
+        "width": 378,
+        "height": 446,
+        "anchor": [
+          189.0,
+          347.4998
+        ]
+      },
+      "unpowered-1": {
+        "file": "residential-d3-l3-s2-unpowered-1.d4146f9547.webp",
+        "width": 378,
+        "height": 446,
+        "anchor": [
+          189.0,
+          347.4996
+        ]
+      },
+      "unpowered-2": {
+        "file": "residential-d3-l3-s2-unpowered-2.8831a59170.webp",
+        "width": 378,
+        "height": 446,
+        "anchor": [
+          189.0,
+          347.4996
+        ]
+      },
+      "unpowered-3": {
+        "file": "residential-d3-l3-s2-unpowered-3.5d43c160e2.webp",
+        "width": 378,
+        "height": 446,
+        "anchor": [
+          189.0,
+          347.4998
+        ]
+      },
+      "day-0-v1": {
+        "file": "residential-d3-l3-s2-day-0-v1.30f2fcab5a.webp",
+        "width": 379,
+        "height": 443,
+        "anchor": [
+          189.5,
+          344.8308
+        ]
+      },
+      "day-1-v1": {
+        "file": "residential-d3-l3-s2-day-1-v1.ca0e140dd8.webp",
+        "width": 379,
+        "height": 443,
+        "anchor": [
+          189.5,
+          344.8308
+        ]
+      },
+      "day-2-v1": {
+        "file": "residential-d3-l3-s2-day-2-v1.8931348448.webp",
+        "width": 379,
+        "height": 443,
+        "anchor": [
+          189.5,
+          344.8308
+        ]
+      },
+      "day-3-v1": {
+        "file": "residential-d3-l3-s2-day-3-v1.a21466f5b6.webp",
+        "width": 379,
+        "height": 443,
+        "anchor": [
+          189.5,
+          344.8308
+        ]
+      },
+      "night-0-v1": {
+        "file": "residential-d3-l3-s2-night-0-v1.c57a3aad47.webp",
+        "width": 379,
+        "height": 443,
+        "anchor": [
+          189.5,
+          344.8308
+        ]
+      },
+      "night-1-v1": {
+        "file": "residential-d3-l3-s2-night-1-v1.ed26d0046d.webp",
+        "width": 379,
+        "height": 443,
+        "anchor": [
+          189.5,
+          344.8308
+        ]
+      },
+      "night-2-v1": {
+        "file": "residential-d3-l3-s2-night-2-v1.539242ecfa.webp",
+        "width": 379,
+        "height": 443,
+        "anchor": [
+          189.5,
+          344.8308
+        ]
+      },
+      "night-3-v1": {
+        "file": "residential-d3-l3-s2-night-3-v1.13a3853a83.webp",
+        "width": 379,
+        "height": 443,
+        "anchor": [
+          189.5,
+          344.8308
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "residential-d3-l3-s2-unpowered-0-v1.a53aeae4af.webp",
+        "width": 379,
+        "height": 443,
+        "anchor": [
+          189.5,
+          344.8308
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "residential-d3-l3-s2-unpowered-1-v1.7b0a69bc53.webp",
+        "width": 379,
+        "height": 443,
+        "anchor": [
+          189.5,
+          344.8308
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "residential-d3-l3-s2-unpowered-2-v1.0a926d1f98.webp",
+        "width": 379,
+        "height": 443,
+        "anchor": [
+          189.5,
+          344.8308
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "residential-d3-l3-s2-unpowered-3-v1.9496981ee4.webp",
+        "width": 379,
+        "height": 443,
+        "anchor": [
+          189.5,
+          344.8308
+        ]
+      },
+      "day-0-v2": {
+        "file": "residential-d3-l3-s2-day-0-v2.8a01584988.webp",
+        "width": 378,
+        "height": 477,
+        "anchor": [
+          189.0,
+          378.7588
+        ]
+      },
+      "day-1-v2": {
+        "file": "residential-d3-l3-s2-day-1-v2.3461eba676.webp",
+        "width": 378,
+        "height": 468,
+        "anchor": [
+          189.0,
+          369.7587
+        ]
+      },
+      "day-2-v2": {
+        "file": "residential-d3-l3-s2-day-2-v2.00336e9982.webp",
+        "width": 378,
+        "height": 468,
+        "anchor": [
+          189.0,
+          369.7587
+        ]
+      },
+      "day-3-v2": {
+        "file": "residential-d3-l3-s2-day-3-v2.f68d659515.webp",
+        "width": 378,
+        "height": 477,
+        "anchor": [
+          189.0,
+          378.7588
+        ]
+      },
+      "night-0-v2": {
+        "file": "residential-d3-l3-s2-night-0-v2.310a93f4bb.webp",
+        "width": 378,
+        "height": 477,
+        "anchor": [
+          189.0,
+          378.7588
+        ]
+      },
+      "night-1-v2": {
+        "file": "residential-d3-l3-s2-night-1-v2.8737b72102.webp",
+        "width": 378,
+        "height": 468,
+        "anchor": [
+          189.0,
+          369.7587
+        ]
+      },
+      "night-2-v2": {
+        "file": "residential-d3-l3-s2-night-2-v2.83a958becd.webp",
+        "width": 378,
+        "height": 468,
+        "anchor": [
+          189.0,
+          369.7587
+        ]
+      },
+      "night-3-v2": {
+        "file": "residential-d3-l3-s2-night-3-v2.73bde7d9c8.webp",
+        "width": 378,
+        "height": 477,
+        "anchor": [
+          189.0,
+          378.7588
+        ]
+      },
+      "unpowered-0-v2": {
+        "file": "residential-d3-l3-s2-unpowered-0-v2.8c41a5592d.webp",
+        "width": 378,
+        "height": 477,
+        "anchor": [
+          189.0,
+          378.7588
+        ]
+      },
+      "unpowered-1-v2": {
+        "file": "residential-d3-l3-s2-unpowered-1-v2.2b5a206861.webp",
+        "width": 378,
+        "height": 468,
+        "anchor": [
+          189.0,
+          369.7587
+        ]
+      },
+      "unpowered-2-v2": {
+        "file": "residential-d3-l3-s2-unpowered-2-v2.5e27b1e1e4.webp",
+        "width": 378,
+        "height": 468,
+        "anchor": [
+          189.0,
+          369.7587
+        ]
+      },
+      "unpowered-3-v2": {
+        "file": "residential-d3-l3-s2-unpowered-3-v2.de24782b32.webp",
+        "width": 378,
+        "height": 477,
+        "anchor": [
+          189.0,
+          378.7588
+        ]
+      },
+      "day-0-v3": {
+        "file": "residential-d3-l3-s2-day-0-v3.f50c46d5e5.webp",
+        "width": 378,
+        "height": 446,
+        "anchor": [
+          189.0,
+          347.4998
+        ]
+      },
+      "day-1-v3": {
+        "file": "residential-d3-l3-s2-day-1-v3.90202c6dcb.webp",
+        "width": 378,
+        "height": 446,
+        "anchor": [
+          189.0,
+          347.4996
+        ]
+      },
+      "day-2-v3": {
+        "file": "residential-d3-l3-s2-day-2-v3.8a04b3a40b.webp",
+        "width": 378,
+        "height": 446,
+        "anchor": [
+          189.0,
+          347.4996
+        ]
+      },
+      "day-3-v3": {
+        "file": "residential-d3-l3-s2-day-3-v3.737e8981e9.webp",
+        "width": 378,
+        "height": 446,
+        "anchor": [
+          189.0,
+          347.4998
+        ]
+      },
+      "night-0-v3": {
+        "file": "residential-d3-l3-s2-night-0-v3.ad7ebcba49.webp",
+        "width": 378,
+        "height": 446,
+        "anchor": [
+          189.0,
+          347.4998
+        ]
+      },
+      "night-1-v3": {
+        "file": "residential-d3-l3-s2-night-1-v3.94f5b6d9cd.webp",
+        "width": 378,
+        "height": 446,
+        "anchor": [
+          189.0,
+          347.4996
+        ]
+      },
+      "night-2-v3": {
+        "file": "residential-d3-l3-s2-night-2-v3.40f3f12fe5.webp",
+        "width": 378,
+        "height": 446,
+        "anchor": [
+          189.0,
+          347.4996
+        ]
+      },
+      "night-3-v3": {
+        "file": "residential-d3-l3-s2-night-3-v3.ff8d2a0f34.webp",
+        "width": 378,
+        "height": 446,
+        "anchor": [
+          189.0,
+          347.4998
+        ]
+      },
+      "unpowered-0-v3": {
+        "file": "residential-d3-l3-s2-unpowered-0-v3.f4cc91ff7e.webp",
+        "width": 378,
+        "height": 446,
+        "anchor": [
+          189.0,
+          347.4998
+        ]
+      },
+      "unpowered-1-v3": {
+        "file": "residential-d3-l3-s2-unpowered-1-v3.13ee00f81f.webp",
+        "width": 378,
+        "height": 446,
+        "anchor": [
+          189.0,
+          347.4996
+        ]
+      },
+      "unpowered-2-v3": {
+        "file": "residential-d3-l3-s2-unpowered-2-v3.64dda42b98.webp",
+        "width": 378,
+        "height": 446,
+        "anchor": [
+          189.0,
+          347.4996
+        ]
+      },
+      "unpowered-3-v3": {
+        "file": "residential-d3-l3-s2-unpowered-3-v3.ef1e85a118.webp",
+        "width": 378,
+        "height": 446,
+        "anchor": [
+          189.0,
+          347.4998
+        ]
+      },
+      "day-0-v4": {
+        "file": "residential-d3-l3-s2-day-0-v4.7a04632f97.webp",
+        "width": 379,
+        "height": 443,
+        "anchor": [
+          189.5,
+          344.8308
+        ]
+      },
+      "day-1-v4": {
+        "file": "residential-d3-l3-s2-day-1-v4.7b1ddddbb3.webp",
+        "width": 379,
+        "height": 443,
+        "anchor": [
+          189.5,
+          344.8308
+        ]
+      },
+      "day-2-v4": {
+        "file": "residential-d3-l3-s2-day-2-v4.63c2d6542e.webp",
+        "width": 379,
+        "height": 443,
+        "anchor": [
+          189.5,
+          344.8308
+        ]
+      },
+      "day-3-v4": {
+        "file": "residential-d3-l3-s2-day-3-v4.0450306215.webp",
+        "width": 379,
+        "height": 443,
+        "anchor": [
+          189.5,
+          344.8308
+        ]
+      },
+      "night-0-v4": {
+        "file": "residential-d3-l3-s2-night-0-v4.f839572607.webp",
+        "width": 379,
+        "height": 443,
+        "anchor": [
+          189.5,
+          344.8308
+        ]
+      },
+      "night-1-v4": {
+        "file": "residential-d3-l3-s2-night-1-v4.16ce0530d7.webp",
+        "width": 379,
+        "height": 443,
+        "anchor": [
+          189.5,
+          344.8308
+        ]
+      },
+      "night-2-v4": {
+        "file": "residential-d3-l3-s2-night-2-v4.ac4cb9d913.webp",
+        "width": 379,
+        "height": 443,
+        "anchor": [
+          189.5,
+          344.8308
+        ]
+      },
+      "night-3-v4": {
+        "file": "residential-d3-l3-s2-night-3-v4.ee77bb1fa4.webp",
+        "width": 379,
+        "height": 443,
+        "anchor": [
+          189.5,
+          344.8308
+        ]
+      },
+      "unpowered-0-v4": {
+        "file": "residential-d3-l3-s2-unpowered-0-v4.8f857d2dd3.webp",
+        "width": 379,
+        "height": 443,
+        "anchor": [
+          189.5,
+          344.8308
+        ]
+      },
+      "unpowered-1-v4": {
+        "file": "residential-d3-l3-s2-unpowered-1-v4.b7e57de033.webp",
+        "width": 379,
+        "height": 443,
+        "anchor": [
+          189.5,
+          344.8308
+        ]
+      },
+      "unpowered-2-v4": {
+        "file": "residential-d3-l3-s2-unpowered-2-v4.479c0f4aa6.webp",
+        "width": 379,
+        "height": 443,
+        "anchor": [
+          189.5,
+          344.8308
+        ]
+      },
+      "unpowered-3-v4": {
+        "file": "residential-d3-l3-s2-unpowered-3-v4.78732fce40.webp",
+        "width": 379,
+        "height": 443,
+        "anchor": [
+          189.5,
+          344.8308
+        ]
+      }
+    },
+    "family": "residential",
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 3
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 3 \u00b7 2\u00d72",
+    "description": "Residential density 3, growth stage 3, authored specifically for a 2\u00d72 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l3-s2",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 2\u00d72 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l3-s2_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 2\u00d72 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l3-s2_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 2\u00d72 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l3-s2_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 2\u00d72 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l3-s2_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 2\u00d72 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l3-s3": {
+    "tiles": 3,
+    "scale": 3,
+    "height": 107,
+    "frames": {
+      "day-0": {
+        "file": "residential-d3-l3-s3-day-0.6da2d02610.webp",
+        "width": 570,
+        "height": 521,
+        "anchor": [
+          285.0,
+          374.4998
+        ]
+      },
+      "day-1": {
+        "file": "residential-d3-l3-s3-day-1.3bde9dfa9f.webp",
+        "width": 570,
+        "height": 521,
+        "anchor": [
+          285.0,
+          374.4996
+        ]
+      },
+      "day-2": {
+        "file": "residential-d3-l3-s3-day-2.eab585c0c1.webp",
+        "width": 570,
+        "height": 521,
+        "anchor": [
+          285.0,
+          374.4996
+        ]
+      },
+      "day-3": {
+        "file": "residential-d3-l3-s3-day-3.f38da1423a.webp",
+        "width": 570,
+        "height": 521,
+        "anchor": [
+          285.0,
+          374.4998
+        ]
+      },
+      "night-0": {
+        "file": "residential-d3-l3-s3-night-0.f4e1894df4.webp",
+        "width": 570,
+        "height": 521,
+        "anchor": [
+          285.0,
+          374.4998
+        ]
+      },
+      "night-1": {
+        "file": "residential-d3-l3-s3-night-1.3d2303e1e5.webp",
+        "width": 570,
+        "height": 521,
+        "anchor": [
+          285.0,
+          374.4996
+        ]
+      },
+      "night-2": {
+        "file": "residential-d3-l3-s3-night-2.01a15cd306.webp",
+        "width": 570,
+        "height": 521,
+        "anchor": [
+          285.0,
+          374.4996
+        ]
+      },
+      "night-3": {
+        "file": "residential-d3-l3-s3-night-3.30df742fdb.webp",
+        "width": 570,
+        "height": 521,
+        "anchor": [
+          285.0,
+          374.4998
+        ]
+      },
+      "unpowered-0": {
+        "file": "residential-d3-l3-s3-unpowered-0.cf987e1cd4.webp",
+        "width": 570,
+        "height": 521,
+        "anchor": [
+          285.0,
+          374.4998
+        ]
+      },
+      "unpowered-1": {
+        "file": "residential-d3-l3-s3-unpowered-1.5fa064a58b.webp",
+        "width": 570,
+        "height": 521,
+        "anchor": [
+          285.0,
+          374.4996
+        ]
+      },
+      "unpowered-2": {
+        "file": "residential-d3-l3-s3-unpowered-2.5dac1a9534.webp",
+        "width": 570,
+        "height": 521,
+        "anchor": [
+          285.0,
+          374.4996
+        ]
+      },
+      "unpowered-3": {
+        "file": "residential-d3-l3-s3-unpowered-3.96c1d7ce12.webp",
+        "width": 570,
+        "height": 521,
+        "anchor": [
+          285.0,
+          374.4998
+        ]
+      },
+      "day-0-v1": {
+        "file": "residential-d3-l3-s3-day-0-v1.367af5029d.webp",
+        "width": 571,
+        "height": 511,
+        "anchor": [
+          285.0,
+          364.3308
+        ]
+      },
+      "day-1-v1": {
+        "file": "residential-d3-l3-s3-day-1-v1.177bdc52bd.webp",
+        "width": 571,
+        "height": 511,
+        "anchor": [
+          285.0,
+          364.3308
+        ]
+      },
+      "day-2-v1": {
+        "file": "residential-d3-l3-s3-day-2-v1.9d370948ca.webp",
+        "width": 571,
+        "height": 511,
+        "anchor": [
+          285.0,
+          364.3308
+        ]
+      },
+      "day-3-v1": {
+        "file": "residential-d3-l3-s3-day-3-v1.366c8bbbbd.webp",
+        "width": 571,
+        "height": 511,
+        "anchor": [
+          285.0,
+          364.3308
+        ]
+      },
+      "night-0-v1": {
+        "file": "residential-d3-l3-s3-night-0-v1.b7d8d355e3.webp",
+        "width": 571,
+        "height": 511,
+        "anchor": [
+          285.0,
+          364.3308
+        ]
+      },
+      "night-1-v1": {
+        "file": "residential-d3-l3-s3-night-1-v1.bfc567a2d0.webp",
+        "width": 571,
+        "height": 511,
+        "anchor": [
+          285.0,
+          364.3308
+        ]
+      },
+      "night-2-v1": {
+        "file": "residential-d3-l3-s3-night-2-v1.021f2cd5cd.webp",
+        "width": 571,
+        "height": 511,
+        "anchor": [
+          285.0,
+          364.3308
+        ]
+      },
+      "night-3-v1": {
+        "file": "residential-d3-l3-s3-night-3-v1.a33650fccf.webp",
+        "width": 571,
+        "height": 511,
+        "anchor": [
+          285.0,
+          364.3308
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "residential-d3-l3-s3-unpowered-0-v1.70c70df40a.webp",
+        "width": 571,
+        "height": 511,
+        "anchor": [
+          285.0,
+          364.3308
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "residential-d3-l3-s3-unpowered-1-v1.ca80e17c42.webp",
+        "width": 571,
+        "height": 511,
+        "anchor": [
+          285.0,
+          364.3308
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "residential-d3-l3-s3-unpowered-2-v1.12feab91e9.webp",
+        "width": 571,
+        "height": 511,
+        "anchor": [
+          285.0,
+          364.3308
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "residential-d3-l3-s3-unpowered-3-v1.595b51d9a4.webp",
+        "width": 571,
+        "height": 511,
+        "anchor": [
+          285.0,
+          364.3308
+        ]
+      },
+      "day-0-v2": {
+        "file": "residential-d3-l3-s3-day-0-v2.16eaf653d4.webp",
+        "width": 571,
+        "height": 558,
+        "anchor": [
+          285.0,
+          411.7588
+        ]
+      },
+      "day-1-v2": {
+        "file": "residential-d3-l3-s3-day-1-v2.30dd0decf0.webp",
+        "width": 571,
+        "height": 544,
+        "anchor": [
+          285.0,
+          397.7587
+        ]
+      },
+      "day-2-v2": {
+        "file": "residential-d3-l3-s3-day-2-v2.a74f65ffe9.webp",
+        "width": 571,
+        "height": 544,
+        "anchor": [
+          285.0,
+          397.7587
+        ]
+      },
+      "day-3-v2": {
+        "file": "residential-d3-l3-s3-day-3-v2.b79215b9bd.webp",
+        "width": 571,
+        "height": 558,
+        "anchor": [
+          285.0,
+          411.7588
+        ]
+      },
+      "night-0-v2": {
+        "file": "residential-d3-l3-s3-night-0-v2.1527ab72b8.webp",
+        "width": 571,
+        "height": 558,
+        "anchor": [
+          285.0,
+          411.7588
+        ]
+      },
+      "night-1-v2": {
+        "file": "residential-d3-l3-s3-night-1-v2.eb4c0f93f4.webp",
+        "width": 571,
+        "height": 544,
+        "anchor": [
+          285.0,
+          397.7587
+        ]
+      },
+      "night-2-v2": {
+        "file": "residential-d3-l3-s3-night-2-v2.a685c8555c.webp",
+        "width": 571,
+        "height": 544,
+        "anchor": [
+          285.0,
+          397.7587
+        ]
+      },
+      "night-3-v2": {
+        "file": "residential-d3-l3-s3-night-3-v2.fee2a1d4e6.webp",
+        "width": 571,
+        "height": 558,
+        "anchor": [
+          285.0,
+          411.7588
+        ]
+      },
+      "unpowered-0-v2": {
+        "file": "residential-d3-l3-s3-unpowered-0-v2.1fa716bc33.webp",
+        "width": 571,
+        "height": 558,
+        "anchor": [
+          285.0,
+          411.7588
+        ]
+      },
+      "unpowered-1-v2": {
+        "file": "residential-d3-l3-s3-unpowered-1-v2.9be5717eae.webp",
+        "width": 571,
+        "height": 544,
+        "anchor": [
+          285.0,
+          397.7587
+        ]
+      },
+      "unpowered-2-v2": {
+        "file": "residential-d3-l3-s3-unpowered-2-v2.fb37c3dc64.webp",
+        "width": 571,
+        "height": 544,
+        "anchor": [
+          285.0,
+          397.7587
+        ]
+      },
+      "unpowered-3-v2": {
+        "file": "residential-d3-l3-s3-unpowered-3-v2.b8b9aa3238.webp",
+        "width": 571,
+        "height": 558,
+        "anchor": [
+          285.0,
+          411.7588
+        ]
+      },
+      "day-0-v3": {
+        "file": "residential-d3-l3-s3-day-0-v3.cc0d9e6474.webp",
+        "width": 570,
+        "height": 521,
+        "anchor": [
+          285.0,
+          374.4998
+        ]
+      },
+      "day-1-v3": {
+        "file": "residential-d3-l3-s3-day-1-v3.a1fb09d0dc.webp",
+        "width": 570,
+        "height": 521,
+        "anchor": [
+          285.0,
+          374.4996
+        ]
+      },
+      "day-2-v3": {
+        "file": "residential-d3-l3-s3-day-2-v3.7ed1e383cc.webp",
+        "width": 570,
+        "height": 521,
+        "anchor": [
+          285.0,
+          374.4996
+        ]
+      },
+      "day-3-v3": {
+        "file": "residential-d3-l3-s3-day-3-v3.282d7f3a6d.webp",
+        "width": 570,
+        "height": 521,
+        "anchor": [
+          285.0,
+          374.4998
+        ]
+      },
+      "night-0-v3": {
+        "file": "residential-d3-l3-s3-night-0-v3.8d1911be90.webp",
+        "width": 570,
+        "height": 521,
+        "anchor": [
+          285.0,
+          374.4998
+        ]
+      },
+      "night-1-v3": {
+        "file": "residential-d3-l3-s3-night-1-v3.0dfa2400ff.webp",
+        "width": 570,
+        "height": 521,
+        "anchor": [
+          285.0,
+          374.4996
+        ]
+      },
+      "night-2-v3": {
+        "file": "residential-d3-l3-s3-night-2-v3.6c43a0a2e4.webp",
+        "width": 570,
+        "height": 521,
+        "anchor": [
+          285.0,
+          374.4996
+        ]
+      },
+      "night-3-v3": {
+        "file": "residential-d3-l3-s3-night-3-v3.b0234d4383.webp",
+        "width": 570,
+        "height": 521,
+        "anchor": [
+          285.0,
+          374.4998
+        ]
+      },
+      "unpowered-0-v3": {
+        "file": "residential-d3-l3-s3-unpowered-0-v3.19a1527da4.webp",
+        "width": 570,
+        "height": 521,
+        "anchor": [
+          285.0,
+          374.4998
+        ]
+      },
+      "unpowered-1-v3": {
+        "file": "residential-d3-l3-s3-unpowered-1-v3.334b814c2b.webp",
+        "width": 570,
+        "height": 521,
+        "anchor": [
+          285.0,
+          374.4996
+        ]
+      },
+      "unpowered-2-v3": {
+        "file": "residential-d3-l3-s3-unpowered-2-v3.fa1d12ec13.webp",
+        "width": 570,
+        "height": 521,
+        "anchor": [
+          285.0,
+          374.4996
+        ]
+      },
+      "unpowered-3-v3": {
+        "file": "residential-d3-l3-s3-unpowered-3-v3.423e59146e.webp",
+        "width": 570,
+        "height": 521,
+        "anchor": [
+          285.0,
+          374.4998
+        ]
+      },
+      "day-0-v4": {
+        "file": "residential-d3-l3-s3-day-0-v4.f9cfdb67ee.webp",
+        "width": 571,
+        "height": 511,
+        "anchor": [
+          285.0,
+          364.3308
+        ]
+      },
+      "day-1-v4": {
+        "file": "residential-d3-l3-s3-day-1-v4.e48df4a819.webp",
+        "width": 571,
+        "height": 511,
+        "anchor": [
+          285.0,
+          364.3308
+        ]
+      },
+      "day-2-v4": {
+        "file": "residential-d3-l3-s3-day-2-v4.0453a218cb.webp",
+        "width": 571,
+        "height": 511,
+        "anchor": [
+          285.0,
+          364.3308
+        ]
+      },
+      "day-3-v4": {
+        "file": "residential-d3-l3-s3-day-3-v4.8ff87be69c.webp",
+        "width": 571,
+        "height": 511,
+        "anchor": [
+          285.0,
+          364.3308
+        ]
+      },
+      "night-0-v4": {
+        "file": "residential-d3-l3-s3-night-0-v4.965e0f931b.webp",
+        "width": 571,
+        "height": 511,
+        "anchor": [
+          285.0,
+          364.3308
+        ]
+      },
+      "night-1-v4": {
+        "file": "residential-d3-l3-s3-night-1-v4.38e183c635.webp",
+        "width": 571,
+        "height": 511,
+        "anchor": [
+          285.0,
+          364.3308
+        ]
+      },
+      "night-2-v4": {
+        "file": "residential-d3-l3-s3-night-2-v4.fcb83c60cc.webp",
+        "width": 571,
+        "height": 511,
+        "anchor": [
+          285.0,
+          364.3308
+        ]
+      },
+      "night-3-v4": {
+        "file": "residential-d3-l3-s3-night-3-v4.62a27be247.webp",
+        "width": 571,
+        "height": 511,
+        "anchor": [
+          285.0,
+          364.3308
+        ]
+      },
+      "unpowered-0-v4": {
+        "file": "residential-d3-l3-s3-unpowered-0-v4.904d7d9bb4.webp",
+        "width": 571,
+        "height": 511,
+        "anchor": [
+          285.0,
+          364.3308
+        ]
+      },
+      "unpowered-1-v4": {
+        "file": "residential-d3-l3-s3-unpowered-1-v4.8483b6a7c6.webp",
+        "width": 571,
+        "height": 511,
+        "anchor": [
+          285.0,
+          364.3308
+        ]
+      },
+      "unpowered-2-v4": {
+        "file": "residential-d3-l3-s3-unpowered-2-v4.c870682c0e.webp",
+        "width": 571,
+        "height": 511,
+        "anchor": [
+          285.0,
+          364.3308
+        ]
+      },
+      "unpowered-3-v4": {
+        "file": "residential-d3-l3-s3-unpowered-3-v4.e65e530b90.webp",
+        "width": 571,
+        "height": 511,
+        "anchor": [
+          285.0,
+          364.3308
+        ]
+      }
+    },
+    "family": "residential",
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 3
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 3 \u00b7 3\u00d73",
+    "description": "Residential density 3, growth stage 3, authored specifically for a 3\u00d73 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l3-s3",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 3\u00d73 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l3-s3_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 3\u00d73 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l3-s3_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 3\u00d73 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l3-s3_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 3\u00d73 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l3-s3_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 3\u00d73 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l4-s1": {
+    "tiles": 1,
+    "scale": 3,
+    "height": 122,
+    "frames": {
+      "day-0": {
+        "file": "residential-d3-l4-s1-day-0.c3223b573c.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          92.9999,
+          370.4844
+        ]
+      },
+      "day-1": {
+        "file": "residential-d3-l4-s1-day-1.a052497f6d.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          92.9999,
+          370.4846
+        ]
+      },
+      "day-2": {
+        "file": "residential-d3-l4-s1-day-2.422bdabce9.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          93.0001,
+          370.4846
+        ]
+      },
+      "day-3": {
+        "file": "residential-d3-l4-s1-day-3.09439fe9a2.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          93.0001,
+          370.4844
+        ]
+      },
+      "night-0": {
+        "file": "residential-d3-l4-s1-night-0.0de2cf210b.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          92.9999,
+          370.4844
+        ]
+      },
+      "night-1": {
+        "file": "residential-d3-l4-s1-night-1.211734de18.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          92.9999,
+          370.4846
+        ]
+      },
+      "night-2": {
+        "file": "residential-d3-l4-s1-night-2.3842a80b71.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          93.0001,
+          370.4846
+        ]
+      },
+      "night-3": {
+        "file": "residential-d3-l4-s1-night-3.17e57e1da9.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          93.0001,
+          370.4844
+        ]
+      },
+      "unpowered-0": {
+        "file": "residential-d3-l4-s1-unpowered-0.683614c081.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          92.9999,
+          370.4844
+        ]
+      },
+      "unpowered-1": {
+        "file": "residential-d3-l4-s1-unpowered-1.12c1a7eba3.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          92.9999,
+          370.4846
+        ]
+      },
+      "unpowered-2": {
+        "file": "residential-d3-l4-s1-unpowered-2.69fd125b94.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          93.0001,
+          370.4846
+        ]
+      },
+      "unpowered-3": {
+        "file": "residential-d3-l4-s1-unpowered-3.7a37d399b6.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          93.0001,
+          370.4844
+        ]
+      },
+      "day-0-v1": {
+        "file": "residential-d3-l4-s1-day-0-v1.c7a43c0d1b.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          92.9999,
+          370.4844
+        ]
+      },
+      "day-1-v1": {
+        "file": "residential-d3-l4-s1-day-1-v1.bc7afb3018.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          92.9999,
+          370.4846
+        ]
+      },
+      "day-2-v1": {
+        "file": "residential-d3-l4-s1-day-2-v1.577ee7f8c1.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          93.0001,
+          370.4846
+        ]
+      },
+      "day-3-v1": {
+        "file": "residential-d3-l4-s1-day-3-v1.f40f1d96c2.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          93.0001,
+          370.4844
+        ]
+      },
+      "night-0-v1": {
+        "file": "residential-d3-l4-s1-night-0-v1.29af1c91c0.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          92.9999,
+          370.4844
+        ]
+      },
+      "night-1-v1": {
+        "file": "residential-d3-l4-s1-night-1-v1.9df680f082.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          92.9999,
+          370.4846
+        ]
+      },
+      "night-2-v1": {
+        "file": "residential-d3-l4-s1-night-2-v1.c64dd94691.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          93.0001,
+          370.4846
+        ]
+      },
+      "night-3-v1": {
+        "file": "residential-d3-l4-s1-night-3-v1.ed8a18b971.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          93.0001,
+          370.4844
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "residential-d3-l4-s1-unpowered-0-v1.8d044c6739.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          92.9999,
+          370.4844
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "residential-d3-l4-s1-unpowered-1-v1.2c12c543b4.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          92.9999,
+          370.4846
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "residential-d3-l4-s1-unpowered-2-v1.af4df47bdb.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          93.0001,
+          370.4846
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "residential-d3-l4-s1-unpowered-3-v1.7669e8bfb8.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          93.0001,
+          370.4844
+        ]
+      },
+      "day-0-v2": {
+        "file": "residential-d3-l4-s1-day-0-v2.dab6530e5e.webp",
+        "width": 186,
+        "height": 446,
+        "anchor": [
+          92.9999,
+          395.7435
+        ]
+      },
+      "day-1-v2": {
+        "file": "residential-d3-l4-s1-day-1-v2.e30357210b.webp",
+        "width": 186,
+        "height": 442,
+        "anchor": [
+          92.9999,
+          391.7436
+        ]
+      },
+      "day-2-v2": {
+        "file": "residential-d3-l4-s1-day-2-v2.bc2ce97cf1.webp",
+        "width": 186,
+        "height": 442,
+        "anchor": [
+          93.0001,
+          391.7436
+        ]
+      },
+      "day-3-v2": {
+        "file": "residential-d3-l4-s1-day-3-v2.66db714c22.webp",
+        "width": 186,
+        "height": 446,
+        "anchor": [
+          93.0001,
+          395.7435
+        ]
+      },
+      "night-0-v2": {
+        "file": "residential-d3-l4-s1-night-0-v2.d98011e51d.webp",
+        "width": 186,
+        "height": 446,
+        "anchor": [
+          92.9999,
+          395.7435
+        ]
+      },
+      "night-1-v2": {
+        "file": "residential-d3-l4-s1-night-1-v2.f9b4c4d1af.webp",
+        "width": 186,
+        "height": 442,
+        "anchor": [
+          92.9999,
+          391.7436
+        ]
+      },
+      "night-2-v2": {
+        "file": "residential-d3-l4-s1-night-2-v2.1c9c274ea6.webp",
+        "width": 186,
+        "height": 442,
+        "anchor": [
+          93.0001,
+          391.7436
+        ]
+      },
+      "night-3-v2": {
+        "file": "residential-d3-l4-s1-night-3-v2.ed413f5fdb.webp",
+        "width": 186,
+        "height": 446,
+        "anchor": [
+          93.0001,
+          395.7435
+        ]
+      },
+      "unpowered-0-v2": {
+        "file": "residential-d3-l4-s1-unpowered-0-v2.391f06c7fe.webp",
+        "width": 186,
+        "height": 446,
+        "anchor": [
+          92.9999,
+          395.7435
+        ]
+      },
+      "unpowered-1-v2": {
+        "file": "residential-d3-l4-s1-unpowered-1-v2.0ee4b58ba0.webp",
+        "width": 186,
+        "height": 442,
+        "anchor": [
+          92.9999,
+          391.7436
+        ]
+      },
+      "unpowered-2-v2": {
+        "file": "residential-d3-l4-s1-unpowered-2-v2.9088b5f7d5.webp",
+        "width": 186,
+        "height": 442,
+        "anchor": [
+          93.0001,
+          391.7436
+        ]
+      },
+      "unpowered-3-v2": {
+        "file": "residential-d3-l4-s1-unpowered-3-v2.219d9c299d.webp",
+        "width": 186,
+        "height": 446,
+        "anchor": [
+          93.0001,
+          395.7435
+        ]
+      },
+      "day-0-v3": {
+        "file": "residential-d3-l4-s1-day-0-v3.1af161f8af.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          92.9999,
+          370.4844
+        ]
+      },
+      "day-1-v3": {
+        "file": "residential-d3-l4-s1-day-1-v3.2911dfc861.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          92.9999,
+          370.4846
+        ]
+      },
+      "day-2-v3": {
+        "file": "residential-d3-l4-s1-day-2-v3.59ec09b088.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          93.0001,
+          370.4846
+        ]
+      },
+      "day-3-v3": {
+        "file": "residential-d3-l4-s1-day-3-v3.5e327f1404.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          93.0001,
+          370.4844
+        ]
+      },
+      "night-0-v3": {
+        "file": "residential-d3-l4-s1-night-0-v3.7e6571bf27.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          92.9999,
+          370.4844
+        ]
+      },
+      "night-1-v3": {
+        "file": "residential-d3-l4-s1-night-1-v3.24b7821d43.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          92.9999,
+          370.4846
+        ]
+      },
+      "night-2-v3": {
+        "file": "residential-d3-l4-s1-night-2-v3.08f28914c1.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          93.0001,
+          370.4846
+        ]
+      },
+      "night-3-v3": {
+        "file": "residential-d3-l4-s1-night-3-v3.a6667bc1f7.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          93.0001,
+          370.4844
+        ]
+      },
+      "unpowered-0-v3": {
+        "file": "residential-d3-l4-s1-unpowered-0-v3.ee2fdfa724.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          92.9999,
+          370.4844
+        ]
+      },
+      "unpowered-1-v3": {
+        "file": "residential-d3-l4-s1-unpowered-1-v3.791a20c207.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          92.9999,
+          370.4846
+        ]
+      },
+      "unpowered-2-v3": {
+        "file": "residential-d3-l4-s1-unpowered-2-v3.3bb68ab05f.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          93.0001,
+          370.4846
+        ]
+      },
+      "unpowered-3-v3": {
+        "file": "residential-d3-l4-s1-unpowered-3-v3.dfc7269673.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          93.0001,
+          370.4844
+        ]
+      },
+      "day-0-v4": {
+        "file": "residential-d3-l4-s1-day-0-v4.bc4fcab163.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          92.9999,
+          370.4844
+        ]
+      },
+      "day-1-v4": {
+        "file": "residential-d3-l4-s1-day-1-v4.3a22cb46a4.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          92.9999,
+          370.4846
+        ]
+      },
+      "day-2-v4": {
+        "file": "residential-d3-l4-s1-day-2-v4.37ffc95745.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          93.0001,
+          370.4846
+        ]
+      },
+      "day-3-v4": {
+        "file": "residential-d3-l4-s1-day-3-v4.b87c8c69ca.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          93.0001,
+          370.4844
+        ]
+      },
+      "night-0-v4": {
+        "file": "residential-d3-l4-s1-night-0-v4.a90b03029d.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          92.9999,
+          370.4844
+        ]
+      },
+      "night-1-v4": {
+        "file": "residential-d3-l4-s1-night-1-v4.c3287da593.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          92.9999,
+          370.4846
+        ]
+      },
+      "night-2-v4": {
+        "file": "residential-d3-l4-s1-night-2-v4.3c12d85e26.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          93.0001,
+          370.4846
+        ]
+      },
+      "night-3-v4": {
+        "file": "residential-d3-l4-s1-night-3-v4.a578b118b5.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          93.0001,
+          370.4844
+        ]
+      },
+      "unpowered-0-v4": {
+        "file": "residential-d3-l4-s1-unpowered-0-v4.3dd33fc5b5.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          92.9999,
+          370.4844
+        ]
+      },
+      "unpowered-1-v4": {
+        "file": "residential-d3-l4-s1-unpowered-1-v4.3e639a27bf.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          92.9999,
+          370.4846
+        ]
+      },
+      "unpowered-2-v4": {
+        "file": "residential-d3-l4-s1-unpowered-2-v4.ba8c0819b8.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          93.0001,
+          370.4846
+        ]
+      },
+      "unpowered-3-v4": {
+        "file": "residential-d3-l4-s1-unpowered-3-v4.2ff4a58931.webp",
+        "width": 186,
+        "height": 421,
+        "anchor": [
+          93.0001,
+          370.4844
+        ]
+      }
+    },
+    "family": "residential",
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 4
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 4 \u00b7 1\u00d71",
+    "description": "Residential density 3, growth stage 4, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l4-s1",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 1\u00d71 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l4-s1_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 1\u00d71 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l4-s1_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 1\u00d71 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l4-s1_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 1\u00d71 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l4-s1_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 1\u00d71 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l4-s2": {
+    "tiles": 2,
+    "scale": 3,
+    "height": 125,
+    "frames": {
+      "day-0": {
+        "file": "residential-d3-l4-s2-day-0.15c72cd575.webp",
+        "width": 378,
+        "height": 496,
+        "anchor": [
+          188.9999,
+          397.4844
+        ]
+      },
+      "day-1": {
+        "file": "residential-d3-l4-s2-day-1.77c4b7dd84.webp",
+        "width": 378,
+        "height": 496,
+        "anchor": [
+          188.9999,
+          397.4845
+        ]
+      },
+      "day-2": {
+        "file": "residential-d3-l4-s2-day-2.cbd87a6b0e.webp",
+        "width": 378,
+        "height": 496,
+        "anchor": [
+          189.0001,
+          397.4845
+        ]
+      },
+      "day-3": {
+        "file": "residential-d3-l4-s2-day-3.63437b841c.webp",
+        "width": 378,
+        "height": 496,
+        "anchor": [
+          189.0001,
+          397.4844
+        ]
+      },
+      "night-0": {
+        "file": "residential-d3-l4-s2-night-0.c9dc2ba2a8.webp",
+        "width": 378,
+        "height": 496,
+        "anchor": [
+          188.9999,
+          397.4844
+        ]
+      },
+      "night-1": {
+        "file": "residential-d3-l4-s2-night-1.973b918211.webp",
+        "width": 378,
+        "height": 496,
+        "anchor": [
+          188.9999,
+          397.4845
+        ]
+      },
+      "night-2": {
+        "file": "residential-d3-l4-s2-night-2.65c7ed9c1f.webp",
+        "width": 378,
+        "height": 496,
+        "anchor": [
+          189.0001,
+          397.4845
+        ]
+      },
+      "night-3": {
+        "file": "residential-d3-l4-s2-night-3.98153e0da8.webp",
+        "width": 378,
+        "height": 496,
+        "anchor": [
+          189.0001,
+          397.4844
+        ]
+      },
+      "unpowered-0": {
+        "file": "residential-d3-l4-s2-unpowered-0.1a1365ca01.webp",
+        "width": 378,
+        "height": 496,
+        "anchor": [
+          188.9999,
+          397.4844
+        ]
+      },
+      "unpowered-1": {
+        "file": "residential-d3-l4-s2-unpowered-1.056a1244b0.webp",
+        "width": 378,
+        "height": 496,
+        "anchor": [
+          188.9999,
+          397.4845
+        ]
+      },
+      "unpowered-2": {
+        "file": "residential-d3-l4-s2-unpowered-2.d6c5874ea7.webp",
+        "width": 378,
+        "height": 496,
+        "anchor": [
+          189.0001,
+          397.4845
+        ]
+      },
+      "unpowered-3": {
+        "file": "residential-d3-l4-s2-unpowered-3.8d832b3847.webp",
+        "width": 378,
+        "height": 496,
+        "anchor": [
+          189.0001,
+          397.4844
+        ]
+      },
+      "day-0-v1": {
+        "file": "residential-d3-l4-s2-day-0-v1.182e3b7345.webp",
+        "width": 378,
+        "height": 495,
+        "anchor": [
+          189.0,
+          396.5649
+        ]
+      },
+      "day-1-v1": {
+        "file": "residential-d3-l4-s2-day-1-v1.ff9f5c35c8.webp",
+        "width": 378,
+        "height": 495,
+        "anchor": [
+          189.0,
+          396.5649
+        ]
+      },
+      "day-2-v1": {
+        "file": "residential-d3-l4-s2-day-2-v1.cd00de78e0.webp",
+        "width": 378,
+        "height": 495,
+        "anchor": [
+          189.0,
+          396.5649
+        ]
+      },
+      "day-3-v1": {
+        "file": "residential-d3-l4-s2-day-3-v1.b36f257fc2.webp",
+        "width": 378,
+        "height": 495,
+        "anchor": [
+          189.0,
+          396.5649
+        ]
+      },
+      "night-0-v1": {
+        "file": "residential-d3-l4-s2-night-0-v1.5f6f096274.webp",
+        "width": 378,
+        "height": 495,
+        "anchor": [
+          189.0,
+          396.5649
+        ]
+      },
+      "night-1-v1": {
+        "file": "residential-d3-l4-s2-night-1-v1.e2c0b18ff4.webp",
+        "width": 378,
+        "height": 495,
+        "anchor": [
+          189.0,
+          396.5649
+        ]
+      },
+      "night-2-v1": {
+        "file": "residential-d3-l4-s2-night-2-v1.744146f5bd.webp",
+        "width": 378,
+        "height": 495,
+        "anchor": [
+          189.0,
+          396.5649
+        ]
+      },
+      "night-3-v1": {
+        "file": "residential-d3-l4-s2-night-3-v1.699808a9bc.webp",
+        "width": 378,
+        "height": 495,
+        "anchor": [
+          189.0,
+          396.5649
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "residential-d3-l4-s2-unpowered-0-v1.0ab8e28b6f.webp",
+        "width": 378,
+        "height": 495,
+        "anchor": [
+          189.0,
+          396.5649
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "residential-d3-l4-s2-unpowered-1-v1.68914d3434.webp",
+        "width": 378,
+        "height": 495,
+        "anchor": [
+          189.0,
+          396.5649
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "residential-d3-l4-s2-unpowered-2-v1.00cf69357d.webp",
+        "width": 378,
+        "height": 495,
+        "anchor": [
+          189.0,
+          396.5649
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "residential-d3-l4-s2-unpowered-3-v1.b962f7c904.webp",
+        "width": 378,
+        "height": 495,
+        "anchor": [
+          189.0,
+          396.5649
+        ]
+      },
+      "day-0-v2": {
+        "file": "residential-d3-l4-s2-day-0-v2.379fbb61d5.webp",
+        "width": 378,
+        "height": 528,
+        "anchor": [
+          188.9999,
+          428.7435
+        ]
+      },
+      "day-1-v2": {
+        "file": "residential-d3-l4-s2-day-1-v2.4aaaefd5e7.webp",
+        "width": 378,
+        "height": 518,
+        "anchor": [
+          188.9999,
+          418.7436
+        ]
+      },
+      "day-2-v2": {
+        "file": "residential-d3-l4-s2-day-2-v2.de17a62c5f.webp",
+        "width": 378,
+        "height": 519,
+        "anchor": [
+          189.0001,
+          419.7436
+        ]
+      },
+      "day-3-v2": {
+        "file": "residential-d3-l4-s2-day-3-v2.9d2efbe814.webp",
+        "width": 378,
+        "height": 528,
+        "anchor": [
+          189.0001,
+          428.7435
+        ]
+      },
+      "night-0-v2": {
+        "file": "residential-d3-l4-s2-night-0-v2.13d3efed17.webp",
+        "width": 378,
+        "height": 528,
+        "anchor": [
+          188.9999,
+          428.7435
+        ]
+      },
+      "night-1-v2": {
+        "file": "residential-d3-l4-s2-night-1-v2.dbe1e3d488.webp",
+        "width": 378,
+        "height": 518,
+        "anchor": [
+          188.9999,
+          418.7436
+        ]
+      },
+      "night-2-v2": {
+        "file": "residential-d3-l4-s2-night-2-v2.c327b20b7a.webp",
+        "width": 378,
+        "height": 519,
+        "anchor": [
+          189.0001,
+          419.7436
+        ]
+      },
+      "night-3-v2": {
+        "file": "residential-d3-l4-s2-night-3-v2.8169963bfc.webp",
+        "width": 378,
+        "height": 528,
+        "anchor": [
+          189.0001,
+          428.7435
+        ]
+      },
+      "unpowered-0-v2": {
+        "file": "residential-d3-l4-s2-unpowered-0-v2.a138e1cb96.webp",
+        "width": 378,
+        "height": 528,
+        "anchor": [
+          188.9999,
+          428.7435
+        ]
+      },
+      "unpowered-1-v2": {
+        "file": "residential-d3-l4-s2-unpowered-1-v2.c0bcc67db1.webp",
+        "width": 378,
+        "height": 518,
+        "anchor": [
+          188.9999,
+          418.7436
+        ]
+      },
+      "unpowered-2-v2": {
+        "file": "residential-d3-l4-s2-unpowered-2-v2.10a99f92de.webp",
+        "width": 378,
+        "height": 519,
+        "anchor": [
+          189.0001,
+          419.7436
+        ]
+      },
+      "unpowered-3-v2": {
+        "file": "residential-d3-l4-s2-unpowered-3-v2.26b9f67c11.webp",
+        "width": 378,
+        "height": 528,
+        "anchor": [
+          189.0001,
+          428.7435
+        ]
+      },
+      "day-0-v3": {
+        "file": "residential-d3-l4-s2-day-0-v3.e09beeb707.webp",
+        "width": 378,
+        "height": 496,
+        "anchor": [
+          188.9999,
+          397.4844
+        ]
+      },
+      "day-1-v3": {
+        "file": "residential-d3-l4-s2-day-1-v3.4a83c96598.webp",
+        "width": 378,
+        "height": 496,
+        "anchor": [
+          188.9999,
+          397.4845
+        ]
+      },
+      "day-2-v3": {
+        "file": "residential-d3-l4-s2-day-2-v3.f9c2bc9c02.webp",
+        "width": 378,
+        "height": 496,
+        "anchor": [
+          189.0001,
+          397.4845
+        ]
+      },
+      "day-3-v3": {
+        "file": "residential-d3-l4-s2-day-3-v3.4a29ea635f.webp",
+        "width": 378,
+        "height": 496,
+        "anchor": [
+          189.0001,
+          397.4844
+        ]
+      },
+      "night-0-v3": {
+        "file": "residential-d3-l4-s2-night-0-v3.5d9d065bb3.webp",
+        "width": 378,
+        "height": 496,
+        "anchor": [
+          188.9999,
+          397.4844
+        ]
+      },
+      "night-1-v3": {
+        "file": "residential-d3-l4-s2-night-1-v3.d21764c40d.webp",
+        "width": 378,
+        "height": 496,
+        "anchor": [
+          188.9999,
+          397.4845
+        ]
+      },
+      "night-2-v3": {
+        "file": "residential-d3-l4-s2-night-2-v3.ca8f14d0fc.webp",
+        "width": 378,
+        "height": 496,
+        "anchor": [
+          189.0001,
+          397.4845
+        ]
+      },
+      "night-3-v3": {
+        "file": "residential-d3-l4-s2-night-3-v3.7f232a6add.webp",
+        "width": 378,
+        "height": 496,
+        "anchor": [
+          189.0001,
+          397.4844
+        ]
+      },
+      "unpowered-0-v3": {
+        "file": "residential-d3-l4-s2-unpowered-0-v3.8862d76185.webp",
+        "width": 378,
+        "height": 496,
+        "anchor": [
+          188.9999,
+          397.4844
+        ]
+      },
+      "unpowered-1-v3": {
+        "file": "residential-d3-l4-s2-unpowered-1-v3.402272c6db.webp",
+        "width": 378,
+        "height": 496,
+        "anchor": [
+          188.9999,
+          397.4845
+        ]
+      },
+      "unpowered-2-v3": {
+        "file": "residential-d3-l4-s2-unpowered-2-v3.ad753794f3.webp",
+        "width": 378,
+        "height": 496,
+        "anchor": [
+          189.0001,
+          397.4845
+        ]
+      },
+      "unpowered-3-v3": {
+        "file": "residential-d3-l4-s2-unpowered-3-v3.4323eb6cee.webp",
+        "width": 378,
+        "height": 496,
+        "anchor": [
+          189.0001,
+          397.4844
+        ]
+      },
+      "day-0-v4": {
+        "file": "residential-d3-l4-s2-day-0-v4.76a259e274.webp",
+        "width": 378,
+        "height": 495,
+        "anchor": [
+          189.0,
+          396.5649
+        ]
+      },
+      "day-1-v4": {
+        "file": "residential-d3-l4-s2-day-1-v4.3ba10d8a44.webp",
+        "width": 378,
+        "height": 495,
+        "anchor": [
+          189.0,
+          396.5649
+        ]
+      },
+      "day-2-v4": {
+        "file": "residential-d3-l4-s2-day-2-v4.13c056b2b7.webp",
+        "width": 378,
+        "height": 495,
+        "anchor": [
+          189.0,
+          396.5649
+        ]
+      },
+      "day-3-v4": {
+        "file": "residential-d3-l4-s2-day-3-v4.27f83dfd8a.webp",
+        "width": 378,
+        "height": 495,
+        "anchor": [
+          189.0,
+          396.5649
+        ]
+      },
+      "night-0-v4": {
+        "file": "residential-d3-l4-s2-night-0-v4.95c4f05e81.webp",
+        "width": 378,
+        "height": 495,
+        "anchor": [
+          189.0,
+          396.5649
+        ]
+      },
+      "night-1-v4": {
+        "file": "residential-d3-l4-s2-night-1-v4.83d76a1a89.webp",
+        "width": 378,
+        "height": 495,
+        "anchor": [
+          189.0,
+          396.5649
+        ]
+      },
+      "night-2-v4": {
+        "file": "residential-d3-l4-s2-night-2-v4.fea56e6764.webp",
+        "width": 378,
+        "height": 495,
+        "anchor": [
+          189.0,
+          396.5649
+        ]
+      },
+      "night-3-v4": {
+        "file": "residential-d3-l4-s2-night-3-v4.1e6a541d37.webp",
+        "width": 378,
+        "height": 495,
+        "anchor": [
+          189.0,
+          396.5649
+        ]
+      },
+      "unpowered-0-v4": {
+        "file": "residential-d3-l4-s2-unpowered-0-v4.6ac048ba36.webp",
+        "width": 378,
+        "height": 495,
+        "anchor": [
+          189.0,
+          396.5649
+        ]
+      },
+      "unpowered-1-v4": {
+        "file": "residential-d3-l4-s2-unpowered-1-v4.b533e55919.webp",
+        "width": 378,
+        "height": 495,
+        "anchor": [
+          189.0,
+          396.5649
+        ]
+      },
+      "unpowered-2-v4": {
+        "file": "residential-d3-l4-s2-unpowered-2-v4.4162fe32e5.webp",
+        "width": 378,
+        "height": 495,
+        "anchor": [
+          189.0,
+          396.5649
+        ]
+      },
+      "unpowered-3-v4": {
+        "file": "residential-d3-l4-s2-unpowered-3-v4.94c49c492b.webp",
+        "width": 378,
+        "height": 495,
+        "anchor": [
+          189.0,
+          396.5649
+        ]
+      }
+    },
+    "family": "residential",
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 4
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 4 \u00b7 2\u00d72",
+    "description": "Residential density 3, growth stage 4, authored specifically for a 2\u00d72 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l4-s2",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 2\u00d72 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l4-s2_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 2\u00d72 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l4-s2_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 2\u00d72 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l4-s2_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 2\u00d72 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l4-s2_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 2\u00d72 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l4-s3": {
+    "tiles": 3,
+    "scale": 3,
+    "height": 125,
+    "frames": {
+      "day-0": {
+        "file": "residential-d3-l4-s3-day-0.b3227cea04.webp",
+        "width": 570,
+        "height": 582,
+        "anchor": [
+          284.9999,
+          435.4844
+        ]
+      },
+      "day-1": {
+        "file": "residential-d3-l4-s3-day-1.4cfaa45b1a.webp",
+        "width": 570,
+        "height": 582,
+        "anchor": [
+          284.9999,
+          435.4845
+        ]
+      },
+      "day-2": {
+        "file": "residential-d3-l4-s3-day-2.555062f171.webp",
+        "width": 570,
+        "height": 558,
+        "anchor": [
+          285.0001,
+          411.4845
+        ]
+      },
+      "day-3": {
+        "file": "residential-d3-l4-s3-day-3.ea0e2de2d8.webp",
+        "width": 570,
+        "height": 557,
+        "anchor": [
+          285.0001,
+          410.4844
+        ]
+      },
+      "night-0": {
+        "file": "residential-d3-l4-s3-night-0.02a56a451b.webp",
+        "width": 570,
+        "height": 582,
+        "anchor": [
+          284.9999,
+          435.4844
+        ]
+      },
+      "night-1": {
+        "file": "residential-d3-l4-s3-night-1.6fe4437cfb.webp",
+        "width": 570,
+        "height": 582,
+        "anchor": [
+          284.9999,
+          435.4845
+        ]
+      },
+      "night-2": {
+        "file": "residential-d3-l4-s3-night-2.37d322499e.webp",
+        "width": 570,
+        "height": 558,
+        "anchor": [
+          285.0001,
+          411.4845
+        ]
+      },
+      "night-3": {
+        "file": "residential-d3-l4-s3-night-3.a08a7ce96f.webp",
+        "width": 570,
+        "height": 557,
+        "anchor": [
+          285.0001,
+          410.4844
+        ]
+      },
+      "unpowered-0": {
+        "file": "residential-d3-l4-s3-unpowered-0.e79e5d552c.webp",
+        "width": 570,
+        "height": 582,
+        "anchor": [
+          284.9999,
+          435.4844
+        ]
+      },
+      "unpowered-1": {
+        "file": "residential-d3-l4-s3-unpowered-1.499190e7d0.webp",
+        "width": 570,
+        "height": 582,
+        "anchor": [
+          284.9999,
+          435.4845
+        ]
+      },
+      "unpowered-2": {
+        "file": "residential-d3-l4-s3-unpowered-2.dc4fc1a8f8.webp",
+        "width": 570,
+        "height": 558,
+        "anchor": [
+          285.0001,
+          411.4845
+        ]
+      },
+      "unpowered-3": {
+        "file": "residential-d3-l4-s3-unpowered-3.52ae210f58.webp",
+        "width": 570,
+        "height": 557,
+        "anchor": [
+          285.0001,
+          410.4844
+        ]
+      },
+      "day-0-v1": {
+        "file": "residential-d3-l4-s3-day-0-v1.1567a88f8e.webp",
+        "width": 570,
+        "height": 563,
+        "anchor": [
+          285.0,
+          416.5648
+        ]
+      },
+      "day-1-v1": {
+        "file": "residential-d3-l4-s3-day-1-v1.918d8c4752.webp",
+        "width": 570,
+        "height": 563,
+        "anchor": [
+          285.0,
+          416.5648
+        ]
+      },
+      "day-2-v1": {
+        "file": "residential-d3-l4-s3-day-2-v1.79b627398a.webp",
+        "width": 570,
+        "height": 563,
+        "anchor": [
+          285.0,
+          416.5648
+        ]
+      },
+      "day-3-v1": {
+        "file": "residential-d3-l4-s3-day-3-v1.3b446db786.webp",
+        "width": 570,
+        "height": 563,
+        "anchor": [
+          285.0,
+          416.5648
+        ]
+      },
+      "night-0-v1": {
+        "file": "residential-d3-l4-s3-night-0-v1.25283280f7.webp",
+        "width": 570,
+        "height": 563,
+        "anchor": [
+          285.0,
+          416.5648
+        ]
+      },
+      "night-1-v1": {
+        "file": "residential-d3-l4-s3-night-1-v1.12ff2a6eba.webp",
+        "width": 570,
+        "height": 563,
+        "anchor": [
+          285.0,
+          416.5648
+        ]
+      },
+      "night-2-v1": {
+        "file": "residential-d3-l4-s3-night-2-v1.09ccccc517.webp",
+        "width": 570,
+        "height": 563,
+        "anchor": [
+          285.0,
+          416.5648
+        ]
+      },
+      "night-3-v1": {
+        "file": "residential-d3-l4-s3-night-3-v1.eb43a134a4.webp",
+        "width": 570,
+        "height": 563,
+        "anchor": [
+          285.0,
+          416.5648
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "residential-d3-l4-s3-unpowered-0-v1.9e4a388554.webp",
+        "width": 570,
+        "height": 563,
+        "anchor": [
+          285.0,
+          416.5648
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "residential-d3-l4-s3-unpowered-1-v1.80a028b5ee.webp",
+        "width": 570,
+        "height": 563,
+        "anchor": [
+          285.0,
+          416.5648
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "residential-d3-l4-s3-unpowered-2-v1.cdc7353c20.webp",
+        "width": 570,
+        "height": 563,
+        "anchor": [
+          285.0,
+          416.5648
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "residential-d3-l4-s3-unpowered-3-v1.a183a4912c.webp",
+        "width": 570,
+        "height": 563,
+        "anchor": [
+          285.0,
+          416.5648
+        ]
+      },
+      "day-0-v2": {
+        "file": "residential-d3-l4-s3-day-0-v2.246bbbc36d.webp",
+        "width": 571,
+        "height": 609,
+        "anchor": [
+          285.9999,
+          462.7435
+        ]
+      },
+      "day-1-v2": {
+        "file": "residential-d3-l4-s3-day-1-v2.e3f46228ac.webp",
+        "width": 571,
+        "height": 594,
+        "anchor": [
+          285.9999,
+          447.7436
+        ]
+      },
+      "day-2-v2": {
+        "file": "residential-d3-l4-s3-day-2-v2.20736a8b37.webp",
+        "width": 571,
+        "height": 594,
+        "anchor": [
+          286.0001,
+          447.7436
+        ]
+      },
+      "day-3-v2": {
+        "file": "residential-d3-l4-s3-day-3-v2.5ef35e343d.webp",
+        "width": 571,
+        "height": 609,
+        "anchor": [
+          286.0001,
+          462.7435
+        ]
+      },
+      "night-0-v2": {
+        "file": "residential-d3-l4-s3-night-0-v2.54f0c3b5d8.webp",
+        "width": 571,
+        "height": 609,
+        "anchor": [
+          285.9999,
+          462.7435
+        ]
+      },
+      "night-1-v2": {
+        "file": "residential-d3-l4-s3-night-1-v2.a930538caa.webp",
+        "width": 571,
+        "height": 594,
+        "anchor": [
+          285.9999,
+          447.7436
+        ]
+      },
+      "night-2-v2": {
+        "file": "residential-d3-l4-s3-night-2-v2.15d2458b7d.webp",
+        "width": 571,
+        "height": 594,
+        "anchor": [
+          286.0001,
+          447.7436
+        ]
+      },
+      "night-3-v2": {
+        "file": "residential-d3-l4-s3-night-3-v2.f701673b5d.webp",
+        "width": 571,
+        "height": 609,
+        "anchor": [
+          286.0001,
+          462.7435
+        ]
+      },
+      "unpowered-0-v2": {
+        "file": "residential-d3-l4-s3-unpowered-0-v2.e70002d05a.webp",
+        "width": 571,
+        "height": 609,
+        "anchor": [
+          285.9999,
+          462.7435
+        ]
+      },
+      "unpowered-1-v2": {
+        "file": "residential-d3-l4-s3-unpowered-1-v2.012ed2f0b0.webp",
+        "width": 571,
+        "height": 594,
+        "anchor": [
+          285.9999,
+          447.7436
+        ]
+      },
+      "unpowered-2-v2": {
+        "file": "residential-d3-l4-s3-unpowered-2-v2.c32e6fb781.webp",
+        "width": 571,
+        "height": 594,
+        "anchor": [
+          286.0001,
+          447.7436
+        ]
+      },
+      "unpowered-3-v2": {
+        "file": "residential-d3-l4-s3-unpowered-3-v2.7da5aab030.webp",
+        "width": 571,
+        "height": 609,
+        "anchor": [
+          286.0001,
+          462.7435
+        ]
+      },
+      "day-0-v3": {
+        "file": "residential-d3-l4-s3-day-0-v3.5d4872e141.webp",
+        "width": 570,
+        "height": 582,
+        "anchor": [
+          284.9999,
+          435.4844
+        ]
+      },
+      "day-1-v3": {
+        "file": "residential-d3-l4-s3-day-1-v3.969dbda50b.webp",
+        "width": 570,
+        "height": 582,
+        "anchor": [
+          284.9999,
+          435.4845
+        ]
+      },
+      "day-2-v3": {
+        "file": "residential-d3-l4-s3-day-2-v3.8359d7ab3a.webp",
+        "width": 570,
+        "height": 558,
+        "anchor": [
+          285.0001,
+          411.4845
+        ]
+      },
+      "day-3-v3": {
+        "file": "residential-d3-l4-s3-day-3-v3.8839f57bb7.webp",
+        "width": 570,
+        "height": 557,
+        "anchor": [
+          285.0001,
+          410.4844
+        ]
+      },
+      "night-0-v3": {
+        "file": "residential-d3-l4-s3-night-0-v3.c8948f6281.webp",
+        "width": 570,
+        "height": 582,
+        "anchor": [
+          284.9999,
+          435.4844
+        ]
+      },
+      "night-1-v3": {
+        "file": "residential-d3-l4-s3-night-1-v3.e2c816b38c.webp",
+        "width": 570,
+        "height": 582,
+        "anchor": [
+          284.9999,
+          435.4845
+        ]
+      },
+      "night-2-v3": {
+        "file": "residential-d3-l4-s3-night-2-v3.0ffda941d7.webp",
+        "width": 570,
+        "height": 558,
+        "anchor": [
+          285.0001,
+          411.4845
+        ]
+      },
+      "night-3-v3": {
+        "file": "residential-d3-l4-s3-night-3-v3.488a4150de.webp",
+        "width": 570,
+        "height": 557,
+        "anchor": [
+          285.0001,
+          410.4844
+        ]
+      },
+      "unpowered-0-v3": {
+        "file": "residential-d3-l4-s3-unpowered-0-v3.c8b06ed619.webp",
+        "width": 570,
+        "height": 582,
+        "anchor": [
+          284.9999,
+          435.4844
+        ]
+      },
+      "unpowered-1-v3": {
+        "file": "residential-d3-l4-s3-unpowered-1-v3.3c8483a924.webp",
+        "width": 570,
+        "height": 582,
+        "anchor": [
+          284.9999,
+          435.4845
+        ]
+      },
+      "unpowered-2-v3": {
+        "file": "residential-d3-l4-s3-unpowered-2-v3.bfc5989fbc.webp",
+        "width": 570,
+        "height": 558,
+        "anchor": [
+          285.0001,
+          411.4845
+        ]
+      },
+      "unpowered-3-v3": {
+        "file": "residential-d3-l4-s3-unpowered-3-v3.030436dbab.webp",
+        "width": 570,
+        "height": 557,
+        "anchor": [
+          285.0001,
+          410.4844
+        ]
+      },
+      "day-0-v4": {
+        "file": "residential-d3-l4-s3-day-0-v4.ae3f2614e3.webp",
+        "width": 570,
+        "height": 563,
+        "anchor": [
+          285.0,
+          416.5648
+        ]
+      },
+      "day-1-v4": {
+        "file": "residential-d3-l4-s3-day-1-v4.e5dfc810f8.webp",
+        "width": 570,
+        "height": 563,
+        "anchor": [
+          285.0,
+          416.5648
+        ]
+      },
+      "day-2-v4": {
+        "file": "residential-d3-l4-s3-day-2-v4.2366e8cf4d.webp",
+        "width": 570,
+        "height": 563,
+        "anchor": [
+          285.0,
+          416.5648
+        ]
+      },
+      "day-3-v4": {
+        "file": "residential-d3-l4-s3-day-3-v4.f84d1b6f65.webp",
+        "width": 570,
+        "height": 563,
+        "anchor": [
+          285.0,
+          416.5648
+        ]
+      },
+      "night-0-v4": {
+        "file": "residential-d3-l4-s3-night-0-v4.d2f788ce46.webp",
+        "width": 570,
+        "height": 563,
+        "anchor": [
+          285.0,
+          416.5648
+        ]
+      },
+      "night-1-v4": {
+        "file": "residential-d3-l4-s3-night-1-v4.cb5aa3fc0a.webp",
+        "width": 570,
+        "height": 563,
+        "anchor": [
+          285.0,
+          416.5648
+        ]
+      },
+      "night-2-v4": {
+        "file": "residential-d3-l4-s3-night-2-v4.fcaf95df09.webp",
+        "width": 570,
+        "height": 563,
+        "anchor": [
+          285.0,
+          416.5648
+        ]
+      },
+      "night-3-v4": {
+        "file": "residential-d3-l4-s3-night-3-v4.3c1e1983ca.webp",
+        "width": 570,
+        "height": 563,
+        "anchor": [
+          285.0,
+          416.5648
+        ]
+      },
+      "unpowered-0-v4": {
+        "file": "residential-d3-l4-s3-unpowered-0-v4.dadde8eb49.webp",
+        "width": 570,
+        "height": 563,
+        "anchor": [
+          285.0,
+          416.5648
+        ]
+      },
+      "unpowered-1-v4": {
+        "file": "residential-d3-l4-s3-unpowered-1-v4.1578a96e20.webp",
+        "width": 570,
+        "height": 563,
+        "anchor": [
+          285.0,
+          416.5648
+        ]
+      },
+      "unpowered-2-v4": {
+        "file": "residential-d3-l4-s3-unpowered-2-v4.155cddbbb8.webp",
+        "width": 570,
+        "height": 563,
+        "anchor": [
+          285.0,
+          416.5648
+        ]
+      },
+      "unpowered-3-v4": {
+        "file": "residential-d3-l4-s3-unpowered-3-v4.5dafebfb97.webp",
+        "width": 570,
+        "height": 563,
+        "anchor": [
+          285.0,
+          416.5648
+        ]
+      }
+    },
+    "family": "residential",
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 4
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 4 \u00b7 3\u00d73",
+    "description": "Residential density 3, growth stage 4, authored specifically for a 3\u00d73 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l4-s3",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 3\u00d73 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l4-s3_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 3\u00d73 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l4-s3_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 3\u00d73 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l4-s3_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 3\u00d73 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l4-s3_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 3\u00d73 lot. Brick setbacks."
+      }
+    ]
+  },
   "school": {
     "tiles": 3,
     "scale": 3,

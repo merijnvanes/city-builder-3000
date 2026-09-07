@@ -1,5 +1,8 @@
+import { NIGHT_EXPOSURE, shadeHex } from './art-colors.js';
+export { NIGHT_EXPOSURE, shadeHex } from './art-colors.js';
+import { drawLotEffects } from './lot-art-effects.js';
 import { drawCivicSprite, civicSpriteSpec } from './civic-sprites.js';
-export { preloadCivicSprites, civicSpriteStats, civicSpriteSpec } from './civic-sprites.js';
+export { preloadCivicSprites, civicSpriteStats, civicSpriteSpec, civicSpriteKey } from './civic-sprites.js';
 import { drawStadium } from "./civic-art.js";
 import { drawPolice, drawFire, drawHospital, drawSchool, drawJail } from "./civic-services-art.js";
 import { drawCollegeCampus, drawLibrary, drawMuseum } from "./civic-culture-art.js";
@@ -12,7 +15,6 @@ import { drawPocketPark, drawGardenPark } from "./park-art.js";
 import { random } from './architecture-variation.js';
 export { random } from './architecture-variation.js';
 const pick = (list, n) => list[Math.floor(n * list.length) % list.length];
-const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
 // Approximate roof height for depth sorting, shadows and fire markers.
 export function heightOf(t) {
@@ -71,15 +73,6 @@ function scoped(r, lot, dim, powered = true) {
     },
     pt: (a, b, z = 0) => r.project(x + a * w, y + b * h, z),
   };
-}
-
-// One definition of the night exposure so drawing code and tests agree.
-export const NIGHT_EXPOSURE = 0.62;
-export function shadeHex(hex, k) {
-  if (typeof hex !== "string" || !/^#[0-9a-f]{6}([0-9a-f]{2})?$/i.test(hex)) return hex;
-  const n = parseInt(hex.slice(1, 7), 16);
-  const c = [n >> 16, (n >> 8) & 255, n & 255].map((v) => clamp(v * k, 0, 255) | 0);
-  return "#" + c.map((v) => v.toString(16).padStart(2, "0")).join("") + hex.slice(7);
 }
 
 const WALLS = ["#d0b690", "#c2b69c", "#d8c6a6", "#a69583", "#c1baa5", "#d8c4b0", "#e0d2b8", "#b9a98f"];
@@ -756,16 +749,5 @@ export function drawArchitecture(r, t) {
   else if (t.type === "industrial") industrial(d, t, n, level, r);
   else if (RECIPES[t.type]) RECIPES[t.type](d, t, n, r);
   else { d.box(0.15, 0.15, 0.7, 0.7, 12, "#b0aa96"); }
-  if (t.abandoned) {
-    // Boarded windows and weeds.
-    for (let i = 0; i < 4; i++) d.flat(0.1 + random(t.x, t.y, i) * 0.7, 0.1 + random(t.y, t.x, i + 3) * 0.7, 0.12, 0.08, 0.5, "#6b6a4c");
-  } else if (t.age === 0 && ["residential", "commercial", "industrial"].includes(t.type)) {
-    // Freshly built or expanded: a crane and scaffolding for the month.
-    const h = heightOf(t) + 10;
-    d.line(0.85, 0.15, 0, 0.85, 0.15, h, "#d9c24a", 1.4);
-    d.line(0.85, 0.15, h, 0.3, 0.15, h, "#d9c24a", 1.2);
-    d.line(0.45, 0.15, h, 0.45, 0.15, h * 0.55, "#d9c24a", 0.7);
-    d.box(0.42, 0.12, 0.06, 0.06, 3, "#8a8a80", h * 0.55 - 3);
-    for (let z = 4; z < Math.min(h - 6, 30); z += 6) d.line(0.06, 0.94, z, 0.94, 0.94, z, "#c9c4a8", 0.6);
-  }
+  drawLotEffects(r, t, heightOf(t));
 }

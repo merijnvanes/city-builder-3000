@@ -29,7 +29,9 @@
     "art:deals": "blender --background --factory-startup --python tools/civic_art/render.py -- --types deals --states day,night,unpowered --rotations 0,1,2,3 --samples 32 && python3 tools/civic_art/package.py --types deals",
     "test:deals": "node --test tests/architecture-variation.test.js && ART_FAMILY=deals node tests/power-sprites.mjs && ART_FAMILY=deals node tests/civic-art.mjs",
     "art:landmarks": "blender --background --factory-startup --python tools/civic_art/render.py -- --types landmarks --states day,night,unpowered --rotations 0,1,2,3 --samples 32 && python3 tools/civic_art/package.py --types landmarks",
-    "test:landmarks": "node --test tests/architecture-variation.test.js && ART_FAMILY=landmarks node tests/power-sprites.mjs && ART_FAMILY=landmarks node tests/civic-art.mjs"
+    "test:landmarks": "node --test tests/architecture-variation.test.js && ART_FAMILY=landmarks node tests/power-sprites.mjs && ART_FAMILY=landmarks node tests/civic-art.mjs",
+    "art:residential": "blender --background --factory-startup --python tools/civic_art/render.py -- --types residential --states day,night,unpowered --rotations 0,1,2,3 --samples 32 && python3 tools/civic_art/package.py --types residential",
+    "test:residential": "node --test tests/zone-art.test.js && ART_FAMILY=residential node tests/power-sprites.mjs && ART_FAMILY=residential node tests/zone-gallery.mjs && node tests/zone-lifecycle.mjs"
   },
   "devDependencies": {
     "vite": "^7.0.0",

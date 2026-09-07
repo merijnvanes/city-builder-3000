@@ -37,7 +37,7 @@ rewards and landmarks are separate assets.
 
 | Family | Remaining assets / coverage |
 | --- | --- |
-| Residential zones | All three densities, development levels 1–4, supported lot sizes and deterministic architectural variants |
+| Residential zones | Complete: all densities, levels 1–4, supported lot sizes and 100 authored layouts; see [RESIDENTIAL-ART.md](RESIDENTIAL-ART.md) |
 | Commercial zones | All three densities, levels 1–4, supported lot sizes and variants, including tower families |
 | Industrial zones | All three densities, levels 1–4 and variants; preserve both 3×3 low-density farms and 1×1 workshops |
 | Power | Complete: `coal`, `oil`, `gas`, `nuclear`, `wind`, `solar`, `microwave`, `fusion`; see [POWER-ART.md](POWER-ART.md) |
@@ -61,7 +61,7 @@ committing and pushing it.
 ## Pipeline extension requirements
 
 The `tools/civic_art/registry.json` registry covers twelve civic, eight power, four water, three park, five transport, eight reward, five business-deal and five landmark
-assets. The shared export, loader and gallery support legacy square lots (1×1,
+fixed assets plus 24 residential state/footprint entries. The shared export, loader and gallery support legacy square lots (1×1,
 2×2, 3×3, 4×4 and 5×5) and explicit rectangular footprint metadata. New families still need explicit coverage and contract checks. Share primitives and export machinery;
 keep authored models in small family modules. Avoid a second divergent renderer
 or a giant switch containing every model. Preserve existing civic exports during
@@ -73,6 +73,10 @@ incremental migration.
   only exact footprint matches, centered on the lot with the measured pixel anchor.
   Gallery sizing uses actual frame bounds. Validate new assets in all rotations;
   do not stretch a square sprite to fit.
+- Zone registry entries declare `zone: {type, density, level}` alongside the exact
+  footprint. `zone-art-key.js` selects the state entry; the normalized seed selects
+  its layout. Construction and abandonment overlays share `lot-art-effects.js`.
+  Dense zone facades use scoped direct mesh primitives during offline modeling.
 - Zone selection must account for type, density, level, footprint and deterministic
   variant. Read `src/sim/lots.js`, `src/sim/growth.js`, `src/building-art.js` and
   `src/architecture-cache.js` for actual state semantics before choosing keys.

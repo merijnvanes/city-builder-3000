@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { expectedZoneEntries } from './zone-art-contract.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync, statSync } from 'node:fs';
 import { CIVIC_SPRITES } from '../src/civic-sprite-manifest.js';
@@ -7,19 +8,23 @@ import { BUILDINGS } from '../src/sim/catalog.js';
 
 test('every authored building family ships all four angles and three lighting states', () => {
   const expected = Object.entries(BUILDINGS).filter(([, s]) => Object.keys(FAMILY_COUNTS).some(f => belongsToFamily(s, f))).map(([type]) => type).sort();
+  const zones=expectedZoneEntries();
+  expected.push(...zones.map(z=>z.key));expected.sort();
   assert.deepEqual(Object.keys(CIVIC_SPRITES).sort(), expected);
   const registry = JSON.parse(readFileSync(new URL('../tools/civic_art/registry.json', import.meta.url)));
   assert.deepEqual(Object.keys(registry).sort(), expected);
-  let compressedBytes = 0, parksBytes = 0, transportBytes = 0, rewardsBytes = 0, dealsBytes = 0, landmarksBytes = 0;
+  let compressedBytes = 0, parksBytes = 0, transportBytes = 0, rewardsBytes = 0, dealsBytes = 0, landmarksBytes = 0, residentialBytes = 0;
   for (const [type, spec] of Object.entries(CIVIC_SPRITES)) {
     assert.equal(spec.label, registry[type].label);
     assert.equal(spec.description, registry[type].description);
     assert.ok(spec.label && spec.description);
-    assert.equal(spec.family, Object.keys(FAMILY_COUNTS).find(f => belongsToFamily(BUILDINGS[type], f)));
+    const zone=zones.find(z=>z.key===type);
+    assert.equal(spec.family, zone?.type || Object.keys(FAMILY_COUNTS).find(f => belongsToFamily(BUILDINGS[type], f)));
+    assert.deepEqual(spec.zone, zone ? {type:zone.type,density:zone.density,level:zone.level} : undefined);
     const footprint = spec.footprint || { w: spec.tiles, h: spec.tiles };
     assert.deepEqual(footprint, registry[type].footprint || { w: registry[type].tiles, h: registry[type].tiles });
-    assert.deepEqual(footprint, { w: BUILDINGS[type].w, h: BUILDINGS[type].h });
-    const variants = EXPECTED_VARIANTS[type] || 1;
+    assert.deepEqual(footprint, zone ? {w:zone.size,h:zone.size} : { w: BUILDINGS[type].w, h: BUILDINGS[type].h });
+    const variants = zone?.variants || EXPECTED_VARIANTS[type] || 1;
     assert.equal(spec.variants?.length || 1, variants);
     assert.deepEqual(spec.variants, registry[type].variants);
     assert.equal(Object.keys(spec.frames).length, 12 * variants);
@@ -34,7 +39,8 @@ test('every authored building family ships all four angles and three lighting st
       assert.ok(frame.width > 0 && frame.height > 0);
       assert.ok(frame.anchor[0] > 0 && frame.anchor[0] < frame.width);
       assert.ok(frame.anchor[1] > 0 && frame.anchor[1] < frame.height);
-      if (spec.family === 'landmarks') landmarksBytes += statSync(url).size;
+      if (spec.family === 'residential') residentialBytes += statSync(url).size;
+      else if (spec.family === 'landmarks') landmarksBytes += statSync(url).size;
       else if (spec.family === 'deals') dealsBytes += statSync(url).size;
       else if (spec.family === 'rewards') rewardsBytes += statSync(url).size;
       else if (spec.family === 'transport') transportBytes += statSync(url).size;
@@ -43,6 +49,7 @@ test('every authored building family ships all four angles and three lighting st
     }
   }
   // Each new family has a separate budget; earlier ceilings remain unchanged.
+  assert.ok(residentialBytes < 24 * 1024 * 1024, '1200 residential frames stay below 24 MiB');
   assert.ok(landmarksBytes < 2 * 1024 * 1024, '60 landmark frames stay below 2 MiB');
   assert.ok(dealsBytes < 5 * 1024 * 1024, '168 business deal frames stay below 5 MiB');
   assert.ok(rewardsBytes < 4 * 1024 * 1024, '108 reward frames stay below 4 MiB');

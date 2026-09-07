@@ -1,4 +1,6 @@
 import { spriteVariant, spriteFrameKey } from './architecture-variation.js';
+import { zoneArtKey } from './zone-art-key.js';
+import { drawLotEffects } from './lot-art-effects.js';
 import { CIVIC_SPRITES } from './civic-sprite-manifest.js';
 
 // Authored models are baked offline. One decoded image is shared by every lot
@@ -154,17 +156,19 @@ export function civicSpriteStats() {
   return { entries: entries.size, decodedBytes: bytes, maxDecodedBytes: MAX_DECODED_BYTES };
 }
 
+export function civicSpriteKey(t) { return zoneArtKey(t) || t.type; }
+
 // Drawing, culling heights and shadow direction must agree on eligibility.
 export function civicSpriteSpec(t) {
-  const spec = CIVIC_SPRITES[t.type];
+  const spec = CIVIC_SPRITES[civicSpriteKey(t)];
   return spec && t.lot && t.lot.w === (spec.footprint?.w ?? spec.tiles) && t.lot.h === (spec.footprint?.h ?? spec.tiles) ? spec : null;
 }
 
 export function drawCivicSprite(r, t) {
   const spec = civicSpriteSpec(t);
   if (!spec || !r.base?.drawImage) return null;
-  const state = r.night ? t.powered === false ? 'unpowered' : 'night' : 'day';
-  const entry = requestFrame(t.type, state, r.rotation || 0, r.atlasOwner || r, spriteVariant(t, spec.variants?.length || 1));
+  const state = r.night ? t.powered === false || (spec.zone && t.abandoned) ? 'unpowered' : 'night' : 'day';
+  const entry = requestFrame(civicSpriteKey(t), state, r.rotation || 0, r.atlasOwner || r, spriteVariant(t, spec.variants?.length || 1));
   if (!entry?.canvas) return null;
   const { frame, canvas } = entry;
   const center = r.project(t.lot.x + t.lot.w / 2, t.lot.y + t.lot.h / 2);
@@ -176,5 +180,13 @@ export function drawCivicSprite(r, t) {
   if (t.abandoned) { r.base.globalAlpha *= 0.7; r.base.filter = 'saturate(0.35)'; }
   r.base.drawImage(canvas, bounds.x, bounds.y, bounds.w, bounds.h);
   r.base.restore();
+  const effects = spec.zone && drawLotEffects(r, t, spec.height);
+  if (effects) {
+    const right=Math.max(bounds.x+bounds.w,effects.right),bottom=Math.max(bounds.y+bounds.h,effects.bottom);
+    bounds.x=Math.min(bounds.x,effects.left);bounds.y=Math.min(bounds.y,effects.top);
+    bounds.w=right-bounds.x;bounds.h=bottom-bounds.y;
+    // Temporary crane/scaffold pixels use the existing exact click-pixel path.
+    bounds.canvas=null;
+  }
   return bounds;
 }

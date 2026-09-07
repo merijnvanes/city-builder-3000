@@ -7,6 +7,9 @@ export const random = (x, y, n = 0) => {
 export function spriteVariant(tile, count = 1) {
   if (count <= 1) return 0;
   const seed = tile.variant ?? random(tile.x, tile.y);
+  // Save serialization can round the terminal seed to 1. The legacy high
+  // residential recipe then selects floor(1*5)%3: the balcony family.
+  if (tile.type === 'residential' && tile.density === 3 && count === 5 && seed === 1) return 2;
   return Math.max(0, Math.min(count - 1, Math.floor((Number.isFinite(seed) ? seed : 0) * count)));
 }
 

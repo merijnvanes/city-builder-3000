@@ -4,7 +4,7 @@ Authorized order, with a completed review, commit and push for every coherent sl
 
 1. Business deals — complete: five sites, fourteen authored palettes/layouts; see DEALS-ART.md.
 2. Landmarks — complete: five models and sixty frames; see LANDMARKS-ART.md.
-3. Residential zones — next: all density/level/lot-size/variant combinations.
+3. Residential zones — complete: 24 states, 100 layouts, 1,200 frames; see RESIDENTIAL-ART.md.
 4. Commercial zones — pending: all density/level/lot-size/variant combinations.
 5. Industrial zones — pending: all density/level/lot-size/variant combinations.
 

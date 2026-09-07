@@ -54,9 +54,10 @@ try {
     const coldPortrait = portraitCanvas.toDataURL();
     await preloadCivicSprites({ types: ['police'] });
     const portraitRefreshed = portraitCanvas.toDataURL() !== coldPortrait;
-    // Keep one actual game view pinned while other views fill the LRU.
+    // Keep a full-export-resolution view pinned while other views fill the LRU.
+    // Lower zoom permits intentional quality reduction and buffer replacement.
     const pinned = Object.assign(Object.create(CityRenderer.prototype), {
-      ...r, rotation: 0, night: false, pickables: [], dirty: false, paintEpoch: 1,
+      ...r, zoom: 3, rotation: 0, night: false, pickables: [], dirty: false, paintEpoch: 1,
     });
     drawCachedArchitecture(pinned, tile, city);
     const pinnedCanvas = pinned.pickables[0].canvas;
@@ -67,7 +68,7 @@ try {
         // and LRU churn without requiring every family to stay resident.
         await preloadCivicSprites({ types: [type], variant: 0, rotation, night: state !== 'day', powered: state !== 'unpowered' });
         r.rotation = rotation; r.night = state !== 'day'; r.pickables = [];
-        drawCachedArchitecture(r, { ...tile, type, powered: state !== 'unpowered', lot: { x: 0, y: 0, w: spec.footprint?.w ?? spec.tiles, h: spec.footprint?.h ?? spec.tiles } }, { tiles: [] });
+        drawCachedArchitecture(r, { ...tile, type, ...spec.zone, powered: state !== 'unpowered', lot: { x: 0, y: 0, w: spec.footprint?.w ?? spec.tiles, h: spec.footprint?.h ?? spec.tiles } }, { tiles: [] });
         if (!r.pickables[0]?.canvas) throw new Error(`${type} ${state} ${rotation}: missing sprite`);
         if (type === 'fire') {
           const p = r.pickables[0].canvas;

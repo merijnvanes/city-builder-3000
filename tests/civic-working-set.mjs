@@ -29,7 +29,7 @@ async function setup(page, portraitHistory = false, zoom = .8) {
     const base = canvas.getContext('2d'); base.scale(2, 2);
     const r = Object.assign(Object.create(CityRenderer.prototype), { base, w: 1200, h: 1000, size: 64, zoom, dpr: 2, rotation: 0, night: false, panX: 0, panY: 0, platform: 0, paintEpoch: 1, pickables: [] });
     r.pick = () => ({ miss: true });
-    const tiles = Object.entries(CIVIC_SPRITES).map(([type, spec], index) => {
+    const tiles = Object.entries(CIVIC_SPRITES).filter(([,spec])=>!spec.zone).map(([type, spec], index) => {
       const x = index % 8 * 7, y = Math.floor(index / 8) * 7;
       return { type, x, y, lot: { x, y, w: spec.footprint?.w ?? spec.tiles, h: spec.footprint?.h ?? spec.tiles }, powered: true, age: 10, variant: 0 };
     });

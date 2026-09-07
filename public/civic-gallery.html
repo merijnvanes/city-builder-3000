@@ -14,15 +14,18 @@
 <footer>Original architecture · Four camera angles · Three lighting states · Shared, compressed browser assets</footer>
 <script type="module">
 const requestedFamily=new URLSearchParams(location.search).get('family');
-const family=['civic','power','water','parks','transport','rewards','deals','landmarks'].includes(requestedFamily)?requestedFamily:'civic';
-let catalog,state='day',rotation=0,detail=false;
+const family=['civic','power','water','parks','transport','rewards','deals','landmarks','residential'].includes(requestedFamily)?requestedFamily:'civic';
+let catalog,state='day',rotation=0,detail=false,density=0,level=0;
 const cards=[];
 function update(){
   document.body.classList.toggle('detail',detail);
   document.querySelectorAll('[data-state]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.state===state));
   document.querySelectorAll('[data-detail]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.detail===String(detail)));
   document.querySelector('#angle').textContent=`${rotation+1} / 4`;
-  for(const {type,variant,stage,img} of cards){
+  for(const {type,variant,stage,img,figure} of cards){
+    const zone=catalog[type].zone;
+    figure.hidden=!!zone && ((density && zone.density!==density)||(level && zone.level!==level));
+    if(figure.hidden)continue;
     const spec=catalog[type],f=spec.frames[`${state}-${rotation}${variant?`-v${variant}`:''}`];if(!f)continue;
     const zoom=Math.min(detail?2.6:1,(stage.clientWidth-36)/(f.width/spec.scale),(stage.clientHeight-30)/(f.height/spec.scale));
     img.src=`./assets/civic/${f.file}`;
@@ -33,7 +36,7 @@ function update(){
 }
 try{
   const response=await fetch('./assets/civic/catalog.json');if(!response.ok)throw new Error('Asset catalog could not be loaded.');catalog=await response.json();
-  for(const other of ['civic','power','water','parks','transport','rewards','deals','landmarks'].filter(value=>value!==family)){
+  for(const other of ['civic','power','water','parks','transport','rewards','deals','landmarks','residential'].filter(value=>value!==family)){
     const link=document.createElement('a');link.href=`?family=${other}`;link.textContent=`View ${other} collection →`;link.style.cssText='color:var(--accent);margin-right:12px';document.querySelector('nav').prepend(link);
   }
   if(family==='power'){
@@ -47,6 +50,21 @@ try{
     document.querySelector('.eyebrow').textContent='City Builder 3000 · Asset Collection 03';
     document.querySelector('h1').textContent='Water for a growing city.';
     document.querySelector('header p').textContent='Four purposeful water works: freshwater pumps, elevated storage, membrane filtration, and open treatment basins. Crafted in brick, concrete, and teal metalwork.';
+  }
+  if(['residential','commercial','industrial'].includes(family)){
+    for(const [label,max] of [['Density',3],['Stage',4]]){
+      const select=document.createElement('select');select.setAttribute('aria-label',label);select.style.cssText='padding:9px;background:#20373a;color:#eee8d5;border:1px solid #47605f;border-radius:5px';
+      select.add(new Option(`All ${label.toLowerCase()} levels`,'0'));
+      for(let i=1;i<=max;i++)select.add(new Option(`${label} ${i}`,String(i)));
+      select.onchange=()=>{if(label==='Density')density=Number(select.value);else level=Number(select.value);update();};
+      document.querySelector('nav').append(select);
+    }
+  }
+  if(family==='residential'){
+    document.title='Residential Architecture · City Builder 3000';
+    document.querySelector('.eyebrow').textContent='City Builder 3000 · Neighborhood Collection';
+    document.querySelector('h1').textContent='A place to call home.';
+    document.querySelector('header p').textContent='Cottages, verandas, brownstones, courtyard apartments, balconies and towers. Every density, growth stage and supported lot size has its own authored architecture.';
   }
   if(family==='landmarks'){
     document.title='Landmarks · City Builder 3000';
@@ -85,7 +103,7 @@ try{
     const stage=document.createElement('div');stage.className='stage';
     const img=document.createElement('img');img.alt=label;img.decoding='async';stage.append(img);
     const caption=document.createElement('figcaption');caption.innerHTML=`<span class="index">${String(cards.length+1).padStart(2,'0')} / ${family.toUpperCase()}</span><h2>${label}</h2><p class="description">${description}</p>`;
-    figure.append(stage,caption);document.querySelector('#collection').append(figure);cards.push({type,variant,stage,img});
+    figure.append(stage,caption);document.querySelector('#collection').append(figure);cards.push({type,variant,stage,img,figure});
   }
   document.querySelectorAll('[data-state]').forEach(b=>b.onclick=()=>{state=b.dataset.state;update()});
   document.querySelectorAll('[data-detail]').forEach(b=>b.onclick=()=>{detail=b.dataset.detail==='true';update()});

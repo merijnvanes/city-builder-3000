@@ -22,9 +22,9 @@ try {
       document.documentElement.style.cssText = 'height:auto;overflow:visible';
       document.body.style.cssText = 'display:grid;grid-template-columns:repeat(4,300px);background:#263c46;margin:0;height:auto;overflow:visible';
       let count = 0;
-      const { belongsToFamily, EXPECTED_VARIANTS } = await import('/tests/art-families.mjs');
-      for (const [type, spec] of Object.entries(BUILDINGS).filter(([, s]) => belongsToFamily(s, family))) {
-        const variants = EXPECTED_VARIANTS[type] || 1;
+      const { familyBuildings, EXPECTED_VARIANTS } = await import('/tests/art-families.mjs');
+      for (const [type, spec] of familyBuildings(family)) {
+        const variants = spec.artVariants || EXPECTED_VARIANTS[type] || 1;
         for (let variant = 0; variant < variants; variant++)
         for (const rotation of mode === 'overview' ? [0] : [0, 1, 2, 3]) {
           await preloadCivicSprites({ types: [type], variant, rotation, night: mode === 'night' || mode === 'unpowered', powered: mode !== 'unpowered' });
@@ -37,7 +37,7 @@ try {
             panX: 0, panY: 35, rotation, night: mode === 'night' || mode === 'unpowered', platform: 0,
           });
           r.base.scale(2, 2);
-          drawArchitecture(r, { x: 0, y: 0, lot: { x: 0, y: 0, w: spec.w, h: spec.h }, type, variant: (variant+.5)/variants, level: 1, age: 10, powered: mode !== 'unpowered' });
+          drawArchitecture(r, { x: 0, y: 0, lot: { x: 0, y: 0, w: spec.w, h: spec.h }, type, variant: (variant+.5)/variants, level: 1, ...spec.zone, age: 10, powered: mode !== 'unpowered' });
           const pixels = r.base.getImageData(0, 0, canvas.width, canvas.height).data;
           let occupied = 0;
           for (let y = 0; y < canvas.height; y++) for (let x = 0; x < canvas.width; x++) {

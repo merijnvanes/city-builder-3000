@@ -5,6 +5,8 @@ from mathutils import Vector
 from bpy_extras.object_utils import world_to_camera_view
 sys.path.insert(0,str(Path(__file__).parent))
 import common
+from contextlib import nullcontext
+from fast_primitives import zone_primitives
 
 p=argparse.ArgumentParser();p.add_argument('--types',default='fire');p.add_argument('--states',default='day');p.add_argument('--rotations',default='0');p.add_argument('--samples',type=int,default=32);p.add_argument('--scale',type=float,default=3);p.add_argument('--output',default='artifacts/civic-renders');p.add_argument('--save-blend',action='store_true')
 args=p.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
@@ -25,7 +27,8 @@ for kind,variant,model in work:
     common.M.clear();common.LIGHTS.clear();common.palette()
     footprint=registry[kind].get('footprint') or dict(w=registry[kind]['tiles'],h=registry[kind]['tiles'])
     width,depth=footprint['w'],footprint['h'];tiles=max(width,depth)
-    getattr(importlib.import_module(registry[kind]['module']),model)()
+    with zone_primitives() if registry[kind].get('zone') else nullcontext():
+        getattr(importlib.import_module(registry[kind]['module']),model)()
     scene=bpy.context.scene;scene.render.engine='CYCLES';scene.cycles.samples=args.samples;scene.cycles.use_denoising=True;scene.render.use_persistent_data=True
     scene.cycles.max_bounces=5;scene.cycles.diffuse_bounces=3;scene.cycles.glossy_bounces=3
     scene.render.film_transparent=True;scene.render.image_settings.file_format='PNG';scene.render.image_settings.color_mode='RGBA';scene.render.image_settings.color_depth='8'

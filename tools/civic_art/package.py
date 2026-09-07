@@ -51,7 +51,7 @@ def main():
     with ProcessPoolExecutor(max_workers=4) as pool:
         for kind,key,frame in pool.map(encode,jobs): manifest[kind]['frames'][key] = frame
     for kind, spec in manifest.items():
-        spec.update({key:value for key,value in REGISTRY[kind].items() if key in {'family','label','description','variants'}})
+        spec.update({key:value for key,value in REGISTRY[kind].items() if key in {'family','label','description','variants','zone'}})
     manifest = dict(sorted(manifest.items()))
     if set(manifest) != TYPES or any(set(s['frames']) != expected_frames(kind) for kind,s in manifest.items()):
         raise ValueError('Incomplete building catalog; bake and package all registered types first')

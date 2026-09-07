@@ -473,5 +473,841 @@
     "tiles": 3,
     "label": "Aquarium",
     "description": "Paired wave roofs cover a glazed marine hall, with shallow tidal exhibits beside the entrance."
+  },
+  "residential-d1-l1-s1": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 1,
+    "zone": {
+      "type": "residential",
+      "density": 1,
+      "level": 1
+    },
+    "label": "Residential \u00b7 density 1 \u00b7 stage 1 \u00b7 1\u00d71",
+    "description": "Residential density 1, growth stage 1, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d1-l1-s1",
+        "label": "Gabled cottage",
+        "description": "Residential density 1, growth stage 1, authored specifically for a 1\u00d71 lot. Gabled cottage."
+      },
+      {
+        "model": "residential-d1-l1-s1_v1",
+        "label": "Hipped home",
+        "description": "Residential density 1, growth stage 1, authored specifically for a 1\u00d71 lot. Hipped home."
+      },
+      {
+        "model": "residential-d1-l1-s1_v2",
+        "label": "Craftsman veranda",
+        "description": "Residential density 1, growth stage 1, authored specifically for a 1\u00d71 lot. Craftsman veranda."
+      },
+      {
+        "model": "residential-d1-l1-s1_v3",
+        "label": "Garden-roof modern",
+        "description": "Residential density 1, growth stage 1, authored specifically for a 1\u00d71 lot. Garden-roof modern."
+      }
+    ]
+  },
+  "residential-d1-l2-s1": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 1,
+    "zone": {
+      "type": "residential",
+      "density": 1,
+      "level": 2
+    },
+    "label": "Residential \u00b7 density 1 \u00b7 stage 2 \u00b7 1\u00d71",
+    "description": "Residential density 1, growth stage 2, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d1-l2-s1",
+        "label": "Gabled cottage",
+        "description": "Residential density 1, growth stage 2, authored specifically for a 1\u00d71 lot. Gabled cottage."
+      },
+      {
+        "model": "residential-d1-l2-s1_v1",
+        "label": "Hipped home",
+        "description": "Residential density 1, growth stage 2, authored specifically for a 1\u00d71 lot. Hipped home."
+      },
+      {
+        "model": "residential-d1-l2-s1_v2",
+        "label": "Craftsman veranda",
+        "description": "Residential density 1, growth stage 2, authored specifically for a 1\u00d71 lot. Craftsman veranda."
+      },
+      {
+        "model": "residential-d1-l2-s1_v3",
+        "label": "Garden-roof modern",
+        "description": "Residential density 1, growth stage 2, authored specifically for a 1\u00d71 lot. Garden-roof modern."
+      }
+    ]
+  },
+  "residential-d1-l3-s1": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 1,
+    "zone": {
+      "type": "residential",
+      "density": 1,
+      "level": 3
+    },
+    "label": "Residential \u00b7 density 1 \u00b7 stage 3 \u00b7 1\u00d71",
+    "description": "Residential density 1, growth stage 3, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d1-l3-s1",
+        "label": "Gabled cottage",
+        "description": "Residential density 1, growth stage 3, authored specifically for a 1\u00d71 lot. Gabled cottage."
+      },
+      {
+        "model": "residential-d1-l3-s1_v1",
+        "label": "Hipped home",
+        "description": "Residential density 1, growth stage 3, authored specifically for a 1\u00d71 lot. Hipped home."
+      },
+      {
+        "model": "residential-d1-l3-s1_v2",
+        "label": "Craftsman veranda",
+        "description": "Residential density 1, growth stage 3, authored specifically for a 1\u00d71 lot. Craftsman veranda."
+      },
+      {
+        "model": "residential-d1-l3-s1_v3",
+        "label": "Garden-roof modern",
+        "description": "Residential density 1, growth stage 3, authored specifically for a 1\u00d71 lot. Garden-roof modern."
+      }
+    ]
+  },
+  "residential-d1-l4-s1": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 1,
+    "zone": {
+      "type": "residential",
+      "density": 1,
+      "level": 4
+    },
+    "label": "Residential \u00b7 density 1 \u00b7 stage 4 \u00b7 1\u00d71",
+    "description": "Residential density 1, growth stage 4, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d1-l4-s1",
+        "label": "Gabled cottage",
+        "description": "Residential density 1, growth stage 4, authored specifically for a 1\u00d71 lot. Gabled cottage."
+      },
+      {
+        "model": "residential-d1-l4-s1_v1",
+        "label": "Hipped home",
+        "description": "Residential density 1, growth stage 4, authored specifically for a 1\u00d71 lot. Hipped home."
+      },
+      {
+        "model": "residential-d1-l4-s1_v2",
+        "label": "Craftsman veranda",
+        "description": "Residential density 1, growth stage 4, authored specifically for a 1\u00d71 lot. Craftsman veranda."
+      },
+      {
+        "model": "residential-d1-l4-s1_v3",
+        "label": "Garden-roof modern",
+        "description": "Residential density 1, growth stage 4, authored specifically for a 1\u00d71 lot. Garden-roof modern."
+      }
+    ]
+  },
+  "residential-d2-l1-s1": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 1,
+    "zone": {
+      "type": "residential",
+      "density": 2,
+      "level": 1
+    },
+    "label": "Residential \u00b7 density 2 \u00b7 stage 1 \u00b7 1\u00d71",
+    "description": "Residential density 2, growth stage 1, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d2-l1-s1",
+        "label": "Masonry apartments",
+        "description": "Residential density 2, growth stage 1, authored specifically for a 1\u00d71 lot. Masonry apartments."
+      },
+      {
+        "model": "residential-d2-l1-s1_v1",
+        "label": "Brick brownstones",
+        "description": "Residential density 2, growth stage 1, authored specifically for a 1\u00d71 lot. Brick brownstones."
+      },
+      {
+        "model": "residential-d2-l1-s1_v2",
+        "label": "Balcony apartments",
+        "description": "Residential density 2, growth stage 1, authored specifically for a 1\u00d71 lot. Balcony apartments."
+      }
+    ]
+  },
+  "residential-d2-l1-s2": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 2,
+    "zone": {
+      "type": "residential",
+      "density": 2,
+      "level": 1
+    },
+    "label": "Residential \u00b7 density 2 \u00b7 stage 1 \u00b7 2\u00d72",
+    "description": "Residential density 2, growth stage 1, authored specifically for a 2\u00d72 lot.",
+    "variants": [
+      {
+        "model": "residential-d2-l1-s2",
+        "label": "Masonry apartments",
+        "description": "Residential density 2, growth stage 1, authored specifically for a 2\u00d72 lot. Masonry apartments."
+      },
+      {
+        "model": "residential-d2-l1-s2_v1",
+        "label": "Brick brownstones",
+        "description": "Residential density 2, growth stage 1, authored specifically for a 2\u00d72 lot. Brick brownstones."
+      },
+      {
+        "model": "residential-d2-l1-s2_v2",
+        "label": "Balcony apartments",
+        "description": "Residential density 2, growth stage 1, authored specifically for a 2\u00d72 lot. Balcony apartments."
+      }
+    ]
+  },
+  "residential-d2-l2-s1": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 1,
+    "zone": {
+      "type": "residential",
+      "density": 2,
+      "level": 2
+    },
+    "label": "Residential \u00b7 density 2 \u00b7 stage 2 \u00b7 1\u00d71",
+    "description": "Residential density 2, growth stage 2, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d2-l2-s1",
+        "label": "Masonry apartments",
+        "description": "Residential density 2, growth stage 2, authored specifically for a 1\u00d71 lot. Masonry apartments."
+      },
+      {
+        "model": "residential-d2-l2-s1_v1",
+        "label": "Brick brownstones",
+        "description": "Residential density 2, growth stage 2, authored specifically for a 1\u00d71 lot. Brick brownstones."
+      },
+      {
+        "model": "residential-d2-l2-s1_v2",
+        "label": "Balcony apartments",
+        "description": "Residential density 2, growth stage 2, authored specifically for a 1\u00d71 lot. Balcony apartments."
+      }
+    ]
+  },
+  "residential-d2-l2-s2": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 2,
+    "zone": {
+      "type": "residential",
+      "density": 2,
+      "level": 2
+    },
+    "label": "Residential \u00b7 density 2 \u00b7 stage 2 \u00b7 2\u00d72",
+    "description": "Residential density 2, growth stage 2, authored specifically for a 2\u00d72 lot.",
+    "variants": [
+      {
+        "model": "residential-d2-l2-s2",
+        "label": "Masonry apartments",
+        "description": "Residential density 2, growth stage 2, authored specifically for a 2\u00d72 lot. Masonry apartments."
+      },
+      {
+        "model": "residential-d2-l2-s2_v1",
+        "label": "Brick brownstones",
+        "description": "Residential density 2, growth stage 2, authored specifically for a 2\u00d72 lot. Brick brownstones."
+      },
+      {
+        "model": "residential-d2-l2-s2_v2",
+        "label": "Balcony apartments",
+        "description": "Residential density 2, growth stage 2, authored specifically for a 2\u00d72 lot. Balcony apartments."
+      }
+    ]
+  },
+  "residential-d2-l3-s1": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 1,
+    "zone": {
+      "type": "residential",
+      "density": 2,
+      "level": 3
+    },
+    "label": "Residential \u00b7 density 2 \u00b7 stage 3 \u00b7 1\u00d71",
+    "description": "Residential density 2, growth stage 3, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d2-l3-s1",
+        "label": "Masonry apartments",
+        "description": "Residential density 2, growth stage 3, authored specifically for a 1\u00d71 lot. Masonry apartments."
+      },
+      {
+        "model": "residential-d2-l3-s1_v1",
+        "label": "Brick brownstones",
+        "description": "Residential density 2, growth stage 3, authored specifically for a 1\u00d71 lot. Brick brownstones."
+      },
+      {
+        "model": "residential-d2-l3-s1_v2",
+        "label": "Balcony apartments",
+        "description": "Residential density 2, growth stage 3, authored specifically for a 1\u00d71 lot. Balcony apartments."
+      }
+    ]
+  },
+  "residential-d2-l3-s2": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 2,
+    "zone": {
+      "type": "residential",
+      "density": 2,
+      "level": 3
+    },
+    "label": "Residential \u00b7 density 2 \u00b7 stage 3 \u00b7 2\u00d72",
+    "description": "Residential density 2, growth stage 3, authored specifically for a 2\u00d72 lot.",
+    "variants": [
+      {
+        "model": "residential-d2-l3-s2",
+        "label": "Masonry apartments",
+        "description": "Residential density 2, growth stage 3, authored specifically for a 2\u00d72 lot. Masonry apartments."
+      },
+      {
+        "model": "residential-d2-l3-s2_v1",
+        "label": "Brick brownstones",
+        "description": "Residential density 2, growth stage 3, authored specifically for a 2\u00d72 lot. Brick brownstones."
+      },
+      {
+        "model": "residential-d2-l3-s2_v2",
+        "label": "Balcony apartments",
+        "description": "Residential density 2, growth stage 3, authored specifically for a 2\u00d72 lot. Balcony apartments."
+      }
+    ]
+  },
+  "residential-d2-l4-s1": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 1,
+    "zone": {
+      "type": "residential",
+      "density": 2,
+      "level": 4
+    },
+    "label": "Residential \u00b7 density 2 \u00b7 stage 4 \u00b7 1\u00d71",
+    "description": "Residential density 2, growth stage 4, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d2-l4-s1",
+        "label": "Masonry apartments",
+        "description": "Residential density 2, growth stage 4, authored specifically for a 1\u00d71 lot. Masonry apartments."
+      },
+      {
+        "model": "residential-d2-l4-s1_v1",
+        "label": "Brick brownstones",
+        "description": "Residential density 2, growth stage 4, authored specifically for a 1\u00d71 lot. Brick brownstones."
+      },
+      {
+        "model": "residential-d2-l4-s1_v2",
+        "label": "Balcony apartments",
+        "description": "Residential density 2, growth stage 4, authored specifically for a 1\u00d71 lot. Balcony apartments."
+      }
+    ]
+  },
+  "residential-d2-l4-s2": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 2,
+    "zone": {
+      "type": "residential",
+      "density": 2,
+      "level": 4
+    },
+    "label": "Residential \u00b7 density 2 \u00b7 stage 4 \u00b7 2\u00d72",
+    "description": "Residential density 2, growth stage 4, authored specifically for a 2\u00d72 lot.",
+    "variants": [
+      {
+        "model": "residential-d2-l4-s2",
+        "label": "Masonry apartments",
+        "description": "Residential density 2, growth stage 4, authored specifically for a 2\u00d72 lot. Masonry apartments."
+      },
+      {
+        "model": "residential-d2-l4-s2_v1",
+        "label": "Brick brownstones",
+        "description": "Residential density 2, growth stage 4, authored specifically for a 2\u00d72 lot. Brick brownstones."
+      },
+      {
+        "model": "residential-d2-l4-s2_v2",
+        "label": "Balcony apartments",
+        "description": "Residential density 2, growth stage 4, authored specifically for a 2\u00d72 lot. Balcony apartments."
+      }
+    ]
+  },
+  "residential-d3-l1-s1": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 1,
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 1
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 1 \u00b7 1\u00d71",
+    "description": "Residential density 3, growth stage 1, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l1-s1",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 1\u00d71 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l1-s1_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 1\u00d71 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l1-s1_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 1\u00d71 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l1-s1_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 1\u00d71 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l1-s1_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 1\u00d71 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l1-s2": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 2,
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 1
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 1 \u00b7 2\u00d72",
+    "description": "Residential density 3, growth stage 1, authored specifically for a 2\u00d72 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l1-s2",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 2\u00d72 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l1-s2_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 2\u00d72 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l1-s2_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 2\u00d72 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l1-s2_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 2\u00d72 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l1-s2_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 2\u00d72 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l1-s3": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 3,
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 1
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 1 \u00b7 3\u00d73",
+    "description": "Residential density 3, growth stage 1, authored specifically for a 3\u00d73 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l1-s3",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 3\u00d73 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l1-s3_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 3\u00d73 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l1-s3_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 3\u00d73 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l1-s3_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 3\u00d73 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l1-s3_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 3\u00d73 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l2-s1": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 1,
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 2
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 2 \u00b7 1\u00d71",
+    "description": "Residential density 3, growth stage 2, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l2-s1",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 1\u00d71 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l2-s1_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 1\u00d71 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l2-s1_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 1\u00d71 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l2-s1_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 1\u00d71 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l2-s1_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 1\u00d71 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l2-s2": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 2,
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 2
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 2 \u00b7 2\u00d72",
+    "description": "Residential density 3, growth stage 2, authored specifically for a 2\u00d72 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l2-s2",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 2\u00d72 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l2-s2_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 2\u00d72 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l2-s2_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 2\u00d72 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l2-s2_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 2\u00d72 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l2-s2_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 2\u00d72 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l2-s3": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 3,
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 2
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 2 \u00b7 3\u00d73",
+    "description": "Residential density 3, growth stage 2, authored specifically for a 3\u00d73 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l2-s3",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 3\u00d73 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l2-s3_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 3\u00d73 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l2-s3_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 3\u00d73 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l2-s3_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 3\u00d73 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l2-s3_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 3\u00d73 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l3-s1": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 1,
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 3
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 3 \u00b7 1\u00d71",
+    "description": "Residential density 3, growth stage 3, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l3-s1",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 1\u00d71 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l3-s1_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 1\u00d71 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l3-s1_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 1\u00d71 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l3-s1_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 1\u00d71 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l3-s1_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 1\u00d71 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l3-s2": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 2,
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 3
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 3 \u00b7 2\u00d72",
+    "description": "Residential density 3, growth stage 3, authored specifically for a 2\u00d72 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l3-s2",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 2\u00d72 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l3-s2_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 2\u00d72 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l3-s2_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 2\u00d72 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l3-s2_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 2\u00d72 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l3-s2_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 2\u00d72 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l3-s3": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 3,
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 3
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 3 \u00b7 3\u00d73",
+    "description": "Residential density 3, growth stage 3, authored specifically for a 3\u00d73 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l3-s3",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 3\u00d73 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l3-s3_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 3\u00d73 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l3-s3_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 3\u00d73 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l3-s3_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 3\u00d73 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l3-s3_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 3\u00d73 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l4-s1": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 1,
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 4
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 4 \u00b7 1\u00d71",
+    "description": "Residential density 3, growth stage 4, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l4-s1",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 1\u00d71 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l4-s1_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 1\u00d71 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l4-s1_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 1\u00d71 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l4-s1_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 1\u00d71 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l4-s1_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 1\u00d71 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l4-s2": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 2,
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 4
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 4 \u00b7 2\u00d72",
+    "description": "Residential density 3, growth stage 4, authored specifically for a 2\u00d72 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l4-s2",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 2\u00d72 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l4-s2_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 2\u00d72 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l4-s2_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 2\u00d72 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l4-s2_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 2\u00d72 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l4-s2_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 2\u00d72 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l4-s3": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 3,
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 4
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 4 \u00b7 3\u00d73",
+    "description": "Residential density 3, growth stage 4, authored specifically for a 3\u00d73 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l4-s3",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 3\u00d73 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l4-s3_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 3\u00d73 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l4-s3_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 3\u00d73 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l4-s3_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 3\u00d73 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l4-s3_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 3\u00d73 lot. Brick setbacks."
+      }
+    ]
   }
 }

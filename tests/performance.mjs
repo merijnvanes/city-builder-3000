@@ -9,7 +9,7 @@ try {
   await page.waitForFunction(() => window.civic);
   const results = await page.evaluate(async () => {
     const { CityRenderer } = await import('/src/renderer.js');
-    const { preloadCivicSprites, civicSpriteSpec } = await import('/src/building-art.js');
+    const { preloadCivicSprites, civicSpriteSpec, civicSpriteKey } = await import('/src/building-art.js');
     const { spriteVariant } = await import('/src/architecture-variation.js');
     const canvas = document.createElement('canvas');
     canvas.style.cssText = 'position:fixed;inset:0;width:1440px;height:1000px;z-index:99999';
@@ -41,8 +41,9 @@ try {
         for (const tile of city.tiles) {
           if (tile.lot?.x !== tile.x || tile.lot?.y !== tile.y) continue;
           const spec = civicSpriteSpec(tile); if (!spec) continue;
-          const variant = spriteVariant(tile, spec.variants?.length || 1), powered = tile.powered !== false;
-          requests.set(`${tile.type}:${variant}:${powered}`, { types: [tile.type], variant, powered, night, owner: r });
+          const variant = spriteVariant(tile, spec.variants?.length || 1), powered = tile.powered !== false && !(spec.zone && tile.abandoned);
+          const key = civicSpriteKey(tile);
+          requests.set(`${key}:${variant}:${powered}`, { types: [key], variant, powered, night, owner: r });
         }
         await Promise.all([...requests.values()].map(request => preloadCivicSprites(request)));
         r.paint(city);
