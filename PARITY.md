@@ -774,6 +774,31 @@ is "a little while", twelve is "months on end". The mark is on the plant's own
 `strain` counter, which already persisted, so it fires once per run of strain
 and resets when the load comes off.
 
+### Long-run scenarios, September 7
+
+The bug above passed 387 tests. So did the three before it. They share a shape:
+two pieces that are each correct, composed into a loop that runs away. Nothing
+in the suite asked whether a city that runs for forty years behaves like a city.
+
+`tests/longrun.test.js` does. Four seeds, sixty years each, asserting on shape
+rather than balance: a maintained city ends within 40% of its peak, never
+troughs below half of it, never spends a year under 85% power coverage, never
+swings 25% of its population in one year, and never sits at zero residents with
+money in the bank and demand pegged at 100. Measured spread across nine seeds
+was end/peak 0.83–1.00, trough/peak 0.75–0.84, worst year-on-year swing 2.3–8.4%
+and zero dark years, so the bounds sit well clear of normal variation.
+
+Checked against the fault it was written for: with the old totals-based
+maintenance, seed 44 breaks all five assertions and the other three seeds pass.
+
+`maintainUtilities` in `tests/city-helpers.mjs` was blind in the same way the
+advisor was, and for the same reason. It now reads the worst-off network, and
+places its replacement plant near the grid that is short with a line run back
+to it, checking the two ended up on the same network before believing it. The
+old version scanned from the top-left and wired only the plant's own footprint,
+so a new plant could sit alone on an island, lifting the city-wide total while
+the strained grid stayed exactly as short as it was.
+
 ## Visual and performance work, September 7
 
 - Preserved and verified the previous agent's query-card sizing/rotation work.
