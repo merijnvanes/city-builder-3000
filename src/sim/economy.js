@@ -53,14 +53,23 @@ export function computeBudget(city) {
   for (const loan of city.loans || []) expenses.loans += Math.min(loan.payment, loan.remaining);
   expenses.loans = Math.round(expenses.loans);
 
-  // Neighbour deals: sales pay only when the network could deliver.
+  // Neighbour deals. Buying is metered on what the city actually needed, with
+  // a minimum fee "if you didn't need any during the month". Selling pays the
+  // contracted amount, and only when the network could deliver it.
   for (const [resource, deal] of Object.entries(city.deals || {})) {
     const d = DEALS[resource]?.[deal.kind];
     if (!d) continue;
-    const met = resource === "garbage" ? true : city._util?.[resource]?.deal?.met !== false;
+    const traded = resource === "garbage"
+      ? (deal.kind === "sell" ? city._svc?.exported || 0 : d.cap)
+      : city._util?.[resource]?.deal?.amount ?? 0;
+    const bill = Math.max(d.minimum || 0, Math.round(traded * d.rate));
+    // Exporting garbage costs money; importing it pays. Power and water are
+    // the other way round.
     const earns = (deal.kind === "sell") !== (resource === "garbage");
-    if (earns) { if (met) income.neighbors += d.price; }
-    else expenses.neighbors += d.price;
+    if (earns) {
+      const met = resource === "garbage" ? true : city._util?.[resource]?.deal?.met !== false;
+      if (met) income.neighbors += bill;
+    } else expenses.neighbors += bill;
   }
 
   for (const k of ["residential", "commercial", "industrial"]) income[k] = Math.round(income[k]);

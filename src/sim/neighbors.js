@@ -9,20 +9,51 @@ import { ROAD_TYPES } from "./catalog.js";
 export const SIDES = ["north", "east", "south", "west"];
 const NAMES = ["Ashford", "Brightwater", "Cedar Falls", "Dunmore", "Eastbrook", "Fairhaven", "Glenrock", "Harborview", "Ironvale", "Juniper", "Kingsport", "Lakemont", "Millbridge", "Northgate", "Oakridge", "Pinehurst"];
 
+// What a neighbour will do for you, and what it costs.
+//
+// The manual, pages 81 and 100-101, is specific about which side of a deal is
+// metered and which is a fixed obligation:
+//
+//   Buying: "a contracted neighbour will look at your city's power or water
+//     needs at the connection point, and will supply any deficit... funds are
+//     deducted from your treasury based on how much power or water you
+//     needed. If you didn't need any during the month, you still have to pay
+//     a minimum fee."
+//   Selling: "Each month you are responsible to supply them with the
+//     contracted amount... If conditions change and you can no longer provide
+//     the power you promised, the deal is canceled and you'll be charged a
+//     large penalty."
+//   Exporting garbage: "a contracted neighbour will take all your excess
+//     garbage... funds are deducted based on how much garbage they took. If
+//     you don't generate any excess garbage, you still have to pay a minimum
+//     fee."
+//
+// So `cap` is the most a neighbour will handle, `rate` is the price per unit
+// actually traded, and `minimum` is the standing charge either way.
 export const DEALS = {
   power: {
-    buy:  { amount: 3000, price: 180, label: "Buy 3,000 units of power", needs: "power" },
-    sell: { amount: 2000, price: 150, label: "Sell 2,000 units of surplus power", needs: "power" },
+    buy:  { cap: 6000, rate: 0.06, minimum: 40, label: "Buy power as needed", needs: "power" },
+    sell: { cap: 2000, rate: 0.075, minimum: 0, label: "Sell 2,000 units of surplus power", needs: "power" },
   },
   water: {
-    buy:  { amount: 2000, price: 110, label: "Buy 2,000 units of water", needs: "water" },
-    sell: { amount: 1500, price: 90,  label: "Sell 1,500 units of surplus water", needs: "water" },
+    buy:  { cap: 4000, rate: 0.055, minimum: 25, label: "Buy water as needed", needs: "water" },
+    sell: { cap: 1500, rate: 0.06, minimum: 0, label: "Sell 1,500 units of water", needs: "water" },
   },
   garbage: {
-    buy:  { amount: 600, price: 220, label: "Accept 600 tons of their garbage", needs: "road" },
-    sell: { amount: 500, price: 160, label: "Export 500 tons of garbage", needs: "road" },
+    buy:  { cap: 600, rate: 0.37, minimum: 0, label: "Accept 600 tons of their garbage", needs: "road" },
+    sell: { cap: 4000, rate: 0.32, minimum: 45, label: "Export excess garbage", needs: "road" },
   },
 };
+
+// "There is a large penalty for cancelling the deal", whether the mayor walks
+// away or the city simply stops being able to deliver. Twelve months of the
+// standing charge, or of the contracted amount for a sale.
+export const CANCEL_MONTHS = 12;
+export function cancelPenalty(resource, kind) {
+  const d = DEALS[resource]?.[kind];
+  if (!d) return 0;
+  return Math.round((d.minimum || d.cap * d.rate) * CANCEL_MONTHS);
+}
 
 export function neighborName(seed, index) {
   return NAMES[(seed * 7 + index * 3 + (seed >> 5)) % NAMES.length];
@@ -81,23 +112,39 @@ export function signDeal(city, resource, side, kind) {
   }
   ensureDeals(city)[resource] = { side, kind, since: city.month };
   const d = DEALS[resource][kind];
-  return { ok: true, message: `${d.label} ${kind === "buy" ? "from" : "to"} ${connections[side].name} for $${d.price}/month.` };
+  const terms = kind === "buy" && d.minimum
+    ? `at $${d.rate.toFixed(2)} a unit, minimum $${d.minimum}/month`
+    : `for about $${Math.round(d.cap * d.rate).toLocaleString()}/month`;
+  return { ok: true, message: `${d.label} ${kind === "buy" ? "from" : "to"} ${connections[side].name} ${terms}. Breaking it costs $${cancelPenalty(resource, kind).toLocaleString()}.` };
 }
 
 export function cancelDeal(city, resource) {
-  if (!city.deals?.[resource]) return { ok: false, message: "No such deal." };
+  const deal = city.deals?.[resource];
+  if (!deal) return { ok: false, message: "No such deal." };
+  const penalty = cancelPenalty(resource, deal.kind);
+  if (penalty > city.money) return { ok: false, message: `Breaking the ${resource} contract costs $${penalty.toLocaleString()}, which the city cannot pay.` };
   delete city.deals[resource];
-  return { ok: true, message: `${resource} deal cancelled.` };
+  city.money -= penalty;
+  return { ok: true, message: `${resource} deal cancelled. The contract penalty cost $${penalty.toLocaleString()}.` };
 }
 
-// Drop deals whose connection is gone. Returns news lines.
-export function auditDeals(city, connections) {
+// End deals the city can no longer honour, and charge for it. "If conditions
+// change and you can no longer provide the power you promised, the deal is
+// canceled and you'll be charged a large penalty." Losing the connection ends
+// a deal the same way.
+export function auditDeals(city, connections, utilities) {
   const news = [];
   for (const [resource, deal] of Object.entries(city.deals || {})) {
-    if (!dealAvailable(connections, resource, deal.side)) {
-      delete city.deals[resource];
-      news.push(`${connections[deal.side].name} cancelled the ${resource} deal: the connection was cut.`);
-    }
+    const cut = !dealAvailable(connections, resource, deal.side);
+    const undelivered = !cut && deal.kind === "sell" && resource !== "garbage" && utilities?.[resource]?.deal?.met === false;
+    if (!cut && !undelivered) continue;
+    const penalty = cancelPenalty(resource, deal.kind);
+    delete city.deals[resource];
+    city.money -= penalty;
+    const who = connections[deal.side]?.name || "The neighbour";
+    news.push(cut
+      ? `${who} cancelled the ${resource} deal: the connection was cut. Penalty $${penalty.toLocaleString()}.`
+      : `${who} cancelled the ${resource} deal: the city could not deliver. Penalty $${penalty.toLocaleString()}.`);
   }
   return news;
 }

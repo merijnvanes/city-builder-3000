@@ -789,9 +789,13 @@ export function mountUI(actions) {
       for (const r of Object.keys(resources)) {
         const active = stats.deals?.[r];
         if (active && active.side === n.side) {
-          const tag = el("span", "neighbor-active", `${active.kind === "buy" ? "Buying" : "Selling"} ${r}: ${active.kind === "buy" ? (r === "garbage" ? "+" : "−") : (r === "garbage" ? "−" : "+")}$${active.price}/mo${active.met === false ? " (not delivered)" : ""}`);
+          const earns = (active.kind === "sell") !== (r === "garbage");
+          const unit = r === "garbage" ? "tons" : "units";
+          const tag = el("span", "neighbor-active",
+            `${active.kind === "buy" ? "Buying" : "Selling"} ${r}: ${earns ? "+" : "−"}$${active.monthly}/mo` +
+            ` (${active.traded.toLocaleString()} ${unit})${active.met === false ? " — cannot deliver" : ""}`);
           acts.appendChild(tag);
-          acts.appendChild(btn("btn btn-sm btn-danger", "Cancel", `Cancel ${r} deal`, () => actions.setPolicy?.("cancelDeal", r)));
+          acts.appendChild(btn("btn btn-sm btn-danger", "Cancel", `Cancel ${r} deal — penalty $${active.penalty.toLocaleString()}`, () => actions.setPolicy?.("cancelDeal", r)));
           continue;
         }
         if (!n.deals?.[r] || active) continue;

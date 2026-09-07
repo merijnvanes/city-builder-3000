@@ -171,14 +171,19 @@ export function updateServices(city) {
   let garbageProduced = population * 0.03 + jobs * 0.015;
   if (ord.recycling) garbageProduced *= 0.75;
   const garbageDeal = city.deals?.garbage;
-  if (garbageDeal?.kind === "buy") garbageProduced += DEALS.garbage.buy.amount;
-  const exported = garbageDeal?.kind === "sell" ? DEALS.garbage.sell.amount : 0;
+  if (garbageDeal?.kind === "buy") garbageProduced += DEALS.garbage.buy.cap;
 
-  let left = Math.max(0, garbageProduced - recycleRate - burnRate - exported);
+  // Recycling first, then the incinerators, then the tips. "A contracted
+  // neighbour will take all your excess garbage, meaning any garbage that
+  // your city's landfills and incinerators cannot handle", so export is what
+  // is left after all of that, up to the contracted cap.
+  let left = Math.max(0, garbageProduced - recycleRate - burnRate);
   const buried = Math.min(left, landfillSpace);
-  const uncollected = left - buried;
+  left -= buried;
+  const exported = garbageDeal?.kind === "sell" ? Math.min(left, DEALS.garbage.sell.cap) : 0;
+  const uncollected = left - exported;
   const garbage = garbageProduced > 0 ? Math.round(100 * uncollected / garbageProduced) : 0;
-  const garbageCapacity = recycleRate + burnRate + exported + landfillSpace;
+  const garbageCapacity = recycleRate + burnRate + landfillSpace + (garbageDeal?.kind === "sell" ? DEALS.garbage.sell.cap : 0);
   if (garbage > 0) for (const t of tiles) if (ZONE_TYPES.has(t.type)) t.pollution = Math.min(100, t.pollution + Math.round(garbage * 0.06));
 
   // ── Land value (before crime, so the result depends only on the
@@ -259,7 +264,7 @@ export function updateServices(city) {
   }
 
   return { garbage, garbageProduced: Math.round(garbageProduced), garbageCapacity: Math.round(garbageCapacity), industrialLots,
-           buried, landfillSpace: Math.round(landfillSpace), landfillFill: Math.round(landfillFill), landfillHold,
+           buried, exported, landfillSpace: Math.round(landfillSpace), landfillFill: Math.round(landfillFill), landfillHold,
            waterPollution: city._util?.waterPollution || 0,
            cells: Math.round(cells), arrestable: Math.round(arrestable), jailFactor };
 }

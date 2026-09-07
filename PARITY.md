@@ -22,7 +22,9 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 | Aura | A per-neighbourhood mood map whose average is the mayoral approval rating | **Done.** See below |
 | Public safety | Budget sets precinct size and effectiveness; overlaps are additive; jails cap police effectiveness | **Done.** See below |
 
-Other systems needing controlled comparisons against the original game include growth thresholds, lot stages, land value, budgets, rewards, neighbor contracts and disasters. The manual describes behaviors but does not expose all numerical formulas. Exact balance requires repeatable reference-game experiments, not guessed constants.
+| Neighbour deals | Purchases meter the deficit with a minimum fee; sales are an obligation; cancelling costs a large penalty | **Done.** See below |
+
+Other systems needing controlled comparisons against the original game include growth thresholds, land value, rewards, petitions and disaster severity. The manual describes behaviors but does not expose all numerical formulas. Exact balance requires repeatable reference-game experiments, not guessed constants.
 
 ## Demographics, September 7
 
@@ -299,6 +301,31 @@ shrinks the reach of every stop and station.
 Sanitation loses its slider, as in the original. Landfills, incinerators and
 recycling centres cost what they cost and work at full effect; garbage is a
 building problem, not a budget one.
+
+## Neighbour deals, September 7
+
+The manual is unusually specific about which side of a deal is metered and
+which is a fixed obligation, and the game had every one of them as a flat
+monthly fee.
+
+**Buying** power or water: *"a contracted neighbour will look at your city's
+needs at the connection point, and will supply any deficit... funds are
+deducted based on how much you needed. If you didn't need any during the
+month, you still have to pay a minimum fee."* Purchases now cover exactly the
+shortfall on the network that reaches the border, up to a contracted cap, and
+bill per unit with a standing charge.
+
+**Selling** is the reverse: a fixed amount the city owes every month. *"If
+conditions change and you can no longer provide the power you promised, the
+deal is canceled and you'll be charged a large penalty."*
+
+**Exporting garbage** takes *"all your excess garbage, meaning any garbage
+that your city's landfills and incinerators cannot handle"*, so it now comes
+last in the disposal chain and bills for what was actually hauled away.
+
+**Cancelling** any deal costs a year of its standing charge, whether the mayor
+walks away or the city simply stops being able to deliver. A city that cannot
+afford the penalty is held to its contract.
 
 ## Visual and performance work, September 7
 

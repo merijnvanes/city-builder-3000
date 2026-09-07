@@ -2,10 +2,11 @@
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
 import { createCity, tick, getStats, place, setPolicy, serialize, deserialize, refresh, disaster } from "../src/sim/index.js";
-import { detectConnections, DEALS } from "../src/sim/neighbors.js";
+import { detectConnections, DEALS, cancelPenalty } from "../src/sim/neighbors.js";
 import { findLot, assignLot } from "../src/sim/lots.js";
 import { computeDemand } from "../src/sim/growth.js";
 import { computeMetrics } from "../src/sim/metrics.js";
+import { BUILDINGS } from "../src/sim/catalog.js";
 
 const plains = () => createCity({ seed: 7, layout: "plains", starter: false, hills: 0 });
 const at = (c, x, y) => c.tiles[y * c.size + x];
@@ -60,40 +61,117 @@ describe("connections", () => {
 });
 
 describe("deals", () => {
-  test("buying power needs a line to that edge and adds supply", () => {
+  test("buying power supplies the deficit, and only up to the contracted cap", () => {
     const c = district(plains());
     assert.equal(setPolicy(c, "deal", { resource: "power", side: "north", kind: "buy" }).ok, false);
     for (let y = 0; y <= 14; y++) put(c, 4, y, "powerline");
     refresh(c);
-    const before = getStats(c).utilities.power.supply;
+    const before = getStats(c).utilities.power;
     assert.equal(setPolicy(c, "deal", { resource: "power", side: "north", kind: "buy" }).ok, true);
     const s = getStats(c);
-    assert.equal(s.utilities.power.supply, before + DEALS.power.buy.amount);
-    assert.equal(s.budget.expenses.neighbors, DEALS.power.buy.price);
-    assert.equal(setPolicy(c, "cancelDeal", "power").ok, true);
-    assert.equal(getStats(c).utilities.power.supply, before);
+    // The town already generates enough, so there is no deficit to cover.
+    const deficit = Math.max(0, before.demand - before.supply);
+    assert.equal(s.utilities.power.supply, before.supply + Math.min(deficit, DEALS.power.buy.cap));
+    // "If you didn't need any during the month, you still have to pay a
+    // minimum fee."
+    assert.equal(s.budget.expenses.neighbors, DEALS.power.buy.minimum);
   });
-  test("selling power earns while the plant has surplus, and the deal dies with its line", () => {
+
+  test("a city short of power buys what it is short of, and pays for it", () => {
+    // A consumer wired to the north edge with no plant of its own.
+    const c = plains();
+    put(c, 20, 10, "police");
+    for (let i = -1; i <= 3; i++) put(c, 20 + i, 13, "road");
+    for (let y = 0; y <= 9; y++) put(c, 21, y, "powerline");
+    refresh(c);
+    const before = getStats(c).utilities.power;
+    assert.equal(before.supply, 0);
+    assert.ok(before.demand > 0, "the station should be asking for power");
+
+    setPolicy(c, "deal", { resource: "power", side: "north", kind: "buy" });
+    const s = getStats(c);
+    assert.equal(s.utilities.power.supply, before.demand, "the neighbour covers exactly the deficit");
+    assert.equal(s.utilities.power.deal.amount, before.demand);
+    assert.equal(at(c, 20, 10).powered, true, "and the station runs on it");
+    // Too small a draw to beat the standing charge, so the minimum applies.
+    assert.equal(s.budget.expenses.neighbors, Math.max(DEALS.power.buy.minimum, Math.round(before.demand * DEALS.power.buy.rate)));
+  });
+
+  test("it will not buy more than the contracted cap", () => {
+    const c = plains();
+    // Far more draw than any one contract covers.
+    for (let i = 0; i < 40; i++) { put(c, 4 + (i % 10) * 4, 20 + Math.floor(i / 10) * 4, "hospital"); }
+    for (let y = 0; y <= 20; y++) put(c, 3, y, "powerline");
+    for (let x = 3; x <= 45; x++) put(c, x, 19, "powerline");
+    refresh(c);
+    setPolicy(c, "deal", { resource: "power", side: "north", kind: "buy" });
+    const s = getStats(c);
+    assert.ok(s.utilities.power.deal.amount <= DEALS.power.buy.cap);
+  });
+
+  test("selling power pays the contracted amount while the city can deliver", () => {
     const c = district(plains());
     for (let y = 0; y <= 14; y++) put(c, 4, y, "powerline");
     refresh(c);
     assert.equal(setPolicy(c, "deal", { resource: "power", side: "north", kind: "sell" }).ok, true);
-    let s = getStats(c);
-    assert.equal(s.budget.income.neighbors, DEALS.power.sell.price);
+    const s = getStats(c);
+    assert.equal(s.budget.income.neighbors, Math.round(DEALS.power.sell.cap * DEALS.power.sell.rate));
     assert.equal(s.deals.power.met, true);
+  });
+
+  test("losing the connection ends the deal and charges the penalty", () => {
+    const c = district(plains());
+    for (let y = 0; y <= 14; y++) put(c, 4, y, "powerline");
+    refresh(c);
+    setPolicy(c, "deal", { resource: "power", side: "north", kind: "sell" });
+    const before = c.money;
     put(c, 4, 0, "bulldoze"); refresh(c);
     tick(c);
     assert.equal(c.deals.power, undefined);
     assert.ok(c.news.some((n) => /cancelled the power deal/.test(n)));
+    assert.ok(before - c.money >= cancelPenalty("power", "sell"), "the penalty should have been charged");
   });
-  test("garbage export adds capacity; garbage import pays", () => {
+
+  test("walking away from a deal costs a large penalty", () => {
+    const c = district(plains());
+    for (let y = 0; y <= 14; y++) put(c, 4, y, "powerline");
+    refresh(c);
+    setPolicy(c, "deal", { resource: "power", side: "north", kind: "buy" });
+    const penalty = cancelPenalty("power", "buy");
+    assert.ok(penalty > 0);
+    const before = c.money;
+    assert.equal(setPolicy(c, "cancelDeal", "power").ok, true);
+    assert.equal(Math.round(before - c.money), penalty);
+    assert.equal(c.deals.power, undefined);
+  });
+
+  test("a city that cannot afford the penalty is held to its contract", () => {
+    const c = district(plains());
+    for (let y = 0; y <= 14; y++) put(c, 4, y, "powerline");
+    refresh(c);
+    setPolicy(c, "deal", { resource: "power", side: "north", kind: "buy" });
+    c.money = 1;
+    const result = setPolicy(c, "cancelDeal", "power");
+    assert.equal(result.ok, false);
+    assert.match(result.message, /cannot pay/);
+    assert.ok(c.deals.power, "the deal should still stand");
+  });
+
+  test("exporting garbage takes what the tips cannot, and bills for it", () => {
     const c = district(plains());
     assert.equal(setPolicy(c, "deal", { resource: "garbage", side: "west", kind: "sell" }).ok, true);
-    assert.equal(getStats(c).garbageCapacity, 500);
-    assert.equal(getStats(c).budget.expenses.neighbors, DEALS.garbage.sell.price);
+    const s = getStats(c);
+    assert.equal(s.garbageCapacity >= DEALS.garbage.sell.cap, true);
+    // Nothing to export yet, so only the standing charge.
+    assert.equal(s.budget.expenses.neighbors, DEALS.garbage.sell.minimum);
+  });
+
+  test("importing garbage pays, and adds to what the city must dispose of", () => {
+    const c = district(plains());
     setPolicy(c, "deal", { resource: "garbage", side: "west", kind: "buy" });
-    assert.equal(getStats(c).budget.income.neighbors, DEALS.garbage.buy.price);
-    assert.ok(getStats(c).garbageProduced >= 600);
+    const s = getStats(c);
+    assert.equal(s.budget.income.neighbors, Math.round(DEALS.garbage.buy.cap * DEALS.garbage.buy.rate));
+    assert.ok(s.garbageProduced >= DEALS.garbage.buy.cap);
     const d = deserialize(serialize(c));
     assert.deepEqual(d.deals, c.deals);
   });

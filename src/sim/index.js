@@ -16,7 +16,7 @@ import { anchorOf, capacityOf, drawOf } from "./lots.js";
 import { WATER_RADIUS } from "./utilities.js";
 import { updateEvents, respondPetition, openPetition, specialAvailable, ensureEvents, PETITIONS } from "./events.js";
 import { SPECIAL_TYPES } from "./catalog.js";
-import { DEALS, SIDES, signDeal, cancelDeal, auditDeals, dealAvailable } from "./neighbors.js";
+import { DEALS, SIDES, signDeal, cancelDeal, auditDeals, dealAvailable, cancelPenalty } from "./neighbors.js";
 import { buildingName } from "./names.js";
 import { advanceYear, updateStrikes, readPopulation, blankPopulation, serviceQuality } from "./population.js";
 import { INDUSTRY, industryOf, ensureIndustry } from "./industry.js";
@@ -112,7 +112,7 @@ export function tick(city) {
   const news = [...monthNews];
   news.push(...generateNews(city, statsForNews, city._prev));
   news.push(...updateEvents(city, statsForNews, rng));
-  const cancelled = auditDeals(city, city._connections);
+  const cancelled = auditDeals(city, city._connections, city._util);
   news.push(...cancelled);
   const disaster = randomDisaster(city, m, rng);
   if (disaster) news.push(disaster);
@@ -190,7 +190,21 @@ export function getStats(city) {
       return { side, name: c.name, road: c.road || 0, rail: c.rail || 0, power: c.power || 0, water: c.water || 0,
         deals: Object.fromEntries(Object.keys(DEALS).map((r) => [r, dealAvailable(city._connections, r, side)])) };
     }),
-    deals: Object.fromEntries(Object.entries(city.deals || {}).map(([r, d]) => [r, { ...d, ...DEALS[r][d.kind], met: r === "garbage" ? true : city._util?.[r]?.deal?.met !== false }])),
+    // What each deal is actually costing or earning this month, so the
+    // neighbours panel can show the metered figure rather than a list price.
+    deals: Object.fromEntries(Object.entries(city.deals || {}).map(([r, d]) => {
+      const terms = DEALS[r][d.kind];
+      const traded = r === "garbage"
+        ? (d.kind === "sell" ? city._svc?.exported || 0 : terms.cap)
+        : city._util?.[r]?.deal?.amount ?? 0;
+      return [r, {
+        ...d, ...terms,
+        traded: Math.round(traded),
+        monthly: Math.max(terms.minimum || 0, Math.round(traded * terms.rate)),
+        penalty: cancelPenalty(r, d.kind),
+        met: r === "garbage" ? true : city._util?.[r]?.deal?.met !== false,
+      }];
+    })),
     advice: "",
   };
   stats.advisors = generateAdvisors(city, stats);

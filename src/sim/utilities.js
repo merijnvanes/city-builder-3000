@@ -20,8 +20,15 @@ import { industryTraits } from "./industry.js";
 // act as relay stations." - the manual, page 99.
 export const WATER_RADIUS = 7;
 
-// Neighbour deals: bought supply arrives on the network touching the edge;
-// sold supply is a fixed extra load on that network.
+// Neighbour deals attach to the network that touches the map edge.
+//
+// Buying is metered: "a contracted neighbour will look at your city's needs at
+// the connection point, and will supply any deficit", up to the contracted
+// cap. Selling is a fixed obligation the city has to be able to meet.
+//
+// "The connection point is critical. Any area of the city that you want to
+// supply with purchased power or water must be able to be served from the
+// connection point." So only the one network that reaches the edge benefits.
 function applyDeal(city, resource, netIds, supply, consumers, tilesKey) {
   const deal = city.deals?.[resource];
   if (!deal) return null;
@@ -31,9 +38,17 @@ function applyDeal(city, resource, netIds, supply, consumers, tilesKey) {
   const net = netIds[edge.y * city.size + edge.x];
   if (net < 0) return null;
   const d = DEALS[resource][deal.kind];
-  if (deal.kind === "buy") supply[net] += d.amount;
-  else consumers.unshift({ anchor: { deal: resource }, net, draw: d.amount });
-  return { net, kind: deal.kind, amount: d.amount };
+  if (deal.kind === "buy") {
+    // Work out that network's shortfall, and buy exactly that much.
+    let demand = 0;
+    for (const c of consumers) if (c.net === net) demand += c.draw;
+    const deficit = Math.max(0, demand - supply[net]);
+    const bought = Math.min(deficit, d.cap);
+    supply[net] += bought;
+    return { net, kind: "buy", amount: bought };
+  }
+  consumers.unshift({ anchor: { deal: resource }, net, draw: d.cap });
+  return { net, kind: "sell", amount: d.cap };
 }
 
 // Conductors: power lines, zoned tiles and building footprints. Power also
