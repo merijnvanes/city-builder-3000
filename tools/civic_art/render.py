@@ -23,7 +23,9 @@ for kind,variant,model in work:
         for block in list(collection):
             if block.users==0:collection.remove(block)
     common.M.clear();common.LIGHTS.clear();common.palette()
-    tiles=registry[kind]['tiles'];getattr(importlib.import_module(registry[kind]['module']),model)()
+    footprint=registry[kind].get('footprint') or dict(w=registry[kind]['tiles'],h=registry[kind]['tiles'])
+    width,depth=footprint['w'],footprint['h'];tiles=max(width,depth)
+    getattr(importlib.import_module(registry[kind]['module']),model)()
     scene=bpy.context.scene;scene.render.engine='CYCLES';scene.cycles.samples=args.samples;scene.cycles.use_denoising=True;scene.render.use_persistent_data=True
     scene.cycles.max_bounces=5;scene.cycles.diffuse_bounces=3;scene.cycles.glossy_bounces=3
     scene.render.film_transparent=True;scene.render.image_settings.file_format='PNG';scene.render.image_settings.color_mode='RGBA';scene.render.image_settings.color_depth='8'
@@ -45,7 +47,7 @@ for kind,variant,model in work:
         size=max(size,math.ceil(2*extent*32*args.scale/(4/math.sqrt(2))+32))
         # Every authored solid stays within the catalog lot, including blades.
         for point in points:
-            if abs(point.x)>tiles*2+.001 or abs(point.y)>tiles*2+.001:
+            if abs(point.x)>width*2+.001 or abs(point.y)>depth*2+.001:
                 raise ValueError(f'{kind}: geometry exceeds lot: {tuple(point)}')
     scene.render.resolution_x=size;scene.render.resolution_y=size
     scene.view_settings.view_transform='AgX';scene.view_settings.look='AgX - Medium High Contrast';scene.view_settings.exposure=.25
@@ -56,7 +58,7 @@ for kind,variant,model in work:
     bpy.ops.object.light_add(type='AREA',location=(10,3,12));fill=bpy.context.object;fill.data.energy=750;fill.data.size=12;fill.data.color=(.69,.82,1)
     look(key,(0,0,0));look(fill,(0,0,2))
     radius=25
-    metadata=metadata_by_type.setdefault(kind,{'type':kind,'tiles':tiles,'scale':args.scale,'frames':{},'maxHeight':0})
+    metadata=metadata_by_type.setdefault(kind,{'type':kind,**({'footprint':footprint} if 'footprint' in registry[kind] else {'tiles':tiles}),'scale':args.scale,'frames':{},'maxHeight':0})
     # Bounds are measured from the authored geometry, not hand-estimated.
     bpy.context.view_layer.update()
     for obj in scene.objects:

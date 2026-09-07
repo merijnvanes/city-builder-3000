@@ -43,7 +43,10 @@ def main():
     for kind in sorted(selected):
         meta = json.loads((source/f'{kind}.json').read_text())
         if set(meta['frames']) != expected_frames(kind): raise ValueError(f'{kind}: render all rotations, lighting states and registered variants before packaging')
-        manifest[kind] = {'tiles':meta['tiles'], 'scale':meta['scale'], 'height':round(meta['maxHeight']+1), 'frames':{}}
+        footprint = meta.get('footprint') or dict(w=meta['tiles'], h=meta['tiles'])
+        expected = REGISTRY[kind].get('footprint') or dict(w=REGISTRY[kind]['tiles'], h=REGISTRY[kind]['tiles'])
+        if footprint != expected: raise ValueError(f'{kind}: render footprint differs from registry')
+        manifest[kind] = {**({'footprint':footprint} if 'footprint' in REGISTRY[kind] else {'tiles':meta['tiles']}), 'scale':meta['scale'], 'height':round(meta['maxHeight']+1), 'frames':{}}
         jobs += [(str(source),str(out),kind,key,frame) for key,frame in meta['frames'].items()]
     with ProcessPoolExecutor(max_workers=4) as pool:
         for kind,key,frame in pool.map(encode,jobs): manifest[kind]['frames'][key] = frame

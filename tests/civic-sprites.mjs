@@ -65,7 +65,7 @@ try {
       await preloadCivicSprites({ rotation, night: state !== 'day', powered: state !== 'unpowered' });
       for (const [type, spec] of Object.entries(CIVIC_SPRITES)) {
         r.rotation = rotation; r.night = state !== 'day'; r.pickables = [];
-        drawCachedArchitecture(r, { ...tile, type, powered: state !== 'unpowered', lot: { x: 0, y: 0, w: spec.tiles, h: spec.tiles } }, { tiles: [] });
+        drawCachedArchitecture(r, { ...tile, type, powered: state !== 'unpowered', lot: { x: 0, y: 0, w: spec.footprint?.w ?? spec.tiles, h: spec.footprint?.h ?? spec.tiles } }, { tiles: [] });
         if (!r.pickables[0]?.canvas) throw new Error(`${type} ${state} ${rotation}: missing sprite`);
         if (type === 'fire') {
           const p = r.pickables[0].canvas;

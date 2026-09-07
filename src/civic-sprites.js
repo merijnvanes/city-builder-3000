@@ -93,7 +93,7 @@ export function civicSpriteStats() {
 
 export function drawCivicSprite(r, t) {
   const spec = CIVIC_SPRITES[t.type];
-  if (!spec || !t.lot || !r.base?.drawImage || t.lot.w !== spec.tiles || t.lot.h !== spec.tiles) return null;
+  if (!spec || !t.lot || !r.base?.drawImage || t.lot.w !== (spec.footprint?.w ?? spec.tiles) || t.lot.h !== (spec.footprint?.h ?? spec.tiles)) return null;
   const state = r.night ? t.powered === false ? 'unpowered' : 'night' : 'day';
   const entry = requestFrame(t.type, state, r.rotation || 0, r.atlasOwner || r, spriteVariant(t, spec.variants?.length || 1));
   if (!entry?.canvas) return null;

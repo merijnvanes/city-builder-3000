@@ -16,9 +16,9 @@ test('every civic, power, water and park building ships all four angles and thre
     assert.equal(spec.description, registry[type].description);
     assert.ok(spec.label && spec.description);
     assert.equal(spec.family, Object.keys(FAMILY_COUNTS).find(f => belongsToFamily(BUILDINGS[type], f)));
-    assert.equal(spec.tiles, registry[type].tiles);
-    assert.equal(spec.tiles, BUILDINGS[type].w);
-    assert.equal(BUILDINGS[type].w, BUILDINGS[type].h);
+    const footprint = spec.footprint || { w: spec.tiles, h: spec.tiles };
+    assert.deepEqual(footprint, registry[type].footprint || { w: registry[type].tiles, h: registry[type].tiles });
+    assert.deepEqual(footprint, { w: BUILDINGS[type].w, h: BUILDINGS[type].h });
     const variants = EXPECTED_VARIANTS[type] || 1;
     assert.equal(spec.variants?.length || 1, variants);
     assert.deepEqual(spec.variants, registry[type].variants);

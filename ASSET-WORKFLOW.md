@@ -62,15 +62,18 @@ committing and pushing it.
 ## Pipeline extension requirements
 
 The `tools/civic_art/registry.json` registry covers twelve civic, eight power, four water and three park
-assets. The shared export, loader and gallery support these square lots (1×1,
-2×2, 3×3 and 4×4). New families still need explicit coverage and contract checks. Share primitives and export machinery;
+assets. The shared export, loader and gallery support legacy square lots (1×1,
+2×2, 3×3 and 4×4) and explicit rectangular footprint metadata. New families still need explicit coverage and contract checks. Share primitives and export machinery;
 keep authored models in small family modules. Avoid a second divergent renderer
 or a giant switch containing every model. Preserve existing civic exports during
 incremental migration.
 
-- Generalize square `tiles` metadata and the exact-square loader check to explicit
-  footprint width/height. The airport is 6×5. Validate placement and picking in all
-  rotations; do not stretch a square sprite to fit.
+- New rectangular assets declare `footprint: {w, h}` in registry, render metadata
+  and packaged catalog. Legacy square `tiles` remains supported without rebaking.
+  Model bounds are checked independently against width and depth; runtime draws
+  only exact footprint matches, centered on the lot with the measured pixel anchor.
+  Gallery sizing uses actual frame bounds. Validate new assets in all rotations;
+  do not stretch a square sprite to fit.
 - Zone selection must account for type, density, level, footprint and deterministic
   variant. Read `src/sim/lots.js`, `src/sim/growth.js`, `src/building-art.js` and
   `src/architecture-cache.js` for actual state semantics before choosing keys.
@@ -155,3 +158,29 @@ uncommitted files before including them. Keep ignored render intermediates out o
 Git. Verify clean status and the remote branch after pushing. A session handoff
 should state completed coverage, remaining work, branch/worktree and any blockers,
 and link this guide instead of reproducing it.
+
+## Rectangular contract validation · 2026-09-07
+
+Infrastructure checkpoint: explicit `{w, h}` footprints coexist with unchanged
+square exports. All 306 Node tests pass, including a deliberately asymmetric 6×5
+fixture across twelve view/lighting combinations, exact-dimension rejection and
+Retina anchor rounding. Existing civic lifecycle, portrait refresh, picking,
+348-frame nested-path gallery, 640 direct/cached comparisons, disaster rendering,
+gameplay smoke and production build pass. Local p95 frame cadence remains
+16.7–16.8 ms (cached CPU 0.6–1.1 ms, camera redraw 15.5–22.8 ms).
+`python3 tests/civic-package.py` also passes isolated real packaging, alpha-crop
+anchor adjustment and footprint mismatch rejection without catalog replacement.
+An isolated asymmetric 6×5 Blender fixture also completed all twelve renders and
+packaging; its actual exports passed single-blit drawing, all-view alpha picking,
+state hashes and portrait framing through the browser runtime (3,313,440 decoded
+bytes). Four daylight views were visually inspected. Production models still
+require their own geometry and real-game visual checks.
+
+Integration discovery: current `main` has replaced fixed airport/seaport buildings
+with port zones that grow to varying rectangles up to 8×8. Do not merge fixed-lot
+art into that contract without deliberately covering those sizes and both orientations.
+The art branch's gameplay catalog is unchanged by this infrastructure checkpoint.
+
+Independent review: fresh Codex fallback found no blocking issues after the Claude
+CLI rejected its effort flag. Its discoverability suggestion is addressed by
+`npm run test:art-contract`, covering runtime/manifest checks and real packaging.

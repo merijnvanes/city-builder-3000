@@ -24,7 +24,7 @@ function update(){
   document.querySelector('#angle').textContent=`${rotation+1} / 4`;
   for(const {type,variant,stage,img} of cards){
     const spec=catalog[type],f=spec.frames[`${state}-${rotation}${variant?`-v${variant}`:''}`];if(!f)continue;
-    const zoom=Math.min(detail?2.6:1,(stage.clientWidth-36)/(spec.tiles*64),(stage.clientHeight-30)/(f.height/spec.scale));
+    const zoom=Math.min(detail?2.6:1,(stage.clientWidth-36)/(f.width/spec.scale),(stage.clientHeight-30)/(f.height/spec.scale));
     img.src=`./assets/civic/${f.file}`;
     img.style.width=`${f.width/spec.scale*zoom}px`;
     img.style.left=`${stage.clientWidth/2-f.anchor[0]/spec.scale*zoom}px`;
