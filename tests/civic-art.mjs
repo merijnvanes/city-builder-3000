@@ -32,6 +32,16 @@ try {
           });
           r.base.scale(2, 2);
           drawArchitecture(r, { x: 0, y: 0, lot: { x: 0, y: 0, w: spec.w, h: spec.h }, type, level: 1, age: 10, powered: mode !== 'unpowered' });
+          const pixels = r.base.getImageData(0, 0, canvas.width, canvas.height).data;
+          let occupied = 0;
+          for (let y = 0; y < canvas.height; y++) for (let x = 0; x < canvas.width; x++) {
+            if (!pixels[(y * canvas.width + x) * 4 + 3]) continue;
+            occupied++;
+            if (x < 2 || y < 2 || x >= canvas.width - 2 || y >= canvas.height - 2) {
+              throw new Error(`${type}: clipped artwork in ${mode}, rotation ${rotation}`);
+            }
+          }
+          if (occupied < 100) throw new Error(`${type}: missing artwork in ${mode}`);
           r.base.fillStyle = '#f1e7d0'; r.base.font = '600 15px sans-serif';
           r.base.fillText(spec.label, 20, 27);
           r.base.fillStyle = '#a2b8bb'; r.base.font = '11px sans-serif';
