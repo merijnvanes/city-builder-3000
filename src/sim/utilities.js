@@ -8,7 +8,7 @@
 // Water flows through pipes. A pipe network serves every tile within
 // WATER_RADIUS (square) of one of its pipes, with the same budget rule.
 import { components, forSquare, forRadius, tileAt } from "./grid.js";
-import { BUILDINGS, ZONE_TYPES, ROAD_TYPES } from "./catalog.js";
+import { BUILDINGS, ZONED_TYPES, ROAD_TYPES } from "./catalog.js";
 import { isAnchor, anchorOf, drawOf, lotTiles } from "./lots.js";
 import { DEALS } from "./neighbors.js";
 import { plantOutput, OVERLOAD_RATIO } from "./power.js";
@@ -54,7 +54,7 @@ function applyDeal(city, resource, netIds, supply, consumers, tilesKey) {
 // Conductors: power lines, zoned tiles and building footprints. Power also
 // jumps across a single road or rail tile, so lots on both sides of a
 // street share a network without lines along every block.
-const conducts = (t) => t.powerline || !!t.lot || ZONE_TYPES.has(t.type);
+const conducts = (t) => t.powerline || !!t.lot || ZONED_TYPES.has(t.type);
 const isRoad = (t) => ROAD_TYPES.has(t.type);
 
 function powerComponents(city) {

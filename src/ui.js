@@ -1,4 +1,4 @@
-import { TOOLS, BUILDINGS, ORDINANCES, DISASTERS, FUNDED_DEPARTMENTS, SPECIAL_TYPES } from "./sim.js";
+import { TOOLS, BUILDINGS, ORDINANCES, DISASTERS, FUNDED_DEPARTMENTS, SPECIAL_TYPES, ZONE_TYPES, PORT_TYPES } from "./sim.js";
 import { createPortrait } from "./portrait.js";
 
 // ── SVG Icons ─────────────────────────────────────────────────────────────────
@@ -26,8 +26,8 @@ const ICONS = {
 
 // ── Tool group definitions ───────────────────────────────────────────────────
 const GROUP_DEFS = [
-  { id: "zone",      label: "Zones",     tools: ["residential", "commercial", "industrial"], hasDensity: true },
-  { id: "transport", label: "Transport", tools: ["road", "highway", "rail", "railstation", "subway", "substation", "bus", "airport", "seaport"] },
+  { id: "zone",      label: "Zones",     tools: ["residential", "commercial", "industrial", "airport", "seaport"], hasDensity: true },
+  { id: "transport", label: "Transport", tools: ["road", "highway", "rail", "railstation", "subway", "substation", "bus"] },
   { id: "power",     label: "Power",     tools: ["coal", "oil", "gas", "nuclear", "wind", "solar", "powerline"] },
   { id: "water",     label: "Water",     tools: ["waterpump", "watertower", "treatment", "pipe"] },
   { id: "civic",     label: "Civic",     tools: ["police", "fire", "hospital", "school", "college", "library", "museum"] },
@@ -48,7 +48,7 @@ function iconFor(id, label) {
 }
 
 const PATH_TOOLS = new Set(["road", "rail", "highway", "powerline", "pipe", "subway"]);
-const RECT_TOOLS = new Set(["residential", "commercial", "industrial", "park", "landfill", "tree", "bulldoze", "makewater", "makeland", "raise", "lower", "level"]);
+const RECT_TOOLS = new Set(["residential", "commercial", "industrial", "airport", "seaport", "park", "landfill", "tree", "bulldoze", "makewater", "makeland", "raise", "lower", "level"]);
 
 // ── Formatters ─────────────────────────────────────────────────────────────────
 function fmtMoney(v) {
@@ -1151,7 +1151,8 @@ export function mountUI(actions) {
     "Zone land (residential, commercial, industrial) next to roads. Lots develop when they have road access within three tiles, power, and for medium or high density, water. Demand (the R C I bars) decides how fast they grow; jobs attract residents, residents attract shops, and industry follows the workforce.",
     "Power flows from plants through power lines, zoned tiles and buildings, and hops across a single road. Water comes from pumps (best next to water) or towers through pipes; every pipe serves six tiles around it. Plants and pumps have limited capacity.",
     "Police, fire, health and education coverage depends on distance and department funding in the Budget. Garbage needs landfills, an incinerator or a recycling center. Parks, trees and water raise land value; industry, pollution, crime and traffic lower it.",
-    "Roads, rails, power lines and pipes that reach the map edge connect you to a neighbor: trade lifts demand, roads bring outside jobs, and lines or pipes let you buy or sell power and water.",
+    "Airports and seaports are zones too. Draw at least 3x5 for an airport (from 1930) or 2x6 for a seaport, give the block power, water and a road, and the Sims build the terminal once the city's commerce and industry need outside trade. A seaport only works on a shoreline, and pays best on a seacoast.",
+    "Roads, rails, power lines and pipes that reach the map edge connect you to a neighbor: trade lifts demand, roads bring outside jobs, and lines or pipes let you buy or sell power and water. A seaport counts as a connection to every neighbor.",
     "Population milestones unlock rewards such as the Mayor's House and City Hall. Petitioners offer money-making deals with strings attached. Every January the budget review pauses the game.",
   ]);
   helpSection("Navigation", [
@@ -1460,10 +1461,13 @@ export function mountUI(actions) {
           : `${tool.label}${size} — ${tool.cost > 0 ? fmtMoney(tool.cost) : "Free"} — ${PATH_TOOLS.has(id) ? "drag a route" : RECT_TOOLS.has(id) ? "drag an area" : "click to place"}`;
       }
 
-      // Density strip visibility
-      const isZone = ["residential", "commercial", "industrial"].includes(id);
+      // Density strip visibility. Ports are zones with a single density, so
+      // the strip has nothing to offer while one is selected.
       const densStrip = document.getElementById("density-strip");
-      if (densStrip) densStrip.classList.toggle("visible", isZone);
+      if (densStrip) {
+        densStrip.classList.toggle("visible", ZONE_TYPES.has(id));
+        densStrip.classList.toggle("no-density", PORT_TYPES.has(id));
+      }
 
       // Inspector: hide when not inspecting
       if (id !== "inspect") {

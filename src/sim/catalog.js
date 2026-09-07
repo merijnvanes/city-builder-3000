@@ -2,6 +2,12 @@
 // utilities, services and art. No browser deps.
 
 export const ZONE_TYPES = new Set(["residential", "commercial", "industrial"]);
+// "What actually builds in the Residential, Commercial, Industrial, Airport
+// and Seaport zones is up to the Sims." Ports are zoned, not placed, but they
+// carry none of the RCI machinery: no density, no taxes, no land value gate.
+// See ports.js.
+export const PORT_TYPES = new Set(["airport", "seaport"]);
+export const ZONED_TYPES = new Set([...ZONE_TYPES, ...PORT_TYPES]);
 export const ROAD_TYPES = new Set(["road", "rail", "highway", "onramp"]);
 // Lots get road access from these; highways need a road to reach a lot.
 // Lots reach the network through these. A highway needs a road or a ramp
@@ -10,7 +16,11 @@ export const ACCESS_TYPES = new Set(["road", "rail", "onramp"]);
 export const OVERLAY_TOOLS = new Set(["powerline", "pipe", "subway"]);
 
 // Zone cost per tile scales with density. Density 1 = low, 2 = medium, 3 = high.
-export const ZONE_COST = { residential: [0, 10, 25, 50], commercial: [0, 10, 25, 50], industrial: [0, 10, 25, 50] };
+// Ports have one density; the Sims pay for the terminal itself.
+export const ZONE_COST = {
+  residential: [0, 10, 25, 50], commercial: [0, 10, 25, 50], industrial: [0, 10, 25, 50],
+  airport: [0, 120], seaport: [0, 90],
+};
 
 // Lot sizes a zone density can form, largest first. Low-density industry
 // spreads into 3×3 farms when it has the room.
@@ -61,8 +71,7 @@ export const BUILDINGS = {
   railstation: { label: "Rail Station",    group: "transport", cost: 500,  w: 2, h: 2, upkeep: 15,  dept: "transit", service: { kind: "rail", radius: 10 }, beside: "rail", powerUse: 4 },
   subway:      { label: "Subway",          group: "transport", cost: 40,   w: 1, h: 1, upkeep: 1,   dept: "transit", path: true, overlay: true, underground: true },
   substation:  { label: "Subway Station",  group: "transport", cost: 400,  w: 1, h: 1, upkeep: 12,  dept: "transit", service: { kind: "rail", radius: 8 }, beside: "subway", powerUse: 3 },
-  airport:     { label: "Airport",         group: "transport", cost: 10000, w: 6, h: 5, upkeep: 200, dept: "transit", unique: true, effects: { jobs: 500, traffic: 40, pollution: 25, radius: 8, demand: { commercial: 18 } }, powerUse: 12, waterUse: 6 },
-  seaport:     { label: "Seaport",         group: "transport", cost: 5000, w: 4, h: 4, upkeep: 120, dept: "transit", unique: true, requiresWater: true, prefers: "salt", effects: { jobs: 350, traffic: 25, pollution: 15, radius: 6, demand: { industrial: 18 } }, powerUse: 8, waterUse: 4 },
+  // Airports and seaports are zones, not buildings. See ports.js.
 
   // lifespan is in years: a plant runs at full output for the first 55% of it,
   // then slides to 35% of nameplate capacity. Query one to see the gap.
@@ -155,6 +164,8 @@ export const TOOLS = [
   { id: "residential", label: "Residential",    cost: 10, group: "zone",      description: "Zone residential ($10-50 per tile by density)", shortcut: "z" },
   { id: "commercial",  label: "Commercial",     cost: 10, group: "zone",      description: "Zone commercial ($10-50 per tile by density)", shortcut: "c" },
   { id: "industrial",  label: "Industrial",     cost: 10, group: "zone",      description: "Zone industrial ($10-50 per tile by density)", shortcut: "n" },
+  { id: "airport",     label: "Airport",        cost: ZONE_COST.airport[1], group: "zone", description: "Zone an airport ($120 per tile, 3×5 tiles at least)", shortcut: "" },
+  { id: "seaport",     label: "Seaport",        cost: ZONE_COST.seaport[1], group: "zone", description: "Zone a seaport ($90 per tile, 2×6 tiles at least, on a shoreline)", shortcut: "" },
   ...Object.entries(BUILDINGS).map(([id, b]) => ({
     id, label: b.label, cost: b.cost, group: b.group,
     description: `${b.label} ($${b.cost.toLocaleString()}${b.path || b.rect ? " per tile" : ""}${b.w > 1 ? `, ${b.w}×${b.h}` : ""})`,

@@ -2,9 +2,10 @@
 // carries `lot = { x, y, w, h }`; the tile at (lot.x, lot.y) is the anchor
 // and holds level, variant and abandonment state.
 import { inBounds, tileAt } from "./grid.js";
-import { CAPACITY, DRAW, BUILDINGS, ZONE_TYPES, LOT_SIZES, LOT_SIZES_BY_TYPE } from "./catalog.js";
+import { CAPACITY, DRAW, BUILDINGS, ZONE_TYPES, ZONED_TYPES, LOT_SIZES, LOT_SIZES_BY_TYPE } from "./catalog.js";
 import { industryTraits } from "./industry.js";
 import { commerceTraits } from "./commerce.js";
+import { isPort, portDraw } from "./ports.js";
 
 export const isAnchor = (t) => !!t.lot && t.lot.x === t.x && t.lot.y === t.y;
 
@@ -84,7 +85,7 @@ export function clearLot(city, anchor, { keepZone = true } = {}) {
     t.industry = null;
     t.commerce = null;
     t.fill = 0;
-    if (!(keepZone && ZONE_TYPES.has(t.type))) { t.type = "empty"; t.density = 0; }
+    if (!(keepZone && ZONED_TYPES.has(t.type))) { t.type = "empty"; t.density = 0; }
   }
 }
 
@@ -107,6 +108,7 @@ export function drawOf(anchor) {
     const scale = tiles * anchor.density * anchor.level;
     return { power: k.power * scale, water: k.water * scale };
   }
+  if (isPort(anchor.type)) return portDraw(anchor);
   const b = BUILDINGS[anchor.type];
   return { power: b?.powerUse || 0, water: b?.waterUse || 0 };
 }

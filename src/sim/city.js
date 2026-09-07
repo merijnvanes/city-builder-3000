@@ -1,7 +1,7 @@
 import { effectState, parseEffects } from "./effects-state.js";
-// City state: tile schema, creation, save format (version 3).
+// City state: tile schema, creation, save format (version 5).
 import { generateTerrain, LAYOUTS, MAX_ELEVATION } from "./terrain.js";
-import { BUILDINGS, ZONE_TYPES, ROAD_TYPES, FUNDED_DEPARTMENTS } from "./catalog.js";
+import { BUILDINGS, ZONE_TYPES, PORT_TYPES, ZONED_TYPES, ROAD_TYPES, FUNDED_DEPARTMENTS } from "./catalog.js";
 import { tileAt } from "./grid.js";
 import { lotTiles } from "./lots.js";
 import { blankPopulation, serializePopulation, parsePopulation } from "./population.js";
@@ -13,7 +13,7 @@ import { OVERLOAD_MONTHS } from "./power.js";
 // Nothing holds more trash than the largest landfill tile.
 const MAX_FILL = Math.max(...Object.values(BUILDINGS).map((b) => b.hold || 0));
 
-export const SAVE_VERSION = 4;
+export const SAVE_VERSION = 5;
 export const DEFAULT_SIZE = 64;
 export const MAX_SIZE = 128;
 export const START_MONEY = 50000;
@@ -96,7 +96,7 @@ export function blankCity({ seed = 42, size = DEFAULT_SIZE, layout, name = "New 
     roadCondition: 100,
     siren: blankSiren(),
     population: 0, happiness: 50,
-    demand: { residential: 0, commercial: 0, industrial: 0 },
+    demand: Object.fromEntries([...ZONED_TYPES].map((k) => [k, 0])),
     history: [], news: [],
     deals: {},
     revision: 0,
@@ -148,7 +148,7 @@ export function serialize(city) {
   });
 }
 
-const VALID_TYPES = new Set(["empty", ...ZONE_TYPES, ...Object.keys(BUILDINGS)]);
+const VALID_TYPES = new Set(["empty", ...ZONED_TYPES, ...Object.keys(BUILDINGS)]);
 
 export function deserialize(raw) {
   let d;
@@ -202,7 +202,10 @@ export function deserialize(raw) {
     if (![0, 1, 2, 3].includes(trees)) throw new Error(`Invalid save: tile ${i} bad trees.`);
     const type = d.types[typeCode];
     if (!type) throw new Error(`Invalid save: tile ${i} bad type.`);
-    if (![0, 1, 2, 3].includes(density) || (ZONE_TYPES.has(type) ? density === 0 : density !== 0)) throw new Error(`Invalid save: tile ${i} bad density.`);
+    // Ports have exactly one density band; RCI zones have three; nothing else
+    // has any.
+    const bands = PORT_TYPES.has(type) ? [1] : ZONE_TYPES.has(type) ? [1, 2, 3] : [0];
+    if (!bands.includes(density)) throw new Error(`Invalid save: tile ${i} bad density.`);
     if (!Number.isInteger(level) || level < 0 || level > 4) throw new Error(`Invalid save: tile ${i} bad level.`);
     if (!Number.isFinite(variant) || variant < 0 || variant > 1) throw new Error(`Invalid save: tile ${i} bad variant.`);
     if (![0, 1].includes(abandoned) || ![0, 1].includes(powerline) || ![0, 1].includes(pipe)) throw new Error(`Invalid save: tile ${i} bad flags.`);
@@ -239,7 +242,8 @@ export function deserialize(raw) {
     ordinances: { ...policies.ordinances, ...Object.fromEntries(Object.entries(d.ordinances || {}).filter(([k, v]) => k in policies.ordinances && typeof v === "boolean")) },
     population: Number.isFinite(d.population) ? d.population : 0,
     happiness: Number.isFinite(d.happiness) ? d.happiness : 50,
-    demand: { residential: 0, commercial: 0, industrial: 0, ...(d.demand || {}) },
+    demand: Object.fromEntries(["residential", "commercial", "industrial", ...PORT_TYPES]
+      .map((k) => [k, Number.isFinite(d.demand?.[k]) ? Math.max(-100, Math.min(100, Math.round(d.demand[k]))) : 0])),
     history: d.history.filter((h) => h && Number.isSafeInteger(h.month)),
     news: d.news,
     revision: d.revision,

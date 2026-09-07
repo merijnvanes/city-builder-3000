@@ -1,10 +1,11 @@
 // Taxes, department budgets, ordinances and loans.
-import { BUILDINGS, ZONE_TYPES, DEPARTMENTS, FUNDED_DEPARTMENTS, ROAD_TYPES } from "./catalog.js";
+import { BUILDINGS, ZONE_TYPES, PORT_TYPES, DEPARTMENTS, FUNDED_DEPARTMENTS, ROAD_TYPES } from "./catalog.js";
 import { isAnchor, capacityOf } from "./lots.js";
 import { industryTraits } from "./industry.js";
 import { commerceTraits } from "./commerce.js";
 import { ORDINANCES } from "./city.js";
 import { DEALS } from "./neighbors.js";
+import { portUpkeep } from "./ports.js";
 
 export const LOAN_AMOUNT = 10000;
 export const LOAN_MONTHS = 60;
@@ -36,6 +37,8 @@ export function computeBudget(city) {
       else income.industrial += cap * (taxes.industrial / 100) * 1.2 * industryTraits(t).value * (ordinances.wasteTax ? 1.15 : 1);
       continue;
     }
+    // A terminal costs the transit department by the acre it covers.
+    if (PORT_TYPES.has(t.type)) { expenses.transit += portUpkeep(t); continue; }
     const b = BUILDINGS[t.type];
     if (b) expenses[b.dept] += b.upkeep;
     if (b?.offer) income.deals += b.offer.income;

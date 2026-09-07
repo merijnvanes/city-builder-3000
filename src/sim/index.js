@@ -1,5 +1,5 @@
 // Public simulation API. No browser deps.
-import { TOOLS, TOOL_MAP, BUILDINGS, ZONE_TYPES, FUNDED_DEPARTMENTS, isZone } from "./catalog.js";
+import { TOOLS, TOOL_MAP, BUILDINGS, ZONE_TYPES, PORT_TYPES, ZONED_TYPES, FUNDED_DEPARTMENTS, isZone } from "./catalog.js";
 import { blankCity, serialize, deserialize as parseCity, ORDINANCES, START_YEAR, DEFAULT_SIZE, defaultPolicies } from "./city.js";
 import { place, evaluate, techAvailable } from "./place.js";
 import { refreshCity } from "./refresh.js";
@@ -29,8 +29,9 @@ import { sitingNote } from "./siting.js";
 import { sound, advanceSiren, sirenSounding, blankSiren } from "./siren.js";
 import { flammability, reliefGrant, developedLots } from "./fire.js";
 import { ageFactor } from "./wear.js";
+import { PORTS, portJobs, portUpkeep, portNote, portReady, portObstacle } from "./ports.js";
 
-export { TOOLS, TOOL_MAP, BUILDINGS, ZONE_TYPES, ORDINANCES, ADVISORS, DISASTERS, START_YEAR, DEFAULT_SIZE, FUNDED_DEPARTMENTS, SPECIAL_TYPES, PETITIONS, DEALS, SIDES, serialize, place, evaluate, isZone };
+export { TOOLS, TOOL_MAP, BUILDINGS, ZONE_TYPES, PORT_TYPES, ZONED_TYPES, ORDINANCES, ADVISORS, DISASTERS, START_YEAR, DEFAULT_SIZE, FUNDED_DEPARTMENTS, SPECIAL_TYPES, PETITIONS, DEALS, SIDES, serialize, place, evaluate, isZone };
 
 export function createCity(seed = 42, starter = true, options = {}) {
   if (seed && typeof seed === "object") { options = seed; seed = options.seed ?? 42; starter = options.starter ?? true; }
@@ -299,6 +300,7 @@ export function disaster(city, id) {
 const LABELS = {
   empty: "Open land", road: "Road", rail: "Rail line",
   residential: "Residential zone", commercial: "Commercial zone", industrial: "Industrial zone",
+  airport: "Airport zone", seaport: "Seaport zone",
 };
 // Query grades: enough places for everyone, adequately staffed, earns an A.
 const GRADES = [[1.05, "A"], [0.9, "B"], [0.75, "C"], [0.55, "D"], [0, "F"]];
@@ -332,6 +334,29 @@ export function inspectTile(city, x, y) {
     if (a.lot) { const d = drawOf(a); details.push(`Power draw: ${Math.round(d.power)} · Water draw: ${Math.round(d.water)}`); }
     details.push(`Conditions: ${conditionsOk(a) ? "OK" : "Not met"}`);
     if (a.lot) details.push(`Flammability: ${flammability(city, a)}/100${a.watered ? " (watered)" : ""}`);
+  } else if (PORT_TYPES.has(t.type)) {
+    const spec = PORTS[t.type];
+    title = `${spec.label} zone`;
+    if (!a.lot) {
+      description = `Zoned, waiting for development. Needs at least ${spec.short}×${spec.long} tiles of ${t.type} zone, power, water and a road nearby.`;
+      details.push(portObstacle(city, t) || `Ready to build. City demand for ${t.type}s: ${city.demand?.[t.type] ?? 0}`);
+    } else if (a.abandoned) {
+      description = `Closed ${spec.label.toLowerCase()}. Restore power, water and road access to bring the traffic back.`;
+    } else {
+      title = spec.label;
+      description = `${spec.label}, ${a.lot.w}×${a.lot.h}. Serves the city's ${spec.serves} sector.`;
+      const jobs = portJobs(city, a);
+      details.push(`Jobs: ${jobs.toLocaleString()}${a.filled != null ? ` (${Math.min(jobs, Math.round(a.filled)).toLocaleString()} filled)` : ""}`);
+      const d = drawOf(a);
+      details.push(`Power draw: ${Math.round(d.power)} · Water draw: ${Math.round(d.water)}`);
+      details.push(`Upkeep: $${portUpkeep(a).toLocaleString()}/month`);
+    }
+    if (a.lot) {
+      const note = portNote(city, a);
+      if (note) details.push(note);
+      details.push(`Conditions: ${portReady(a) ? "OK" : "Not met"}`);
+      details.push(`Flammability: ${flammability(city, a)}/100${a.watered ? " (watered)" : ""}`);
+    }
   } else if (BUILDINGS[t.type]) {
     const b = BUILDINGS[t.type];
     description = `${b.label}, ${b.w}×${b.h}. Upkeep $${b.upkeep}/month.`;

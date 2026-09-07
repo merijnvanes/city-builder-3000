@@ -7,7 +7,8 @@ What the game has and what could still bring it closer to the classic it follows
 - 64/96/128 maps with rivers, coasts, lakes, hills and terraforming
 - Zones at three densities forming 1×1 to 3×3 lots, farms, abandonment, construction cranes
 - Six power plants, three water sources, treatment, capacity and brownouts, pipes with coverage
-- Roads, highways, rail with stations, subways with stations, bus stops, airport, seaport
+- Roads, highways, rail with stations, subways with stations, bus stops
+- Airport and seaport zones the Sims develop once the city needs outside trade
 - Commuting with congestion, outside jobs through map-edge connections, neighbor deals
 - Police, fire, health, education, sanitation and parks with funding-dependent coverage
 - Taxes, budget ledger, January review, loans, 18 ordinances, advisors with portraits

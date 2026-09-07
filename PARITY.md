@@ -6,7 +6,7 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 
 | Area | Reference behavior | Current gap |
 | --- | --- | --- |
-| Highways | Elevated routes; ramps provide road access | **Done.** Streets and highways interchange only at on-ramps |
+| Highways | Elevated routes; ramps provide road access | Routing done: streets and highways interchange only at on-ramps. **Open:** they are still drawn flat, and a highway cannot cross an existing road |
 | Tunnels | Transport can pass through terrain | **Done.** Road and rail bores through high ground, six tiles minimum |
 | Power | Eight plant types; aging reduces capacity; prolonged overload can destroy plants | **Done.** All eight types with the manual's invention years; output slides after 55% of a plant's life; a year of overdraw destroys one |
 | Water | Freshwater pumps, towers, coastal desalinization; pumps age | **Done.** Sea and fresh water are distinct; three sources with the manual's weaknesses; pumps age and slow in dirty water; pipes reach seven tiles |
@@ -24,7 +24,8 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 
 | Fire | Per-building flammability, halved by water and cut by ordinance; relief scaled by preparedness | **Done.** See below |
 | Disasters | Permanent radiation after a meltdown; an early warning siren that can be abused | **Done.** See below |
-| Siting | Stops need roads, stations need track, seaports want a seacoast | **Done.** See below |
+| Siting | Stops need roads, stations need track | **Done.** See below |
+| Ports | Airports and seaports are zones the Sims develop, with a minimum footprint | **Done.** See below |
 | Neighbour deals | Purchases meter the deficit with a minimum fee; sales are an obligation; cancelling costs a large penalty | **Done.** See below |
 
 Other systems needing controlled comparisons against the original game include growth thresholds, land value, rewards, petitions and disaster severity. The manual describes behaviors but does not expose all numerical formulas. Exact balance requires repeatable reference-game experiments, not guessed constants.
@@ -298,8 +299,8 @@ original does not have.
 
 Transport splits. **Road** pays for roads, highways, ramps and road tunnels,
 and is what keeps the surface from breaking up. **Mass transit** pays for
-rail, stations, subways, buses, the airport and the seaport, and starving it
-shrinks the reach of every stop and station.
+rail, stations, subways, buses and the port zones, and starving it shrinks the
+reach of every stop and station.
 
 Sanitation loses its slider, as in the original. Landfills, incinerators and
 recycling centres cost what they cost and work at full effect; garbage is a
@@ -332,7 +333,7 @@ afford the penalty is held to its contract.
 
 ## Where a building has to stand, September 7
 
-Three rules the manual gives that the game did not enforce. In each case the
+Rules the manual gives that the game did not enforce. In each case the
 building could be placed anywhere and worked the same, so a mistake was
 invisible.
 
@@ -341,13 +342,11 @@ invisible.
 - *"Once the track is laid, you must place Train Stations on tiles that touch
   the track."* A station with no rail beside it is a building, not an
   interchange, and the same goes for a subway station with no line beneath.
-- *"They must be located along a shoreline to do anything, but if you want to
-  see real results, build one on a seacoast."* A seaport on a river works at
-  40%; one on the sea works fully. The sea-versus-fresh distinction added for
-  the water system is what makes this possible.
 
-None of these refuse the placement. The game lets the mistake happen and then
-quietly does nothing with the building, and the query card says why.
+Neither refuses the placement. The game lets the mistake happen and then
+quietly does nothing with the building, and the query card says why. The
+seaport's berth rule works the same way and now lives with the port zones
+below.
 
 ## Blackouts spread from the edges, September 7
 
@@ -413,6 +412,60 @@ take it upon themselves to assist you in the clean up costs. Be forewarned, a
 Mayor that is well prepared generally receives better treatment."* Losing six
 or more lots to a disaster now draws a relief grant, and a city with funded
 fire and police coverage receives about twice what a neglectful one gets.
+
+## Port zones, September 7
+
+The largest structural gap left by the previous session. Airports and seaports
+were buildings the mayor placed, one of each, at a fixed size. The manual is
+explicit that they are neither:
+
+> *"What actually builds in the Residential, Commercial, Industrial, Airport
+> and Seaport zones is up to the Sims."*
+
+> *"Just like RCI zones, you zone for airports and wait for Sims to develop
+> them. Available in 1930, airports must be at least 3x5 tiles or larger in
+> order to develop. They also require power, water and a road nearby. They
+> will only develop as your city grows and requires outside sources for
+> commerce and industry."*
+
+> *"Seaports must be zoned at least 2x6 tiles or larger in order to develop...
+> They must be located along a shoreline to do anything, but if you want to
+> see real results, build one on a seacoast."*
+
+`src/sim/ports.js` implements all of that. Both are now zone tools priced per
+tile, in the Zones palette rather than Transport, with no density submenu.
+
+**Footprint.** A port takes the largest rectangle of contiguous zone it can
+find at one elevation, up to 8x8, and builds nothing at all below the
+manual's minimum in either orientation. Unlike an RCI block it cannot fall
+back to a smaller lot, so a zone that will never develop says why when
+queried: too small, stepping up a hill, or waiting on power, water or a road.
+
+**When.** Demand is measured against the sector the port serves: one tile of
+airport carries 400 commercial jobs, one tile of seaport 300 industrial ones.
+So the city wants its first minimum-size airport at about **6,000 commercial
+jobs** and its first seaport at about **3,600 industrial jobs**, and wants
+nothing before that. The anchor is the manual's minimum footprint; the jobs
+per tile are calibrated, not recovered from the original game.
+
+**Worth.** A working terminal lifts the sector it serves and, less, the other
+one, because the manual names both sectors for both ports. The lift is capped
+at 20 points per sector, which is what keeps the loop from running away: the
+same commerce the airport grows is what decides whether more airport is
+wanted. Measured over 40 years on a 64x64 coast map, a 5x6 airport and a 2x8
+seaport took commercial jobs from 10,400 to 14,325 and then held steady, with
+demand for more port settling at 16 and 43 out of 100.
+
+**Trade.** *"Seaports and airports are considered connections to all
+neighbors"*, and garbage travels by *"road, highway, rail, or seaport
+connection"*. A standing seaport now opens garbage deals on every side, and
+rail counts for garbage where before only roads did. That test reads only
+persisted tile state, not this month's power: connections are derived before
+the utility networks are, so a `powered` test there would come out differently
+on load than in a running city.
+
+A 5x6 airport employs 540 Sims and a 2x8 seaport 352, which is within a few
+percent of the 500 and 350 the placed buildings carried. Save version 5.
 
 ## Visual and performance work, September 7
 

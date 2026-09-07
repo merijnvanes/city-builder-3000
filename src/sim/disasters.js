@@ -2,7 +2,7 @@
 // saucer, volcano. Fires spread month by month unless fire coverage is
 // strong. Burned lots are cleared.
 import { tileAt, forRadius, NEIGHBORS4 } from "./grid.js";
-import { ZONE_TYPES, BUILDINGS } from "./catalog.js";
+import { ZONE_TYPES, ZONED_TYPES, BUILDINGS } from "./catalog.js";
 import { isAnchor, anchorOf, clearLot, lotTiles } from "./lots.js";
 import { MAX_ELEVATION } from "./terrain.js";
 import { meltdown } from "./power.js";
@@ -22,7 +22,7 @@ export const DISASTERS = {
 };
 
 function developedTiles(city) {
-  return city.tiles.filter((t) => isAnchor(t) && (ZONE_TYPES.has(t.type) ? t.level > 0 : true));
+  return city.tiles.filter((t) => isAnchor(t) && (ZONED_TYPES.has(t.type) ? t.level > 0 : true));
 }
 
 export function ignite(city, t, strength = 2) {
@@ -36,7 +36,9 @@ export function ignite(city, t, strength = 2) {
 }
 
 function damageLot(city, a, rng, severe = false) {
-  if (ZONE_TYPES.has(a.type)) {
+  // A burned-out lot leaves the zone behind, port or RCI: the mayor paid for
+  // the zoning, and the Sims can rebuild on it.
+  if (ZONED_TYPES.has(a.type)) {
     if (a.level > 1 && !severe) a.level--; else clearLot(city, a, { keepZone: true });
   } else if (severe || !rng || rng() < 0.35) {
     clearLot(city, a, { keepZone: false });

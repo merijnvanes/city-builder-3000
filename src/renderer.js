@@ -4,7 +4,7 @@ import { drawMapBackdrop, drawBoat, drawOutageMarkers, drawAirplane } from "./sc
 // fires and the construction preview are drawn every frame on top.
 import { drawCachedArchitecture, hitUncachedArchitecture } from "./architecture-cache.js";
 import { drawArchitecture, heightOf, random } from "./building-art.js";
-import { BUILDINGS } from "./sim/catalog.js";
+import { BUILDINGS, PORT_TYPES } from "./sim/catalog.js";
 import { drawTree } from "./foliage.js";
 import { surfaceColor, drawShoreline } from "./terrain-art.js";
 import { drawStreet, hasStreetLamp, drawStreetLamp, drawVehicle, tunnelPortal, drawTunnelMouth } from "./street-art.js";
@@ -19,6 +19,8 @@ const ZONE_TINT = {
   residential: { fill: "#7ed05a77", edge: "#dcf7b0" },
   commercial: { fill: "#5aa0e077", edge: "#c8e4ff" },
   industrial: { fill: "#e0c04a77", edge: "#fff0b0" },
+  airport: { fill: "#9aa2b077", edge: "#dfe4ec" },
+  seaport: { fill: "#4fa8b077", edge: "#c4ecef" },
 };
 const TILE_W = 32, TILE_H = 16;
 const ELEV_PX = 8; // screen pixels per terrain level at zoom 1
@@ -720,8 +722,10 @@ export class CityRenderer {
     const preview = this.preview?.tiles;
     if (preview?.length) {
       const zone = ZONE_TINT[this.preview.tool];
-      // Zoning: show the lot grid the zone will split into.
-      const lot = zone ? (this.preview.tool === "industrial" && this.preview.density === 1 ? 3 : this.preview.density) : 1;
+      // Zoning: show the lot grid the zone will split into. A port takes the
+      // whole block as one lot, so it gets no grid.
+      const lot = zone && !PORT_TYPES.has(this.preview.tool)
+        ? (this.preview.tool === "industrial" && this.preview.density === 1 ? 3 : this.preview.density) : 1;
       for (const t of preview) {
         if (t.x < 0 || t.y < 0 || t.x >= city.size || t.y >= city.size) continue;
         const good = t.valid && !t.noop;

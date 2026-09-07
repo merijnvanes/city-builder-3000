@@ -21,7 +21,7 @@ describe("the six city services", () => {
 
   test("streets bill the road budget and timetabled services bill transit", () => {
     for (const type of ["road", "highway", "onramp", "tunnel"]) assert.equal(BUILDINGS[type].dept, "road", type);
-    for (const type of ["rail", "railstation", "subway", "substation", "bus", "airport", "seaport"]) assert.equal(BUILDINGS[type].dept, "transit", type);
+    for (const type of ["rail", "railstation", "subway", "substation", "bus"]) assert.equal(BUILDINGS[type].dept, "transit", type);
   });
 
   test("both appear in the budget as separate lines", () => {

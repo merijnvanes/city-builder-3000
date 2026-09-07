@@ -799,7 +799,7 @@ const RECIPES = {
 
 // Undeveloped zone tile: painted lot outline.
 export function drawZoneMarker(r, t) {
-  const c = { residential: "#569238", commercial: "#346d9a", industrial: "#b79c38" }[t.type];
+  const c = { residential: "#569238", commercial: "#346d9a", industrial: "#b79c38", airport: "#7a7f8c", seaport: "#3f7f86" }[t.type];
   r.flat(t.x + 0.035, t.y + 0.035, 0.93, 0.93, 0.25, c);
   for (let a = 0.1; a < 0.9; a += 0.2) r.line(r.project(t.x + a, t.y + 0.05, 0.3), r.project(t.x + a, t.y + 0.95, 0.3), "#d1dcba66", 0.5);
   r.flat(t.x + 0.08, t.y + 0.08, 0.84, 0.025, 0.4, "#e0e0ae"); r.flat(t.x + 0.08, t.y + 0.08, 0.025, 0.84, 0.4, "#e0e0ae");

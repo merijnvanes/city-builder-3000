@@ -1,7 +1,7 @@
 // Construction rules: evaluate() prices a single action without mutating;
 // place() applies it. Multi-tile buildings are placed by their top-left
 // anchor and every footprint tile must be free land.
-import { BUILDINGS, ZONE_COST, ZONE_TYPES, OVERLAY_TOOLS, TOOL_MAP, TECH_YEAR, LEVEL_FEE, ROAD_TYPES } from "./catalog.js";
+import { BUILDINGS, ZONE_COST, PORT_TYPES, ZONED_TYPES, OVERLAY_TOOLS, TOOL_MAP, TECH_YEAR, LEVEL_FEE, ROAD_TYPES } from "./catalog.js";
 import { yearOf } from "./metrics.js";
 import { MAX_ELEVATION } from "./terrain.js";
 
@@ -54,14 +54,19 @@ export function evaluate(city, x, y, tool, options = {}) {
 
   if (tool === "inspect") return noop("", here);
 
-  if (ZONE_TYPES.has(tool)) {
-    if (![1, 2, 3].includes(density)) return fail("Invalid density.");
+  // Zoning, RCI and ports alike: "you zone for airports and wait for Sims to
+  // develop them." A port has one density, and a minimum size instead.
+  if (ZONED_TYPES.has(tool)) {
+    const port = PORT_TYPES.has(tool);
+    const band = port ? 1 : density;
+    if (!port && ![1, 2, 3].includes(density)) return fail("Invalid density.");
+    if (!techAvailable(city, tool)) return fail(`${TOOL_MAP[tool].label} zoning is not available until ${TECH_YEAR[tool]}.`);
     if (t.terrain === "water") return fail("Cannot zone on water.");
-    const cost = ZONE_COST[tool][density];
-    if (t.type === tool && t.density === density) return noop("Zone already set.", here);
-    if (ZONE_TYPES.has(t.type)) {
+    const cost = ZONE_COST[tool][band];
+    if (t.type === tool && t.density === band) return noop("Zone already set.", here);
+    if (ZONED_TYPES.has(t.type)) {
       if (t.lot) return fail("Bulldoze the building before rezoning.");
-      return { ok: true, noop: false, cost, message: `Rezone to ${tool} (density ${density})`, tiles: here };
+      return { ok: true, noop: false, cost, message: port ? `Rezone to ${tool}` : `Rezone to ${tool} (density ${density})`, tiles: here };
     }
     if (t.type !== "empty") return fail("Tile is occupied. Bulldoze first.");
     return { ok: true, noop: false, cost, message: "", tiles: here };
@@ -208,8 +213,8 @@ export function place(city, x, y, tool, options = {}) {
   const t = city.tiles[y * city.size + x];
   const density = options.density ?? 1;
 
-  if (ZONE_TYPES.has(tool)) {
-    t.type = tool; t.density = density; t.level = 0; t.lot = null; t.trees = 0; t.abandoned = false; t.age = 0;
+  if (ZONED_TYPES.has(tool)) {
+    t.type = tool; t.density = PORT_TYPES.has(tool) ? 1 : density; t.level = 0; t.lot = null; t.trees = 0; t.abandoned = false; t.age = 0;
   } else if (OVERLAY_TOOLS.has(tool)) {
     t[tool] = true;
   } else if (tool === "tree") {
@@ -230,7 +235,7 @@ export function place(city, x, y, tool, options = {}) {
   } else if (tool === "bulldoze") {
     if (t.lot) {
       const a = anchorOf(city, t);
-      clearLot(city, a, { keepZone: ZONE_TYPES.has(a.type) });
+      clearLot(city, a, { keepZone: ZONED_TYPES.has(a.type) });
     } else {
       // Surface first; a subway under an empty tile goes on the next pass.
       if (t.type === "empty" && !t.powerline && !t.pipe && !t.trees) t.subway = false;

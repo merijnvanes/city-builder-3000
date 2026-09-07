@@ -12,7 +12,7 @@
 // SimNation may take it upon themselves to assist you in the clean up costs.
 // Be forewarned, a Mayor that is well prepared generally receives better
 // treatment."
-import { BUILDINGS, ZONE_TYPES } from "./catalog.js";
+import { BUILDINGS, ZONE_TYPES, PORT_TYPES, ZONED_TYPES } from "./catalog.js";
 import { isAnchor } from "./lots.js";
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -29,6 +29,10 @@ export function flammability(city, t) {
     f = 34 + (t.level || 0) * 5 + (t.density || 1) * 6;
     if (t.type === "industrial") f += 16;
     if (t.abandoned) f += 18;
+  } else if (PORT_TYPES.has(t.type)) {
+    // Fuel on the apron and cargo on the quay: a terminal burns like a
+    // warehouse district, and only once something has been built there.
+    f = t.lot && t.level ? (t.abandoned ? 52 : 40) : 0;
   } else if (BUILDINGS[t.type]) {
     f = BUILDINGS[t.type].powerOut || BUILDINGS[t.type].waterOut ? 18 : 30;
   } else {
@@ -65,6 +69,6 @@ export function reliefGrant(city, stats, lotsLost) {
 
 export function developedLots(city) {
   let n = 0;
-  for (const t of city.tiles) if (isAnchor(t) && (!ZONE_TYPES.has(t.type) || t.level > 0)) n++;
+  for (const t of city.tiles) if (isAnchor(t) && (!ZONED_TYPES.has(t.type) || t.level > 0)) n++;
   return n;
 }

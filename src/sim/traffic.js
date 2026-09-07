@@ -6,10 +6,11 @@
 // which becomes its traffic level. Trips are assigned twice: the second
 // pass routes around the jams the first pass produced.
 import { forRadius, NEIGHBORS4 } from "./grid.js";
-import { ZONE_TYPES, BUILDINGS } from "./catalog.js";
+import { ZONE_TYPES, PORT_TYPES, BUILDINGS } from "./catalog.js";
 import { isAnchor, capacityOf, lotTiles } from "./lots.js";
 import { roadCapacity } from "./roads.js";
 import { besideWhatItNeeds } from "./siting.js";
+import { portJobs } from "./ports.js";
 
 export const MAX_TRIP = 40;
 // Fallback share for callers without a demographic pyramid. The live value
@@ -87,11 +88,17 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
         t.filled = 0;
         if (entry >= 0) addJobs(entry, t, cap);
       }
-    } else if (BUILDINGS[t.type]?.effects?.jobs) {
-      const entry = entryOf(city, t, kind);
+    } else {
+      // Terminals and the special buildings that carry a payroll.
+      const port = PORT_TYPES.has(t.type);
+      if (!port && !BUILDINGS[t.type]?.effects?.jobs) continue;
+      // A port that has gone dark offers nothing, so clear its tally first.
       t.filled = 0;
-      jobsTotal += BUILDINGS[t.type].effects.jobs;
-      if (entry >= 0) addJobs(entry, t, BUILDINGS[t.type].effects.jobs);
+      const cap = port ? portJobs(city, t) : BUILDINGS[t.type].effects.jobs;
+      if (!cap) continue;
+      const entry = entryOf(city, t, kind);
+      jobsTotal += cap;
+      if (entry >= 0) addJobs(entry, t, cap);
     }
   }
   // Jobs in neighbouring cities at every road that reaches the map edge.

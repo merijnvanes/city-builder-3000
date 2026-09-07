@@ -1,11 +1,12 @@
 // Road access, service coverage, pollution, crime, land value and garbage.
 import { forRadius, tileAt } from "./grid.js";
-import { BUILDINGS, ZONE_TYPES, ACCESS_TYPES, ROAD_TYPES, FUNDED_DEPARTMENTS } from "./catalog.js";
+import { BUILDINGS, ZONE_TYPES, PORT_TYPES, ACCESS_TYPES, ROAD_TYPES, FUNDED_DEPARTMENTS } from "./catalog.js";
 import { ORDINANCES } from "./city.js";
 import { isAnchor, lotTiles, capacityOf } from "./lots.js";
 import { industryTraits } from "./industry.js";
 import { commerceTraits } from "./commerce.js";
 import { sitingFactor } from "./siting.js";
+import { PORTS, portTiles } from "./ports.js";
 import { readPopulation, NATIONAL_EQ, BASE_LIFE_EXPECTANCY } from "./population.js";
 import { ageFactor } from "./wear.js";
 import { DEALS } from "./neighbors.js";
@@ -109,6 +110,10 @@ export function updateServices(city) {
       // Shops take deliveries; offices mostly do not.
       const trade = commerceTraits(t).pollution;
       if (trade > 0.5) addSource(t.x, t.y, 4 * t.density * t.lot.w * trade, 3 + t.density);
+    } else if (PORT_TYPES.has(t.type)) {
+      // Jets and diesel: a terminal fouls the air in proportion to its size.
+      const berth = portTiles(city, t);
+      if (berth) addSource(t.x + (t.lot.w >> 1), t.y + (t.lot.h >> 1), berth * PORTS[t.type].pollution, 4 + Math.max(t.lot.w, t.lot.h));
     } else if (b?.pollution) {
       addSource(t.x + (t.lot.w >> 1), t.y + (t.lot.h >> 1), b.pollution * (t.powered || !b.powerUse ? 1 : 0.4), 5 + b.w);
     }

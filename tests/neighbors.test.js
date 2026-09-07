@@ -1,12 +1,12 @@
-// Neighbour connections, deals, external jobs, passenger rail, airport/seaport.
+// Neighbour connections, deals, external jobs and passenger rail. Port zones
+// have their own file: tests/ports.test.js.
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
 import { createCity, tick, getStats, place, setPolicy, serialize, deserialize, refresh, disaster } from "../src/sim/index.js";
-import { detectConnections, DEALS, cancelPenalty } from "../src/sim/neighbors.js";
+import { detectConnections, dealAvailable, DEALS, cancelPenalty } from "../src/sim/neighbors.js";
 import { findLot, assignLot } from "../src/sim/lots.js";
 import { computeDemand } from "../src/sim/growth.js";
 import { computeMetrics } from "../src/sim/metrics.js";
-import { BUILDINGS } from "../src/sim/catalog.js";
 
 const plains = () => createCity({ seed: 7, layout: "plains", starter: false, hills: 0 });
 const at = (c, x, y) => c.tiles[y * c.size + x];
@@ -262,20 +262,14 @@ describe("transport buildings", () => {
     assert.equal(burning.fire, 0);
     assert.equal(money - c.money, 300);
   });
-  test("seaport needs water and boosts industrial demand; airport is unique", () => {
-    const c = createCity({ seed: 5, layout: "river", starter: false, hills: 0 });
-    const inland = c.tiles.find((t) => t.terrain === "grass" && t.x > 4 && t.x < 20 && t.y > 4 && t.y < 20 && [0, 1, 2, 3].every((dx) => [0, 1, 2, 3].every((dy) => at(c, t.x + dx, t.y + dy).terrain === "grass")));
-    assert.equal(place(c, inland.x, inland.y, "seaport").ok, false);
-    const shore = c.tiles.find((t) => t.terrain !== "water" && t.type === "empty" && t.x > 4 && t.x < c.size - 6 && t.y > 4 && t.y < c.size - 6 &&
-      [0, 1, 2, 3].every((dx) => [0, 1, 2, 3].every((dy) => at(c, t.x + dx, t.y + dy).terrain !== "water")) &&
-      [[-1, 0], [4, 0], [0, -1], [0, 4], [-2, 0], [5, 0], [0, -2], [0, 5]].some(([dx, dy]) => at(c, t.x + dx, t.y + dy)?.terrain === "water"));
-    assert.ok(shore, "shore site");
-    const before = computeDemand(c, computeMetrics(c)).industrial;
-    assert.equal(place(c, shore.x, shore.y, "seaport").ok, true);
-    assert.ok(computeDemand(c, computeMetrics(c)).industrial > before);
-    const site = c.tiles.find((t) => t.x > 20 && t.x < 40 && t.y > 4 && t.y < 20 && [...Array(6)].every((_, dx) => [...Array(5)].every((_, dy) => at(c, t.x + dx, t.y + dy).terrain === "grass" && at(c, t.x + dx, t.y + dy).type === "empty")));
-    assert.equal(place(c, site.x, site.y, "airport").ok, true);
-    const site2 = c.tiles.find((t) => t.x > 4 && t.x < 20 && t.y > 30 && t.y < 50 && [...Array(6)].every((_, dx) => [...Array(5)].every((_, dy) => at(c, t.x + dx, t.y + dy).terrain === "grass" && at(c, t.x + dx, t.y + dy).type === "empty")));
-    assert.equal(place(c, site2.x, site2.y, "airport").ok, false);
+  test("a seaport is a connection to every neighbour, an airport is not", () => {
+    // "Seaports and airports are considered connections to all neighbors",
+    // but garbage travels by "road, highway, rail, or seaport connection".
+    const c = plains();
+    c.money = 5_000_000;
+    assert.equal(dealAvailable(detectConnections(c), "garbage", "north"), false);
+    for (let x = 0; x <= 10; x++) place(c, x, 20, "rail");
+    assert.equal(dealAvailable(detectConnections(c), "garbage", "west"), true, "rail counts too");
+    assert.equal(dealAvailable(detectConnections(c), "garbage", "north"), false, "but only on its own side");
   });
 });

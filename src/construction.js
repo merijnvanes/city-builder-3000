@@ -3,11 +3,11 @@
 // planConstruction prices a drag (rectangle, path or single footprint)
 // without touching the city. applyConstruction re-plans against the live
 // city, checks funds, then commits every eligible tile through sim.place().
-import { TOOL_MAP, BUILDINGS, ZONE_TYPES, evaluate, place, refresh } from "./sim/index.js";
+import { TOOL_MAP, BUILDINGS, ZONED_TYPES, evaluate, place, refresh } from "./sim/index.js";
 
 const MAX_TILES = 128 * 128;
 
-const isRect = (tool) => ZONE_TYPES.has(tool) || tool === "bulldoze" || !!BUILDINGS[tool]?.rect;
+const isRect = (tool) => ZONED_TYPES.has(tool) || tool === "bulldoze" || !!BUILDINGS[tool]?.rect;
 const isPath = (tool) => !!BUILDINGS[tool]?.path;
 const footprint = (tool) => (BUILDINGS[tool] && !BUILDINGS[tool].rect && !BUILDINGS[tool].path ? BUILDINGS[tool] : null);
 

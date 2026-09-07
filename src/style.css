@@ -1414,6 +1414,8 @@ input[type="range"].chrome-slider::-moz-range-thumb {
 .flyout-body .tool-grid { grid-template-columns: repeat(4, 1fr); }
 .flyout-body .tool-btn { padding: 6px 2px 5px; }
 .flyout-body #density-strip { display: flex; align-items: center; gap: 10px; margin-top: 8px; padding: 4px 2px 0; border-top: 1px solid rgba(82,104,127,0.25); }
+/* Airports and seaports share the zone flyout but have one density each. */
+#density-strip.no-density, .flyout-body #density-strip.no-density { display: none; }
 .flyout-body .density-label { width: auto; margin: 0; }
 .flyout-body .density-btns { display: flex; gap: 4px; }
 .flyout-body .density-btn { padding: 4px 12px; font-size: 0.6rem; }

@@ -1,7 +1,8 @@
 // City-wide measurements derived from tile state. Pure and cheap enough to
 // run after every construction action.
-import { BUILDINGS, ZONE_TYPES } from "./catalog.js";
-import { isAnchor, capacityOf } from "./lots.js";
+import { BUILDINGS, ZONE_TYPES, PORT_TYPES } from "./catalog.js";
+import { isAnchor, capacityOf, drawOf } from "./lots.js";
+import { portJobs, portDemandBonus, workingPorts } from "./ports.js";
 import { INDUSTRY_TYPES, industryOf } from "./industry.js";
 import { COMMERCE_TYPES, commerceOf } from "./commerce.js";
 import { sitingFactor } from "./siting.js";
@@ -56,11 +57,17 @@ export function computeMetrics(city) {
         wPolice += (s.police || 0) * cap; wFire += (s.fire || 0) * cap;
       } else if (t.type === "commercial") { jobsCommercial += cap; commerceMix[commerceOf(t)] += cap; }
       else { jobsIndustrial += cap; industryMix[industryOf(t)] += cap; }
+    } else if (PORT_TYPES.has(t.type)) {
+      if (t.abandoned) abandonedLots++;
+      const draw = drawOf(t);
+      if (draw.power) { needPower++; if (t.powered) havePower++; }
+      if (draw.water) { needWater++; if (t.watered) haveWater++; }
+      specialJobs += portJobs(city, t);
     } else {
       const b = BUILDINGS[t.type];
       if (b?.powerUse) { needPower++; if (t.powered) havePower++; }
       if (b?.waterUse) { needWater++; if (t.watered) haveWater++; }
-      // A port or terminal only brings the trade its berth can carry.
+      // A terminal only brings the trade its berth can carry.
       const siting = b?.effects ? sitingFactor(city, t) : 1;
       if (b?.effects?.jobs) specialJobs += Math.round(b.effects.jobs * siting);
       if (b?.effects?.happiness) specialHappiness += b.effects.happiness;
@@ -68,12 +75,19 @@ export function computeMetrics(city) {
     }
   }
 
+  // Ports lift the sectors the manual names them for.
+  for (const [k, v] of Object.entries(portDemandBonus(city))) demandBonus[k] = (demandBonus[k] || 0) + v;
+
   const per = (v) => (population ? v / population : 0);
   const people = readPopulation(city, population);
   const jobs = jobsCommercial + jobsIndustrial + specialJobs;
   const traffic = city._traffic || { unemployment: 0, traffic: 0, congestion: 0, workers: 0, employed: 0, externalJobs: 0 };
   const connections = city._connections || {};
-  const tradeConnections = Object.values(connections).filter((c) => c.road || c.rail).length;
+  // "Seaports and airports are considered connections to all neighbors", so a
+  // working terminal is worth as much outside trade as a road to the border.
+  const ports = workingPorts(city);
+  const tradeConnections = Object.values(connections).filter((c) => c.road || c.rail).length
+    + Math.min(4, ports.airport + ports.seaport);
   const svc = city._svc || { garbage: 0 };
   const pollution = Math.round(per(wPoll));
   const crime = Math.round(per(wCrime));
@@ -107,7 +121,7 @@ export function computeMetrics(city) {
 
   return {
     population, jobs, jobsCommercial, jobsIndustrial, specialJobs, demandBonus,
-    tradeConnections, externalJobs: traffic.externalJobs || 0, connections,
+    tradeConnections, externalJobs: traffic.externalJobs || 0, connections, ports,
     workers: traffic.workers, employed: traffic.employed, unemployment: traffic.unemployment,
     traffic: traffic.traffic, congestion: traffic.congestion,
     pollution, crime, education, health, parks, police, fireCover, industryMix, commerceMix,

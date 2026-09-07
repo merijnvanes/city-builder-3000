@@ -5,6 +5,7 @@
 // and neighbour deals: buying or selling power and water, and exporting or
 // importing garbage. Deals end when their connection is cut.
 import { ROAD_TYPES } from "./catalog.js";
+import { standingPorts } from "./ports.js";
 
 export const SIDES = ["north", "east", "south", "west"];
 const NAMES = ["Ashford", "Brightwater", "Cedar Falls", "Dunmore", "Eastbrook", "Fairhaven", "Glenrock", "Harborview", "Ironvale", "Juniper", "Kingsport", "Lakemont", "Millbridge", "Northgate", "Oakridge", "Pinehurst"];
@@ -72,16 +73,24 @@ function edgeTiles(city, side) {
 }
 
 // { north: { name, road, rail, power, water, roadTiles: [...] }, ... }
+//
+// "Seaports and airports are considered connections to all neighbors", and
+// garbage may travel by "road, highway, rail, or seaport connection". So a
+// working terminal opens the same doors a road to the border does, on every
+// side at once. It carries no roadTiles: outbound commuters still need a real
+// road, and a neighbour deal metered at the connection point needs a wire.
 export function detectConnections(city) {
   const result = {};
+  const ports = standingPorts(city);
   SIDES.forEach((side, index) => {
-    const info = { name: neighborName(city.seed, index), road: 0, rail: 0, power: 0, water: 0, roadTiles: [], powerTiles: [], pipeTiles: [] };
+    const info = { name: neighborName(city.seed, index), road: 0, rail: 0, power: 0, water: 0, port: 0, roadTiles: [], powerTiles: [], pipeTiles: [] };
     for (const t of edgeTiles(city, side)) {
       if (t.type === "road" || t.type === "highway") { info.road++; info.roadTiles.push(t); }
       if (t.type === "rail") info.rail++;
       if (t.powerline) { info.power++; info.powerTiles.push(t); }
       if (t.pipe) { info.water++; info.pipeTiles.push(t); }
     }
+    info.port = ports.seaport;
     result[side] = info;
   });
   return result;
@@ -100,6 +109,8 @@ export function dealAvailable(connections, resource, side) {
   const c = connections?.[side];
   if (!c) return false;
   const needs = DEALS[resource].buy.needs;
+  // Garbage travels by "road, highway, rail, or seaport connection".
+  if (needs === "road") return c.road > 0 || c.rail > 0 || c.port > 0;
   return c[needs] > 0;
 }
 
@@ -108,7 +119,7 @@ export function signDeal(city, resource, side, kind) {
   const connections = detectConnections(city);
   if (!dealAvailable(connections, resource, side)) {
     const needs = DEALS[resource][kind].needs;
-    return { ok: false, message: `Connect a ${needs === "power" ? "power line" : needs === "water" ? "pipe" : "road"} to the ${side} edge first.` };
+    return { ok: false, message: `Connect a ${needs === "power" ? "power line" : needs === "water" ? "pipe" : "road, rail line or seaport"} to the ${side} edge first.` };
   }
   ensureDeals(city)[resource] = { side, kind, since: city.month };
   const d = DEALS[resource][kind];
