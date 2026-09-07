@@ -9,7 +9,7 @@ For extending this standard to all other buildings, follow
 entries in group `civic`; rewards such as City Hall and University remain to do.
 
 Each building has four camera angles and three lighting states: daylight,
-powered night, and unpowered night. The 144 sprites total about 2.82 MiB.
+powered night, and unpowered night. The 144 sprites total about 2.85 MiB.
 No 3D library or model data is loaded by the browser.
 
 | Building | Architectural identity |
@@ -17,7 +17,7 @@ No 3D library or model data is loaded by the browser.
 | Police station | Art Deco limestone precinct, bronze shield and blue glazed entrance |
 | Fire station | Brick firehouse, deep engine portals, slate dormers and hose tower |
 | Jail | County entrance lodge, barred cell block and secure exercise courtyard |
-| Hospital | Modern ward, glazed circulation drum and sheltered emergency entry |
+| Hospital | Stepped white ward wings, medical-cross entrance tower and separate red emergency canopy |
 | School | Brick schoolhouse, bell cupola, play garden and raised learning beds |
 | College | Collegiate quadrangle, four-sided clock tower, cloisters and courtyard fountain |
 | Library | Copper-vaulted reading room, timber archive wing and reading terrace |
@@ -74,3 +74,15 @@ The existing 1440×1000 renderer benchmark measured cached-frame CPU p95 of
 0.8 ms for the 64×64 city and 1.2 ms for the 128×128 city. Browser frame intervals
 were about 16.7–16.8 ms. Camera redraw p95 ranged from 12.2 to 21.2 ms. These are
 local measurements with warm caches, not a cross-device performance guarantee.
+
+## Hospital redesign · 2026-09-07
+
+Replaced the cylindrical stairwell and small rooftop beacon with stepped white
+ward wings and an integrated rectangular entrance core. Large red medical crosses
+face all four sides above the ward roofs. Separate hospital and emergency doors,
+a red emergency canopy and a clear receiving bay distinguish the public approaches.
+
+Rebaked all twelve hospital frames at 32 samples and incrementally packaged only
+this building. The civic asset suite and production build passed. Visually checked
+all rotation/lighting combinations, the gallery at game size and close up, and
+the sample town at normal and enlarged zoom. Other civic exports are unchanged.

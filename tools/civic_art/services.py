@@ -75,31 +75,59 @@ def police():
 
 
 def hospital():
-    base();paving(-5.65,-5.65,11.3,3.2);paving(-5.65,-2.45,1.25,8.05)
-    # A modern healing garden: curved sunlit ward above a lower clinic,
-    # terracotta sunshades, glass stairwell, and a sheltered emergency entry.
-    building(-4.6,-1.75,.2,9.2,5.8,1.85,'white',floors=1,pitched=False)
-    box(-3.0,-.6,2.35,5.8,4.45,4.0,'white',.16)
-    for z in [2.65,3.95,5.25]:
-        for x in [-2.6,-1.75,-.9,-.05,.8,1.65]:window(x,-.64,z,.65,.78,lit=int((x+3)*10)%3==0)
-        for yy in [.05,1.15,2.25,3.35]:window(2.82,yy,z,.7,.8,side='right')
-        box(-3.14,-.83,z+1.02,6.1,4.75,.095,'teal')
-    box(-3.2,-.85,6.35,6.2,4.85,.16,'white')
-    # Four-sided raised medical beacon, integrated into the roof plant room.
-    box(-.7,1.0,6.51,1.4,1.25,.8,'teal')
-    for yy in [.96,2.28]:
-        box(-.12,yy,6.64,.24,.035,.53,'white');box(-.35,yy,6.80,.7,.035,.2,'white')
-    # Teal-glass circulation drum brings a contrasting rounded volume.
-    cyl(3.8,.55,2.25,.78,3.55,'glass',32)
-    for z in [2.3,3.45,4.6,5.8]:cyl(3.8,.55,z,.81,.075,'white',32)
-    cyl(3.8,.55,5.88,.9,.14,'white',32)
-    door(0,-1.85,.2,1.5,1.55,'teal')
-    box(-2.1,-3.3,1.85,4.2,1.55,.13,'white',.06)
-    box(-2.08,-3.32,1.66,4.16,.08,.2,'red');text('EMERGENCY',0,-3.38,1.76,.23,'white')
-    for x in [-1.9,1.9]:cyl(x,-3.1,.2,.045,1.65,'steel')
-    for x in [-4.8,3.3]:planter(x,-4.95,1.6,.8,True)
-    bench(-3.95,-3.8);bench(4,-3.8);tree(-5.15,4.8,size=1.05,seed=4);tree(5.1,4.8,size=1,seed=3)
-    for x in [-2.7,2.7]:lamp(x,-4.6,1.3)
+    base()
+    paving(-5.65,-5.65,11.3,3.25)
+    paving(-5.65,-2.4,1.05,8.05)
+    # Broad inpatient wings step down into an outpatient podium. A rectangular
+    # entrance core replaces the ambiguous cylindrical circulation tower.
+    building(-4.65,-1.8,.2,9.3,6.15,2.05,'white',floors=1,pitched=False)
+    box(-4.25,-.75,2.39,8.5,4.65,3.25,'white',.08)
+    for floor,z in enumerate([2.8,4.2]):
+        for yy,side in [(-.76,'front'),(3.91,'back')]:
+            for i,x in enumerate([-3.65,-2.65,-1.65,1.65,2.65,3.65]):
+                window(x,yy,z,.78,.92,side=side,lit=(i+floor)%3==0)
+        for xx,side in [(-4.26,'left'),(4.26,'right')]:
+            for i,y in enumerate([-.05,1.05,2.15,3.25]):
+                window(xx,y,z,.78,.92,side=side,lit=(i+floor)%3==1)
+        box(-4.36,-.86,z+1.08,8.72,4.87,.12,'teal')
+    # Recessed flat roof and parapets keep the ward silhouette clean.
+    box(-4.4,-.9,5.64,8.8,4.95,.16,'white')
+    box(-4.12,-.62,5.8,8.24,4.39,.06,'slate')
+    for x in [-4.33,4.19]:box(x,-.83,5.8,.14,4.81,.22,'white')
+    for y in [-.83,3.84]:box(-4.33,y,5.8,8.66,.14,.22,'white')
+    # Continuous entrance / lift core, with large medical crosses on all four
+    # elevations. Its crown rises above the wings, so rear views still read.
+    box(-1.12,-1.98,.2,2.24,6.02,7.05,'white',.07)
+    for yy in [-2.01,4.07]:
+        box(-.78,yy,.42,1.56,.04,4.66,'glass')
+        for z in [1.95,3.45,4.95]:box(-.82,yy-.01,z,1.64,.065,.12,'teal')
+        for x in [-.28,.25]:box(x,yy-.025,.42,.035,.08,4.65,'white')
+        box(-.23,yy-.03,5.65,.46,.09,1.28,'red')
+        box(-.64,yy-.035,6.06,1.28,.10,.46,'red')
+    for xx in [-1.16,1.13]:
+        box(xx,.69,6.1,.04,.34,.96,'red')
+        box(xx,.38,6.41,.045,.96,.34,'red')
+    box(-1.24,-2.1,7.25,2.48,6.26,.17,'white')
+    # Main entrance and separate emergency receiving bay: both have clear,
+    # sheltered, step-free access from the paved frontage.
+    door(0,-2.1,.2,1.45,1.65,'teal')
+    box(-1.36,-2.21,2.16,2.72,.12,.49,'teal')
+    text('HOSPITAL',0,-2.35,2.41,.37,'white')
+    box(-1.42,-3.16,1.98,2.84,1.15,.14,'white',.05)
+    door(3.15,-1.92,.2,1.5,1.6,'teal')
+    box(1.7,-3.65,1.97,3.35,1.85,.15,'white',.05)
+    box(1.7,-3.68,1.62,3.35,.13,.36,'red')
+    text('EMERGENCY',3.375,-3.83,1.8,.28,'white')
+    box(4.93,-3.65,1.62,.13,1.85,.36,'red')
+    for x in [1.87,4.87]:box(x,-3.43,.2,.085,.085,1.77,'steel')
+    paving(1.65,-5.5,3.5,1.65,'asphalt',z=.205)
+    for x in [1.82,4.92]:box(x,-5.36,.25,.045,1.35,.008,'yellow',0)
+    # Quiet planted waiting garden, kept clear of the emergency approach.
+    planter(-5.1,-4.95,2.85,.65,True)
+    bench(-3.7,-3.85)
+    tree(-5.1,4.95,size=.9,seed=4)
+    tree(5.08,4.95,size=.85,seed=3)
+    lamp(-1.85,-4.6,1.4)
 
 
 def school():

@@ -233,114 +233,114 @@ export const CIVIC_SPRITES = {
   "hospital": {
     "tiles": 3,
     "scale": 3,
-    "height": 73,
+    "height": 74,
     "frames": {
       "day-0": {
-        "file": "hospital-day-0.1f12e5908d.webp",
+        "file": "hospital-day-0.39169d860e.webp",
         "width": 570,
-        "height": 427,
+        "height": 432,
         "anchor": [
           285.0,
-          280.606
+          285.606
         ]
       },
       "day-1": {
-        "file": "hospital-day-1.d74be05256.webp",
+        "file": "hospital-day-1.03db53a06c.webp",
         "width": 570,
-        "height": 389,
+        "height": 407,
         "anchor": [
           285.0,
-          242.6058
+          260.6058
         ]
       },
       "day-2": {
-        "file": "hospital-day-2.11651da8c2.webp",
+        "file": "hospital-day-2.c9c506536a.webp",
         "width": 570,
-        "height": 386,
+        "height": 407,
         "anchor": [
           285.0,
-          239.6058
+          260.6058
         ]
       },
       "day-3": {
-        "file": "hospital-day-3.837b93f198.webp",
+        "file": "hospital-day-3.fb5f0bec90.webp",
         "width": 570,
-        "height": 424,
+        "height": 432,
         "anchor": [
           285.0,
-          277.606
+          285.606
         ]
       },
       "night-0": {
-        "file": "hospital-night-0.eba71c587e.webp",
+        "file": "hospital-night-0.7ca10d27ab.webp",
         "width": 570,
-        "height": 427,
+        "height": 432,
         "anchor": [
           285.0,
-          280.606
+          285.606
         ]
       },
       "night-1": {
-        "file": "hospital-night-1.0d72b59e3e.webp",
+        "file": "hospital-night-1.ded7495339.webp",
         "width": 570,
-        "height": 389,
+        "height": 407,
         "anchor": [
           285.0,
-          242.6058
+          260.6058
         ]
       },
       "night-2": {
-        "file": "hospital-night-2.908535786d.webp",
+        "file": "hospital-night-2.112f6b9fd0.webp",
         "width": 570,
-        "height": 386,
+        "height": 407,
         "anchor": [
           285.0,
-          239.6058
+          260.6058
         ]
       },
       "night-3": {
-        "file": "hospital-night-3.5ff74b25e3.webp",
+        "file": "hospital-night-3.223422fd61.webp",
         "width": 570,
-        "height": 424,
+        "height": 432,
         "anchor": [
           285.0,
-          277.606
+          285.606
         ]
       },
       "unpowered-0": {
-        "file": "hospital-unpowered-0.4f3aba5295.webp",
+        "file": "hospital-unpowered-0.5fa23d9f9a.webp",
         "width": 570,
-        "height": 427,
+        "height": 432,
         "anchor": [
           285.0,
-          280.606
+          285.606
         ]
       },
       "unpowered-1": {
-        "file": "hospital-unpowered-1.891e41c136.webp",
+        "file": "hospital-unpowered-1.afcf52562a.webp",
         "width": 570,
-        "height": 389,
+        "height": 407,
         "anchor": [
           285.0,
-          242.6058
+          260.6058
         ]
       },
       "unpowered-2": {
-        "file": "hospital-unpowered-2.c122cb7f11.webp",
+        "file": "hospital-unpowered-2.ba1678562b.webp",
         "width": 570,
-        "height": 386,
+        "height": 407,
         "anchor": [
           285.0,
-          239.6058
+          260.6058
         ]
       },
       "unpowered-3": {
-        "file": "hospital-unpowered-3.c5453ea636.webp",
+        "file": "hospital-unpowered-3.d336e7a4bc.webp",
         "width": 570,
-        "height": 424,
+        "height": 432,
         "anchor": [
           285.0,
-          277.606
+          285.606
         ]
       }
     }
