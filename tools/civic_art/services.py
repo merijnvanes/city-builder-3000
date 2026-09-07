@@ -13,10 +13,16 @@ def fire():
         box(x-.85,-1.93,.25,1.7,.07,1.92,'red')
         for j in range(7):box(x-.82,-1.98,.33+j*.23,1.64,.025,.025,'bricklight',0)
         for dx in [-.56,0,.56]:box(x+dx-.21,-2.0,1.38,.42,.016,.32,'glasslight',.015)
-        # Curved stone voussoirs and recessed fanlight over each door.
-        for j in range(13):
-            a=j/12*math.pi;ball(x+math.cos(a)*1.01,-1.83,2.37+math.sin(a)*.47,.095,'cream',scale=(1,.65,1),sub=1)
-        text(f'0{i+1}',x,-1.88,3.33,.28,'cream')
+        # Recessed arched fanlight and individual wedge-cut masonry blocks.
+        arc=[(x,-1.94,2.30)]+[(x+math.cos(j/16*math.pi)*.92,-1.94,2.30+math.sin(j/16*math.pi)*.43) for j in range(17)]
+        mesh('dark arched fanlight',arc,[(0,j+1,j+2) for j in range(16)],'glass')
+        for j in range(11):
+            a=j/11*math.pi+.018;b=(j+1)/11*math.pi-.018
+            ring=[(x+math.cos(a)*.94,2.30+math.sin(a)*.45),(x+math.cos(b)*.94,2.30+math.sin(b)*.45),(x+math.cos(b)*1.09,2.30+math.sin(b)*.62),(x+math.cos(a)*1.09,2.30+math.sin(a)*.62)]
+            verts=[(xx,yy,zz) for yy in [-1.99,-1.77] for xx,zz in ring]
+            stone=mesh('arch voussoir',verts,[(0,1,2,3),(4,7,6,5),(0,4,5,1),(1,5,6,2),(2,6,7,3),(3,7,4,0)],'cream')
+            bevel=stone.modifiers.new('worn stone arris','BEVEL');bevel.width=.012;bevel.segments=2
+        text(f'0{i+1}',x,-2.035,2.06,.18,'cream')
         box(x-.9,-4.7,.205,.035,2.4,.008,'yellow',0);box(x+.865,-4.7,.205,.035,2.4,.008,'yellow',0)
         window(x,-1.73,3,.5,.65,lit=i==1)
     for yy in [0,1.45,2.9]:window(4.71,yy,1.25,side='right');window(4.71,yy,2.8,side='right')
@@ -28,7 +34,7 @@ def fire():
         for j in range(5):box(-4.7,yy,5.08+j*.14,1.65,.11,.06,'slate')
     hip(-5.32,.98,6.65,2.89,3.69,1.15,'slate')
     cyl(-3.875,2.825,7.8,.075,.22,'gold')
-    box(-3.1,-1.85,2.7,6.9,.1,.34,'red');text('FIRE STATION',.35,-1.96,2.86,.27,'cream')
+    box(-3.1,-1.85,3.72,6.9,.1,.32,'red');text('FIRE STATION',.35,-1.96,3.88,.27,'cream')
     # Dormers, ridge vents, chimney and gutter downpipes.
     for yy in [-.7,1.4,3.5]:
         box(.4,yy,5.15,1.05,.8,.8,'brick');window(.93,yy-.03,5.28,.5,.48);roof(.3,yy-.08,5.95,1.25,.96,.45,'slate')

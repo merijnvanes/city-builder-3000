@@ -121,7 +121,7 @@ export const CIVIC_SPRITES = {
     "height": 80,
     "frames": {
       "day-0": {
-        "file": "fire-day-0.b76f4830c6.webp",
+        "file": "fire-day-0.57fd49f964.webp",
         "width": 570,
         "height": 466,
         "anchor": [
@@ -130,7 +130,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "day-1": {
-        "file": "fire-day-1.7e9e7b81d0.webp",
+        "file": "fire-day-1.86ad69401e.webp",
         "width": 570,
         "height": 399,
         "anchor": [
@@ -139,7 +139,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "day-2": {
-        "file": "fire-day-2.7c58f98f60.webp",
+        "file": "fire-day-2.8a732ecddd.webp",
         "width": 570,
         "height": 359,
         "anchor": [
@@ -148,7 +148,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "day-3": {
-        "file": "fire-day-3.624a222d02.webp",
+        "file": "fire-day-3.a2eb36c498.webp",
         "width": 570,
         "height": 439,
         "anchor": [
@@ -157,7 +157,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "night-0": {
-        "file": "fire-night-0.74a4705f6e.webp",
+        "file": "fire-night-0.7f900e4624.webp",
         "width": 570,
         "height": 466,
         "anchor": [
@@ -166,7 +166,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "night-1": {
-        "file": "fire-night-1.486d438807.webp",
+        "file": "fire-night-1.af92b59582.webp",
         "width": 570,
         "height": 399,
         "anchor": [
@@ -175,7 +175,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "night-2": {
-        "file": "fire-night-2.0a253b5642.webp",
+        "file": "fire-night-2.bccb610857.webp",
         "width": 570,
         "height": 359,
         "anchor": [
@@ -184,7 +184,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "night-3": {
-        "file": "fire-night-3.0978246ff5.webp",
+        "file": "fire-night-3.0aa85b65dc.webp",
         "width": 570,
         "height": 439,
         "anchor": [
@@ -193,7 +193,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "unpowered-0": {
-        "file": "fire-unpowered-0.c3af751e50.webp",
+        "file": "fire-unpowered-0.6a57d45ddd.webp",
         "width": 570,
         "height": 466,
         "anchor": [
@@ -202,7 +202,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "unpowered-1": {
-        "file": "fire-unpowered-1.8e6c94321a.webp",
+        "file": "fire-unpowered-1.1182d397de.webp",
         "width": 570,
         "height": 399,
         "anchor": [
@@ -211,7 +211,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "unpowered-2": {
-        "file": "fire-unpowered-2.3d589d8caa.webp",
+        "file": "fire-unpowered-2.1a5da63237.webp",
         "width": 570,
         "height": 359,
         "anchor": [
@@ -220,7 +220,7 @@ export const CIVIC_SPRITES = {
         ]
       },
       "unpowered-3": {
-        "file": "fire-unpowered-3.44e77801cc.webp",
+        "file": "fire-unpowered-3.f0672adf7b.webp",
         "width": 570,
         "height": 439,
         "anchor": [

@@ -53,6 +53,12 @@ try {
     const coldPortrait = portraitCanvas.toDataURL();
     await preloadCivicSprites({ types: ['police'] });
     const portraitRefreshed = portraitCanvas.toDataURL() !== coldPortrait;
+    // Keep one actual game view pinned while other views fill the LRU.
+    const pinned = Object.assign(Object.create(CityRenderer.prototype), {
+      ...r, rotation: 0, night: false, pickables: [], dirty: false, paintEpoch: 1,
+    });
+    drawCachedArchitecture(pinned, tile, city);
+    const pinnedCanvas = pinned.pickables[0].canvas;
     const hashes = [];
     for (const state of ['day', 'night', 'unpowered']) for (let rotation = 0; rotation < 4; rotation++) {
       await preloadCivicSprites({ rotation, night: state !== 'day', powered: state !== 'unpowered' });
@@ -69,8 +75,25 @@ try {
       }
       if (civicSpriteStats().decodedBytes > civicSpriteStats().maxDecodedBytes) throw new Error('Decoded sprite budget exceeded');
     }
-    return { portraitRefreshed, coldEntries, fallbackReleased, invalidated, initialBlits: blits - 144, sharedCanvases, solidHit, clearHit, variants: new Set(hashes).size, stats: civicSpriteStats() };
+    pinned.pickables = []; pinned.dirty = false;
+    drawCachedArchitecture(pinned, tile, city);
+    const activeViewRetained = pinned.pickables[0].canvas === pinnedCanvas;
+    // Exercise alpha picking at Retina snapping and non-integer zoom in every view.
+    let retinaPicks = 0;
+    for (let rotation = 0; rotation < 4; rotation++) {
+      await preloadCivicSprites({ types: ['fire'], rotation });
+      r.rotation = rotation; r.night = false; r.zoom = 1.75; r.dpr = 2; r.dirty = false; r.pickables = [];
+      drawCachedArchitecture(r, tile, city);
+      const hit = r.pickables[0], mask = hit.canvas.getContext('2d').getImageData(0, 0, hit.canvas.width, hit.canvas.height).data;
+      let pixel = 0; while (pixel < mask.length / 4 && mask[pixel * 4 + 3] < 250) pixel++;
+      const px = hit.x + ((pixel % hit.canvas.width) + .5) / hit.canvas.width * hit.w;
+      const py = hit.y + (Math.floor(pixel / hit.canvas.width) + .5) / hit.canvas.height * hit.h;
+      if (r.pickObject(px, py).x === tile.x) retinaPicks++;
+    }
+    return { activeViewRetained, retinaPicks, portraitRefreshed, coldEntries, fallbackReleased, invalidated, initialBlits: blits - 150, sharedCanvases, solidHit, clearHit, variants: new Set(hashes).size, stats: civicSpriteStats() };
   });
+  assert.equal(result.activeViewRetained, true, 'active view survives background cache churn');
+  assert.equal(result.retinaPicks, 4, 'Retina picking works in all four views');
   assert.equal(result.portraitRefreshed, true, 'cold inspection portrait redraws automatically');
   assert.equal(result.coldEntries, 1);
   assert.equal(result.fallbackReleased, true, 'temporary procedural canvas is released');

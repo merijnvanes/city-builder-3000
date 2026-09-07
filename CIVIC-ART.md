@@ -57,3 +57,16 @@ The civic suite verifies catalog completeness, compressed size, cold-load
 redraw, release of fallback canvases, shared image reuse, a single blit per
 instance, distinct rotation/lighting states, alpha picking and bounded decoded
 memory. It also exports visual contact sheets in `artifacts/`.
+
+## Validation snapshot
+
+Validated in local Chrome on 2026-09-07: 302 Node tests, the civic asset suite,
+640 direct/cached rendering comparisons, the full gameplay browser smoke test,
+and the production build hosted beneath `/nested/` all passed. The asset suite
+also checks automatic portrait refresh, active-view retention during cache
+churn, and Retina alpha picking in all four rotations.
+
+The existing 1440×1000 renderer benchmark measured cached-frame CPU p95 of
+0.8 ms for the 64×64 city and 1.2 ms for the 128×128 city. Browser frame intervals
+were about 16.7–16.8 ms. Camera redraw p95 ranged from 12.2 to 21.2 ms. These are
+local measurements with warm caches, not a cross-device performance guarantee.
