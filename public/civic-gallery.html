@@ -13,7 +13,6 @@
 <main><p class="note">These are the actual transparent game sprites. No 3D rendering runs in this page or in the game.</p><p id="error" role="alert"></p><div id="collection"></div></main>
 <footer>Original architecture · Four camera angles · Three lighting states · Shared, compressed browser assets</footer>
 <script type="module">
-const descriptions={};
 const requestedFamily=new URLSearchParams(location.search).get('family');
 const family=['civic','power','water','parks'].includes(requestedFamily)?requestedFamily:'civic';
 let catalog,state='day',rotation=0,detail=false;
@@ -23,8 +22,8 @@ function update(){
   document.querySelectorAll('[data-state]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.state===state));
   document.querySelectorAll('[data-detail]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.detail===String(detail)));
   document.querySelector('#angle').textContent=`${rotation+1} / 4`;
-  for(const {type,stage,img} of cards){
-    const spec=catalog[type],f=spec.frames[`${state}-${rotation}`];if(!f)continue;
+  for(const {type,variant,stage,img} of cards){
+    const spec=catalog[type],f=spec.frames[`${state}-${rotation}${variant?`-v${variant}`:''}`];if(!f)continue;
     const zoom=Math.min(detail?2.6:1,(stage.clientWidth-36)/(spec.tiles*64),(stage.clientHeight-30)/(f.height/spec.scale));
     img.src=`./assets/civic/${f.file}`;
     img.style.width=`${f.width/spec.scale*zoom}px`;
@@ -53,15 +52,16 @@ try{
     document.title='Parks Collection · City Builder 3000';
     document.querySelector('.eyebrow').textContent='City Builder 3000 · Asset Collection 04';
     document.querySelector('h1').textContent='Room to breathe and explore.';
-    document.querySelector('header p').textContent='A shaded neighborhood garden, a landscaped park with a bandstand, and a zoo full of distinctive habitats. Places to rest, gather, and discover.';
+    document.querySelector('header p').textContent='Three neighborhood gardens, a landscaped park with a bandstand, and a zoo full of distinctive habitats. Places to rest, gather, and discover.';
   }
-  for(const [type,spec] of Object.entries(catalog))if(spec.family===family)descriptions[type]=[spec.label,spec.description];
-  for(const [type,[label,description]] of Object.entries(descriptions)){
+  for(const [type,spec] of Object.entries(catalog).filter(([,spec])=>spec.family===family))
+  for(const [variant,layout] of (spec.variants || [{label:spec.label,description:spec.description}]).entries()){
+    const label=spec.variants?`${spec.label} · ${layout.label}`:layout.label,description=layout.description;
     const figure=document.createElement('figure');figure.className='card';
     const stage=document.createElement('div');stage.className='stage';
     const img=document.createElement('img');img.alt=label;img.decoding='async';stage.append(img);
     const caption=document.createElement('figcaption');caption.innerHTML=`<span class="index">${String(cards.length+1).padStart(2,'0')} / ${family.toUpperCase()}</span><h2>${label}</h2><p class="description">${description}</p>`;
-    figure.append(stage,caption);document.querySelector('#collection').append(figure);cards.push({type,stage,img});
+    figure.append(stage,caption);document.querySelector('#collection').append(figure);cards.push({type,variant,stage,img});
   }
   document.querySelectorAll('[data-state]').forEach(b=>b.onclick=()=>{state=b.dataset.state;update()});
   document.querySelectorAll('[data-detail]').forEach(b=>b.onclick=()=>{detail=b.dataset.detail==='true';update()});

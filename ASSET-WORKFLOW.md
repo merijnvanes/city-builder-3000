@@ -43,7 +43,7 @@ rewards and landmarks are separate assets.
 | Power | Complete: `coal`, `oil`, `gas`, `nuclear`, `wind`, `solar`, `microwave`, `fusion`; see [POWER-ART.md](POWER-ART.md) |
 | Water | Complete: `waterpump`, `watertower`, `desalination`, `treatment`; see [WATER-ART.md](WATER-ART.md) |
 | Transport buildings | `bus`, `railstation`, `substation`, `airport` (6×5), `seaport` |
-| Parks | Complete: `park`, `largepark`, `zoo`; see [PARKS-ART.md](PARKS-ART.md) |
+| Parks | Complete: `park` (three layouts), `largepark`, `zoo`; see [PARKS-ART.md](PARKS-ART.md) |
 | Rewards | `mayorhouse`, `cityhall`, `courthouse`, `stadium`, `statue`, `marina`, `university`, `medcenter` |
 | Landmarks | `clocktower`, `operahouse`, `observatory`, `cathedral`, `aquarium` |
 | Business deals | `prison`, `casino`, `toxicdump`, `armybase`, `gigamall` |
@@ -76,7 +76,8 @@ incremental migration.
   `src/architecture-cache.js` for actual state semantics before choosing keys.
   Preserve abandonment, undeveloped lots and any construction or disaster overlays.
   A single beautiful house is not complete residential coverage.
-- Define a finite variant set and render matrix before baking. Avoid multiplying
+- Preserve existing visual variance when replacing procedural art; audit seed-driven
+  layout branches first. Define a finite variant set and render matrix before baking. Avoid multiplying
   every cosmetic detail into another downloaded/decoded frame. Show development
   through architecture, while retaining stable visual identity across redraws.
 - Keep on-demand loading, shared decoded frames and bounded memory. Current civic

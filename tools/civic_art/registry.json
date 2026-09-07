@@ -172,7 +172,24 @@
     "tiles": 1,
     "family": "parks",
     "label": "Small park",
-    "description": "A shaded pocket garden with crossing gravel paths, timber seating, and flowering borders."
+    "description": "Three neighborhood layouts: a fountain garden, gazebo garden, and playground.",
+    "variants": [
+      {
+        "model": "park",
+        "label": "Fountain garden",
+        "description": "A stone fountain, flower beds, and shade trees around crossing paths."
+      },
+      {
+        "model": "park_gazebo",
+        "label": "Gazebo garden",
+        "description": "A copper-roofed garden shelter, shaded seating, and flowering borders."
+      },
+      {
+        "model": "park_playground",
+        "label": "Playground",
+        "description": "A timber swing, a small slide, and a sandy play area among trees."
+      }
+    ]
   },
   "largepark": {
     "module": "parks",

@@ -1,3 +1,4 @@
+import { spriteVariant, spriteFrameKey } from './architecture-variation.js';
 import { CIVIC_SPRITES } from './civic-sprite-manifest.js';
 
 // Authored models are baked offline. One decoded image is shared by every lot
@@ -25,9 +26,9 @@ function active(entry) {
   return false;
 }
 
-function requestFrame(type, state, rotation, owner) {
+function requestFrame(type, state, rotation, owner, variant = 0) {
   const spec = CIVIC_SPRITES[type];
-  const frame = spec?.frames[`${state}-${rotation}`];
+  const frame = spec?.frames[spriteFrameKey(state, rotation, variant)];
   if (!frame || typeof Image === 'undefined') return null;
   const key = frame.file;
   let entry = entries.get(key);
@@ -77,9 +78,13 @@ function requestFrame(type, state, rotation, owner) {
   return entry;
 }
 
-export async function preloadCivicSprites({ rotation = 0, night = false, powered = true, owner, types = Object.keys(CIVIC_SPRITES) } = {}) {
+export async function preloadCivicSprites({ rotation = 0, night = false, powered = true, owner, variant, types = Object.keys(CIVIC_SPRITES) } = {}) {
   const state = night ? powered ? 'night' : 'unpowered' : 'day';
-  return Promise.all(types.map(type => requestFrame(type, state, rotation, owner)?.ready));
+  return Promise.all(types.flatMap(type => {
+    const count = CIVIC_SPRITES[type]?.variants?.length || 1;
+    const selected = count === 1 ? [0] : variant === undefined ? Array.from({ length: count }, (_, i) => i) : [variant];
+    return selected.map(index => requestFrame(type, state, rotation, owner, index)?.ready);
+  }));
 }
 
 export function civicSpriteStats() {
@@ -90,7 +95,7 @@ export function drawCivicSprite(r, t) {
   const spec = CIVIC_SPRITES[t.type];
   if (!spec || !t.lot || !r.base?.drawImage || t.lot.w !== spec.tiles || t.lot.h !== spec.tiles) return null;
   const state = r.night ? t.powered === false ? 'unpowered' : 'night' : 'day';
-  const entry = requestFrame(t.type, state, r.rotation || 0, r.atlasOwner || r);
+  const entry = requestFrame(t.type, state, r.rotation || 0, r.atlasOwner || r, spriteVariant(t, spec.variants?.length || 1));
   if (!entry?.canvas) return null;
   const { frame, canvas } = entry;
   const center = r.project(t.lot.x + t.lot.w / 2, t.lot.y + t.lot.h / 2);

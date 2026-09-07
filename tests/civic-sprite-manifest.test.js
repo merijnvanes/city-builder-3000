@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, statSync } from 'node:fs';
 import { CIVIC_SPRITES } from '../src/civic-sprite-manifest.js';
-import { belongsToFamily, FAMILY_COUNTS } from './art-families.mjs';
+import { belongsToFamily, FAMILY_COUNTS, EXPECTED_VARIANTS } from './art-families.mjs';
 import { BUILDINGS } from '../src/sim/catalog.js';
 
 test('every civic, power, water and park building ships all four angles and three lighting states', () => {
@@ -19,10 +19,14 @@ test('every civic, power, water and park building ships all four angles and thre
     assert.equal(spec.tiles, registry[type].tiles);
     assert.equal(spec.tiles, BUILDINGS[type].w);
     assert.equal(BUILDINGS[type].w, BUILDINGS[type].h);
-    assert.equal(Object.keys(spec.frames).length, 12);
+    const variants = EXPECTED_VARIANTS[type] || 1;
+    assert.equal(spec.variants?.length || 1, variants);
+    assert.deepEqual(spec.variants, registry[type].variants);
+    assert.equal(Object.keys(spec.frames).length, 12 * variants);
     assert.ok(spec.height > 0 && spec.height < 150);
+    for (let variant = 0; variant < variants; variant++)
     for (const state of ['day', 'night', 'unpowered']) for (let rotation = 0; rotation < 4; rotation++) {
-      const frame = spec.frames[`${state}-${rotation}`];
+      const frame = spec.frames[`${state}-${rotation}${variant?`-v${variant}`:''}`];
       const url = new URL(`../public/assets/civic/${frame.file}`, import.meta.url);
       const data = readFileSync(url);
       assert.equal(data.toString('ascii', 0, 4), 'RIFF');
@@ -34,8 +38,8 @@ test('every civic, power, water and park building ships all four angles and thre
       else compressedBytes += statSync(url).size;
     }
   }
-  // Preserve the existing families' ceiling; give the new 36-frame parks slice
+  // Preserve the existing families' ceiling; give the new 60-frame parks slice
   // its own explicit budget rather than weakening their regression guard.
-  assert.ok(parksBytes < 0.75 * 1024 * 1024, '36 park frames stay below 0.75 MiB');
+  assert.ok(parksBytes < 0.75 * 1024 * 1024, '60 park frames stay below 0.75 MiB');
   assert.ok(compressedBytes < 6 * 1024 * 1024, 'the combined civic/power/water asset set stays below 6 MiB');
 });

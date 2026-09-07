@@ -19,7 +19,7 @@
     "art:water": "blender --background --factory-startup --python tools/civic_art/render.py -- --types water --states day,night,unpowered --rotations 0,1,2,3 --samples 32 && python3 tools/civic_art/package.py --types water",
     "test:water": "ART_FAMILY=water node tests/power-sprites.mjs && ART_FAMILY=water node tests/civic-art.mjs",
     "art:parks": "blender --background --factory-startup --python tools/civic_art/render.py -- --types parks --states day,night,unpowered --rotations 0,1,2,3 --samples 32 && python3 tools/civic_art/package.py --types parks",
-    "test:parks": "ART_FAMILY=parks node tests/power-sprites.mjs && ART_FAMILY=parks node tests/civic-art.mjs"
+    "test:parks": "node --test tests/architecture-variation.test.js && node tests/park-variants.mjs && ART_FAMILY=parks node tests/power-sprites.mjs && ART_FAMILY=parks node tests/civic-art.mjs"
   },
   "devDependencies": {
     "vite": "^7.0.0",

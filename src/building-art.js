@@ -10,10 +10,8 @@ import { drawPocketPark, drawGardenPark } from "./park-art.js";
 // Original procedural architecture for every lot. A recipe draws into the
 // lot rectangle using fractions of its width/depth, so the same recipe fits
 // 1×1, 2×2 and 3×3 lots. Heights are in renderer z units (≈ pixels at zoom 1).
-export const random = (x, y, n = 0) => {
-  const v = Math.sin(x * 127.1 + y * 311.7 + n * 73.3) * 43758.5453;
-  return v - Math.floor(v);
-};
+import { random } from './architecture-variation.js';
+export { random } from './architecture-variation.js';
 const pick = (list, n) => list[Math.floor(n * list.length) % list.length];
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 

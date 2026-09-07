@@ -11,23 +11,71 @@ def rock(x,y,z,size=1):
     return ball(x,y,z,size,'paving',scale=(1,.8,.63),sub=1)
 
 
-def park():
+def pocket_ground():
     base(4)
-    # Paths meet the middle of every edge, joining adjacent painted park tiles.
+    # Keep intersections disjoint and paths aligned between neighboring lots.
     paving(-.32,-1.79,.64,1.47,'path')
     paving(-.32,.32,.64,1.47,'path')
     paving(-1.79,-.32,3.58,.64,'path')
-    tree(-1.02,.98,size=.92,seed=51)
-    tree(1.03,1.03,size=.65,seed=52)
-    # A timber seat in a low planted nook; no monument crowds a one-tile garden.
-    bench(.91,.38,math.pi)
-    planter(.48,-1.5,1.0,.61,True)
-    box(-1.52,-1.5,.16,.81,.72,.13,'ivory')
-    box(-1.45,-1.43,.29,.67,.58,.04,'soil')
-    for x,y in [(-1.25,-1.18),(-.92,-1.2)]:
-        ball(x,y,.46,.23,'hedge')
-        ball(x,y,.67,.095,'purple')
-    lamp(-.57,-.5,1.15)
+
+
+def park():
+    pocket_ground()
+    tree(-1.08,1.04,size=.8,seed=51)
+    tree(1.1,-1.06,size=.66,seed=52)
+    planter(-1.56,-1.5,1.05,.72,True)
+    planter(.54,.75,1.0,.64,True)
+    # A raised stone bowl with recessed water and a small upper dish.
+    cyl(0,0,.2,.59,.14,'ivory',40)
+    cyl(0,0,.34,.49,.045,'water',40)
+    from power_common import ring
+    ring(0,0,.39,.53,.065,'cream')
+    cyl(0,0,.38,.09,.46,'cream',20)
+    cyl(0,0,.84,.27,.08,'ivory',32,r2=.31)
+    cyl(0,0,.92,.23,.018,'water',32)
+    cyl(0,0,.94,.035,.18,'cream',16)
+    bench(.95,.35,math.pi)
+    lamp(-.6,-.45,1.15)
+
+
+def park_gazebo():
+    pocket_ground()
+    # A sheltered corner rather than a recolored fountain layout.
+    box(-1.58,.43,.16,1.25,1.2,.2,'ivory')
+    for x in [-1.46,-.45]:
+        for y in [.55,1.52]:cyl(x,y,.36,.045,1.25,'cream',12)
+    hip(-1.69,.32,1.61,1.47,1.42,.62,'copper')
+    ball(-.955,1.03,2.25,.045,'gold')
+    bench(-.96,1.1)
+    tree(1.02,.97,size=.8,seed=54)
+    tree(1.12,-1.07,size=.62,seed=55)
+    planter(-1.57,-1.5,1.05,.65,True)
+    bench(.92,.37,math.pi)
+    lamp(-.56,-.53,1.15)
+
+
+def park_playground():
+    pocket_ground()
+    # Real A-frame swing legs, hanging chains and a seat over a sandy patch.
+    paving(-1.62,.38,1.25,1.3,'soil')
+    box(-1.56,.44,.21,1.13,1.18,.025,'path')
+    for x in [-1.5,-.49]:
+        for y in [.54,1.5]:beam((x,y,.24),(x,1.02,1.56),.045,'teal')
+    beam((-1.62,1.02,1.56),(-.38,1.02,1.56),.065,'wood')
+    for x in [-1.18,-.8]:beam((x,1.02,1.53),(x,1.02,.61),.012,'steel')
+    box(-1.25,.89,.55,.52,.26,.065,'red')
+    # A low slide occupies the opposite corner, with its own little ladder.
+    box(.52,-1.53,.2,1.07,1.03,.035,'path')
+    for x in [.65,1.12]:beam((x,-.65,.23),(x,-.65,.93),.035,'wood')
+    box(.59,-.81,.93,.6,.33,.06,'wood')
+    mesh('sloping playground slide',[(.63,-.82,.97),(1.14,-.82,.97),(1.14,-1.51,.3),(.63,-1.51,.3)],[(0,1,2,3)],'silver')
+    for x in [.61,1.16]:beam((x,-.81,1.03),(x,-1.52,.36),.035,'red')
+    for x in [.7,1.06]:beam((x,-.39,.23),(x,-.65,.95),.025,'wood')
+    for i in range(3):beam((.7,-.44-i*.06,.39+i*.19),(1.06,-.44-i*.06,.39+i*.19),.018,'wood')
+    tree(1.04,1.02,size=.86,seed=56)
+    tree(-1.12,-1.13,size=.58,seed=57)
+    bench(.95,.4,math.pi)
+    lamp(-.57,-.48,1.15)
 
 
 def bandstand(x,y):

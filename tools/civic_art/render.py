@@ -10,18 +10,20 @@ p=argparse.ArgumentParser();p.add_argument('--types',default='fire');p.add_argum
 args=p.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
 root=Path(__file__).resolve().parents[2];out=root/args.output;out.mkdir(parents=True,exist_ok=True)
 registry=json.loads((Path(__file__).parent/'registry.json').read_text())
-models={name:(getattr(importlib.import_module(spec['module']),name),spec['tiles']) for name,spec in registry.items()}
-selected=list(models) if args.types=='all' else [name for name,spec in registry.items() if spec['family']==args.types] if args.types in {spec['family'] for spec in registry.values()} else args.types.split(',')
+selected=list(registry) if args.types=='all' else [name for name,spec in registry.items() if spec['family']==args.types] if args.types in {spec['family'] for spec in registry.values()} else args.types.split(',')
 
 def look(o,target):o.rotation_euler=(Vector(target)-o.location).to_track_quat('-Z','Y').to_euler()
 
-for kind in selected:
+metadata_by_type={}
+work=[(kind,i,variant['model']) for kind in selected for i,variant in enumerate(registry[kind].get('variants',[{'model':kind}]))]
+for kind,variant,model in work:
+    suffix=f'-v{variant}' if variant else ''
     started=time.time(); bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
     for collection in [bpy.data.meshes,bpy.data.curves,bpy.data.materials,bpy.data.cameras,bpy.data.lights]:
         for block in list(collection):
             if block.users==0:collection.remove(block)
     common.M.clear();common.LIGHTS.clear();common.palette()
-    build,tiles=models[kind];build()
+    tiles=registry[kind]['tiles'];getattr(importlib.import_module(registry[kind]['module']),model)()
     scene=bpy.context.scene;scene.render.engine='CYCLES';scene.cycles.samples=args.samples;scene.cycles.use_denoising=True;scene.render.use_persistent_data=True
     scene.cycles.max_bounces=5;scene.cycles.diffuse_bounces=3;scene.cycles.glossy_bounces=3
     scene.render.film_transparent=True;scene.render.image_settings.file_format='PNG';scene.render.image_settings.color_mode='RGBA';scene.render.image_settings.color_depth='8'
@@ -54,7 +56,7 @@ for kind in selected:
     bpy.ops.object.light_add(type='AREA',location=(10,3,12));fill=bpy.context.object;fill.data.energy=750;fill.data.size=12;fill.data.color=(.69,.82,1)
     look(key,(0,0,0));look(fill,(0,0,2))
     radius=25
-    metadata={'type':kind,'tiles':tiles,'scale':args.scale,'frames':{},'maxHeight':0}
+    metadata=metadata_by_type.setdefault(kind,{'type':kind,'tiles':tiles,'scale':args.scale,'frames':{},'maxHeight':0})
     # Bounds are measured from the authored geometry, not hand-estimated.
     bpy.context.view_layer.update()
     for obj in scene.objects:
@@ -76,9 +78,9 @@ for kind in selected:
                 x,y,z=original;light.location=(x*c-y*s,x*s+y*c,z);look(light,(0,0,1))
             bpy.context.view_layer.update()
             anchor=world_to_camera_view(scene,camera,Vector((0,0,0)))
-            name=f'{kind}-{state}-{rotation}.png';scene.render.filepath=str(out/name)
+            name=f'{kind}-{state}-{rotation}{suffix}.png';scene.render.filepath=str(out/name)
             bpy.ops.render.render(write_still=True)
-            metadata['frames'][f'{state}-{rotation}']={'file':name,'width':size,'height':size,'anchor':[anchor.x*size,(1-anchor.y)*size]}
+            metadata['frames'][f'{state}-{rotation}{suffix}']={'file':name,'width':size,'height':size,'anchor':[anchor.x*size,(1-anchor.y)*size]}
             print('ASSET_RENDERED',name,round(time.time()-started,1),flush=True)
     (out/f'{kind}.json').write_text(json.dumps(metadata,indent=2))
-    if args.save_blend:bpy.ops.wm.save_as_mainfile(filepath=str(out/f'{kind}.blend'),compress=True)
+    if args.save_blend:bpy.ops.wm.save_as_mainfile(filepath=str(out/f'{kind}{suffix}.blend'),compress=True)

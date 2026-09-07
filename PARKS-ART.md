@@ -7,25 +7,36 @@ remain separate future families.
 
 | Type | Identity |
 | --- | --- |
-| park | Shaded pocket garden, crossing gravel paths, timber bench and flower borders |
+| park | Three layouts: fountain garden, gazebo garden, and a playground with swing and slide |
 | largepark | Copper octagonal bandstand, lily pond, rose pergola and open lawns |
 | zoo | Brick entrance lodges, airy aviary, elephant and giraffe yards, penguin pool |
 
 Original Blender models live in `tools/civic_art/parks.py`. Architecture and
 landscaping use the existing material palette and offline lighting. Animals are
 small authored static sculptures, consistent with the fixed-pose sprite pipeline.
-Path intersections use non-overlapping surfaces. The small park paths meet all
-four edges for repeated painted park tiles. This slice has one authored layout
-per type; the old procedural small-park fallback has three layouts and remains
-available while sprites load. Additional authored park variants remain future work.
+Path intersections use non-overlapping surfaces. The three small parks preserve
+the original procedural layout identities and selection: `floor(seed * 3)`, with
+`tile.variant` as the normalized seed, falling back to the original coordinate
+hash when absent. The saved seed is not a discrete model index. Rotation, lighting,
+redraws and saved tile roundtrips do not change which layout is selected.
 
-The registry preserves gameplay lot sizes and rules. The runtime still uses one
-shared decoded sprite cache, on-demand loading, one draw per lot and a 32 MiB cap.
-No simulation or runtime renderer code changes are required for this family.
+`src/architecture-variation.js` shares the original coordinate hash with procedural
+architecture and resolves sprite variant keys. Existing single-layout frames retain
+`day-0`-style keys; additional layouts use `day-0-v1` and `day-0-v2`. The registry
+lists each layout's model and gallery description. Render metadata accumulates all
+variants with a conservative maximum height; packaging requires all 36 small-park
+frames before replacing the type. Other types still require their original 12.
+
+Normal rendering requests only the selected layout through the shared 32 MiB cache.
+Instances of the same layout share one decoded image, and cold-load completion
+refreshes fallback art and portraits. The explicit preload helper can take a discrete
+`variant` index; single-layout types in mixed requests always use layout zero.
+Omission preloads all layouts of the requested types for inspection.
+Gameplay balance, lot sizes and save data are unchanged.
 
 ## Export and inspect
 
-Run `npm run art:parks` for all 36 frames (four rotations × daylight, powered
+Run `npm run art:parks` for all 60 frames (five layouts × four rotations × daylight, powered
 night, unpowered night) and incremental packaging. Preview in a separate directory:
 
 ```sh
@@ -49,37 +60,40 @@ The shared browser checks select expected types from gameplay catalog predicates
 in `tests/art-families.mjs`, rather than assuming registry membership proves
 coverage. They check all frame selections, single blits, picking, portraits,
 lighting differences and cache limits. The original civic/power/water compressed
-budget stays at 6 MiB; the 36 new park frames have a separate 0.75 MiB ceiling.
+budget stays at 6 MiB; the 60 park frames have a separate 0.75 MiB ceiling.
 
-## Validation snapshot · 2026-09-07
+## Validation snapshot · 2026-09-07 · restored small-park variants
 
-- All 36 park frames passed actual runtime drawing, single-blit reuse, alpha
-  picking, transparent click-through, portrait bounds and distinct lighting/state
-  checks. Peak decoded bytes in the parks lifecycle run: 25,260,192.
-- Civic, power and water lifecycle/gallery regression checks passed. The combined
-  civic lifecycle check reached 32,999,696 bytes within the 33,554,432-byte cap.
-  All 288 prior frame records, file references and metadata are unchanged.
-- The 36 park sprites total 618,912 bytes (0.59 MiB), below their measured-family
-  0.75 MiB ceiling. All 324 images total 6,473,002 bytes (6.17 MiB). The original
-  families remain at 5.58 MiB under their unchanged 6 MiB guard.
-- One daylight frame of all 27 types decodes to 23,625,496 bytes (22.53 MiB), up
-  from 20.49 MiB for 24 types, still within the shared decoded limit.
-- Rendering unit and manifest checks passed, as did 640 direct/cached architecture
-  comparisons, disaster rendering and the gameplay browser smoke test.
-- Default and `/nested/` production builds passed. The nested host loaded the
-  sample town and every one of the 36 park gallery images through relative URLs.
-- Visually inspected every exported rotation and lighting state, the gallery at
-  both scales, and the real game in all rotations by day and night, including
-  a contiguous 3×3 block of small park tiles. The repeated authored layout is
-  intentionally visible; extra layout variants are not part of this slice.
+- All 305 Node tests passed, including original seed boundaries, coordinate fallback
+  and saved seed precedence. All 60 park-family frames passed actual sprite drawing,
+  distinct-layout/state hashes, alpha picking, portrait framing and single-blit checks.
+- A separate cold-load check verifies one requested layout, fallback release,
+  redraw notification and 150 instances of each layout sharing exactly three
+  decoded canvases. Those three daylight images total 306,528 decoded bytes.
+- Civic, power and water lifecycle/gallery regressions passed. All 312 frames and
+  metadata for types other than the small park are unchanged from the first parks
+  commit. The total catalog is now 27 types, 29 layouts and 348 frames.
+- Parks use 739,070 bytes (0.705 MiB), still under the existing 0.75 MiB family cap.
+  All assets use 6,593,160 bytes (6.29 MiB). The unchanged earlier families remain
+  within their original 6 MiB budget.
+- One daylight frame of every layout decodes to 23,826,376 bytes (22.72 MiB).
+  Park lifecycle peak was 27,592,632 bytes, below the unchanged 32 MiB limit.
 
-All simulation and runtime rendering sources are unchanged. The full simulation
-suite was not repeated for this art-only slice; gameplay smoke and renderer
-regressions cover the integration, with the prior water commit's full 302-test
-run as the simulation baseline.
+The first parks commit inadvertently replaced the three procedural small-park
+layouts with one authored garden. This correction restores all three identities
+in the production sprites and gallery, and adds explicit variant coverage to the
+export and test contracts.
 
-Independent review: Gemini found no blocking integration defects. It verified
-family predicates, preserved exports, geometry bounds, runtime compatibility and
-browser checks. Its test-port advisory is covered by the commands above. The
-final park-family budget was tightened from the review's initial 1.25 MiB to
-0.75 MiB after measuring the complete export; the stricter manifest test passed.
+Additional verification: 640 direct/cached rendering comparisons, disaster
+rendering, gameplay smoke, default build and `/nested/` production deployment
+passed. The nested gallery loaded all 60 park-family frames. An intentionally
+incomplete 35-frame park bake was rejected before changing the exported catalog.
+All small-park variants were inspected across every view and lighting state,
+and the real sample-town inspection block now shows the original mixed layouts.
+Local performance p95: 16.7–16.8 ms browser frame intervals, 0.6–0.9 ms cached
+CPU and 11–20 ms camera redraw, within the range of earlier local snapshots.
+
+Independent review: Gemini found no blocking issues. Both optional suggestions
+were addressed: mixed explicit-variant preloads include single-layout types, and
+the browser harness now checks coordinate-only parks against the original hash.
+Targeted parks/civic checks and the production build passed after those changes.

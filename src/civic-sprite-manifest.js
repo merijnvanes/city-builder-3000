@@ -1891,120 +1891,353 @@ export const CIVIC_SPRITES = {
   "park": {
     "tiles": 1,
     "scale": 3,
-    "height": 22,
+    "height": 23,
     "frames": {
       "day-0": {
-        "file": "park-day-0.6775f5f0a5.webp",
+        "file": "park-day-0.dc00e9e127.webp",
         "width": 186,
-        "height": 142,
+        "height": 135,
         "anchor": [
           93.0,
-          91.203
+          84.3939
         ]
       },
       "day-1": {
-        "file": "park-day-1.76049b2124.webp",
+        "file": "park-day-1.3ae1eb3719.webp",
         "width": 186,
-        "height": 113,
+        "height": 111,
         "anchor": [
           93.0,
-          62.2029
+          60.3939
         ]
       },
       "day-2": {
-        "file": "park-day-2.aa64ceb3e7.webp",
+        "file": "park-day-2.d860a621ed.webp",
         "width": 186,
-        "height": 106,
+        "height": 130,
         "anchor": [
           93.0,
-          55.2029
+          79.3939
         ]
       },
       "day-3": {
-        "file": "park-day-3.822d107a17.webp",
+        "file": "park-day-3.8d5f0540d7.webp",
         "width": 186,
-        "height": 128,
+        "height": 112,
         "anchor": [
           93.0,
-          77.203
+          61.3939
         ]
       },
       "night-0": {
-        "file": "park-night-0.6381dcc5af.webp",
+        "file": "park-night-0.0b20510085.webp",
         "width": 186,
-        "height": 142,
+        "height": 135,
         "anchor": [
           93.0,
-          91.203
+          84.3939
         ]
       },
       "night-1": {
-        "file": "park-night-1.72a5396447.webp",
+        "file": "park-night-1.dd16d4824a.webp",
         "width": 186,
-        "height": 113,
+        "height": 111,
         "anchor": [
           93.0,
-          62.2029
+          60.3939
         ]
       },
       "night-2": {
-        "file": "park-night-2.4ac8e0e238.webp",
+        "file": "park-night-2.08b01c80d3.webp",
         "width": 186,
-        "height": 106,
+        "height": 130,
         "anchor": [
           93.0,
-          55.2029
+          79.3939
         ]
       },
       "night-3": {
-        "file": "park-night-3.65e7259a43.webp",
+        "file": "park-night-3.d555c20306.webp",
         "width": 186,
-        "height": 128,
+        "height": 112,
         "anchor": [
           93.0,
-          77.203
+          61.3939
         ]
       },
       "unpowered-0": {
-        "file": "park-unpowered-0.b9c04a48dc.webp",
+        "file": "park-unpowered-0.9aaa8d7a98.webp",
+        "width": 186,
+        "height": 135,
+        "anchor": [
+          93.0,
+          84.3939
+        ]
+      },
+      "unpowered-1": {
+        "file": "park-unpowered-1.f533dbabee.webp",
+        "width": 186,
+        "height": 111,
+        "anchor": [
+          93.0,
+          60.3939
+        ]
+      },
+      "unpowered-2": {
+        "file": "park-unpowered-2.f3815e2c18.webp",
+        "width": 186,
+        "height": 130,
+        "anchor": [
+          93.0,
+          79.3939
+        ]
+      },
+      "unpowered-3": {
+        "file": "park-unpowered-3.759d9f3b88.webp",
+        "width": 186,
+        "height": 112,
+        "anchor": [
+          93.0,
+          61.3939
+        ]
+      },
+      "day-0-v1": {
+        "file": "park-day-0-v1.23be66112a.webp",
+        "width": 186,
+        "height": 145,
+        "anchor": [
+          92.9999,
+          94.9658
+        ]
+      },
+      "day-1-v1": {
+        "file": "park-day-1-v1.31ef6196d0.webp",
+        "width": 186,
+        "height": 120,
+        "anchor": [
+          92.9999,
+          69.9659
+        ]
+      },
+      "day-2-v1": {
+        "file": "park-day-2-v1.052c30416d.webp",
+        "width": 186,
+        "height": 125,
+        "anchor": [
+          93.0001,
+          74.9659
+        ]
+      },
+      "day-3-v1": {
+        "file": "park-day-3-v1.4524f364f5.webp",
+        "width": 186,
+        "height": 136,
+        "anchor": [
+          93.0001,
+          85.9658
+        ]
+      },
+      "night-0-v1": {
+        "file": "park-night-0-v1.cfb78815f6.webp",
+        "width": 186,
+        "height": 145,
+        "anchor": [
+          92.9999,
+          94.9658
+        ]
+      },
+      "night-1-v1": {
+        "file": "park-night-1-v1.b1a93534b6.webp",
+        "width": 186,
+        "height": 120,
+        "anchor": [
+          92.9999,
+          69.9659
+        ]
+      },
+      "night-2-v1": {
+        "file": "park-night-2-v1.4f5841fdf1.webp",
+        "width": 186,
+        "height": 125,
+        "anchor": [
+          93.0001,
+          74.9659
+        ]
+      },
+      "night-3-v1": {
+        "file": "park-night-3-v1.17cb6cc66b.webp",
+        "width": 186,
+        "height": 136,
+        "anchor": [
+          93.0001,
+          85.9658
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "park-unpowered-0-v1.260b2d7be3.webp",
+        "width": 186,
+        "height": 145,
+        "anchor": [
+          92.9999,
+          94.9658
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "park-unpowered-1-v1.b28409942e.webp",
+        "width": 186,
+        "height": 120,
+        "anchor": [
+          92.9999,
+          69.9659
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "park-unpowered-2-v1.ad69543e6c.webp",
+        "width": 186,
+        "height": 125,
+        "anchor": [
+          93.0001,
+          74.9659
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "park-unpowered-3-v1.6d59789c6b.webp",
+        "width": 186,
+        "height": 136,
+        "anchor": [
+          93.0001,
+          85.9658
+        ]
+      },
+      "day-0-v2": {
+        "file": "park-day-0-v2.8b2a07f06a.webp",
+        "width": 186,
+        "height": 132,
+        "anchor": [
+          93.0,
+          81.6737
+        ]
+      },
+      "day-1-v2": {
+        "file": "park-day-1-v2.5ac7fd940e.webp",
+        "width": 186,
+        "height": 126,
+        "anchor": [
+          93.0,
+          75.6735
+        ]
+      },
+      "day-2-v2": {
+        "file": "park-day-2-v2.22577a53c9.webp",
+        "width": 186,
+        "height": 120,
+        "anchor": [
+          93.0,
+          69.6735
+        ]
+      },
+      "day-3-v2": {
+        "file": "park-day-3-v2.5afc35c4f8.webp",
         "width": 186,
         "height": 142,
         "anchor": [
           93.0,
-          91.203
+          91.6737
         ]
       },
-      "unpowered-1": {
-        "file": "park-unpowered-1.2f5bece171.webp",
+      "night-0-v2": {
+        "file": "park-night-0-v2.870bbbdf31.webp",
         "width": 186,
-        "height": 113,
+        "height": 132,
         "anchor": [
           93.0,
-          62.2029
+          81.6737
         ]
       },
-      "unpowered-2": {
-        "file": "park-unpowered-2.3075604507.webp",
+      "night-1-v2": {
+        "file": "park-night-1-v2.48a9b7bf7f.webp",
         "width": 186,
-        "height": 106,
+        "height": 126,
         "anchor": [
           93.0,
-          55.2029
+          75.6735
         ]
       },
-      "unpowered-3": {
-        "file": "park-unpowered-3.2c760bd049.webp",
+      "night-2-v2": {
+        "file": "park-night-2-v2.c4d3ddb3b3.webp",
         "width": 186,
-        "height": 128,
+        "height": 120,
         "anchor": [
           93.0,
-          77.203
+          69.6735
+        ]
+      },
+      "night-3-v2": {
+        "file": "park-night-3-v2.de283cf656.webp",
+        "width": 186,
+        "height": 142,
+        "anchor": [
+          93.0,
+          91.6737
+        ]
+      },
+      "unpowered-0-v2": {
+        "file": "park-unpowered-0-v2.2663c5f2ea.webp",
+        "width": 186,
+        "height": 132,
+        "anchor": [
+          93.0,
+          81.6737
+        ]
+      },
+      "unpowered-1-v2": {
+        "file": "park-unpowered-1-v2.22b4e09708.webp",
+        "width": 186,
+        "height": 126,
+        "anchor": [
+          93.0,
+          75.6735
+        ]
+      },
+      "unpowered-2-v2": {
+        "file": "park-unpowered-2-v2.9c3fff82b7.webp",
+        "width": 186,
+        "height": 120,
+        "anchor": [
+          93.0,
+          69.6735
+        ]
+      },
+      "unpowered-3-v2": {
+        "file": "park-unpowered-3-v2.08ad881a2d.webp",
+        "width": 186,
+        "height": 142,
+        "anchor": [
+          93.0,
+          91.6737
         ]
       }
     },
     "family": "parks",
     "label": "Small park",
-    "description": "A shaded pocket garden with crossing gravel paths, timber seating, and flowering borders."
+    "description": "Three neighborhood layouts: a fountain garden, gazebo garden, and playground.",
+    "variants": [
+      {
+        "model": "park",
+        "label": "Fountain garden",
+        "description": "A stone fountain, flower beds, and shade trees around crossing paths."
+      },
+      {
+        "model": "park_gazebo",
+        "label": "Gazebo garden",
+        "description": "A copper-roofed garden shelter, shaded seating, and flowering borders."
+      },
+      {
+        "model": "park_playground",
+        "label": "Playground",
+        "description": "A timber swing, a small slide, and a sandy play area among trees."
+      }
+    ]
   },
   "police": {
     "tiles": 3,
