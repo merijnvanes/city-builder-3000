@@ -13,6 +13,7 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 | Education | Childhood learning and adult knowledge retention; strikes from sustained underfunding | **Done.** EQ is taught to children aged 5-17, colleges take 18-22, adults decay without libraries or museums, and teachers strike after 18 months below 40% funding |
 | Health | Average city reaches 59 years, a well-run one 90; hospitals need beds and funding; pollution and traffic pull it down | **Done.** Life expectancy is a cohort statistic on the same anchors, with healthcare strikes |
 
+| Commerce | Shops and offices, sorted by density and land value | **Done.** See below |
 | Industry | Farms, heavy industry, manufacturing and high tech, the last attracted by an educated workforce | **Done.** See below |
 
 | Budget | Over-funding wastes money; the road budget keeps roads from falling apart | **Done.** See below |
@@ -254,6 +255,33 @@ edge of a worker's range: on the flat every worker reaches a job, over the
 ridge 23 of 154 cannot, and through the bore every one does again.
 
 Portals are drawn as a retaining wall with the bore cut into it.
+
+## Shops and offices, September 7
+
+The manual lists what a commercial zone builds by density: light is *"mom and
+pop stores, gas stations"*, medium adds *"medium size office buildings and
+stores"*, dense has *"large office buildings and large stores"* — and *"the
+type of Commercial buildings that get built depends on the density of the
+zone, as well its land value."*
+
+Commercial lots now hold shops or offices:
+
+| | Light | Medium | Dense |
+| --- | --- | --- | --- |
+| Poorly schooled city | shops | shops | shops |
+| Well schooled, poor address | shops | shops | offices |
+| Well schooled, good address | shops | offices | offices |
+
+Offices hold more workers per tile, pay more per head and bring no delivery
+traffic; shops follow their customers. A city's commercial ceiling keeps
+climbing with its Education Quotient, which is the manual's *"demand for
+Commercial zones typically rises as a city ages"*.
+
+Each lot decides from its own stable variant rather than a fresh roll, so a
+corner shop does not become a tower and back again every decade. Without that,
+the office share oscillated: offices bring less pollution, which raises land
+value, which attracts more offices, and the loop overshoots in both
+directions.
 
 ## Visual and performance work, September 7
 

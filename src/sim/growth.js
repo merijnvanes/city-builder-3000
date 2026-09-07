@@ -8,6 +8,7 @@ import { ZONE_TYPES } from "./catalog.js";
 import { isAnchor, findLot, assignLot, clearLot } from "./lots.js";
 import { WORKFORCE_SHARE } from "./traffic.js";
 import { pickIndustry, convertIndustry, industryOf } from "./industry.js";
+import { pickCommerce, convertCommerce, commerceOf } from "./commerce.js";
 import { yearOf } from "./metrics.js";
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -48,7 +49,11 @@ export function computeDemand(city, m) {
   res -= Math.max(0, m.pollution - 30) * 0.4;
   res -= Math.max(0, m.unemployment - 8) * 1.2;
 
-  const wantedC = pop * 0.3 + 60 + (ord.tourismPromotion ? pop * 0.04 : 0) + trade * 150;
+  // "The demand for Commercial zones typically rises as a city ages." Shops
+  // follow their customers; offices are what a large, schooled city adds on
+  // top, so its commercial ceiling keeps climbing after the shops are built.
+  const officeRoom = Math.min(pop * 0.22, pop * 0.22 * Math.max(0, (m.eq ?? 55) - 45) / 45);
+  const wantedC = pop * 0.3 + 60 + officeRoom + (ord.tourismPromotion ? pop * 0.04 : 0) + trade * 150;
   let com = (wantedC - m.jobsCommercial) / Math.max(250, wantedC) * 100;
   com -= (taxes.commercial - 7) * 3;
   com -= (ord.smokingBan ? 3 : 0);
@@ -78,7 +83,11 @@ export function desirability(t) {
     // so the street's mood is most of the story.
     d = 0.35 + (t.aura ?? 50) / 90 + lv / 260 + (s.education + s.health) / 900;
   } else if (t.type === "commercial") {
-    d = 0.5 + lv / 120 - t.crime / 150 - t.pollution / 320 + Math.min(t.traffic, 50) / 350 + (s.bus + s.rail) / 500;
+    // Shops want passing trade; offices want an address and a station.
+    const desks = commerceOf(t) === "offices";
+    d = desks
+      ? 0.45 + lv / 95 - t.crime / 170 - t.pollution / 300 + (s.bus + s.rail) / 340
+      : 0.5 + lv / 120 - t.crime / 150 - t.pollution / 320 + Math.min(t.traffic, 50) / 350 + (s.bus + s.rail) / 500;
   } else {
     // Smokestacks want cheap land; laboratories want a good address.
     const clean = industryOf(t) === "hightech";
@@ -110,10 +119,15 @@ export function updateGrowth(city, demand, rng) {
     t.age = (t.age || 0) + 1;
     const ok = conditionsOk(t);
     const des = desirability(t);
-    // A working plant re-tools when the era and the city's schooling move on.
+    // A working plant re-tools when the era and the city's schooling move on,
+    // and a shopfront becomes offices when the neighbourhood does.
     if (t.type === "industrial" && !t.abandoned && t.level && rng() < 0.04) {
       const next = convertIndustry(t, year, eq, rng());
       if (next !== industryOf(t)) { t.industry = next; retooled++; }
+    }
+    if (t.type === "commercial" && !t.abandoned && t.level && rng() < 0.015) {
+      const next = convertCommerce(t, eq);
+      if (next !== commerceOf(t)) { t.commerce = next; retooled++; }
     }
     if (t.abandoned) {
       if (ok && d > 15 && rng() < 0.2 * des) { t.abandoned = false; t.level = 1; t.age = 0; built++; }
@@ -158,6 +172,7 @@ export function updateGrowth(city, demand, rng) {
     if (!lot) continue;
     const anchor = assignLot(city, lot, 1, rng());
     if (t.type === "industrial") anchor.industry = pickIndustry(anchor, year, eq, rng());
+    if (t.type === "commercial") anchor.commerce = pickCommerce(anchor, eq);
     built++;
   }
   return { built, upgraded, declined, abandoned, retooled };

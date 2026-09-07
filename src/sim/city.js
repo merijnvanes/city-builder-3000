@@ -6,6 +6,7 @@ import { tileAt } from "./grid.js";
 import { lotTiles } from "./lots.js";
 import { blankPopulation, serializePopulation, parsePopulation } from "./population.js";
 import { INDUSTRY_TYPES } from "./industry.js";
+import { COMMERCE_TYPES } from "./commerce.js";
 import { OVERLOAD_MONTHS } from "./power.js";
 
 // Nothing holds more trash than the largest landfill tile.
@@ -47,7 +48,7 @@ export function makeTile(x, y, terrain, trees, variant, elev = 0, salt = 0) {
     x, y, terrain, trees, elev,
     // Sea water. Fresh pumps cannot draw from it; a desalinization plant can.
     salt: terrain === "water" ? !!salt : false,
-    type: "empty", density: 0, lot: null, level: 0, variant, abandoned: false, age: 0, fire: 0, industry: null, strain: 0,
+    type: "empty", density: 0, lot: null, level: 0, variant, abandoned: false, age: 0, fire: 0, industry: null, commerce: null, strain: 0,
     // Trash buried in this tile, for landfills.
     fill: 0,
     // A road (1) or rail (2) tunnel bored under this tile.
@@ -117,6 +118,7 @@ export function serialize(city) {
     t.powerline ? 1 : 0, t.pipe ? 1 : 0, t.elev | 0, t.subway ? 1 : 0, t.flooded | 0,
     t.industry ? INDUSTRY_TYPES.indexOf(t.industry) + 1 : 0, t.strain | 0, t.salt ? 1 : 0,
     Math.round((t.fill || 0) * 100) / 100, t.tunnel | 0,
+    t.commerce ? COMMERCE_TYPES.indexOf(t.commerce) + 1 : 0,
   ]);
   return JSON.stringify({
     version: SAVE_VERSION,
@@ -177,8 +179,9 @@ export function deserialize(raw) {
   for (let i = 0; i < d.tiles.length; i++) {
     const r = d.tiles[i];
     const x = i % size, y = (i - x) / size;
-    if (!Array.isArray(r) || r.length < 15 || r.length > 23) throw new Error(`Invalid save: tile ${i} malformed.`);
-    const [terrainCode, trees, typeCode, density, lotX, lotY, lotW, lotH, level, variant, abandoned, age, fire, powerline, pipe, elev = 0, subway = 0, flooded = 0, industry = 0, strain = 0, salt = 0, fill = 0, tunnel = 0] = r;
+    if (!Array.isArray(r) || r.length < 15 || r.length > 24) throw new Error(`Invalid save: tile ${i} malformed.`);
+    const [terrainCode, trees, typeCode, density, lotX, lotY, lotW, lotH, level, variant, abandoned, age, fire, powerline, pipe, elev = 0, subway = 0, flooded = 0, industry = 0, strain = 0, salt = 0, fill = 0, tunnel = 0, commerce = 0] = r;
+    if (!Number.isInteger(commerce) || commerce < 0 || commerce > COMMERCE_TYPES.length) throw new Error(`Invalid save: tile ${i} bad commerce.`);
     if (![0, 1, 2].includes(tunnel)) throw new Error(`Invalid save: tile ${i} bad tunnel.`);
     if (!Number.isFinite(fill) || fill < 0 || fill > MAX_FILL) throw new Error(`Invalid save: tile ${i} bad landfill contents.`);
     if (![0, 1].includes(salt)) throw new Error(`Invalid save: tile ${i} bad water type.`);
@@ -205,6 +208,7 @@ export function deserialize(raw) {
     t.strain = strain;
     t.fill = fill;
     t.tunnel = tunnel;
+    t.commerce = commerce ? COMMERCE_TYPES[commerce - 1] : null;
     if (lotW > 0) {
       if (!Number.isInteger(lotX) || !Number.isInteger(lotY) || !Number.isInteger(lotH) || lotW > 8 || lotH > 8 ||
           lotX > x || lotY > y || lotX + lotW <= x || lotY + lotH <= y) throw new Error(`Invalid save: tile ${i} bad lot.`);

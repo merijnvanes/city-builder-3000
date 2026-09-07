@@ -3,6 +3,7 @@
 import { BUILDINGS, ZONE_TYPES } from "./catalog.js";
 import { isAnchor, capacityOf } from "./lots.js";
 import { INDUSTRY_TYPES, industryOf } from "./industry.js";
+import { COMMERCE_TYPES, commerceOf } from "./commerce.js";
 import { START_YEAR } from "./city.js";
 import { readPopulation, BASE_LIFE_EXPECTANCY, NATIONAL_EQ } from "./population.js";
 
@@ -23,6 +24,7 @@ export function computeMetrics(city) {
   let abandonedLots = 0, landValueSum = 0, landTiles = 0, specialJobs = 0, specialHappiness = 0;
   let developedTiles = 0, dryTiles = 0;
   const industryMix = Object.fromEntries(INDUSTRY_TYPES.map((k) => [k, 0]));
+  const commerceMix = Object.fromEntries(COMMERCE_TYPES.map((k) => [k, 0]));
   const demandBonus = {};
 
   for (const t of tiles) {
@@ -51,7 +53,7 @@ export function computeMetrics(city) {
         wAura += (t.aura ?? 50) * cap;
         wPark += (s.park || 0) * cap;
         wPolice += (s.police || 0) * cap; wFire += (s.fire || 0) * cap;
-      } else if (t.type === "commercial") jobsCommercial += cap;
+      } else if (t.type === "commercial") { jobsCommercial += cap; commerceMix[commerceOf(t)] += cap; }
       else { jobsIndustrial += cap; industryMix[industryOf(t)] += cap; }
     } else {
       const b = BUILDINGS[t.type];
@@ -105,7 +107,7 @@ export function computeMetrics(city) {
     tradeConnections, externalJobs: traffic.externalJobs || 0, connections,
     workers: traffic.workers, employed: traffic.employed, unemployment: traffic.unemployment,
     traffic: traffic.traffic, congestion: traffic.congestion,
-    pollution, crime, education, health, parks, police, fireCover, industryMix,
+    pollution, crime, education, health, parks, police, fireCover, industryMix, commerceMix,
     dryShare: developedTiles ? dryTiles / developedTiles : 0,
     cells: svc.cells || 0, arrestable: svc.arrestable || 0, jailFactor: svc.jailFactor ?? 1,
     eq, lifeExpectancy, strikes: people.strikes,

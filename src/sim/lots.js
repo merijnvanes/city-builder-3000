@@ -4,6 +4,7 @@
 import { inBounds, tileAt } from "./grid.js";
 import { CAPACITY, DRAW, BUILDINGS, ZONE_TYPES, LOT_SIZES, LOT_SIZES_BY_TYPE } from "./catalog.js";
 import { industryTraits } from "./industry.js";
+import { commerceTraits } from "./commerce.js";
 
 export const isAnchor = (t) => !!t.lot && t.lot.x === t.x && t.lot.y === t.y;
 
@@ -62,6 +63,7 @@ export function assignLot(city, lot, level, variant) {
     t.abandoned = false;
     t.age = 0;
     t.industry = null;
+    t.commerce = null;
     t.fill = 0;
   }
   const anchor = tileAt(city, lot.x, lot.y);
@@ -80,6 +82,7 @@ export function clearLot(city, anchor, { keepZone = true } = {}) {
     t.age = 0;
     t.fire = 0;
     t.industry = null;
+    t.commerce = null;
     t.fill = 0;
     if (!(keepZone && ZONE_TYPES.has(t.type))) { t.type = "empty"; t.density = 0; }
   }
@@ -89,7 +92,8 @@ export function clearLot(city, anchor, { keepZone = true } = {}) {
 export function capacityOf(anchor) {
   if (!anchor.lot || !ZONE_TYPES.has(anchor.type) || !anchor.level || anchor.abandoned) return 0;
   const perTile = CAPACITY[anchor.type][anchor.density] || 0;
-  const kind = anchor.type === "industrial" ? industryTraits(anchor).jobs : 1;
+  const kind = anchor.type === "industrial" ? industryTraits(anchor).jobs
+    : anchor.type === "commercial" ? commerceTraits(anchor).jobs : 1;
   return Math.round(perTile * anchor.lot.w * anchor.lot.h * anchor.level * kind / 4);
 }
 

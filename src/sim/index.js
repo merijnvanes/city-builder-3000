@@ -20,6 +20,7 @@ import { DEALS, SIDES, signDeal, cancelDeal, auditDeals, dealAvailable } from ".
 import { buildingName } from "./names.js";
 import { advanceYear, updateStrikes, readPopulation, blankPopulation, serviceQuality } from "./population.js";
 import { INDUSTRY, industryOf, ensureIndustry } from "./industry.js";
+import { COMMERCE, commerceOf, ensureCommerce } from "./commerce.js";
 import { agePlants, plantOutput, OVERLOAD_MONTHS } from "./power.js";
 import { agePumps, pumpOutput, hasSource, SOURCE_REACH } from "./water.js";
 import { fillLandfills, landfillLoad, landfillNews } from "./waste.js";
@@ -44,6 +45,7 @@ function settle(city) {
   refreshCity(city);
   const people = readPopulation(city, city.population || 0);
   ensureIndustry(city, dateYear(city), people.eq);
+  ensureCommerce(city, people.eq);
   city._traffic = updateTraffic(city, people.workforceShare);
   refreshCity(city);
   const m = computeMetrics(city);
@@ -278,7 +280,9 @@ export function inspectTile(city, x, y) {
     else if (a.abandoned) description = `Abandoned ${STAGE_NAMES[t.type][Math.max(1, a.level)].toLowerCase()}. Restore services and demand to bring residents back.`;
     else {
       title = name || title;
-      const stage = t.type === "industrial" ? INDUSTRY[industryOf(a)].label : STAGE_NAMES[t.type][a.level];
+      const stage = t.type === "industrial" ? INDUSTRY[industryOf(a)].label
+        : t.type === "commercial" ? `${COMMERCE[commerceOf(a)].label}, ${STAGE_NAMES.commercial[a.level].toLowerCase()}`
+        : STAGE_NAMES[t.type][a.level];
       description = `${stage}, ${DENSITY_NAMES[t.density].toLowerCase()} ${t.type} (${a.lot.w}×${a.lot.h} lot, stage ${a.level}/4).`;
     }
     const cap = capacityOf(a);

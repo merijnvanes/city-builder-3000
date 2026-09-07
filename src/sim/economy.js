@@ -2,6 +2,7 @@
 import { BUILDINGS, ZONE_TYPES, DEPARTMENTS, FUNDED_DEPARTMENTS, ROAD_TYPES } from "./catalog.js";
 import { isAnchor, capacityOf } from "./lots.js";
 import { industryTraits } from "./industry.js";
+import { commerceTraits } from "./commerce.js";
 import { ORDINANCES } from "./city.js";
 import { DEALS } from "./neighbors.js";
 
@@ -31,7 +32,7 @@ export function computeBudget(city) {
       const cap = capacityOf(t);
       if (!cap) continue;
       if (t.type === "residential") { population += cap; income.residential += cap * (taxes.residential / 100) * 1.4 * wealth(t); }
-      else if (t.type === "commercial") income.commercial += cap * (taxes.commercial / 100) * 1.4 * wealth(t);
+      else if (t.type === "commercial") income.commercial += cap * (taxes.commercial / 100) * 1.4 * wealth(t) * commerceTraits(t).value;
       else income.industrial += cap * (taxes.industrial / 100) * 1.2 * industryTraits(t).value * (ordinances.wasteTax ? 1.15 : 1);
       continue;
     }

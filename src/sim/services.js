@@ -4,6 +4,7 @@ import { BUILDINGS, ZONE_TYPES, ACCESS_TYPES, ROAD_TYPES, FUNDED_DEPARTMENTS } f
 import { ORDINANCES } from "./city.js";
 import { isAnchor, lotTiles, capacityOf } from "./lots.js";
 import { industryTraits } from "./industry.js";
+import { commerceTraits } from "./commerce.js";
 import { readPopulation, NATIONAL_EQ, BASE_LIFE_EXPECTANCY } from "./population.js";
 import { ageFactor } from "./wear.js";
 import { DEALS } from "./neighbors.js";
@@ -103,6 +104,10 @@ export function updateServices(city) {
       industrialLots++;
       const smoke = industryTraits(t).pollution;
       addSource(t.x, t.y, (14 + t.density * t.level * 3 * t.lot.w) * smoke, 7 + t.density);
+    } else if (t.type === "commercial" && t.level && !t.abandoned) {
+      // Shops take deliveries; offices mostly do not.
+      const trade = commerceTraits(t).pollution;
+      if (trade > 0.5) addSource(t.x, t.y, 4 * t.density * t.lot.w * trade, 3 + t.density);
     } else if (b?.pollution) {
       addSource(t.x + (t.lot.w >> 1), t.y + (t.lot.h >> 1), b.pollution * (t.powered || !b.powerUse ? 1 : 0.4), 5 + b.w);
     }
