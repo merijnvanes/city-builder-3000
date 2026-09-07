@@ -10,6 +10,8 @@ import { ZONE_TYPES, BUILDINGS } from "./catalog.js";
 import { isAnchor, capacityOf, lotTiles } from "./lots.js";
 
 export const MAX_TRIP = 40;
+// Fallback share for callers without a demographic pyramid. The live value
+// comes from the city's age structure; see population.js.
 export const WORKFORCE_SHARE = 0.4;
 export const EXTERNAL_JOBS_PER_ROAD = 400;
 const TRAFFIC_PER_POINT = 6; // commuters per traffic point on a road tile
@@ -32,7 +34,7 @@ function entryOf(city, anchor, kind) {
   return best;
 }
 
-export function updateTraffic(city) {
+export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
   const { tiles, size } = city;
   const N = tiles.length;
   // Two layers: surface nodes 0..N-1, tunnel nodes N..2N-1 under subway tiles.
@@ -60,7 +62,7 @@ export function updateTraffic(city) {
       if (!cap) continue;
       const entry = entryOf(city, t, kind);
       if (t.type === "residential") {
-        const w = Math.round(cap * WORKFORCE_SHARE);
+        const w = Math.round(cap * workforceShare);
         workers += w;
         if (entry >= 0) homes.push({ entry, workers: w, anchor: t });
         else t.commute = 0;

@@ -16,7 +16,7 @@ export function computeDemand(city, m) {
   const pop = m.population, jobs = m.jobs;
   const trade = m.tradeConnections || 0;
   const externalJobs = 350 + (m.externalJobs || 0);
-  const wantedPop = (jobs + externalJobs) / WORKFORCE_SHARE;
+  const wantedPop = (jobs + externalJobs) / (m.workforceShare || WORKFORCE_SHARE);
   let res = (wantedPop - pop) / Math.max(900, pop * 0.5) * 100;
   res -= (taxes.residential - 7) * 4;
   res += (m.happiness - 50) * 0.5;

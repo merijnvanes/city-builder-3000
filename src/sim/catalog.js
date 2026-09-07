@@ -38,6 +38,8 @@ export const DRAW = {
 
 // Building catalog. w/h are footprint sizes. upkeep is monthly and goes into
 // the department named by dept. service = { kind, radius, strength }.
+// capacity = { kind, seats }: how many students or patients the building can
+// take, which caps education and health however wide its coverage reaches.
 export const BUILDINGS = {
   road:        { label: "Road",            group: "transport", cost: 10,   w: 1, h: 1, upkeep: 0.5, dept: "transport", path: true, water: true },
   rail:        { label: "Rail",            group: "transport", cost: 25,   w: 1, h: 1, upkeep: 1,   dept: "transport", path: true },
@@ -63,9 +65,9 @@ export const BUILDINGS = {
 
   police:      { label: "Police Station",  group: "civic", cost: 500,  w: 3, h: 3, upkeep: 90,  dept: "police",    service: { kind: "police", radius: 12, strength: 100 }, powerUse: 3, waterUse: 2 },
   fire:        { label: "Fire Station",    group: "civic", cost: 500,  w: 3, h: 3, upkeep: 90,  dept: "fire",      service: { kind: "fire", radius: 12, strength: 100 }, powerUse: 3, waterUse: 2 },
-  hospital:    { label: "Hospital",        group: "civic", cost: 600,  w: 3, h: 3, upkeep: 150, dept: "health",    service: { kind: "health", radius: 14, strength: 100 }, powerUse: 6, waterUse: 4 },
-  school:      { label: "School",          group: "civic", cost: 250,  w: 3, h: 3, upkeep: 70,  dept: "education", service: { kind: "education", radius: 12, strength: 80 }, powerUse: 3, waterUse: 2 },
-  college:     { label: "College",         group: "civic", cost: 1000, w: 4, h: 4, upkeep: 140, dept: "education", service: { kind: "education", radius: 18, strength: 100 }, powerUse: 6, waterUse: 4 },
+  hospital:    { label: "Hospital",        group: "civic", cost: 600,  w: 3, h: 3, upkeep: 150, dept: "health",    service: { kind: "health", radius: 14, strength: 100 }, capacity: { kind: "hospital", seats: 12000 }, powerUse: 6, waterUse: 4 },
+  school:      { label: "School",          group: "civic", cost: 250,  w: 3, h: 3, upkeep: 70,  dept: "education", service: { kind: "education", radius: 12, strength: 80 }, capacity: { kind: "school", seats: 1500 }, powerUse: 3, waterUse: 2 },
+  college:     { label: "College",         group: "civic", cost: 1000, w: 4, h: 4, upkeep: 140, dept: "education", service: { kind: "education", radius: 18, strength: 100 }, capacity: { kind: "college", seats: 5000 }, powerUse: 6, waterUse: 4 },
   library:     { label: "Library",         group: "civic", cost: 500,  w: 2, h: 2, upkeep: 30,  dept: "education", service: { kind: "education", radius: 8, strength: 40 }, powerUse: 2, waterUse: 1 },
   museum:      { label: "Museum",          group: "civic", cost: 1000, w: 3, h: 3, upkeep: 45,  dept: "education", service: { kind: "culture", radius: 10, strength: 60 }, powerUse: 3, waterUse: 1 },
   landfill:    { label: "Landfill",        group: "civic", cost: 20,   w: 1, h: 1, upkeep: 2,   dept: "sanitation", garbage: 60, rect: true, pollution: 10 },
@@ -90,8 +92,8 @@ export const BUILDINGS = {
   stadium:     { label: "Stadium",         group: "special", cost: 0,    w: 5, h: 5, upkeep: 150, dept: "parks", unique: true, reward: { population: 40000 }, service: { kind: "park", radius: 14, strength: 80 }, effects: { happiness: 5, jobs: 300, traffic: 30 }, powerUse: 10, waterUse: 6 },
   statue:      { label: "Mayor's Statue",  group: "special", cost: 0,    w: 1, h: 1, upkeep: 5,   dept: "parks", unique: true, reward: { population: 60000 }, service: { kind: "park", radius: 5, strength: 50 }, effects: { happiness: 2 } },
   marina:      { label: "Marina",          group: "special", cost: 0,    w: 3, h: 3, upkeep: 40,  dept: "parks", unique: true, requiresWater: true, reward: { population: 15000 }, service: { kind: "park", radius: 10, strength: 70 }, effects: { landValue: 8, radius: 8, demand: { commercial: 4 }, jobs: 60 }, powerUse: 2, waterUse: 1 },
-  university:  { label: "University",      group: "special", cost: 0,    w: 4, h: 4, upkeep: 160, dept: "education", unique: true, reward: { population: 30000 }, service: { kind: "education", radius: 22, strength: 110 }, effects: { landValue: 6, radius: 8, jobs: 200, demand: { commercial: 4 } }, powerUse: 8, waterUse: 5 },
-  medcenter:   { label: "Medical Research Center", group: "special", cost: 0, w: 4, h: 4, upkeep: 180, dept: "health", unique: true, reward: { population: 50000 }, service: { kind: "health", radius: 20, strength: 120 }, effects: { jobs: 250, happiness: 2 }, powerUse: 8, waterUse: 6 },
+  university:  { label: "University",      group: "special", cost: 0,    w: 4, h: 4, upkeep: 160, dept: "education", unique: true, reward: { population: 30000 }, service: { kind: "education", radius: 22, strength: 110 }, capacity: { kind: "college", seats: 12000 }, effects: { landValue: 6, radius: 8, jobs: 200, demand: { commercial: 4 } }, powerUse: 8, waterUse: 5 },
+  medcenter:   { label: "Medical Research Center", group: "special", cost: 0, w: 4, h: 4, upkeep: 180, dept: "health", unique: true, reward: { population: 50000 }, service: { kind: "health", radius: 20, strength: 120 }, capacity: { kind: "hospital", seats: 30000 }, effects: { jobs: 250, happiness: 2 }, powerUse: 8, waterUse: 6 },
 
   // Landmarks: pricey showpieces that lift land value, culture and tourism.
   clocktower:  { label: "Clock Tower",     group: "landmark", cost: 8000,  w: 2, h: 2, upkeep: 30,  dept: "parks", unique: true, service: { kind: "culture", radius: 8, strength: 70 }, effects: { landValue: 10, radius: 7, demand: { commercial: 3 } }, powerUse: 2 },

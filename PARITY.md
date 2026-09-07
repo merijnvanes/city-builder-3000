@@ -10,9 +10,30 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 | Tunnels | Transport can pass through terrain | No tunnel construction or routing |
 | Power | Eight plant types; aging reduces capacity; prolonged overload can destroy plants | Six types; output is fixed and overload produces brownouts |
 | Water | Freshwater pumps, towers, coastal desalinization; pumps age | No saltwater distinction or desalinization; fixed lifespan |
-| Education | Childhood learning and adult knowledge retention; strikes from sustained underfunding | Service coverage approximates education without those dynamics |
+| Education | Childhood learning and adult knowledge retention; strikes from sustained underfunding | **Done.** EQ is taught to children aged 5-17, colleges take 18-22, adults decay without libraries or museums, and teachers strike after 18 months below 40% funding |
+| Health | Average city reaches 59 years, a well-run one 90; hospitals need beds and funding; pollution and traffic pull it down | **Done.** Life expectancy is a cohort statistic on the same anchors, with healthcare strikes |
 
 Other systems needing controlled comparisons against the original game include growth thresholds, lot stages, service capacity, land value, pollution, budgets, rewards, neighbor contracts and disasters. The manual describes behaviors but does not expose all numerical formulas. Exact balance requires repeatable reference-game experiments, not guessed constants.
+
+## Demographics, September 7
+
+Sims now have ages. `src/sim/population.js` holds a 110-year cohort pyramid, a
+per-age Education Quotient and a Life Expectancy, all persisted in save
+version 4.
+
+Anchors taken straight from the manual (pages 91-93):
+
+- An average city's Sims live to **59**; a well-run one reaches **90**.
+- Children learn at school; adults only retain, and lose knowledge without
+  libraries and museums.
+- Schools, colleges and hospitals have **capacity**, so coverage alone is not
+  enough. Querying one grades it A to F.
+- Sustained underfunding calls a **strike**, and a cohort schooled during one
+  carries the deficit for life.
+
+The constants between those anchors are calibrated to reproduce them, not
+recovered from the original game. The mortality curve is fitted by bisection
+so the reported life expectancy is a measured mean, not a label.
 
 ## Visual and performance work, September 7
 

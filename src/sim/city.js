@@ -4,8 +4,9 @@ import { generateTerrain, LAYOUTS, MAX_ELEVATION } from "./terrain.js";
 import { BUILDINGS, ZONE_TYPES, ROAD_TYPES, FUNDED_DEPARTMENTS } from "./catalog.js";
 import { tileAt } from "./grid.js";
 import { lotTiles } from "./lots.js";
+import { blankPopulation, serializePopulation, parsePopulation } from "./population.js";
 
-export const SAVE_VERSION = 3;
+export const SAVE_VERSION = 4;
 export const DEFAULT_SIZE = 64;
 export const MAX_SIZE = 128;
 export const START_MONEY = 50000;
@@ -70,6 +71,7 @@ export function blankCity({ seed = 42, size = DEFAULT_SIZE, layout, name = "New 
     money: START_MONEY, debt: 0, loans: [],
     month: 0,
     ...defaultPolicies(),
+    people: blankPopulation(),
     population: 0, happiness: 50,
     demand: { residential: 0, commercial: 0, industrial: 0 },
     history: [], news: [],
@@ -114,6 +116,7 @@ export function serialize(city) {
     petitions: city.petitions ?? [],
     settings: city.settings ?? { yearEndBudget: true },
     deals: city.deals ?? {},
+    people: serializePopulation(city.people),
   });
 }
 
@@ -206,6 +209,7 @@ export function deserialize(raw) {
     unlocked: Object.fromEntries(Object.entries(d.unlocked || {}).filter(([k, v]) => BUILDINGS[k] && Number.isInteger(v))),
     petitions: Array.isArray(d.petitions) ? d.petitions.filter((p) => p && typeof p.id === "string" && typeof p.status === "string" && Number.isInteger(p.since)).slice(0, 50).map((p) => ({ ...p })) : [],
     settings: { yearEndBudget: d.settings?.yearEndBudget !== false },
+    people: parsePopulation(d.people),
     deals: Object.fromEntries(Object.entries(d.deals || {}).filter(([k, v]) => ["power", "water", "garbage"].includes(k) && v && ["north", "east", "south", "west"].includes(v.side) && ["buy", "sell"].includes(v.kind)).map(([k, v]) => [k, { side: v.side, kind: v.kind, since: Number.isInteger(v.since) ? v.since : 0 }])),
   };
   if (d.scenario && typeof d.scenario === "object") city.scenario = d.scenario;

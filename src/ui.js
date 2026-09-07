@@ -122,6 +122,8 @@ const REPORT_GRAPHS = [
   ["crime", "Crime", "#d05060", fmtPct],
   ["traffic", "Traffic", "#80a0c0", fmtPct],
   ["landValue", "Land value", "#60c0a0", fmtPct],
+  ["eq", "Education quotient", "#b090e0", (v) => String(Math.round(v))],
+  ["lifeExpectancy", "Life expectancy", "#70d0c0", (v) => `${Math.round(v)} yrs`],
 ];
 
 // ── mountUI ────────────────────────────────────────────────────────────────────
@@ -836,8 +838,9 @@ export function mountUI(actions) {
     ["jobs", "Jobs"],
     ["unemployment", "Unemployment"],
     ["happiness", "Happiness"],
-    ["health", "Health"],
-    ["education", "Education"],
+    ["lifeExpectancy", "Life expectancy"],
+    ["eq", "Education quotient"],
+    ["workforceShare", "Workforce"],
     ["pollution", "Pollution"],
     ["crime", "Crime"],
     ["traffic", "Traffic"],
@@ -876,6 +879,9 @@ export function mountUI(actions) {
     const fmt = (k, v) => {
       if (v == null) return "--";
       if (["population", "jobs"].includes(k)) return fmtPop(v);
+      if (k === "lifeExpectancy") return `${v} yrs`;
+      if (k === "eq") return String(Math.round(v));
+      if (k === "workforceShare") return `${Math.round(v * 100)}%`;
       return fmtPct(v);
     };
     Object.entries(repStats).forEach(([k, el]) => {
@@ -884,9 +890,15 @@ export function mountUI(actions) {
       if (k === "pollution" || k === "crime" || k === "garbage" || k === "traffic" || k === "waterPollution") {
         if (s[k] > 70) el.classList.add("neg");
         else if (s[k] > 40) el.classList.add("warn");
-      } else if (k === "health" || k === "education" || k === "happiness") {
+      } else if (k === "happiness") {
         if (s[k] < 30) el.classList.add("neg");
         else if (s[k] < 60) el.classList.add("warn");
+      } else if (k === "lifeExpectancy") {
+        if (s[k] < 50) el.classList.add("neg");
+        else if (s[k] < 65) el.classList.add("warn");
+      } else if (k === "eq") {
+        if (s[k] < 45) el.classList.add("neg");
+        else if (s[k] < 65) el.classList.add("warn");
       }
     });
   }

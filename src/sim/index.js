@@ -18,6 +18,7 @@ import { updateEvents, respondPetition, openPetition, specialAvailable, ensureEv
 import { SPECIAL_TYPES } from "./catalog.js";
 import { DEALS, SIDES, signDeal, cancelDeal, auditDeals, dealAvailable } from "./neighbors.js";
 import { buildingName } from "./names.js";
+import { advanceYear, updateStrikes, readPopulation, blankPopulation, serviceQuality } from "./population.js";
 
 export { TOOLS, TOOL_MAP, BUILDINGS, ZONE_TYPES, ORDINANCES, ADVISORS, DISASTERS, START_YEAR, DEFAULT_SIZE, FUNDED_DEPARTMENTS, SPECIAL_TYPES, PETITIONS, DEALS, SIDES, serialize, place, evaluate, isZone };
 
@@ -31,8 +32,10 @@ export function createCity(seed = 42, starter = true, options = {}) {
 // Recompute everything derived and cache stats on the city.
 function settle(city) {
   ensureEvents(city);
+  if (!city.people) city.people = blankPopulation();
   refreshCity(city);
-  city._traffic = updateTraffic(city);
+  const share = readPopulation(city, city.population || 0).workforceShare;
+  city._traffic = updateTraffic(city, share);
   refreshCity(city);
   const m = computeMetrics(city);
   city.population = m.population;
@@ -62,8 +65,11 @@ export function tick(city) {
   const fireMessage = advanceFires(city, rng);
   advanceEffects(city);
   refreshCity(city);
-  city._traffic = updateTraffic(city);
+  city._traffic = updateTraffic(city, readPopulation(city, city.population || 0).workforceShare);
   refreshCity(city);
+  // Sims age once a year: children are schooled, adults forget, and life
+  // expectancy drifts toward what the city's hospitals and air support.
+  const strikeNews = advancePeople(city);
   const m = computeMetrics(city);
   const demand = computeDemand(city, m);
   const budget = computeBudget(city);
@@ -78,7 +84,8 @@ export function tick(city) {
   city._metrics = m;
   city._budget = budget;
 
-  const news = generateNews(city, statsForNews, city._prev);
+  const news = [...strikeNews];
+  news.push(...generateNews(city, statsForNews, city._prev));
   news.push(...updateEvents(city, statsForNews, rng));
   news.push(...auditDeals(city, city._connections));
   const disaster = randomDisaster(city, m, rng);
@@ -91,11 +98,33 @@ export function tick(city) {
     month: city.month, population: m.population, money: Math.round(city.money), happiness: m.happiness,
     income: budget.income.total, expenses: budget.expenses.total, balance: budget.balance, debt: city.debt,
     pollution: m.pollution, crime: m.crime, traffic: m.traffic, landValue: m.landValue,
+    eq: m.eq, lifeExpectancy: m.lifeExpectancy,
     demand: { ...demand },
   });
   if (city.history.length > 240) city.history.shift();
   city.revision++;
   return { growth, news, disaster: disaster || fireMessage || null };
+}
+
+// Strike bookkeeping every month, ageing every January. Returns news.
+function advancePeople(city) {
+  const before = { ...city.people.strikes };
+  updateStrikes(city);
+  const news = [];
+  for (const [dept, label] of [["education", "Teachers"], ["health", "Hospital staff"]]) {
+    if (!before[dept] && city.people.strikes[dept]) news.push(`${label} walk out over budget cuts.`);
+    else if (before[dept] && !city.people.strikes[dept]) news.push(`${label} return to work.`);
+  }
+  if ((city.month + 1) % 12 === 0) {
+    const m = city._metrics || {};
+    advanceYear(city, city.population || 0, {
+      pollution: m.pollution || 0,
+      waterPollution: m.waterPollution || 0,
+      traffic: m.traffic || 0,
+      garbage: m.garbage || 0,
+    });
+  }
+  return news;
 }
 
 export function getStats(city) {
@@ -199,6 +228,9 @@ const LABELS = {
   empty: "Open land", road: "Road", rail: "Rail line",
   residential: "Residential zone", commercial: "Commercial zone", industrial: "Industrial zone",
 };
+// Query grades: enough places for everyone, adequately staffed, earns an A.
+const GRADES = [[1.05, "A"], [0.9, "B"], [0.75, "C"], [0.55, "D"], [0, "F"]];
+const grade = (score) => (GRADES.find(([floor]) => score >= floor) || GRADES.at(-1))[1];
 const DENSITY_NAMES = ["", "Low density", "Medium density", "High density"];
 const STAGE_NAMES = { residential: ["", "Small homes", "Family homes", "Apartments", "Residential towers"], commercial: ["", "Corner shops", "Retail strip", "Offices", "Corporate towers"], industrial: ["", "Workshops", "Factories", "Plants", "Heavy industry"] };
 
@@ -227,8 +259,18 @@ export function inspectTile(city, x, y) {
     if (b.powerOut) details.push(`Power output: ${b.powerOut.toLocaleString()}`);
     if (b.waterOut) details.push(`Water output: ${b.waterOut.toLocaleString()}${b.nearWater ? " (near water)" : ""}`);
     if (b.service) details.push(`${b.service.kind} coverage radius ${b.service.radius}`);
-    if (b.garbage) details.push(`Garbage capacity: ${b.garbage}`);
-    if (t.type === "road" && t.terrain === "water") description = "Bridge.";
+    // The manual tells players to query a school or hospital for its grade:
+    // a good grade means enough places, well enough funded, for everyone who
+    // needs one. Bad grades mean more buildings or more budget.
+    if (b.capacity) {
+      const q = serviceQuality(city, { ...readPopulation(city, city.population || 0), strikes: city.people.strikes });
+      const kind = b.capacity.kind;
+      const needed = { school: q.schoolDemand, college: q.collegeDemand, hospital: city.population || 0 }[kind] || 0;
+      const seats = q.seats[kind] || 0;
+      const score = kind === "hospital" ? q.hospitalService : (kind === "school" ? q.schoolQuality : q.collegeQuality) / 100;
+      details.push(`${kind === "hospital" ? "Beds" : "Places"}: ${b.capacity.seats.toLocaleString()} (city-wide ${Math.round(seats).toLocaleString()} for ${Math.round(needed).toLocaleString()})`);
+      details.push(`Grade: ${grade(score)}`);
+    }
   } else {
     description = t.trees ? `${["", "Scattered trees", "Woodland", "Dense forest"][t.trees]} on ${t.terrain}.` : `Undeveloped ${t.terrain}.`;
   }
