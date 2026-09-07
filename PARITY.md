@@ -15,6 +15,8 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 
 | Industry | Farms, heavy industry, manufacturing and high tech, the last attracted by an educated workforce | **Done.** See below |
 
+| Zone stages | Land value gates how far a zone builds out within its density | **Done.** See below |
+| Waste | Landfills store trash, fill up, decompose and cannot be bulldozed; incinerators age | **Done.** See below |
 | Aura | A per-neighbourhood mood map whose average is the mayoral approval rating | **Done.** See below |
 | Public safety | Budget sets precinct size and effectiveness; overlaps are additive; jails cap police effectiveness | **Done.** See below |
 
@@ -160,6 +162,32 @@ the ordinance table as data rather than a list of special cases.
 
 Residents also choose where to live by aura, so a well-kept district fills
 before a grim one.
+
+## Zone stages and waste, September 7
+
+**Land value gates density.** *"Density sets the maximum density for a zone.
+Land value of the zone must be very high in order for full density to be
+reached."* One threshold at stage 3 became a table: each stage asks a land
+value that rises with the zone's density, so a dense block reaches its top
+stage only on a genuinely good address, and a lot whose neighbourhood decays
+well past what its stage needs loses a storey. Foundries ask almost nothing;
+laboratories ask nearly as much as offices.
+
+**A landfill is a store, not an allowance.** *"Each tile of landfill can hold
+up to a certain amount of trash... When a landfill is full, garbage will
+accumulate around the city."* Landfills now hold 5,000 tons per tile, take
+deliveries only where trucks can reach them, decompose 10 tons a month, and
+fill up: a starter town has about seven years before the streets suffer, with
+two warnings on the way.
+
+They are also permanent: *"You can't bulldoze over landfills; however, you can
+decommission them by removing road or rail access. Over time the landfill will
+decompose all of its accumulated garbage, at which time you can de-zone it."*
+
+Incinerators and recycling centres now lose capacity with age on the shared
+wear curve, and two more pieces from the manual arrived: the **waste-to-energy
+plant** (2000), which burns refuse and returns power, with original artwork,
+and the **Trash Presort** ordinance, which raises recycling throughput 40%.
 
 ## Visual and performance work, September 7
 

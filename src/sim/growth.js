@@ -12,6 +12,29 @@ import { yearOf } from "./metrics.js";
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
+// "Density sets the maximum density for a zone. Land value of the zone must
+// be very high in order for full density to be reached." A stage is how far a
+// lot has built out within its density band, so the taller the target the
+// more the address has to be worth. Indexed [level - 2][density - 1]; stage 1
+// asks nothing.
+const VALUE_FOR_STAGE = {
+  residential:   [[0, 6, 14], [10, 22, 34], [18, 34, 52]],
+  commercial:    [[0, 8, 16], [12, 24, 38], [20, 38, 56]],
+  industrial:    [[0, 0, 0], [0, 4, 8], [0, 10, 18]],
+  // Laboratories want a good address; foundries do not.
+  hightech:      [[0, 8, 16], [8, 16, 26], [16, 28, 42]],
+};
+
+// Land value a lot needs before it will build up to `level`.
+export function valueForStage(t, level) {
+  if (level < 2) return 0;
+  const table = t.type === "industrial" && industryOf(t) === "hightech"
+    ? VALUE_FOR_STAGE.hightech
+    : VALUE_FOR_STAGE[t.type];
+  if (!table) return 0;
+  return table[Math.min(table.length, level - 1) - 1][Math.max(1, Math.min(3, t.density)) - 1];
+}
+
 export function computeDemand(city, m) {
   const taxes = city.taxes;
   const ord = city.ordinances || {};
@@ -110,10 +133,15 @@ export function updateGrowth(city, demand, rng) {
       }
       continue;
     }
+    // A lot whose neighbourhood has decayed well past what its current stage
+    // needs loses a storey: the nicer property no longer belongs there.
+    if (t.level > 1 && (t.landValue ?? 0) < valueForStage(t, t.level) - 12) {
+      if (rng() < 0.1) { t.level--; declined++; t.age = 0; continue; }
+    }
     if (d > 0 && t.level < 4 && t.age >= 2) {
       const needsWater = t.level >= 1 && (t.density >= 2 || t.level >= 2);
       if (needsWater && !t.watered) continue;
-      if (t.level === 3 && t.type !== "industrial" && (t.landValue ?? 0) < 35) continue;
+      if ((t.landValue ?? 0) < valueForStage(t, t.level + 1)) continue;
       const p = (d / 100) * 0.14 * des;
       if (rng() < p) { t.level++; t.age = 0; upgraded++; }
     }

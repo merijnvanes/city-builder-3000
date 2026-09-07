@@ -20,7 +20,7 @@ export const TECH_YEAR = {
   // Power plant years are the manual's, page 38-39.
   coal: 1900, oil: 1900, gas: 1955, nuclear: 1965, wind: 1980, solar: 1990, microwave: 2020, fusion: 2050,
   highway: 1940, subway: 1920, substation: 1920,
-  treatment: 1935, desalination: 1960, incinerator: 1920, recycling: 1970,
+  treatment: 1935, desalination: 1960, incinerator: 1920, recycling: 1970, wasteenergy: 2000,
   airport: 1930, railstation: 1900, bus: 1920,
   college: 1900, hospital: 1900, museum: 1900, zoo: 1900, casino: 1930, toxicdump: 1960, prison: 1900, armybase: 1900, jail: 1900,
 };
@@ -86,9 +86,14 @@ export const BUILDINGS = {
   college:     { label: "College",         group: "civic", cost: 1000, w: 4, h: 4, upkeep: 140, dept: "education", service: { kind: "education", radius: 18, strength: 100 }, capacity: { kind: "college", seats: 5000 }, powerUse: 6, waterUse: 4 },
   library:     { label: "Library",         group: "civic", cost: 500,  w: 2, h: 2, upkeep: 30,  dept: "education", service: { kind: "education", radius: 8, strength: 40 }, powerUse: 2, waterUse: 1 },
   museum:      { label: "Museum",          group: "civic", cost: 1000, w: 3, h: 3, upkeep: 45,  dept: "education", service: { kind: "culture", radius: 10, strength: 60 }, powerUse: 3, waterUse: 1 },
-  landfill:    { label: "Landfill",        group: "civic", cost: 20,   w: 1, h: 1, upkeep: 2,   dept: "sanitation", garbage: 60, rect: true, pollution: 10 },
-  incinerator: { label: "Incinerator",     group: "civic", cost: 3000, w: 3, h: 3, upkeep: 90,  dept: "sanitation", garbage: 900, pollution: 35, powerUse: 5 },
-  recycling:   { label: "Recycling Center",group: "civic", cost: 1500, w: 3, h: 3, upkeep: 50,  dept: "sanitation", garbage: 300, powerUse: 3 },
+  // A landfill stores rather than processes: "Each tile of landfill can hold
+  // up to a certain amount of trash", and it decomposes slowly. Incinerators
+  // and recycling centres have a monthly throughput instead, and both lose
+  // efficiency as they age.
+  landfill:    { label: "Landfill",        group: "civic", cost: 20,   w: 1, h: 1, upkeep: 2,   dept: "sanitation", hold: 5000, rect: true, pollution: 10 },
+  incinerator: { label: "Incinerator",     group: "civic", cost: 3000, w: 3, h: 3, upkeep: 90,  dept: "sanitation", garbage: 900, pollution: 35, powerUse: 5, lifespan: 45 },
+  recycling:   { label: "Recycling Center",group: "civic", cost: 1500, w: 3, h: 3, upkeep: 50,  dept: "sanitation", recycles: 400, powerUse: 3, lifespan: 45 },
+  wasteenergy: { label: "Waste-to-Energy Plant", group: "civic", cost: 9000, w: 3, h: 3, upkeep: 180, dept: "sanitation", garbage: 1400, pollution: 22, powerOut: 2200, lifespan: 45 },
 
   park:        { label: "Small Park",      group: "landscape", cost: 20,   w: 1, h: 1, upkeep: 1,   dept: "parks", service: { kind: "park", radius: 4, strength: 30 }, rect: true },
   largepark:   { label: "Large Park",      group: "landscape", cost: 200,  w: 3, h: 3, upkeep: 8,   dept: "parks", service: { kind: "park", radius: 7, strength: 60 } },

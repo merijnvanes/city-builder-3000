@@ -5,6 +5,8 @@ import { ORDINANCES } from "./city.js";
 import { isAnchor, lotTiles, capacityOf } from "./lots.js";
 import { industryTraits } from "./industry.js";
 import { readPopulation, NATIONAL_EQ, BASE_LIFE_EXPECTANCY } from "./population.js";
+import { ageFactor } from "./wear.js";
+import { DEALS } from "./neighbors.js";
 
 export const ROAD_REACH = 3;
 // Share of residents who pass through the courts in a year and need a cell.
@@ -135,21 +137,40 @@ export function updateServices(city) {
   }
 
   // ── Garbage ───────────────────────────────────────────────────
-  let population = 0, jobs = 0, garbageCapacity = 0;
+  // Recycling first ("Recycling centers can significantly reduce the amount
+  // of trash that Sims produce"), then incinerators burn what they can, then
+  // whatever is left goes into landfills until they are full. "When a
+  // landfill is full, garbage will accumulate around the city."
+  let population = 0, jobs = 0, burnRate = 0, recycleRate = 0, landfillSpace = 0, landfillFill = 0, landfillHold = 0;
   for (const t of tiles) {
     if (!isAnchor(t)) continue;
     const cap = capacityOf(t);
     if (t.type === "residential") population += cap; else jobs += cap;
     const b = BUILDINGS[t.type];
-    if (b?.garbage) garbageCapacity += b.garbage * (b.powerUse && !t.powered ? 0.3 : 1) * pct(b.dept);
+    if (!b) continue;
+    // "Like landfills, incinerators need to be near a road so garbage trucks
+    // can deliver garbage to them."
+    const reachable = t.roadAccess ? 1 : 0;
+    const running = reachable * (b.powerUse && !t.powered ? 0.3 : 1) * pct(b.dept) * ageFactor(t.type, t.age || 0);
+    if (b.garbage) burnRate += b.garbage * running;
+    if (b.recycles) recycleRate += b.recycles * running * (ord.trashPresort ? 1.4 : 1);
+    if (b.hold) {
+      landfillHold += b.hold;
+      landfillFill += t.fill || 0;
+      if (reachable) landfillSpace += Math.max(0, b.hold - (t.fill || 0));
+    }
   }
   let garbageProduced = population * 0.03 + jobs * 0.015;
   if (ord.recycling) garbageProduced *= 0.75;
   const garbageDeal = city.deals?.garbage;
-  if (garbageDeal?.kind === "sell") garbageCapacity += 500;
-  if (garbageDeal?.kind === "buy") garbageProduced += 600;
-  const uncollected = Math.max(0, garbageProduced - garbageCapacity);
+  if (garbageDeal?.kind === "buy") garbageProduced += DEALS.garbage.buy.amount;
+  const exported = garbageDeal?.kind === "sell" ? DEALS.garbage.sell.amount : 0;
+
+  let left = Math.max(0, garbageProduced - recycleRate - burnRate - exported);
+  const buried = Math.min(left, landfillSpace);
+  const uncollected = left - buried;
   const garbage = garbageProduced > 0 ? Math.round(100 * uncollected / garbageProduced) : 0;
+  const garbageCapacity = recycleRate + burnRate + exported + landfillSpace;
   if (garbage > 0) for (const t of tiles) if (ZONE_TYPES.has(t.type)) t.pollution = Math.min(100, t.pollution + Math.round(garbage * 0.06));
 
   // ── Land value (before crime, so the result depends only on the
@@ -230,6 +251,7 @@ export function updateServices(city) {
   }
 
   return { garbage, garbageProduced: Math.round(garbageProduced), garbageCapacity: Math.round(garbageCapacity), industrialLots,
+           buried, landfillSpace: Math.round(landfillSpace), landfillFill: Math.round(landfillFill), landfillHold,
            waterPollution: city._util?.waterPollution || 0,
            cells: Math.round(cells), arrestable: Math.round(arrestable), jailFactor };
 }

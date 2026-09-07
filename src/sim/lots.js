@@ -62,6 +62,7 @@ export function assignLot(city, lot, level, variant) {
     t.abandoned = false;
     t.age = 0;
     t.industry = null;
+    t.fill = 0;
   }
   const anchor = tileAt(city, lot.x, lot.y);
   anchor.level = level;
@@ -79,6 +80,7 @@ export function clearLot(city, anchor, { keepZone = true } = {}) {
     t.age = 0;
     t.fire = 0;
     t.industry = null;
+    t.fill = 0;
     if (!(keepZone && ZONE_TYPES.has(t.type))) { t.type = "empty"; t.density = 0; }
   }
 }

@@ -20,7 +20,7 @@ export function heightOf(t) {
   if (t.type === "commercial") return t.density === 1 ? 10 + level * 2 : t.density === 2 ? 20 + level * 7 : 40 + level * 24;
   if (t.type === "industrial") return t.density === 1 ? 12 : t.density === 2 ? 18 : 26;
   return { coal: 46, oil: 34, gas: 30, nuclear: 60, wind: 42, solar: 6, microwave: 45, fusion: 40, waterpump: 10, watertower: 47, treatment: 14, desalination: 20,
-    police: 24, fire: 21, jail: 25, hospital: 40, school: 22, college: 30, library: 18, museum: 26, landfill: 6, incinerator: 40, recycling: 16,
+    police: 24, fire: 21, jail: 25, hospital: 40, school: 22, college: 30, library: 18, museum: 26, landfill: 6, incinerator: 40, wasteenergy: 46, recycling: 16,
     park: 14, largepark: 16, zoo: 14, bus: 9, railstation: 16, airport: 18, seaport: 16, substation: 8,
     mayorhouse: 24, cityhall: 46, courthouse: 27, stadium: 30, statue: 25, prison: 20, casino: 36, toxicdump: 10, armybase: 14,
     marina: 14, university: 34, medcenter: 40, gigamall: 20,
@@ -604,6 +604,25 @@ const RECIPES = {
     d.box(0.08, 0.3, 0.6, 0.6, 18, "#8f8a7c"); d.windows(0.08, 0.3, 0.6, 0.6, 18, t.x + t.y); d.roof(0.08, 0.3, 0.6, 0.6, 18, 5, "#5f5f58");
     d.cyl(0.8, 0.3, 0.06, 40, "#c0b9a4"); d.cyl(0.8, 0.3, 0.062, 4, "#a4624c", 28);
     d.box(0.72, 0.62, 0.22, 0.3, 8, "#77756b");
+  },
+  // Burns refuse and sells the heat back to the grid: a boiler hall with a
+  // scrubbed stack, a turbine house and the switchyard that ties it in.
+  wasteenergy(d, t, n) {
+    d.flat(0.02, 0.02, 0.96, 0.96, 0.3, "#8b9088");
+    d.box(0.06, 0.24, 0.5, 0.5, 24, "#a9ada0"); d.windows(0.06, 0.24, 0.5, 0.5, 24, t.x + t.y, true);
+    d.roof(0.04, 0.22, 0.54, 0.54, 24, 6, "#5a655f");
+    d.cyl(0.74, 0.26, 0.075, 44, "#cfd2c4");
+    d.cyl(0.74, 0.26, 0.08, 5, "#7f9aa2", 39);
+    d.box(0.62, 0.56, 0.32, 0.3, 13, "#b9bdb0"); d.windows(0.62, 0.56, 0.32, 0.3, 13, t.x + t.y + 3, true);
+    d.roof(0.6, 0.54, 0.36, 0.34, 13, 4, "#5a655f");
+    // Switchyard: pylons and busbars carrying the output away.
+    for (let i = 0; i < 3; i++) {
+      const a = 0.1 + i * 0.14;
+      d.line(a, 0.9, 0, a, 0.9, 12, "#c8ccbe", 1.2);
+      d.line(a, 0.9, 11, a + 0.14, 0.9, 11, "#c8ccbe", 0.9);
+    }
+    d.box(0.08, 0.06, 0.34, 0.12, 6, "#9aa096");
+    d.fence(0.03, 0.97, 0.94, 0, "#7f867e");
   },
   recycling(d, t, n) {
     d.flat(0.03, 0.03, 0.94, 0.94, 0.2, "#96a08c");

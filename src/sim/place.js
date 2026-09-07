@@ -36,6 +36,7 @@ import { tileAt, inBounds, nextRandom } from "./grid.js";
 import { lotTiles, assignLot, clearLot, anchorOf } from "./lots.js";
 import { refreshCity } from "./refresh.js";
 import { specialAvailable } from "./events.js";
+import { isLandfill } from "./waste.js";
 
 export const DEMOLISH_FEE = 5;
 export const BRIDGE_MULTIPLIER = 5;
@@ -114,6 +115,12 @@ export function evaluate(city, x, y, tool, options = {}) {
   }
 
   if (tool === "bulldoze") {
+    // "You can't bulldoze over landfills; however, you can decommission them
+    // by removing road or rail access. Over time the landfill will decompose
+    // all of its accumulated garbage, at which time you can de-zone it."
+    if (isLandfill(t) && (t.fill || 0) > 0) {
+      return fail(`This landfill still holds ${Math.round(t.fill).toLocaleString()} tons. Cut its road access and let it decompose.`);
+    }
     if (t.lot) {
       const a = anchorOf(city, t);
       const tiles = lotTiles(city, a.lot).map((n) => ({ x: n.x, y: n.y }));

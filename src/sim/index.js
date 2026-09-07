@@ -22,6 +22,8 @@ import { advanceYear, updateStrikes, readPopulation, blankPopulation, serviceQua
 import { INDUSTRY, industryOf, ensureIndustry } from "./industry.js";
 import { agePlants, plantOutput, OVERLOAD_MONTHS } from "./power.js";
 import { agePumps, pumpOutput, hasSource, SOURCE_REACH } from "./water.js";
+import { fillLandfills, landfillLoad, landfillNews } from "./waste.js";
+import { ageFactor } from "./wear.js";
 
 export { TOOLS, TOOL_MAP, BUILDINGS, ZONE_TYPES, ORDINANCES, ADVISORS, DISASTERS, START_YEAR, DEFAULT_SIZE, FUNDED_DEPARTMENTS, SPECIAL_TYPES, PETITIONS, DEALS, SIDES, serialize, place, evaluate, isZone };
 
@@ -78,6 +80,11 @@ export function tick(city) {
   // Plants and pumps age; a grid overdrawn for a year loses a plant.
   monthNews.push(...agePlants(city, rng));
   monthNews.push(...agePumps(city));
+  // Trucks tip this month's collection into the landfills, and what is
+  // already buried decomposes a little.
+  const tipsBefore = landfillLoad(city);
+  fillLandfills(city, city._svc?.buried || 0);
+  monthNews.push(...landfillNews(city, tipsBefore, landfillLoad(city)));
   advanceEffects(city);
 
   refreshCity(city);
@@ -304,6 +311,24 @@ export function inspectTile(city, x, y) {
       const score = kind === "hospital" ? q.hospitalService : (kind === "school" ? q.schoolQuality : q.collegeQuality) / 100;
       details.push(`${kind === "hospital" ? "Beds" : "Places"}: ${b.capacity.seats.toLocaleString()} (city-wide ${Math.round(seats).toLocaleString()} for ${Math.round(needed).toLocaleString()})`);
       details.push(`Grade: ${grade(score)}`);
+    }
+    if (b.cells) {
+      const m = city._svc || {};
+      details.push(`Cells: ${b.cells.toLocaleString()} (city-wide ${(m.cells || 0).toLocaleString()} for ${(m.arrestable || 0).toLocaleString()} arrests)`);
+      if ((m.jailFactor ?? 1) < 1) details.push("Overcrowded: arrests are released and police effectiveness drops.");
+    }
+    // "Query a landfill tile to find out the disposal capacity system-wide",
+    // and check an incinerator's capacity as it ages.
+    if (b.garbage || b.recycles) {
+      const rate = Math.round((b.garbage || b.recycles) * ageFactor(t.type, t.age || 0));
+      details.push(`${b.recycles ? "Recycles" : "Burns"}: ${rate.toLocaleString()} of ${(b.garbage || b.recycles).toLocaleString()} tons per month`);
+      if (!t.roadAccess) details.push("No road: garbage trucks cannot reach it.");
+    }
+    if (b.hold) {
+      const m = city._svc || {};
+      details.push(`Buried here: ${Math.round(t.fill || 0).toLocaleString()} of ${b.hold.toLocaleString()}`);
+      details.push(`City landfills: ${Math.round(100 * landfillLoad(city))}% full (${(m.landfillSpace || 0).toLocaleString()} tons of space left)`);
+      if (!t.roadAccess) details.push("No road: this landfill is decommissioned and slowly decomposing.");
     }
   } else {
     description = t.trees ? `${["", "Scattered trees", "Woodland", "Dense forest"][t.trees]} on ${t.terrain}.` : `Undeveloped ${t.terrain}.`;

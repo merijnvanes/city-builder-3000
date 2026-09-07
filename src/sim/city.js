@@ -8,6 +8,9 @@ import { blankPopulation, serializePopulation, parsePopulation } from "./populat
 import { INDUSTRY_TYPES } from "./industry.js";
 import { OVERLOAD_MONTHS } from "./power.js";
 
+// Nothing holds more trash than the largest landfill tile.
+const MAX_FILL = Math.max(...Object.values(BUILDINGS).map((b) => b.hold || 0));
+
 export const SAVE_VERSION = 4;
 export const DEFAULT_SIZE = 64;
 export const MAX_SIZE = 128;
@@ -36,6 +39,7 @@ export const ORDINANCES = {
   leafBurningBan:     { label: "Leaf Burning Ban",         cost: 0.002, mood: -1, description: "Reduces air pollution 5%. Gardeners grumble." },
   cprTraining:        { label: "CPR Training",             cost: 0.006, description: "Raises health a little everywhere." },
   wasteTax:           { label: "Industrial Waste Tax",     cost: 0,     mood: -1, description: "Industry pays 15% more tax and pollutes 8% less, but grows slower." },
+  trashPresort:       { label: "Trash Presort",            cost: 0.006, mood: -1, description: "Residents sort their own waste. Recycling centers handle 40% more." },
 };
 
 export function makeTile(x, y, terrain, trees, variant, elev = 0, salt = 0) {
@@ -44,6 +48,8 @@ export function makeTile(x, y, terrain, trees, variant, elev = 0, salt = 0) {
     // Sea water. Fresh pumps cannot draw from it; a desalinization plant can.
     salt: terrain === "water" ? !!salt : false,
     type: "empty", density: 0, lot: null, level: 0, variant, abandoned: false, age: 0, fire: 0, industry: null, strain: 0,
+    // Trash buried in this tile, for landfills.
+    fill: 0,
     powered: false, watered: false, roadAccess: false, powerline: false, pipe: false, subway: false,
     pollution: 0, crime: 0, traffic: 0, landValue: 40, svc: null,
   };
@@ -107,6 +113,7 @@ export function serialize(city) {
     t.level | 0, Math.round(t.variant * 1000) / 1000, t.abandoned ? 1 : 0, t.age | 0, t.fire | 0,
     t.powerline ? 1 : 0, t.pipe ? 1 : 0, t.elev | 0, t.subway ? 1 : 0, t.flooded | 0,
     t.industry ? INDUSTRY_TYPES.indexOf(t.industry) + 1 : 0, t.strain | 0, t.salt ? 1 : 0,
+    Math.round((t.fill || 0) * 100) / 100,
   ]);
   return JSON.stringify({
     version: SAVE_VERSION,
@@ -166,8 +173,9 @@ export function deserialize(raw) {
   for (let i = 0; i < d.tiles.length; i++) {
     const r = d.tiles[i];
     const x = i % size, y = (i - x) / size;
-    if (!Array.isArray(r) || r.length < 15 || r.length > 21) throw new Error(`Invalid save: tile ${i} malformed.`);
-    const [terrainCode, trees, typeCode, density, lotX, lotY, lotW, lotH, level, variant, abandoned, age, fire, powerline, pipe, elev = 0, subway = 0, flooded = 0, industry = 0, strain = 0, salt = 0] = r;
+    if (!Array.isArray(r) || r.length < 15 || r.length > 22) throw new Error(`Invalid save: tile ${i} malformed.`);
+    const [terrainCode, trees, typeCode, density, lotX, lotY, lotW, lotH, level, variant, abandoned, age, fire, powerline, pipe, elev = 0, subway = 0, flooded = 0, industry = 0, strain = 0, salt = 0, fill = 0] = r;
+    if (!Number.isFinite(fill) || fill < 0 || fill > MAX_FILL) throw new Error(`Invalid save: tile ${i} bad landfill contents.`);
     if (![0, 1].includes(salt)) throw new Error(`Invalid save: tile ${i} bad water type.`);
     if (!Number.isInteger(industry) || industry < 0 || industry > INDUSTRY_TYPES.length) throw new Error(`Invalid save: tile ${i} bad industry.`);
     if (!Number.isInteger(strain) || strain < 0 || strain > OVERLOAD_MONTHS) throw new Error(`Invalid save: tile ${i} bad plant strain.`);
@@ -190,6 +198,7 @@ export function deserialize(raw) {
     t.powerline = !!powerline; t.pipe = !!pipe; t.subway = !!subway; t.flooded = flooded;
     t.industry = industry ? INDUSTRY_TYPES[industry - 1] : null;
     t.strain = strain;
+    t.fill = fill;
     if (lotW > 0) {
       if (!Number.isInteger(lotX) || !Number.isInteger(lotY) || !Number.isInteger(lotH) || lotW > 8 || lotH > 8 ||
           lotX > x || lotY > y || lotX + lotW <= x || lotY + lotH <= y) throw new Error(`Invalid save: tile ${i} bad lot.`);
