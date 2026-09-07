@@ -27,6 +27,7 @@ import { fillLandfills, landfillLoad, landfillNews } from "./waste.js";
 import { advanceRoads, roadCapacity } from "./roads.js";
 import { sitingNote } from "./siting.js";
 import { sound, advanceSiren, sirenSounding, blankSiren } from "./siren.js";
+import { flammability, reliefGrant, developedLots } from "./fire.js";
 import { ageFactor } from "./wear.js";
 
 export { TOOLS, TOOL_MAP, BUILDINGS, ZONE_TYPES, ORDINANCES, ADVISORS, DISASTERS, START_YEAR, DEFAULT_SIZE, FUNDED_DEPARTMENTS, SPECIAL_TYPES, PETITIONS, DEALS, SIDES, serialize, place, evaluate, isZone };
@@ -116,8 +117,12 @@ export function tick(city) {
   news.push(...updateEvents(city, statsForNews, rng));
   const cancelled = auditDeals(city, city._connections, city._util);
   news.push(...cancelled);
+  const standing = developedLots(city);
   const disaster = randomDisaster(city, m, rng);
-  if (disaster) news.push(disaster);
+  if (disaster) {
+    news.push(disaster);
+    news.push(...claimRelief(city, m, standing));
+  }
   if (fireMessage) news.push(fireMessage);
   // A warning that came to nothing costs the mayor credibility.
   news.push(...advanceSiren(city, !!(disaster || fireMessage)));
@@ -139,6 +144,17 @@ export function tick(city) {
   if (disaster || cancelled.length) settle(city);
   city.revision++;
   return { growth, news, disaster: disaster || fireMessage || null };
+}
+
+// "In the event of a catastrophic disaster, the powers that be in SimNation
+// may take it upon themselves to assist you in the clean up costs. Be
+// forewarned, a Mayor that is well prepared generally receives better
+// treatment." Returns news.
+function claimRelief(city, stats, standingBefore) {
+  const grant = reliefGrant(city, stats, standingBefore - developedLots(city));
+  if (grant <= 0) return [];
+  city.money += grant;
+  return [`SimNation sends $${grant.toLocaleString()} in disaster relief.`];
 }
 
 // Strike bookkeeping every month, ageing every January. Returns news.
@@ -272,8 +288,11 @@ export function setPolicy(city, key, value) {
 export function disaster(city, id) {
   if (!DISASTERS[id]) return "Unknown disaster.";
   const rng = lcg(nextRandom(city) * 4294967296);
+  const standing = developedLots(city);
   const message = triggerDisaster(city, id, rng);
   refresh(city);
+  const relief = claimRelief(city, city._metrics, standing);
+  if (relief.length) city.news = [...city.news, ...relief].slice(-30);
   return message;
 }
 
@@ -312,6 +331,7 @@ export function inspectTile(city, x, y) {
     if (t.type === "residential" && a.commute != null && cap) details.push(`Workers with a job: ${Math.round(a.commute * 100)}%`);
     if (a.lot) { const d = drawOf(a); details.push(`Power draw: ${Math.round(d.power)} · Water draw: ${Math.round(d.water)}`); }
     details.push(`Conditions: ${conditionsOk(a) ? "OK" : "Not met"}`);
+    if (a.lot) details.push(`Flammability: ${flammability(city, a)}/100${a.watered ? " (watered)" : ""}`);
   } else if (BUILDINGS[t.type]) {
     const b = BUILDINGS[t.type];
     description = `${b.label}, ${b.w}×${b.h}. Upkeep $${b.upkeep}/month.`;
@@ -331,6 +351,7 @@ export function inspectTile(city, x, y) {
     if (b.service) details.push(`${b.service.kind} coverage radius ${b.service.radius}`);
     const note = sitingNote(city, t);
     if (note) details.push(note);
+    details.push(`Flammability: ${flammability(city, t)}/100${t.watered ? " (watered)" : ""}`);
     // The manual tells players to query a school or hospital for its grade:
     // a good grade means enough places, well enough funded, for everyone who
     // needs one. Bad grades mean more buildings or more budget.

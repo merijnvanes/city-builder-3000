@@ -42,6 +42,7 @@ export const ORDINANCES = {
   cprTraining:        { label: "CPR Training",             cost: 0.006, description: "Raises health a little everywhere." },
   wasteTax:           { label: "Industrial Waste Tax",     cost: 0,     mood: -1, description: "Industry pays 15% more tax and pollutes 8% less, but grows slower." },
   trashPresort:       { label: "Trash Presort",            cost: 0.006, mood: -1, description: "Residents sort their own waste. Recycling centers handle 40% more." },
+  fireCode:           { label: "Fire Code",                cost: 0.01,  mood: -1, description: "Sprinklers and inspections cut flammability across the city by 30%." },
 };
 
 export function makeTile(x, y, terrain, trees, variant, elev = 0, salt = 0) {

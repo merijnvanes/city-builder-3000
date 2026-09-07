@@ -22,6 +22,8 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 | Aura | A per-neighbourhood mood map whose average is the mayoral approval rating | **Done.** See below |
 | Public safety | Budget sets precinct size and effectiveness; overlaps are additive; jails cap police effectiveness | **Done.** See below |
 
+| Fire | Per-building flammability, halved by water and cut by ordinance; relief scaled by preparedness | **Done.** See below |
+| Disasters | Permanent radiation after a meltdown; an early warning siren that can be abused | **Done.** See below |
 | Siting | Stops need roads, stations need track, seaports want a seacoast | **Done.** See below |
 | Neighbour deals | Purchases meter the deficit with a minimum fee; sales are an obligation; cancelling costs a large penalty | **Done.** See below |
 
@@ -390,6 +392,27 @@ One latent bug fixed with them: the nuclear explosion left a smoke cloud with
 a twelve-month lifetime, but the save format caps effects at six, so the city
 left behind could not be reloaded. Permanence now lives in the radiation flag,
 where it belongs, and the disaster save-integrity test covers meltdowns.
+
+## Flammability and relief, September 7
+
+*"All buildings in your city have an inherent flammability rating, which you
+can see if you query the building... The most effective way to reduce the
+flammability of a building is to see that it is receiving water... The
+reduction in potential fire damage is significant."*
+
+Every building now carries a flammability rating shown on its query card.
+Water roughly halves it, which is the manual's stated best defence; industry
+and abandoned blocks burn worse, utilities better. The rating decides where a
+fire starts, how readily it spreads to a neighbour, and whether a burning
+building is actually consumed. A new **Fire Code** ordinance cuts it citywide
+by 30%, which is the manual's *"ordinances can be enacted to reduce the global
+flammability level"*.
+
+*"In the event of a catastrophic disaster, the powers that be in SimNation may
+take it upon themselves to assist you in the clean up costs. Be forewarned, a
+Mayor that is well prepared generally receives better treatment."* Losing six
+or more lots to a disaster now draws a relief grant, and a city with funded
+fire and police coverage receives about twice what a neglectful one gets.
 
 ## Visual and performance work, September 7
 

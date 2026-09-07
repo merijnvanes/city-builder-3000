@@ -7,6 +7,7 @@ import { isAnchor, anchorOf, clearLot, lotTiles } from "./lots.js";
 import { MAX_ELEVATION } from "./terrain.js";
 import { meltdown } from "./power.js";
 import { shelter } from "./siren.js";
+import { flammability, fireWeight } from "./fire.js";
 
 export const DISASTERS = {
   fire:       { label: "Fire",       description: "A building catches fire. Spreads without fire coverage." },
@@ -42,12 +43,13 @@ function damageLot(city, a, rng, severe = false) {
   }
 }
 
-// Zones burn most readily; utilities and civic buildings are built tougher.
+// A fire starts where things burn most readily. "All buildings in your city
+// have an inherent flammability rating... The higher the rating, the more
+// likely that building will be consumed by fire if one occurs."
 function fireTargets(city) {
   const pool = [];
   for (const t of developedTiles(city)) {
-    if (ZONE_TYPES.has(t.type)) { for (let i = 0; i < t.density; i++) pool.push(t); }
-    else if (!BUILDINGS[t.type]?.powerOut && !BUILDINGS[t.type]?.waterOut) pool.push(t);
+    for (let i = 0, n = fireWeight(city, t); i < n; i++) pool.push(t);
   }
   return pool;
 }
@@ -225,12 +227,18 @@ export function advanceFires(city, rng) {
       for (const [dx, dy] of NEIGHBORS4) {
         const n = tileAt(city, e.x + dx, e.y + dy);
         if (!n || n.terrain === "water" || (n.lot && n.lot.x === t.lot?.x && n.lot.y === t.lot?.y)) continue;
-        if (rng() < 0.12 * (1 - (n.svc?.fire || 0) / 130)) ignite(city, n, 2);
+        // A dry timber block catches from its neighbour; a watered one
+        // usually does not. Fire cover still cuts the odds either way.
+        const catches = 0.26 * (flammability(city, n) / 100) * (1 - (n.svc?.fire || 0) / 130);
+        if (rng() < catches) ignite(city, n, 2);
       }
     }
     t.fire--;
     if (t.fire === 0) {
-      if (t.lot) damageLot(city, anchorOf(city, t) || t, rng);
+      // "The reduction in potential fire damage is significant." A watered
+      // building often comes through a blaze standing.
+      if (t.lot && rng() * 100 < flammability(city, t)) damageLot(city, anchorOf(city, t) || t, rng);
+      else if (t.lot) { contained++; destroyed--; }
       else if (t.type === "empty") t.trees = 0;
       // Burning out a zoned but undeveloped tile has to clear its density
       // too, or the tile is left as empty land still marked high density.
