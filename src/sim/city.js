@@ -10,6 +10,7 @@ import { COMMERCE_TYPES } from "./commerce.js";
 import { blankSiren, parseSiren, serializeSiren } from "./siren.js";
 import { OVERLOAD_MONTHS } from "./power.js";
 import { DEALS, SIDES, RATE_SPREAD, CAP_SPREAD } from "./neighbors.js";
+import { MAX_LOANS, LOAN_MAX, LOAN_YEARS } from "./economy.js";
 
 // Nothing holds more trash than the largest landfill tile.
 const MAX_FILL = Math.max(...Object.values(BUILDINGS).map((b) => b.hold || 0));
@@ -111,6 +112,9 @@ export function blankCity({ seed = 42, size = DEFAULT_SIZE, layout, name = "New 
   };
 }
 
+// One canonical shape for a loan, out and in, so a save round-trips exactly.
+const loanRecord = (l) => ({ amount: l.amount, remaining: l.remaining, payment: l.payment, since: l.since });
+
 // One canonical shape for a petition, used on the way out and on the way in.
 // A petition may carry a neighbour's offer, which is money, so this copies
 // only the fields the game writes and holds the terms to what an offer can be.
@@ -161,7 +165,7 @@ export function serialize(city) {
     version: SAVE_VERSION,
     size: city.size, seed: city.seed, layout: city.layout, name: city.name, startYear: city.startYear ?? START_YEAR,
     types, tiles,
-    money: city.money, debt: city.debt, loans: city.loans, month: city.month,
+    money: city.money, debt: city.debt, loans: city.loans.map(loanRecord), month: city.month,
     taxes: city.taxes, funding: city.funding, ordinances: city.ordinances,
     population: city.population, happiness: city.happiness, demand: city.demand,
     history: city.history, news: city.news, revision: city.revision, _rng: city._rng,
@@ -208,7 +212,13 @@ export function deserialize(raw) {
   }
   if (d.ordinances && typeof d.ordinances !== "object") throw new Error("Invalid save: bad ordinances.");
   if (!Number.isFinite(d.debt) || d.debt < 0) throw new Error("Invalid save: bad debt.");
-  if (!Array.isArray(d.loans) || d.loans.length > 10 || d.loans.some((l) => !l || !Number.isFinite(l.amount) || !Number.isFinite(l.remaining) || !Number.isFinite(l.payment) || l.remaining < 0))
+  // "You may have up to ten loans outstanding at any time", each of at most
+  // $25,000, repaid over ten annual instalments.
+  if (!Array.isArray(d.loans) || d.loans.length > MAX_LOANS || d.loans.some((l) => !l ||
+      !Number.isFinite(l.amount) || l.amount <= 0 || l.amount > LOAN_MAX ||
+      !Number.isFinite(l.payment) || l.payment <= 0 ||
+      !Number.isFinite(l.remaining) || l.remaining < 0 || l.remaining > l.payment * LOAN_YEARS ||
+      !Number.isSafeInteger(l.since) || l.since < 0 || l.since > d.month))
     throw new Error("Invalid save: bad loans.");
   if (!Array.isArray(d.history) || d.history.length > 240) throw new Error("Invalid save: bad history.");
   if (!Array.isArray(d.news) || d.news.length > 30 || d.news.some((n) => typeof n !== "string" || n.length > 300)) throw new Error("Invalid save: bad news.");
@@ -267,7 +277,7 @@ export function deserialize(raw) {
     size, seed: d.seed, layout: d.layout, name: d.name,
     startYear: Number.isInteger(d.startYear) && d.startYear >= 1800 && d.startYear <= 2200 ? d.startYear : START_YEAR,
     tiles,
-    money: d.money, debt: d.debt, loans: d.loans.map((l) => ({ amount: l.amount, remaining: l.remaining, payment: l.payment })),
+    money: d.money, debt: d.debt, loans: d.loans.map(loanRecord),
     month: d.month,
     taxes: { residential: d.taxes.residential, commercial: d.taxes.commercial, industrial: d.taxes.industrial },
     funding: { ...policies.funding, ...Object.fromEntries(Object.entries(d.funding || {}).filter(([k]) => k in policies.funding)) },

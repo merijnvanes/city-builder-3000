@@ -117,6 +117,16 @@ export function tick(city) {
   city._budget = budget;
 
   const news = [...monthNews];
+  // "As long as Auto Budget is on, all of your Budget window settings will
+  // remain unchanged and the Budget window will not pop up year after year. As
+  // soon as your finances go into the negative, Auto Budget will be turned
+  // off. This way you can hopefully recover before things get too out of
+  // hand." The setting here is the review itself, so going into the red turns
+  // it back on.
+  if (city.settings?.yearEndBudget === false && city.money < 0) {
+    city.settings.yearEndBudget = true;
+    news.push("The treasury is in the red: the year-end budget review is back on.");
+  }
   news.push(...generateNews(city, statsForNews, city._prev));
   news.push(...updateEvents(city, statsForNews, rng));
   const cancelled = auditDeals(city, city._connections, city._util);

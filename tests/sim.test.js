@@ -7,6 +7,7 @@ import { findLot, assignLot, capacityOf, isAnchor, anchorOf } from "../src/sim/l
 import { computeDemand } from "../src/sim/growth.js";
 import { computeMetrics } from "../src/sim/metrics.js";
 import { pumpOutput, hasSource } from "../src/sim/water.js";
+import { MAX_LOANS, LOAN_YEARS, LOAN_MAX, LOAN_STEP } from "../src/sim/economy.js";
 
 const at = (c, x, y) => c.tiles[y * c.size + x];
 // Flat maps keep lot and footprint tests independent of the hills.
@@ -300,18 +301,67 @@ describe("economy", () => {
     assert.ok(half.budget.expenses.police < full.budget.expenses.police);
     assert.ok(half.crime >= full.crime);
   });
-  test("loans add money and monthly payments, and can be repaid", () => {
+  // The manual, page 63, spells the loan rules out: "Loans are available in
+  // 5000 Simoleon increments, up to 25K per loan... Each new loan is extended
+  // for ten years, and cannot be paid off early... The city must make annual
+  // payments on each loan for ten full years... Total payments made will equal
+  // approximately 150% of the original loan amount."
+  test("a loan pays out at once and costs 150% over ten years", () => {
     const c = blank();
     assert.equal(setPolicy(c, "loan", 10000).ok, true);
-    assert.equal(c.money, 60000);
-    assert.ok(c.debt > 10000);
-    assert.ok(getStats(c).loanPayment > 0);
-    tick(c);
-    const afterTick = c.debt;
-    assert.ok(afterTick < 11600);
-    assert.equal(setPolicy(c, "repayLoan", true).ok, true);
+    assert.equal(c.money, 60000, "the money arrives in full");
+    assert.equal(c.debt, 15000, "and 150% of it is owed");
+    assert.equal(c.loans[0].payment, 1500, "in ten annual payments");
+  });
+
+  test("it comes in $5,000 increments, up to $25,000", () => {
+    const c = blank();
+    assert.equal(setPolicy(c, "loan", 7500).ok, false, "not a round increment");
+    assert.equal(setPolicy(c, "loan", 30000).ok, false, "over the per-loan ceiling");
+    assert.equal(setPolicy(c, "loan", 25000).ok, true);
+    assert.equal(setPolicy(c, "loan", 5000).ok, true);
+  });
+
+  test("ten loans at a time and no more", () => {
+    const c = blank();
+    for (let i = 0; i < MAX_LOANS; i++) assert.equal(setPolicy(c, "loan", 5000).ok, true, `loan ${i + 1}`);
+    assert.equal(setPolicy(c, "loan", 5000).ok, false, "the eleventh is refused");
+  });
+
+  test("payments fall due once a year, ten times, then it comes off the books", () => {
+    const c = blank();
+    setPolicy(c, "loan", 10000);
+    const charged = [];
+    for (let m = 1; m <= 12 * 11; m++) {
+      const before = c.debt;
+      tick(c);
+      if (c.debt !== before) charged.push({ month: m, paid: before - c.debt });
+    }
+    assert.equal(charged.length, LOAN_YEARS, `ten payments, got ${charged.length}`);
+    assert.ok(charged.every((p) => p.paid === 1500), JSON.stringify(charged));
+    assert.ok(charged.every((p, i) => i === 0 || p.month - charged[i - 1].month === 12), `once a year: ${charged.map((p) => p.month)}`);
     assert.equal(c.debt, 0);
-    assert.equal(setPolicy(c, "loan", 200000).ok, false);
+    assert.equal(c.loans.length, 0, "and off the books");
+  });
+
+  test("and it cannot be paid off early", () => {
+    const c = blank();
+    setPolicy(c, "loan", 10000);
+    const r = setPolicy(c, "repayLoan", true);
+    assert.equal(r.ok, false);
+    assert.match(r.message, /cannot be paid off early/);
+    assert.equal(c.debt, 15000);
+  });
+
+  test("a loan survives a save, anniversary and all", () => {
+    const c = blank();
+    setPolicy(c, "loan", 15000);
+    for (let i = 0; i < 18; i++) tick(c);
+    const back = deserialize(serialize(c));
+    assert.deepEqual(back.loans, c.loans);
+    assert.equal(back.debt, c.debt);
+    tick(c); tick(back);
+    assert.equal(back.debt, c.debt, "and falls due on the same month either way");
   });
   test("ordinances toggle and cost per resident", () => {
     const c = createCity(44, true);
@@ -427,5 +477,22 @@ describe("disasters and inspection", () => {
     const ids = new Set(TOOLS.map((t) => t.id));
     for (const id of Object.keys(BUILDINGS)) assert.ok(ids.has(id), id);
     assert.ok(ids.has("bulldoze") && ids.has("inspect"));
+  });
+});
+
+describe("auto budget", () => {
+  // "As soon as your finances go into the negative, Auto Budget will be turned
+  // off. This way you can hopefully recover before things get too out of hand."
+  test("going into the red brings the year-end review back", () => {
+    const c = createCity(44, true);
+    assert.equal(setPolicy(c, "setting.yearEndBudget", false).ok, true);
+    assert.equal(c.settings.yearEndBudget, false);
+    tick(c);
+    assert.equal(c.settings.yearEndBudget, false, "a solvent city keeps it off");
+    // Deep enough that one month of income cannot climb back out.
+    c.money = -50_000;
+    tick(c);
+    assert.equal(c.settings.yearEndBudget, true);
+    assert.ok(c.news.some((n) => /budget review is back on/.test(n)));
   });
 });

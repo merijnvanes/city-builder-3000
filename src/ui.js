@@ -1,5 +1,6 @@
 import { TOOLS, BUILDINGS, ORDINANCES, DISASTERS, FUNDED_DEPARTMENTS, SPECIAL_TYPES, ZONE_TYPES, PORT_TYPES } from "./sim.js";
 import { createPortrait } from "./portrait.js";
+import { LOAN_STEP, LOAN_MAX, LOAN_YEARS, MAX_LOANS } from "./sim/economy.js";
 
 // ── SVG Icons ─────────────────────────────────────────────────────────────────
 const ICONS = {
@@ -730,18 +731,23 @@ export function mountUI(actions) {
   });
   budSummary.appendChild(budGrid);
 
-  // Loan / repay
+  // Loans: "available in 5000 Simoleon increments, up to 25K per loan",
+  // ten years at a time, and no paying one off early.
   const loanRow = el("div", "slider-row");
   loanRow.style.marginTop = "8px";
-  loanRow.appendChild(btn("btn btn-sm", "Take Loan $10K", "Take a $10,000 loan", () => {
-    actions.setPolicy?.("loan", 10000);
-    budgetDialog.close();
-  }));
-  loanRow.appendChild(btn("btn btn-sm btn-danger", "Repay Loan", "Repay outstanding loan", () => {
-    actions.setPolicy?.("repayLoan", true);
-    budgetDialog.close();
-  }));
+  for (let amount = LOAN_STEP; amount <= LOAN_MAX; amount += LOAN_STEP) {
+    const years = LOAN_YEARS, yearly = Math.round(amount * 1.5 / years);
+    loanRow.appendChild(btn("btn btn-sm", `$${amount / 1000}K`,
+      `Borrow $${amount.toLocaleString()}: $${yearly.toLocaleString()} a year for ${years} years`, () => {
+        actions.setPolicy?.("loan", amount);
+        budgetDialog.close();
+      }));
+  }
+  const loanNote = el("div");
+  loanNote.style.cssText = "font-size:.55rem;color:var(--text-dim);margin-top:4px";
+  loanNote.textContent = `Ten years of annual payments, ${MAX_LOANS} loans at a time. A loan cannot be paid off early.`;
   budSummary.appendChild(loanRow);
+  budSummary.appendChild(loanNote);
   budBody.appendChild(budSummary);
 
   // Ordinances

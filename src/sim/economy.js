@@ -7,13 +7,37 @@ import { ORDINANCES } from "./city.js";
 import { dealTerms } from "./neighbors.js";
 import { portUpkeep } from "./ports.js";
 
-export const LOAN_AMOUNT = 10000;
-export const LOAN_MONTHS = 60;
-export const LOAN_RATE = 0.005; // monthly
-export const MAX_DEBT = 100000;
+// The manual, page 63, lists the loan rules outright:
+//
+//   "You may have up to ten loans outstanding at any time."
+//   "Loans are available in 5000 Simoleon increments, up to 25K per loan."
+//   "Each new loan is extended for ten years, and cannot be paid off early."
+//   "The city must make annual payments on each loan for ten full years."
+//   "Annual payment amounts are based on principal and interest."
+//   "When the final payment is made in the tenth year, the loan is repaid and
+//    comes off the books."
+//   "Total payments made will equal approximately 150% of the original loan
+//    amount."
+//
+// The last line gives the interest away, so there is no rate to guess: ten
+// annual payments of 15% of the principal repay 150% of it. That is 10% of the
+// principal and 5% interest a year.
+export const LOAN_STEP = 5000;
+export const LOAN_AMOUNT = 10000;   // what the button offers
+export const LOAN_MAX = 25000;
+export const MAX_LOANS = 10;
+export const LOAN_YEARS = 10;
+export const LOAN_TOTAL = 1.5;
 
-export function loanPayment(amount, months = LOAN_MONTHS, r = LOAN_RATE) {
-  return Math.round(amount * (r * Math.pow(1 + r, months)) / (Math.pow(1 + r, months) - 1));
+export function loanPayment(amount) {
+  return Math.round(amount * LOAN_TOTAL / LOAN_YEARS);
+}
+
+// A loan falls due on each anniversary of the month it was taken, ten times.
+// amortize() runs while `city.month` is still the month being closed.
+export function loanDue(month, loan) {
+  const age = month - loan.since;
+  return age >= 12 && age % 12 === 0;
 }
 
 const wealth = (t) => 0.7 + ((t.landValue ?? 40) / 100) * 0.6;
@@ -53,7 +77,9 @@ export function computeBudget(city) {
   }
   expenses.ordinances = Math.round(expenses.ordinances);
   income.ordinances = Math.round(income.ordinances);
-  for (const loan of city.loans || []) expenses.loans += Math.min(loan.payment, loan.remaining);
+  // Annual, not monthly: the ledger charges in the month the payment falls
+  // due, which is the month amortize() knocks it off the balance.
+  for (const loan of city.loans || []) if (loanDue(city.month, loan)) expenses.loans += Math.min(loan.payment, loan.remaining);
   expenses.loans = Math.round(expenses.loans);
 
   // Neighbour deals. Buying is metered on what the city actually needed, with
@@ -81,10 +107,13 @@ export function computeBudget(city) {
   return { income, expenses, balance: income.total - expenses.total };
 }
 
-// Apply a month of loan amortisation. Returns the amount paid.
+// Knock this month's due payments off the outstanding balances. "When the
+// final payment is made in the tenth year, the loan is repaid and comes off
+// the books." Returns the amount paid.
 export function amortize(city) {
   let paid = 0;
   city.loans = (city.loans || []).filter((loan) => {
+    if (!loanDue(city.month, loan)) return true;
     const p = Math.min(loan.payment, loan.remaining);
     loan.remaining = Math.max(0, Math.round((loan.remaining - p) * 100) / 100);
     paid += p;
@@ -98,28 +127,18 @@ export function takeLoan(city, amount = LOAN_AMOUNT) {
   amount = Number(amount);
   if (!Number.isFinite(amount) || amount <= 0) return { ok: false, message: "Loan amount must be positive." };
   amount = Math.round(amount);
-  if ((city.debt || 0) + amount > MAX_DEBT) return { ok: false, message: `Outstanding debt cannot exceed $${MAX_DEBT.toLocaleString()}.` };
-  if ((city.loans || []).length >= 10) return { ok: false, message: "Too many loans outstanding." };
+  if (amount % LOAN_STEP !== 0) return { ok: false, message: `Loans come in $${LOAN_STEP.toLocaleString()} increments.` };
+  if (amount > LOAN_MAX) return { ok: false, message: `No single loan may exceed $${LOAN_MAX.toLocaleString()}.` };
+  if ((city.loans || []).length >= MAX_LOANS) return { ok: false, message: `The city may have ${MAX_LOANS} loans outstanding at a time.` };
   const payment = loanPayment(amount);
-  city.loans = [...(city.loans || []), { amount, remaining: payment * LOAN_MONTHS, payment }];
+  city.loans = [...(city.loans || []), { amount, remaining: payment * LOAN_YEARS, payment, since: city.month }];
   city.money += amount;
   city.debt = Math.round(city.loans.reduce((s, l) => s + l.remaining, 0));
-  return { ok: true, message: `Borrowed $${amount.toLocaleString()} at $${payment}/month for ${LOAN_MONTHS} months.` };
+  return { ok: true, message: `Borrowed $${amount.toLocaleString()}: $${payment.toLocaleString()} a year for ${LOAN_YEARS} years, $${(payment * LOAN_YEARS).toLocaleString()} in all. It cannot be paid off early.` };
 }
 
-export function repayLoan(city, amount) {
+// "Each new loan is extended for ten years, and cannot be paid off early."
+export function repayLoan(city) {
   if (!city.loans?.length) return { ok: false, message: "No outstanding loans." };
-  let budget = amount === true || amount == null ? Infinity : Number(amount);
-  if (!Number.isFinite(budget) && budget !== Infinity) return { ok: false, message: "Repayment must be a number." };
-  if (budget <= 0) return { ok: false, message: "Repayment must be positive." };
-  let paid = 0;
-  for (const loan of city.loans) {
-    const p = Math.min(loan.remaining, budget, city.money);
-    if (p <= 0) break;
-    loan.remaining -= p; budget -= p; city.money -= p; paid += p;
-  }
-  if (paid <= 0) return { ok: false, message: "Not enough funds to repay." };
-  city.loans = city.loans.filter((l) => l.remaining > 0.5);
-  city.debt = Math.round(city.loans.reduce((s, l) => s + l.remaining, 0));
-  return { ok: true, message: `Repaid $${Math.round(paid).toLocaleString()}. Remaining debt: $${city.debt.toLocaleString()}.` };
+  return { ok: false, message: `A loan runs its ${LOAN_YEARS} years and cannot be paid off early.` };
 }

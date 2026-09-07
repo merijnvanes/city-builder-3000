@@ -66,13 +66,14 @@ try {
   const tax = page.getByRole("slider", { name: "Residential tax rate", exact: true });
   await tax.fill("12"); await tax.dispatchEvent("input");
   assert.deepEqual(await page.evaluate(() => civic.getStats().taxes), { residential: 12, commercial: 7, industrial: 7 }, "Taxes remain independent");
+  // "Loans are available in 5000 Simoleon increments, up to 25K per loan...
+  // Total payments made will equal approximately 150% of the original loan
+  // amount." And there is no repaying one early.
   const beforeLoan = await money();
-  await page.getByRole("button", { name: "Take a $10,000 loan", exact: true }).click();
-  assert.ok((await page.evaluate(() => civic.city.debt)) > 10000, "loan recorded with interest");
+  await page.getByRole("button", { name: "Borrow $10,000: $1,500 a year for 10 years", exact: true }).click();
+  assert.equal(await page.evaluate(() => civic.city.debt), 15000, "ten annual payments of 15%");
   assert.equal(await money(), beforeLoan + 10000);
-  await page.getByRole("button", { name: "Open budget", exact: true }).click();
-  await page.getByRole("button", { name: "Repay outstanding loan", exact: true }).click();
-  assert.equal(await page.evaluate(() => civic.city.debt), 0, "Repay clears affordable debt");
+  assert.equal(await page.getByRole("button", { name: /Repay/ }).count(), 0, "no early repayment");
   await page.getByRole("button", { name: "Open budget", exact: true }).click();
   await page.getByRole("button", { name: "Toggle Clean Air Act", exact: true }).click();
   assert.equal(await page.evaluate(() => civic.city.ordinances.cleanAir), true, "ordinance toggles");

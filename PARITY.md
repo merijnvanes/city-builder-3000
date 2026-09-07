@@ -17,6 +17,7 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 | Industry | Farms, heavy industry, manufacturing and high tech, the last attracted by an educated workforce | **Done.** See below |
 
 | Budget | Six named services; over-funding wastes money; the road budget keeps roads from falling apart | **Done.** See below |
+| Loans | Ten years of annual payments totalling 150%, $5K increments to $25K, ten at a time, no early repayment | **Done.** See below |
 | Zone stages | Land value gates how far a zone builds out within its density | **Done.** See below |
 | Waste | Landfills store trash, fill up, decompose and cannot be bulldozed; incinerators age | **Done.** See below |
 | Aura | A per-neighbourhood mood map whose average is the mayoral approval rating | **Done.** See below |
@@ -415,6 +416,41 @@ take it upon themselves to assist you in the clean up costs. Be forewarned, a
 Mayor that is well prepared generally receives better treatment."* Losing six
 or more lots to a disaster now draws a relief grant, and a city with funded
 fire and police coverage receives about twice what a neglectful one gets.
+
+## Loans by the book, September 7
+
+Page 63 lists the loan rules outright, and the game matched almost none of them.
+
+> *"You may have up to ten loans outstanding at any time."*
+> *"Loans are available in 5000 Simoleon increments, up to 25K per loan."*
+> *"Each new loan is extended for ten years, and cannot be paid off early."*
+> *"The city must make annual payments on each loan for ten full years."*
+> *"Annual payment amounts are based on principal and interest."*
+> *"When the final payment is made in the tenth year, the loan is repaid and
+> comes off the books."*
+> *"Total payments made will equal approximately 150% of the original loan
+> amount."*
+
+Before: any amount at all up to a $100,000 debt ceiling, sixty **monthly**
+payments, 116% repaid in total, and the mayor could clear a loan whenever the
+treasury allowed. Now: $5,000 to $25,000 in $5,000 steps, ten of them at a
+time, **ten annual payments of 15% of the principal** - exactly the manual's
+150% - falling due on the anniversary of the month the loan was taken, and no
+paying one off early.
+
+The last line of the manual gives the interest away, so there is no rate to
+guess: 15% a year for ten years is 10% principal and 5% interest, which is
+what *"based on principal and interest"* asks for. The $100,000 debt ceiling
+goes; the manual's own limit is ten loans of $25,000.
+
+`amortize()` tracks the balance and `computeBudget()` charges the treasury, so
+both had to learn the annual cadence together or the ledger and the bank
+balance would drift apart. Both now ask the same `loanDue()`.
+
+And from the Financial Advisor's Q&A, on Auto Budget: *"As soon as your
+finances go into the negative, Auto Budget will be turned off. This way you can
+hopefully recover before things get too out of hand."* A city that has switched
+the year-end review off gets it back the month the treasury goes into the red.
 
 ## Two more from the advisors' Q&A, September 7
 
