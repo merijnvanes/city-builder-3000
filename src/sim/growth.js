@@ -50,7 +50,10 @@ export function desirability(t) {
   const lv = t.landValue ?? 40;
   let d;
   if (t.type === "residential") {
-    d = 0.45 + lv / 100 - t.pollution / 140 - t.crime / 140 + (s.park + s.education + s.health) / 700 - t.traffic / 500;
+    // People move where the neighbourhood feels good. Aura already folds in
+    // pollution, crime, traffic, parks and the city's schooling and lifespan,
+    // so the street's mood is most of the story.
+    d = 0.35 + (t.aura ?? 50) / 90 + lv / 260 + (s.education + s.health) / 900;
   } else if (t.type === "commercial") {
     d = 0.5 + lv / 120 - t.crime / 150 - t.pollution / 320 + Math.min(t.traffic, 50) / 350 + (s.bus + s.rail) / 500;
   } else {

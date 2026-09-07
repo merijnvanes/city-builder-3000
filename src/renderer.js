@@ -366,6 +366,8 @@ export class CityRenderer {
     if (o === "power") return t.powered ? "#dbe64488" : (t.lot || t.type !== "empty") ? "#db5b40aa" : null;
     if (o === "water") return t.watered ? "#469bdbaa" : (t.lot || t.type !== "empty") ? "#bd7045aa" : null;
     if (o === "landvalue") return "hsla(" + (t.landValue * 1.2) + ",65%,48%,.6)";
+    // Same red-to-green ramp as land value, so the two maps read alike.
+    if (o === "aura") return "hsla(" + ((t.aura ?? 50) * 1.2) + ",62%,50%,.55)";
     if (["police", "fire", "health", "education"].includes(o)) { const v = t.svc?.[o] || 0; return v ? "hsla(" + (60 + v * 0.6) + ",70%,50%," + (0.15 + v / 160) + ")" : null; }
     if (o === "transit") { const v = (t.svc?.rail || 0) + (t.svc?.bus || 0); return v ? "hsla(200,70%,55%," + (0.1 + Math.min(1, v / 100) * 0.4) + ")" : null; }
     const value = t[o] || 0;

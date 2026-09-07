@@ -1,14 +1,19 @@
 // Road access, service coverage, pollution, crime, land value and garbage.
 import { forRadius, tileAt } from "./grid.js";
 import { BUILDINGS, ZONE_TYPES, ACCESS_TYPES, FUNDED_DEPARTMENTS } from "./catalog.js";
+import { ORDINANCES } from "./city.js";
 import { isAnchor, lotTiles, capacityOf } from "./lots.js";
 import { industryTraits } from "./industry.js";
+import { readPopulation, NATIONAL_EQ, BASE_LIFE_EXPECTANCY } from "./population.js";
 
 export const ROAD_REACH = 3;
 // Share of residents who pass through the courts in a year and need a cell.
 export const ARREST_RATE = 0.02;
 // Overlapping precincts stack, but not without limit.
 export const SERVICE_CAP = 160;
+// Aura a plain, adequately served neighbourhood sits at before anything
+// local or city-wide moves it.
+export const AURA_BASE = 62;
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 export const SERVICE_KINDS = ["police", "fire", "health", "education", "culture", "park", "bus", "rail"];
 
@@ -106,6 +111,9 @@ export function updateServices(city) {
   // Special buildings with area effects (prisons, dumps, city hall...).
   const crimeBump = new Float32Array(tiles.length);
   const valueBump = new Float32Array(tiles.length);
+  // Landfills, prisons and their like drag a neighbourhood's mood down;
+  // zoos, parks and landmarks lift it.
+  const auraBump = new Float32Array(tiles.length);
   for (const t of tiles) {
     if (!isAnchor(t)) continue;
     const e = BUILDINGS[t.type]?.effects;
@@ -116,6 +124,7 @@ export function updateServices(city) {
       const f = 1 - d / (e.radius + 1);
       if (e.crime) crimeBump[n.y * size + n.x] += e.crime * f;
       if (e.landValue) valueBump[n.y * size + n.x] += e.landValue * f;
+      if (e.aura ?? e.landValue) auraBump[n.y * size + n.x] += (e.aura ?? e.landValue * 0.6) * f;
     });
   }
   const airScale = (ord.cleanAir ? 0.7 : 1) * (ord.leafBurningBan ? 0.95 : 1) * (ord.wasteTax ? 0.92 : 1);
@@ -176,6 +185,49 @@ export function updateServices(city) {
     t.crime = Math.max(0, Math.min(100, Math.round(c)));
   }
   for (const t of tiles) t.landValue = Math.max(0, Math.min(100, Math.round(baseValue[t.y * size + t.x] - t.crime * 0.2)));
+
+  // ── Aura ──────────────────────────────────────────────────────
+  // The manual, page 93: "Many things affect a city's aura. High education
+  // levels, high life expectancy, a growing economy, and desirable buildings
+  // such as parks and zoos can raise aura. Pollution, crime, traffic,
+  // excessive regulations (ordinances), high tax levels, and the presence of
+  // undesirable buildings such as landfills and prisons can lower aura...
+  // Neighborhoods each have their own aura."
+  //
+  // So it is a map, not a single number, and the mayoral approval rating is
+  // its population-weighted average. City-wide terms (taxes, schooling,
+  // lifespan, red tape) shift every neighbourhood alike; the rest is local.
+  const people = readPopulation(city, city.population || 0);
+  const avgTax = (city.taxes.residential + city.taxes.commercial + city.taxes.industrial) / 3;
+  let enacted = 0, mood = 0;
+  for (const [key, on] of Object.entries(ord)) {
+    if (!on || !ORDINANCES[key]) continue;
+    enacted++;
+    mood += ORDINANCES[key].mood || 0;
+  }
+  let civic = mood;
+  civic += (people.eq - NATIONAL_EQ) * 0.14;
+  civic += (people.le - BASE_LIFE_EXPECTANCY) * 0.32;
+  civic -= (avgTax - 7) * 3;
+  // "Excessive regulations": the first few ordinances are tolerated, the rest
+  // grate. This is on top of the individual gripes each one carries.
+  civic -= Math.max(0, enacted - 4) * 1.1;
+  civic -= (garbage || 0) * 0.08;
+  if (people.strikes.education) civic -= 6;
+  if (people.strikes.health) civic -= 6;
+
+  for (const t of tiles) {
+    const i = t.y * size + t.x;
+    let a = AURA_BASE + civic;
+    a += t.svc.park * 0.30 + t.svc.culture * 0.22;
+    a += (t.landValue - 40) * 0.22;
+    a += Math.min(t.svc.police, 100) * 0.06 + Math.min(t.svc.fire, 100) * 0.06;
+    a += (t.svc.health + t.svc.education) * 0.04;
+    a -= t.pollution * 0.30 + t.crime * 0.26 + (t.traffic || 0) * 0.10;
+    a += auraBump[i];
+    if (t.lot && t.abandoned) a -= 8;
+    t.aura = Math.max(0, Math.min(100, Math.round(a)));
+  }
 
   return { garbage, garbageProduced: Math.round(garbageProduced), garbageCapacity: Math.round(garbageCapacity), industrialLots,
            waterPollution: city._util?.waterPollution || 0,

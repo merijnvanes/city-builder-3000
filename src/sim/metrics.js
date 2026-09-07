@@ -17,7 +17,7 @@ export function computeMetrics(city) {
   const ord = city.ordinances || {};
   let population = 0, jobsCommercial = 0, jobsIndustrial = 0;
   let needPower = 0, havePower = 0, needWater = 0, haveWater = 0;
-  let wPoll = 0, wCrime = 0, wPark = 0, wPolice = 0, wFire = 0, wLand = 0, wTraffic = 0;
+  let wPoll = 0, wCrime = 0, wPark = 0, wPolice = 0, wFire = 0, wLand = 0, wTraffic = 0, wAura = 0;
   const counts = {};
   const zones = { residential: { tiles: 0, developed: 0, abandoned: 0 }, commercial: { tiles: 0, developed: 0, abandoned: 0 }, industrial: { tiles: 0, developed: 0, abandoned: 0 } };
   let abandonedLots = 0, landValueSum = 0, landTiles = 0, specialJobs = 0, specialHappiness = 0;
@@ -48,6 +48,7 @@ export function computeMetrics(city) {
         population += cap;
         const s = t.svc || {};
         wPoll += t.pollution * cap; wCrime += t.crime * cap; wLand += t.landValue * cap; wTraffic += t.traffic * cap;
+        wAura += (t.aura ?? 50) * cap;
         wPark += (s.park || 0) * cap;
         wPolice += (s.police || 0) * cap; wFire += (s.fire || 0) * cap;
       } else if (t.type === "commercial") jobsCommercial += cap;
@@ -86,25 +87,18 @@ export function computeMetrics(city) {
   const fireCover = Math.round(per(wFire));
   const powerPct = needPower ? Math.round(100 * havePower / needPower) : 100;
   const waterPct = needWater ? Math.round(100 * haveWater / needWater) : 100;
-  const avgTax = (city.taxes.residential + city.taxes.commercial + city.taxes.industrial) / 3;
 
-  // Expectations grow with the city: a village does not miss a hospital.
-  const expect = clamp(population / 8000, 0.15, 1);
-  let happiness = 58;
-  happiness += ((health - 40) * 0.14 + (education - NATIONAL_EQ) * 0.10 + parks * 0.12 + police * 0.05 + fireCover * 0.05) * expect;
-  happiness -= pollution * 0.22 + crime * 0.18 * expect + traffic.unemployment * 0.5 + (avgTax - 7) * 3 + svc.garbage * 0.08;
-  happiness -= (100 - powerPct) * 0.2 + (100 - waterPct) * 0.06 * expect + traffic.traffic * 0.08;
-  if (ord.youthCurfew) happiness -= 2;
-  if (ord.parkingFines) happiness -= 2;
-  if (ord.gambling) happiness -= 1;
-  if (ord.alternateDriving) happiness -= 3;
-  if (ord.leafBurningBan) happiness -= 1;
-  // Strikes are visible and unpopular long before their effects show up.
-  if (people.strikes.education) happiness -= 6;
-  if (people.strikes.health) happiness -= 6;
+  // "Approval Rating Line Graph - a measure of the city's global aura which
+  // doubles as your Mayoral Approval Rating." So the headline figure is not
+  // its own formula: it is the average of the aura map, weighted by where
+  // people actually live. Empty land has an aura too, but nobody is there to
+  // feel it. services.js builds the map.
+  let happiness = population ? Math.round(clamp(per(wAura), 5, 100)) : 50;
   happiness += specialHappiness;
-  if (!population) happiness = 50;
   happiness = Math.round(clamp(happiness, 5, 100));
+  // Unemployment is the one thing residents feel that is not on the map,
+  // because it belongs to the city rather than to a street.
+  happiness = Math.round(clamp(happiness - traffic.unemployment * 0.5 - (100 - powerPct) * 0.2, 5, 100));
 
   return {
     population, jobs, jobsCommercial, jobsIndustrial, specialJobs, demandBonus,
@@ -123,6 +117,7 @@ export function computeMetrics(city) {
     power: powerPct, water: waterPct,
     utilities: city._util || { power: { supply: 0, demand: 0 }, water: { supply: 0, demand: 0 } },
     landValue: landTiles ? Math.round(landValueSum / landTiles) : 0,
+    aura: population ? Math.round(per(wAura)) : 50,
     residentialLandValue: Math.round(per(wLand)),
     happiness, counts, zones, abandonedLots,
     date: dateOf(city.month, city.startYear), year: yearOf(city.month, city.startYear), month: city.month,

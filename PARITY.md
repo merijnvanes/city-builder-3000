@@ -15,6 +15,7 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 
 | Industry | Farms, heavy industry, manufacturing and high tech, the last attracted by an educated workforce | **Done.** See below |
 
+| Aura | A per-neighbourhood mood map whose average is the mayoral approval rating | **Done.** See below |
 | Public safety | Budget sets precinct size and effectiveness; overlaps are additive; jails cap police effectiveness | **Done.** See below |
 
 Other systems needing controlled comparisons against the original game include growth thresholds, lot stages, land value, budgets, rewards, neighbor contracts and disasters. The manual describes behaviors but does not expose all numerical formulas. Exact balance requires repeatable reference-game experiments, not guessed constants.
@@ -139,6 +140,26 @@ city short of cells loses police effectiveness everywhere, down to 35%. Two
 percent of residents need a cell; a jail holds 400 and the maximum security
 prison 1,200. Starter towns come with one, and querying a jail shows the
 city's cells against its arrests.
+
+## Aura, September 7
+
+The manual, page 93: *"Neighborhoods each have their own aura. Study the Aura
+map to see which areas of the city are happiest"*, and the approval rating is
+*"a measure of the city's global aura"*.
+
+Approval was its own formula. It is now the population-weighted average of a
+real per-tile aura map, so the headline number and the map cannot disagree.
+The map is a new overlay, on the same red-to-green ramp as land value.
+
+What moves it, all from the manual's own list: education, life expectancy, a
+neighbourhood's parks and culture, police and fire cover, and land value lift
+it; pollution, crime, traffic, high taxes, landfills and prisons pull it down.
+"Excessive regulations (ordinances)" is a penalty that grows once more than
+four are in force, on top of each ordinance's own mood, which now lives in
+the ordinance table as data rather than a list of special cases.
+
+Residents also choose where to live by aura, so a well-kept district fills
+before a grim one.
 
 ## Visual and performance work, September 7
 

@@ -14,25 +14,28 @@ export const MAX_SIZE = 128;
 export const START_MONEY = 50000;
 export const START_YEAR = 2000;
 
+// mood: how residents feel about the ordinance itself, on top of whatever it
+// does. The manual lists "excessive regulations (ordinances)" as a drag on
+// aura; services.js adds a further penalty for enacting a great many.
 export const ORDINANCES = {
   recycling:          { label: "Recycling Program",        cost: 0.012, description: "Cuts garbage by 25%. Costs $0.012 per resident." },
   cleanAir:           { label: "Clean Air Act",            cost: 0.02,  description: "Reduces air pollution 30%. Industry dislikes it." },
   neighborhoodWatch:  { label: "Neighborhood Watch",       cost: 0.008, description: "Cuts crime 15% city-wide." },
   energyConservation: { label: "Energy Conservation",      cost: 0.01,  description: "Reduces power demand 15%." },
   waterConservation:  { label: "Water Conservation",       cost: 0.01,  description: "Reduces water demand 15%." },
-  youthCurfew:        { label: "Youth Curfew",             cost: 0.005, description: "Lowers crime a little; residents grumble." },
-  tourismPromotion:   { label: "Tourism Promotion",        cost: 0.02,  description: "Boosts commercial demand." },
-  gambling:           { label: "Legalized Gambling",       cost: -0.05, description: "Earns $0.05 per resident. Raises crime." },
-  freeClinics:        { label: "Free Clinics",             cost: 0.03,  description: "Improves health coverage everywhere." },
-  readingCampaign:    { label: "Pro-Reading Campaign",     cost: 0.015, description: "Improves education coverage everywhere." },
-  parkingFines:       { label: "Parking Fines",            cost: -0.02, description: "Earns $0.02 per resident. Slightly lowers approval." },
-  smokingBan:         { label: "Public Smoking Ban",       cost: 0.004, description: "Small health boost. Commerce grumbles a little." },
+  youthCurfew:        { label: "Youth Curfew",             cost: 0.005, mood: -2, description: "Lowers crime a little; residents grumble." },
+  tourismPromotion:   { label: "Tourism Promotion",        cost: 0.02,  mood: 1, description: "Boosts commercial demand." },
+  gambling:           { label: "Legalized Gambling",       cost: -0.05, mood: -1, description: "Earns $0.05 per resident. Raises crime." },
+  freeClinics:        { label: "Free Clinics",             cost: 0.03,  mood: 1, description: "Improves health coverage everywhere." },
+  readingCampaign:    { label: "Pro-Reading Campaign",     cost: 0.015, mood: 1, description: "Improves education coverage everywhere." },
+  parkingFines:       { label: "Parking Fines",            cost: -0.02, mood: -2, description: "Earns $0.02 per resident. Slightly lowers approval." },
+  smokingBan:         { label: "Public Smoking Ban",       cost: 0.004, mood: -1, description: "Small health boost. Commerce grumbles a little." },
   carpool:            { label: "Carpool Incentive",        cost: 0.008, description: "Cuts road traffic 10%." },
-  alternateDriving:   { label: "Alternate-Day Driving",    cost: 0.004, description: "Cuts road traffic 25%. Drivers hate it." },
-  juniorSports:       { label: "Junior Sports League",     cost: 0.012, description: "Healthier, better-educated kids." },
-  leafBurningBan:     { label: "Leaf Burning Ban",         cost: 0.002, description: "Reduces air pollution 5%. Gardeners grumble." },
+  alternateDriving:   { label: "Alternate-Day Driving",    cost: 0.004, mood: -3, description: "Cuts road traffic 25%. Drivers hate it." },
+  juniorSports:       { label: "Junior Sports League",     cost: 0.012, mood: 1, description: "Healthier, better-educated kids." },
+  leafBurningBan:     { label: "Leaf Burning Ban",         cost: 0.002, mood: -1, description: "Reduces air pollution 5%. Gardeners grumble." },
   cprTraining:        { label: "CPR Training",             cost: 0.006, description: "Raises health a little everywhere." },
-  wasteTax:           { label: "Industrial Waste Tax",     cost: 0,     description: "Industry pays 15% more tax and pollutes 8% less, but grows slower." },
+  wasteTax:           { label: "Industrial Waste Tax",     cost: 0,     mood: -1, description: "Industry pays 15% more tax and pollutes 8% less, but grows slower." },
 };
 
 export function makeTile(x, y, terrain, trees, variant, elev = 0, salt = 0) {
