@@ -15,7 +15,9 @@
     "test:civic": "node --test tests/civic-art.test.js tests/civic-sprite-manifest.test.js && node tests/civic-sprites.mjs && node tests/civic-art.mjs",
     "art:civic": "blender --background --factory-startup --python tools/civic_art/render.py -- --types civic --states day,night,unpowered --rotations 0,1,2,3 --samples 32 && python3 tools/civic_art/package.py --types civic",
     "art:power": "blender --background --factory-startup --python tools/civic_art/render.py -- --types power --states day,night,unpowered --rotations 0,1,2,3 --samples 32 && python3 tools/civic_art/package.py --types power",
-    "test:power": "node tests/power-sprites.mjs && ART_FAMILY=power node tests/civic-art.mjs"
+    "test:power": "node tests/power-sprites.mjs && ART_FAMILY=power node tests/civic-art.mjs",
+    "art:water": "blender --background --factory-startup --python tools/civic_art/render.py -- --types water --states day,night,unpowered --rotations 0,1,2,3 --samples 32 && python3 tools/civic_art/package.py --types water",
+    "test:water": "ART_FAMILY=water node tests/power-sprites.mjs && ART_FAMILY=water node tests/civic-art.mjs"
   },
   "devDependencies": {
     "vite": "^7.0.0",

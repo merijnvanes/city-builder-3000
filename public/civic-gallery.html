@@ -14,7 +14,8 @@
 <footer>Original architecture · Four camera angles · Three lighting states · Shared, compressed browser assets</footer>
 <script type="module">
 const descriptions={};
-const family=new URLSearchParams(location.search).get('family')==='power'?'power':'civic';
+const requestedFamily=new URLSearchParams(location.search).get('family');
+const family=['civic','power','water'].includes(requestedFamily)?requestedFamily:'civic';
 let catalog,state='day',rotation=0,detail=false;
 const cards=[];
 function update(){
@@ -33,12 +34,20 @@ function update(){
 }
 try{
   const response=await fetch('./assets/civic/catalog.json');if(!response.ok)throw new Error('Asset catalog could not be loaded.');catalog=await response.json();
-  const familyLink=document.createElement('a');familyLink.href=`?family=${family==='civic'?'power':'civic'}`;familyLink.textContent=family==='civic'?'View power collection →':'View civic collection →';familyLink.style.cssText='color:var(--accent);margin-right:12px';document.querySelector('nav').prepend(familyLink);
+  for(const other of ['civic','power','water'].filter(value=>value!==family)){
+    const link=document.createElement('a');link.href=`?family=${other}`;link.textContent=`View ${other} collection →`;link.style.cssText='color:var(--accent);margin-right:12px';document.querySelector('nav').prepend(link);
+  }
   if(family==='power'){
     document.title='Power Collection · City Builder 3000';
     document.querySelector('.eyebrow').textContent='City Builder 3000 · Asset Collection 02';
     document.querySelector('h1').textContent='The power behind the city.';
     document.querySelector('header p').textContent='Eight distinct ways to power a city, from brick coal works to a futuristic fusion campus. Original miniature architecture and recognizable generating equipment.';
+  }
+  if(family==='water'){
+    document.title='Water Collection · City Builder 3000';
+    document.querySelector('.eyebrow').textContent='City Builder 3000 · Asset Collection 03';
+    document.querySelector('h1').textContent='Water for a growing city.';
+    document.querySelector('header p').textContent='Four purposeful water works: freshwater pumps, elevated storage, membrane filtration, and open treatment basins. Crafted in brick, concrete, and teal metalwork.';
   }
   for(const [type,spec] of Object.entries(catalog))if(spec.family===family)descriptions[type]=[spec.label,spec.description];
   for(const [type,[label,description]] of Object.entries(descriptions)){

@@ -1,29 +1,32 @@
-// Exercise actual power exports through the shared runtime, including tall
-// one-tile rotor picking and inspection portraits at every rotation/state.
+// Exercise power or water exports through the shared runtime, including tall
+// one-tile silhouette picking and portraits at every rotation/state.
 import { chromium } from '@playwright/test';
 import assert from 'node:assert/strict';
+const family = process.env.ART_FAMILY || 'power';
+assert.ok(['power','water'].includes(family));
+const expectedFrames = family === 'water' ? 48 : 96;
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
 try {
   const page = await browser.newPage({ viewport: { width: 900, height: 800 }, deviceScaleFactor: 2 });
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
-  await page.goto(`${process.env.CIVIC_TEST_URL || 'http://127.0.0.1:4173'}/civic-gallery.html?family=power`);
-  await page.waitForFunction(() => document.querySelectorAll('.card').length === 8);
-  const result = await page.evaluate(async () => {
+  await page.goto(`${process.env.CIVIC_TEST_URL || 'http://127.0.0.1:4173'}/civic-gallery.html?family=${family}`);
+  await page.waitForFunction(count => document.querySelectorAll('.card').length === count, expectedFrames / 12);
+  const result = await page.evaluate(async family => {
     const { CityRenderer } = await import('/src/renderer.js');
     const { preloadCivicSprites, civicSpriteStats } = await import('/src/building-art.js');
     const { drawCachedArchitecture } = await import('/src/architecture-cache.js');
     const { CIVIC_SPRITES } = await import('/src/civic-sprite-manifest.js');
     const { BUILDINGS } = await import('/src/sim/catalog.js');
     const { createPortrait } = await import('/src/portrait.js');
-    const power = Object.entries(BUILDINGS).filter(([, spec]) => spec.group === 'utilities' && spec.powerOut > 0);
+    const buildings = Object.entries(BUILDINGS).filter(([, spec]) => spec.group === 'utilities' && (family === 'water' ? spec.waterOut > 0 || spec.cleansWater : spec.powerOut > 0));
     const canvas = document.createElement('canvas');canvas.width = canvas.height = 800;
     const r = Object.assign(Object.create(CityRenderer.prototype), { base: canvas.getContext('2d'), w: 800, h: 800, size: 16, zoom: 1.75, minZoom: .3, maxZoom: 2.8, dpr: 2, panX: 0, panY: 0, platform: 0, pickables: [], rotation: 0 });
     r.pick = () => ({ miss: true });
     const portraitCanvas = document.createElement('canvas');portraitCanvas.style.cssText='width:200px;height:160px';document.body.append(portraitCanvas);
     const portrait = createPortrait(portraitCanvas);
     let frames = 0, picks = 0, portraits = 0, maxBytes = 0;
-    for (const [type, spec] of power) {
+    for (const [type, spec] of buildings) {
       const hashes = new Set();
       for (const state of ['day','night','unpowered']) for (let rotation = 0; rotation < 4; rotation++) {
         const night = state !== 'day', powered = state !== 'unpowered';
@@ -43,8 +46,8 @@ try {
         for(let i=3;i<pixels.length;i+=4)if(pixels[i]>240){first=(i-3)/4;break;}
         hashes.add(hash);
         if(first<0)throw new Error(`${type}: empty artwork`);
-        // The first opaque wind pixel belongs to an elevated rotor tip,
-        // outside the ground diamond: exercise the actual alpha picking path.
+        // The top opaque pixel exercises elevated silhouettes, including the
+        // turbine rotor and water tower, through the actual picking path.
         const px=hit.x+((first%frame.width)+.5)/frame.width*hit.w;
         const py=hit.y+(Math.floor(first/frame.width)+.5)/frame.height*hit.h;
         if(r.pickObject(px,py).x!==tile.x)throw new Error(`${type}: top silhouette is not pickable`);
@@ -65,8 +68,8 @@ try {
       if(hashes.size!==12)throw new Error(`${type}: expected distinct artwork for all rotations and lighting states, got ${hashes.size}`);
     }
     return {frames,picks,portraits,maxBytes};
-  });
-  assert.equal(result.frames,96);assert.equal(result.picks,96);assert.equal(result.portraits,96);
+  }, family);
+  assert.equal(result.frames,expectedFrames);assert.equal(result.picks,expectedFrames);assert.equal(result.portraits,expectedFrames);
   assert.deepEqual(errors,[]);
-  console.log('Power sprites: all 96 frames, single blits, silhouette picking, portraits, lighting and shared memory pass.',result);
+  console.log(`${family}: all ${expectedFrames} frames, single blits, silhouette picking, portraits, lighting and shared memory pass.`,result);
 } finally { await browser.close(); }

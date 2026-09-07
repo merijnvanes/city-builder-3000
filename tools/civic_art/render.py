@@ -11,7 +11,7 @@ args=p.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
 root=Path(__file__).resolve().parents[2];out=root/args.output;out.mkdir(parents=True,exist_ok=True)
 registry=json.loads((Path(__file__).parent/'registry.json').read_text())
 models={name:(getattr(importlib.import_module(spec['module']),name),spec['tiles']) for name,spec in registry.items()}
-selected=list(models) if args.types=='all' else [name for name,spec in registry.items() if spec['family']==args.types] if args.types in {'civic','power'} else args.types.split(',')
+selected=list(models) if args.types=='all' else [name for name,spec in registry.items() if spec['family']==args.types] if args.types in {spec['family'] for spec in registry.values()} else args.types.split(',')
 
 def look(o,target):o.rotation_euler=(Vector(target)-o.location).to_track_quat('-Z','Y').to_euler()
 

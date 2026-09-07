@@ -138,5 +138,33 @@
     "family": "power",
     "label": "Fusion plant",
     "description": "An annular reactor enclosure, radial copper housings, and a teal control gallery."
+  },
+  "waterpump": {
+    "module": "water",
+    "tiles": 1,
+    "family": "water",
+    "label": "Water pump",
+    "description": "A copper-roofed brick wet-well house with paired teal pumps and exposed intake pipes."
+  },
+  "watertower": {
+    "module": "water",
+    "tiles": 1,
+    "family": "water",
+    "label": "Water tower",
+    "description": "An elevated teal reservoir on splayed steel legs, with cross bracing and an access ladder."
+  },
+  "desalination": {
+    "module": "water",
+    "tiles": 3,
+    "family": "water",
+    "label": "Desalination plant",
+    "description": "White membrane pressure-vessel racks, intake filters, and a clerestory process hall."
+  },
+  "treatment": {
+    "module": "water",
+    "tiles": 3,
+    "family": "water",
+    "label": "Water treatment",
+    "description": "Twin open clarifiers, bridge-mounted drives, and baffled aeration channels beside a brick blower house."
   }
 }

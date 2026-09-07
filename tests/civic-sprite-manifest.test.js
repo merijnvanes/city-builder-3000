@@ -4,8 +4,8 @@ import { readFileSync, statSync } from 'node:fs';
 import { CIVIC_SPRITES } from '../src/civic-sprite-manifest.js';
 import { BUILDINGS } from '../src/sim/catalog.js';
 
-test('every civic and power building ships all four angles and three lighting states', () => {
-  const expected = Object.entries(BUILDINGS).filter(([, s]) => s.group === 'civic' || (s.group === 'utilities' && s.powerOut > 0)).map(([type]) => type).sort();
+test('every civic, power and water building ships all four angles and three lighting states', () => {
+  const expected = Object.entries(BUILDINGS).filter(([, s]) => s.group === 'civic' || (s.group === 'utilities' && (s.powerOut > 0 || s.waterOut > 0 || s.cleansWater))).map(([type]) => type).sort();
   assert.deepEqual(Object.keys(CIVIC_SPRITES).sort(), expected);
   const registry = JSON.parse(readFileSync(new URL('../tools/civic_art/registry.json', import.meta.url)));
   assert.deepEqual(Object.keys(registry).sort(), expected);
@@ -14,7 +14,7 @@ test('every civic and power building ships all four angles and three lighting st
     assert.equal(spec.label, registry[type].label);
     assert.equal(spec.description, registry[type].description);
     assert.ok(spec.label && spec.description);
-    assert.equal(spec.family, BUILDINGS[type].group === 'civic' ? 'civic' : 'power');
+    assert.equal(spec.family, BUILDINGS[type].group === 'civic' ? 'civic' : BUILDINGS[type].powerOut > 0 ? 'power' : 'water');
     assert.equal(spec.tiles, registry[type].tiles);
     assert.equal(spec.tiles, BUILDINGS[type].w);
     assert.equal(BUILDINGS[type].w, BUILDINGS[type].h);
@@ -32,5 +32,5 @@ test('every civic and power building ships all four angles and three lighting st
       compressedBytes += statSync(url).size;
     }
   }
-  assert.ok(compressedBytes < 6 * 1024 * 1024, 'the combined civic/power asset set stays below 6 MiB');
+  assert.ok(compressedBytes < 6 * 1024 * 1024, 'the combined civic/power/water asset set stays below 6 MiB');
 });

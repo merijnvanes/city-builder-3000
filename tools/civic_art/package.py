@@ -33,7 +33,7 @@ def main():
     if args.types and not (out/'catalog.json').is_file():
         raise ValueError('Incremental packaging requires the tracked catalog.json; restore it or bake and package all types first')
     manifest = json.loads((out/'catalog.json').read_text()) if args.types else {}
-    selected = {name for name,spec in REGISTRY.items() if spec['family']==args.types} if args.types in {'civic','power'} else set(args.types.split(',')) if args.types else TYPES
+    selected = {name for name,spec in REGISTRY.items() if spec['family']==args.types} if args.types in {spec['family'] for spec in REGISTRY.values()} else set(args.types.split(',')) if args.types else TYPES
     if not selected <= TYPES: raise ValueError('Unknown building type')
     jobs = []
     for kind in sorted(selected):

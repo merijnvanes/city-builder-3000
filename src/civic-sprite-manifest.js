@@ -236,6 +236,124 @@ export const CIVIC_SPRITES = {
     "label": "College",
     "description": "A collegiate quadrangle, copper clock tower, cloisters, and a shaded court."
   },
+  "desalination": {
+    "tiles": 3,
+    "scale": 3,
+    "height": 40,
+    "frames": {
+      "day-0": {
+        "file": "desalination-day-0.8c29b55c0c.webp",
+        "width": 570,
+        "height": 368,
+        "anchor": [
+          285.0,
+          220.9763
+        ]
+      },
+      "day-1": {
+        "file": "desalination-day-1.3615ca1377.webp",
+        "width": 570,
+        "height": 316,
+        "anchor": [
+          285.0,
+          168.9761
+        ]
+      },
+      "day-2": {
+        "file": "desalination-day-2.06e907a270.webp",
+        "width": 570,
+        "height": 311,
+        "anchor": [
+          285.0,
+          163.9761
+        ]
+      },
+      "day-3": {
+        "file": "desalination-day-3.630562811f.webp",
+        "width": 570,
+        "height": 340,
+        "anchor": [
+          285.0,
+          192.9763
+        ]
+      },
+      "night-0": {
+        "file": "desalination-night-0.b2174718ae.webp",
+        "width": 570,
+        "height": 368,
+        "anchor": [
+          285.0,
+          220.9763
+        ]
+      },
+      "night-1": {
+        "file": "desalination-night-1.81b50c7837.webp",
+        "width": 570,
+        "height": 316,
+        "anchor": [
+          285.0,
+          168.9761
+        ]
+      },
+      "night-2": {
+        "file": "desalination-night-2.46f77233fe.webp",
+        "width": 570,
+        "height": 311,
+        "anchor": [
+          285.0,
+          163.9761
+        ]
+      },
+      "night-3": {
+        "file": "desalination-night-3.5fdf70a3cf.webp",
+        "width": 570,
+        "height": 340,
+        "anchor": [
+          285.0,
+          192.9763
+        ]
+      },
+      "unpowered-0": {
+        "file": "desalination-unpowered-0.0fe0efaffd.webp",
+        "width": 570,
+        "height": 368,
+        "anchor": [
+          285.0,
+          220.9763
+        ]
+      },
+      "unpowered-1": {
+        "file": "desalination-unpowered-1.70037302ba.webp",
+        "width": 570,
+        "height": 316,
+        "anchor": [
+          285.0,
+          168.9761
+        ]
+      },
+      "unpowered-2": {
+        "file": "desalination-unpowered-2.24ce17da2b.webp",
+        "width": 570,
+        "height": 311,
+        "anchor": [
+          285.0,
+          163.9761
+        ]
+      },
+      "unpowered-3": {
+        "file": "desalination-unpowered-3.70c603ad60.webp",
+        "width": 570,
+        "height": 340,
+        "anchor": [
+          285.0,
+          192.9763
+        ]
+      }
+    },
+    "family": "water",
+    "label": "Desalination plant",
+    "description": "White membrane pressure-vessel racks, intake filters, and a clerestory process hall."
+  },
   "fire": {
     "tiles": 3,
     "scale": 3,
@@ -2124,6 +2242,124 @@ export const CIVIC_SPRITES = {
     "label": "Solar array",
     "description": "Tilted blue photovoltaic rows on steel supports, with an inverter service lane."
   },
+  "treatment": {
+    "tiles": 3,
+    "scale": 3,
+    "height": 26,
+    "frames": {
+      "day-0": {
+        "file": "treatment-day-0.4da4f19562.webp",
+        "width": 570,
+        "height": 314,
+        "anchor": [
+          285.0,
+          167.3718
+        ]
+      },
+      "day-1": {
+        "file": "treatment-day-1.fd34778fd6.webp",
+        "width": 570,
+        "height": 293,
+        "anchor": [
+          285.0,
+          146.3717
+        ]
+      },
+      "day-2": {
+        "file": "treatment-day-2.4cbf03182c.webp",
+        "width": 570,
+        "height": 293,
+        "anchor": [
+          285.0,
+          146.3717
+        ]
+      },
+      "day-3": {
+        "file": "treatment-day-3.12aa222a6c.webp",
+        "width": 570,
+        "height": 329,
+        "anchor": [
+          285.0,
+          182.3718
+        ]
+      },
+      "night-0": {
+        "file": "treatment-night-0.8e41c8c0a0.webp",
+        "width": 570,
+        "height": 314,
+        "anchor": [
+          285.0,
+          167.3718
+        ]
+      },
+      "night-1": {
+        "file": "treatment-night-1.11d5a23395.webp",
+        "width": 570,
+        "height": 293,
+        "anchor": [
+          285.0,
+          146.3717
+        ]
+      },
+      "night-2": {
+        "file": "treatment-night-2.4f811cb083.webp",
+        "width": 570,
+        "height": 293,
+        "anchor": [
+          285.0,
+          146.3717
+        ]
+      },
+      "night-3": {
+        "file": "treatment-night-3.b1350d39c7.webp",
+        "width": 570,
+        "height": 329,
+        "anchor": [
+          285.0,
+          182.3718
+        ]
+      },
+      "unpowered-0": {
+        "file": "treatment-unpowered-0.d1e521858a.webp",
+        "width": 570,
+        "height": 314,
+        "anchor": [
+          285.0,
+          167.3718
+        ]
+      },
+      "unpowered-1": {
+        "file": "treatment-unpowered-1.d313bf2fb3.webp",
+        "width": 570,
+        "height": 293,
+        "anchor": [
+          285.0,
+          146.3717
+        ]
+      },
+      "unpowered-2": {
+        "file": "treatment-unpowered-2.0694d51b5e.webp",
+        "width": 570,
+        "height": 293,
+        "anchor": [
+          285.0,
+          146.3717
+        ]
+      },
+      "unpowered-3": {
+        "file": "treatment-unpowered-3.d430a4bfd6.webp",
+        "width": 570,
+        "height": 329,
+        "anchor": [
+          285.0,
+          182.3718
+        ]
+      }
+    },
+    "family": "water",
+    "label": "Water treatment",
+    "description": "Twin open clarifiers, bridge-mounted drives, and baffled aeration channels beside a brick blower house."
+  },
   "wasteenergy": {
     "tiles": 3,
     "scale": 3,
@@ -2241,6 +2477,242 @@ export const CIVIC_SPRITES = {
     "family": "civic",
     "label": "Waste-to-energy plant",
     "description": "A blue boiler hall, glazed turbine gallery, and insulated district-heating pipes."
+  },
+  "waterpump": {
+    "tiles": 1,
+    "scale": 3,
+    "height": 27,
+    "frames": {
+      "day-0": {
+        "file": "waterpump-day-0.41774e2033.webp",
+        "width": 186,
+        "height": 155,
+        "anchor": [
+          93.0,
+          104.4294
+        ]
+      },
+      "day-1": {
+        "file": "waterpump-day-1.add82ade63.webp",
+        "width": 186,
+        "height": 137,
+        "anchor": [
+          93.0,
+          86.4292
+        ]
+      },
+      "day-2": {
+        "file": "waterpump-day-2.cf2b5b6adf.webp",
+        "width": 186,
+        "height": 130,
+        "anchor": [
+          93.0,
+          79.4292
+        ]
+      },
+      "day-3": {
+        "file": "waterpump-day-3.7b136e6ac1.webp",
+        "width": 186,
+        "height": 147,
+        "anchor": [
+          93.0,
+          96.4294
+        ]
+      },
+      "night-0": {
+        "file": "waterpump-night-0.f9368885bd.webp",
+        "width": 186,
+        "height": 155,
+        "anchor": [
+          93.0,
+          104.4294
+        ]
+      },
+      "night-1": {
+        "file": "waterpump-night-1.3e1d588e74.webp",
+        "width": 186,
+        "height": 137,
+        "anchor": [
+          93.0,
+          86.4292
+        ]
+      },
+      "night-2": {
+        "file": "waterpump-night-2.739c2e5e2f.webp",
+        "width": 186,
+        "height": 130,
+        "anchor": [
+          93.0,
+          79.4292
+        ]
+      },
+      "night-3": {
+        "file": "waterpump-night-3.62b5c565ab.webp",
+        "width": 186,
+        "height": 147,
+        "anchor": [
+          93.0,
+          96.4294
+        ]
+      },
+      "unpowered-0": {
+        "file": "waterpump-unpowered-0.1ae64809b3.webp",
+        "width": 186,
+        "height": 155,
+        "anchor": [
+          93.0,
+          104.4294
+        ]
+      },
+      "unpowered-1": {
+        "file": "waterpump-unpowered-1.5610b94eff.webp",
+        "width": 186,
+        "height": 137,
+        "anchor": [
+          93.0,
+          86.4292
+        ]
+      },
+      "unpowered-2": {
+        "file": "waterpump-unpowered-2.450a3762a6.webp",
+        "width": 186,
+        "height": 130,
+        "anchor": [
+          93.0,
+          79.4292
+        ]
+      },
+      "unpowered-3": {
+        "file": "waterpump-unpowered-3.95c0b7e901.webp",
+        "width": 186,
+        "height": 147,
+        "anchor": [
+          93.0,
+          96.4294
+        ]
+      }
+    },
+    "family": "water",
+    "label": "Water pump",
+    "description": "A copper-roofed brick wet-well house with paired teal pumps and exposed intake pipes."
+  },
+  "watertower": {
+    "tiles": 1,
+    "scale": 3,
+    "height": 61,
+    "frames": {
+      "day-0": {
+        "file": "watertower-day-0.5cc6459a43.webp",
+        "width": 187,
+        "height": 238,
+        "anchor": [
+          93.5,
+          187.8287
+        ]
+      },
+      "day-1": {
+        "file": "watertower-day-1.d4587b8f7b.webp",
+        "width": 187,
+        "height": 238,
+        "anchor": [
+          93.5,
+          187.8285
+        ]
+      },
+      "day-2": {
+        "file": "watertower-day-2.7d4b2bd739.webp",
+        "width": 187,
+        "height": 238,
+        "anchor": [
+          93.5,
+          187.8285
+        ]
+      },
+      "day-3": {
+        "file": "watertower-day-3.5f158d275f.webp",
+        "width": 187,
+        "height": 238,
+        "anchor": [
+          93.5,
+          187.8287
+        ]
+      },
+      "night-0": {
+        "file": "watertower-night-0.c2eddb273e.webp",
+        "width": 187,
+        "height": 238,
+        "anchor": [
+          93.5,
+          187.8287
+        ]
+      },
+      "night-1": {
+        "file": "watertower-night-1.a1e9d45308.webp",
+        "width": 187,
+        "height": 238,
+        "anchor": [
+          93.5,
+          187.8285
+        ]
+      },
+      "night-2": {
+        "file": "watertower-night-2.b035c2f187.webp",
+        "width": 187,
+        "height": 238,
+        "anchor": [
+          93.5,
+          187.8285
+        ]
+      },
+      "night-3": {
+        "file": "watertower-night-3.5f66c00132.webp",
+        "width": 187,
+        "height": 238,
+        "anchor": [
+          93.5,
+          187.8287
+        ]
+      },
+      "unpowered-0": {
+        "file": "watertower-unpowered-0.63302ca1cb.webp",
+        "width": 187,
+        "height": 238,
+        "anchor": [
+          93.5,
+          187.8287
+        ]
+      },
+      "unpowered-1": {
+        "file": "watertower-unpowered-1.107196ff53.webp",
+        "width": 187,
+        "height": 238,
+        "anchor": [
+          93.5,
+          187.8285
+        ]
+      },
+      "unpowered-2": {
+        "file": "watertower-unpowered-2.ca31a6892a.webp",
+        "width": 187,
+        "height": 238,
+        "anchor": [
+          93.5,
+          187.8285
+        ]
+      },
+      "unpowered-3": {
+        "file": "watertower-unpowered-3.89e446143a.webp",
+        "width": 187,
+        "height": 238,
+        "anchor": [
+          93.5,
+          187.8287
+        ]
+      }
+    },
+    "family": "water",
+    "label": "Water tower",
+    "description": "An elevated teal reservoir on splayed steel legs, with cross bracing and an access ladder."
   },
   "wind": {
     "tiles": 1,

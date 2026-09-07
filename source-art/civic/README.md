@@ -30,6 +30,7 @@ and the visual checks required before shipping.
 
 Civic model sources: `common.py`, `services.py`, `culture.py`, `sanitation.py`.
 The shared registry and power-family sources are documented in [POWER-ART.md](../../POWER-ART.md).
+Water sources and export commands are documented in [WATER-ART.md](../../WATER-ART.md).
 `render.py` owns the exact 2:1 ground projection, consistent screen-relative
 lighting, four rotations, and day / powered night / unpowered night states.
 `package.py` exports alpha-cropped WebP with screen anchors and measured heights.
