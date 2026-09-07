@@ -1,4 +1,5 @@
 // Advisors and the news ticker. Messages come from the current stats.
+import { MAX_TRIP } from "./traffic.js";
 
 export const ADVISORS = [
   { id: "finance",   name: "Constance Ledger", role: "Financial Advisor" },
@@ -27,16 +28,24 @@ export function generateAdvisors(city, s) {
   else say("finance", "good", `Budget is balanced with ${m(s.balance)} to spare each month.`);
 
   // Transportation
-  if (s.unemployment > 25 && s.population > 500) say("transport", "bad", `${s.unemployment}% of workers cannot reach a job. Connect homes to workplaces by road.`);
+  if (s.strikes?.transit) say("transport", "bad", "Bus drivers and conductors are on strike. Every stop and station in the city is shut. Restore the mass transit budget.");
+  else if (s.unemployment > 25 && s.population > 500) say("transport", "bad", `${s.unemployment}% of workers cannot reach a job. Connect homes to workplaces by road.`);
   else if (s.congestion > 30) say("transport", "bad", `${s.congestion}% of roads are jammed. Add parallel routes, bus stops or rail.`);
+  // "Sims aren't willing to drive as far if traffic is bad... you are forced to
+  // make a tiny congested city with no real hope for expansion."
+  else if (s.range != null && s.range < MAX_TRIP * 0.8) say("transport", "warning", `Traffic has Sims unwilling to drive more than ${s.range} tiles to work. Rail and subway take cars off the road and give them their range back.`);
   else if (s.traffic > 45) say("transport", "warning", "Traffic is getting heavy. Bus stops cut road load by a quarter.");
   else say("transport", "good", "Commutes are flowing. Keep roads connected as the city grows.");
 
   // Planning
   const d = s.demand;
-  const top = Object.entries(d).sort((a, b) => b[1] - a[1])[0];
+  // The RCI bars only: port demand has its own line, because a port is a
+  // single facility rather than land to keep zoning.
+  const top = ["residential", "commercial", "industrial"].map((k) => [k, d[k] ?? 0]).sort((a, b) => b[1] - a[1])[0];
+  const port = ["airport", "seaport"].map((k) => [k, d[k] ?? 0]).sort((a, b) => b[1] - a[1])[0];
   if (s.abandonedLots > 5) say("planning", "bad", `${s.abandonedLots} buildings stand abandoned. Check power, water, road access and demand.`);
   else if (top[1] > 50) say("planning", "warning", `Strong ${top[0]} demand. Zone more ${top[0]} land near roads.`);
+  else if (port[1] > 70) say("planning", "warning", `Trade has outgrown what the city can move. Zone ${port[0] === "airport" ? "an airport, 3x5 tiles at least" : "a seaport on a shoreline, 2x6 tiles at least"}.`);
   else if (d.residential < -30) say("planning", "warning", "People are leaving. Cut residential taxes, add jobs and improve services.");
   else if (d.commercial < -30 || d.industrial < -30) say("planning", "warning", "Businesses see no customers. Residential growth drives commerce and industry.");
   else say("planning", "good", "Zoning is balanced. Mix densities as land value rises.");

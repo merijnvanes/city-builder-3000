@@ -10,7 +10,7 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 | Tunnels | Transport can pass through terrain | **Done.** Road and rail bores through high ground, six tiles minimum |
 | Power | Eight plant types; aging reduces capacity; prolonged overload can destroy plants | **Done.** All eight types with the manual's invention years; output slides after 55% of a plant's life; a year of overdraw destroys one |
 | Water | Freshwater pumps, towers, coastal desalinization; pumps age | **Done.** Sea and fresh water are distinct; three sources with the manual's weaknesses; pumps age and slow in dirty water; pipes reach seven tiles |
-| Education | Childhood learning and adult knowledge retention; strikes from sustained underfunding | **Done.** EQ is taught to children aged 5-17, colleges take 18-22, adults decay without libraries or museums, and teachers strike after 18 months below 40% funding |
+| Education | Childhood learning and adult knowledge retention; strikes from sustained underfunding (transit too) | **Done.** EQ is taught to children aged 5-17, colleges take 18-22, adults decay without libraries or museums, and teachers strike after 18 months below 40% funding |
 | Health | Average city reaches 59 years, a well-run one 90; hospitals need beds and funding; pollution and traffic pull it down | **Done.** Life expectancy is a cohort statistic on the same anchors, with healthcare strikes |
 
 | Commerce | Shops and offices, sorted by density and land value | **Done.** See below |
@@ -22,7 +22,7 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 | Waste | Landfills store trash, fill up, decompose and cannot be bulldozed; incinerators age | **Done.** See below |
 | Aura | A per-neighbourhood mood map whose average is the mayoral approval rating | **Done.** See below |
 | Land value | Pylons blight the ground around them | **Done.** See below |
-| Public safety | Budget sets precinct size and effectiveness; overlaps are additive; jails cap police effectiveness | **Done.** See below |
+| Public safety | Budget sets precinct size and effectiveness; overlaps are additive; jails cap police effectiveness; coverage raises land value | **Done.** See below |
 
 | Fire | Per-building flammability, halved by water and cut by ordinance; relief scaled by preparedness; one crew per station plus the volunteers | **Done.** See below |
 | Disasters | Permanent radiation after a meltdown; an early warning siren that can be abused | **Done.** See below |
@@ -416,6 +416,32 @@ take it upon themselves to assist you in the clean up costs. Be forewarned, a
 Mayor that is well prepared generally receives better treatment."* Losing six
 or more lots to a disaster now draws a relief grant, and a city with funded
 fire and police coverage receives about twice what a neglectful one gets.
+
+## Transit strikes, and safety on the ground, September 7
+
+**Transit workers walk out too.** The manual, on the mass transit budget:
+*"If the mass transit budget is low, things will start deteriorating and Sims
+will be less likely to use the system. If the budget is far below adequate,
+transit workers will go out on strike."*
+
+Teachers and hospital staff already struck; transit was the third branch the
+manual names and the only one that could be starved indefinitely without
+consequence beyond a shorter coverage radius. It now uses the same eighteen
+months of anger below 40% funding, and a picket line shuts every stop and
+station in the city: no bus or rail coverage, no station interchanges, no
+subway. The Transportation Advisor says so, and approval drops five points
+until the drivers are back.
+
+**Police and fire coverage raises land value.** *"Good police and fire coverage
+raises land values in a city, which makes Sims happy and proud to be
+citizens."* Land value counted parks, culture, schools and hospitals but had no
+idea whether the streets were safe. Both now lift it, half as strongly as a
+park does.
+
+The aura test that measured red tape had to change with this: it compared two
+approval ratings rounded to whole points, and the extra land value pushed both
+arms onto the same integer. It averages the aura map itself now, which has the
+resolution the effect needs.
 
 ## Loans by the book, September 7
 

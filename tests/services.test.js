@@ -2,7 +2,7 @@
 // and a city with nowhere to hold arrests loses police effectiveness.
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
-import { createCity, tick, getStats, place, setPolicy, inspectTile } from "../src/sim.js";
+import { createCity, tick, getStats, place, refresh, setPolicy, serialize, deserialize, inspectTile } from "../src/sim.js";
 import { SERVICE_CAP, ARREST_RATE } from "../src/sim/services.js";
 import { fireRiskOf } from "../src/sim/disasters.js";
 import { BUILDINGS } from "../src/sim/catalog.js";
@@ -122,5 +122,74 @@ describe("fire risk", () => {
     const c = createCity(21, true);
     for (let i = 0; i < 12; i++) tick(c);
     assert.ok(getStats(c).dryShare < 0.05, `dry share ${getStats(c).dryShare}`);
+  });
+});
+
+describe("transit workers walk out", () => {
+  // "The mass transit budget pays for the upkeep of rail and subway track, and
+  // also the salaries of conductors, and bus drivers. If the mass transit
+  // budget is low, things will start deteriorating and Sims will be less
+  // likely to use the system. If the budget is far below adequate, transit
+  // workers will go out on strike."
+  const starve = (c) => { setPolicy(c, "funding.transit", 0); for (let i = 0; i < 30; i++) tick(c); };
+
+  test("sustained underfunding calls a strike", () => {
+    const c = createCity(21, true);
+    assert.equal(c.people.strikes.transit, 0);
+    starve(c);
+    assert.ok(c.people.strikes.transit > 0, "the drivers should be out");
+    assert.ok(c.news.some((n) => /Bus drivers and conductors walk out/.test(n)));
+  });
+
+  test("and every stop and station closes with them", () => {
+    const c = createCity(21, true);
+    const cover = (city) => city.tiles.reduce((a, t) => a + (t.svc?.bus || 0) + (t.svc?.rail || 0), 0);
+    assert.ok(cover(c) > 0, "the town has stops to close");
+    starve(c);
+    assert.equal(cover(c), 0);
+  });
+
+  test("funding them properly again sends them back", () => {
+    const c = createCity(21, true);
+    starve(c);
+    assert.ok(c.people.strikes.transit > 0);
+    setPolicy(c, "funding.transit", 100);
+    for (let i = 0; i < 6; i++) tick(c);
+    assert.equal(c.people.strikes.transit, 0);
+    assert.ok(c.news.some((n) => /Bus drivers and conductors return to work/.test(n)));
+  });
+
+  test("the strike survives a save", () => {
+    const c = createCity(21, true);
+    starve(c);
+    assert.equal(deserialize(serialize(c)).people.strikes.transit, c.people.strikes.transit);
+  });
+});
+
+describe("safety is worth something on the ground", () => {
+  // "Good police and fire coverage raises land values in a city, which makes
+  // Sims happy and proud to be citizens."
+  test("a precinct lifts the value of the streets it covers", () => {
+    const c = createCity({ seed: 7, layout: "plains", starter: false, hills: 0 });
+    const spot = [36, 30];
+    const before = at(c, spot[0], spot[1]).landValue;
+    c.money = 5_000_000;
+    place(c, 30, 30, "police");
+    for (let i = -1; i <= 3; i++) place(c, 30 + i, 33, "road");
+    refresh(c);
+    assert.ok(at(c, spot[0], spot[1]).landValue > before,
+      `${at(c, spot[0], spot[1]).landValue} vs ${before}`);
+  });
+
+  test("and so does a fire station", () => {
+    const c = createCity({ seed: 7, layout: "plains", starter: false, hills: 0 });
+    const spot = [36, 30];
+    const before = at(c, spot[0], spot[1]).landValue;
+    c.money = 5_000_000;
+    place(c, 30, 30, "fire");
+    for (let i = -1; i <= 3; i++) place(c, 30 + i, 33, "road");
+    refresh(c);
+    assert.ok(at(c, spot[0], spot[1]).landValue > before,
+      `${at(c, spot[0], spot[1]).landValue} vs ${before}`);
   });
 });

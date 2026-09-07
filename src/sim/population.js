@@ -36,6 +36,10 @@ const STRIKE_FUNDING = 40;  // below this, months of anger accumulate
 const STRIKE_MONTHS = 18;   // ...and this many in a row calls a strike
 const STRIKE_ENDS = 80;     // funding at or above this ends it
 const STRIKE_QUALITY = 0.15;
+// The three branches the manual says walk out: "teachers will go on strike",
+// "healthcare workers calling a strike", and "if the budget is far below
+// adequate, transit workers will go out on strike".
+export const STRIKING_DEPTS = ["education", "health", "transit"];
 
 // Migration skews young: singles and young families move to a growing city.
 const MIGRATION_PROFILE = (age) => {
@@ -125,8 +129,8 @@ export function blankPopulation(le = BASE_LIFE_EXPECTANCY) {
     le,
     pyramid: stationaryPyramid(le),
     eq: new Array(MAX_AGE).fill(NATIONAL_EQ),
-    strikes: { education: 0, health: 0 },
-    anger: { education: 0, health: 0 },
+    strikes: Object.fromEntries(STRIKING_DEPTS.map((d) => [d, 0])),
+    anger: Object.fromEntries(STRIKING_DEPTS.map((d) => [d, 0])),
   });
 }
 
@@ -225,7 +229,7 @@ export function readPopulation(city, population) {
 export function updateStrikes(city) {
   const pop = city.people;
   const funding = city.funding || {};
-  for (const dept of ["education", "health"]) {
+  for (const dept of STRIKING_DEPTS) {
     const level = funding[dept] ?? 100;
     if (pop.strikes[dept] > 0) {
       pop.strikes[dept] = level >= STRIKE_ENDS ? 0 : pop.strikes[dept] + 1;
@@ -325,7 +329,7 @@ export function parsePopulation(raw) {
     le: raw.le,
     pyramid: raw.pyramid.slice(),
     eq: raw.eq.slice(),
-    strikes: { education: counter(raw.strikes?.education), health: counter(raw.strikes?.health) },
-    anger: { education: counter(raw.anger?.education), health: counter(raw.anger?.health) },
+    strikes: Object.fromEntries(STRIKING_DEPTS.map((d) => [d, counter(raw.strikes?.[d])])),
+    anger: Object.fromEntries(STRIKING_DEPTS.map((d) => [d, counter(raw.anger?.[d])])),
   };
 }

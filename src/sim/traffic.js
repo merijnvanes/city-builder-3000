@@ -72,18 +72,21 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
   const N = tiles.length;
   // Two layers: surface nodes 0..N-1, tunnel nodes N..2N-1 under subway tiles.
   const kind = new Uint8Array(N * 2);
+  // "If the budget is far below adequate, transit workers will go out on
+  // strike." Nobody boards a train that is not running.
+  const strike = (city.people?.strikes?.transit || 0) > 0;
   for (let i = 0; i < N; i++) {
     const t = tiles[i];
     if (t.type === "road") kind[i] = ROAD;
     else if (t.type === "rail") kind[i] = RAIL;
     // "You must place Train Stations on tiles that touch the track." A
     // station with no rail beside it is a building, not an interchange.
-    else if (t.type === "railstation") kind[i] = besideWhatItNeeds(city, t) ? STATION : ROAD;
+    else if (t.type === "railstation") kind[i] = besideWhatItNeeds(city, t) && !strike ? STATION : ROAD;
     else if (t.type === "highway") kind[i] = HIGHWAY;
-    else if (t.type === "substation") kind[i] = besideWhatItNeeds(city, t) ? SUBSTATION : ROAD;
+    else if (t.type === "substation") kind[i] = besideWhatItNeeds(city, t) && !strike ? SUBSTATION : ROAD;
     else if (t.type === "onramp") kind[i] = RAMP;
     else if (t.tunnel) kind[i] = BORE;
-    if (t.subway || t.type === "substation") kind[N + i] = TUNNEL;
+    if (!strike && (t.subway || t.type === "substation")) kind[N + i] = TUNNEL;
   }
 
   // Jobs reachable from each road tile.

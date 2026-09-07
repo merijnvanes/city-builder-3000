@@ -71,6 +71,11 @@ export function updateServices(city) {
   for (const t of tiles) if (isAnchor(t) && t.type === "residential") arrestable += capacityOf(t) * ARREST_RATE;
   const jailFactor = arrestable > 0 ? clamp(0.35 + 0.65 * (cells / arrestable), 0.35, 1) : 1;
 
+  // "If the mass transit budget is low, things will start deteriorating and
+  // Sims will be less likely to use the system. If the budget is far below
+  // adequate, transit workers will go out on strike." A picket line closes
+  // every stop and station in the city.
+  const transitStrike = (city.people?.strikes?.transit || 0) > 0;
   for (const t of tiles) {
     if (!isAnchor(t)) continue;
     const b = BUILDINGS[t.type];
@@ -80,6 +85,7 @@ export function updateServices(city) {
     const powered = b.powerUse && !t.powered ? 0.35 : 1;
     let strength = (s.strength ?? 100) * budget * powered * sitingFactor(city, t);
     if (s.kind === "police") strength *= jailFactor;
+    if (b.dept === "transit" && transitStrike) strength = 0;
     if (strength <= 0) continue;
     // A well-funded department reaches further; a starved one pulls back to
     // the streets around its own station.
@@ -215,6 +221,9 @@ export function updateServices(city) {
     const i = t.y * size + t.x;
     let v = 34 + waterNear[i] - industryNear[i] - pylonNear[i];
     v += t.svc.park * 0.28 + t.svc.culture * 0.2 + t.svc.education * 0.08 + t.svc.health * 0.06;
+    // "Good police and fire coverage raises land values in a city, which makes
+    // Sims happy and proud to be citizens."
+    v += Math.min(t.svc.police, 100) * 0.05 + Math.min(t.svc.fire, 100) * 0.04;
     v += t.trees * 2.5 + valueBump[i] + (t.elev || 0) * 2;
     v -= t.pollution * 0.38 + (t.traffic || 0) * 0.08;
     if (t.powered) v += 5;
@@ -267,6 +276,7 @@ export function updateServices(city) {
   civic -= (garbage || 0) * 0.08;
   if (people.strikes.education) civic -= 6;
   if (people.strikes.health) civic -= 6;
+  if (people.strikes.transit) civic -= 5;
 
   for (const t of tiles) {
     const i = t.y * size + t.x;

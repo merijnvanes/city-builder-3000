@@ -123,7 +123,7 @@ export function computeMetrics(city) {
     population, jobs, jobsCommercial, jobsIndustrial, specialJobs, demandBonus,
     tradeConnections, externalJobs: traffic.externalJobs || 0, connections, ports,
     workers: traffic.workers, employed: traffic.employed, unemployment: traffic.unemployment,
-    traffic: traffic.traffic, congestion: traffic.congestion,
+    traffic: traffic.traffic, congestion: traffic.congestion, range: traffic.range ?? null,
     pollution, crime, education, health, parks, police, fireCover, industryMix, commerceMix,
     dryShare: developedTiles ? dryTiles / developedTiles : 0,
     cells: svc.cells || 0, arrestable: svc.arrestable || 0, jailFactor: svc.jailFactor ?? 1,

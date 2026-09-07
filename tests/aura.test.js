@@ -62,6 +62,14 @@ describe("what the manual says moves aura", () => {
     setup(c);
     return getStats(c).happiness;
   };
+  // The headline figure is rounded to a whole point, which is too coarse for
+  // effects worth a fraction of one. Averaging the map itself is not.
+  const meanAura = (setup) => {
+    const c = createCity(21, true);
+    setup(c);
+    const lots = c.tiles.filter((t) => t.type === "residential" && t.lot?.x === t.x && t.lot?.y === t.y && !t.abandoned);
+    return lots.reduce((s, t) => s + t.aura, 0) / lots.length;
+  };
 
   test("high taxes lower it", () => {
     const base = approval(() => {});
@@ -72,9 +80,9 @@ describe("what the manual says moves aura", () => {
   test("excessive regulation lowers it even when each rule is popular", () => {
     const liked = Object.entries(ORDINANCES).filter(([, o]) => (o.mood || 0) >= 0).map(([k]) => k);
     assert.ok(liked.length > 5, "need several inoffensive ordinances to test red tape");
-    const base = approval(() => {});
-    const regulated = approval((c) => { for (const k of liked) setPolicy(c, `ordinance.${k}`, true); });
-    assert.ok(regulated < base, `${regulated} vs ${base}: red tape should still cost something`);
+    const base = meanAura(() => {});
+    const regulated = meanAura((c) => { for (const k of liked) setPolicy(c, `ordinance.${k}`, true); });
+    assert.ok(regulated < base, `${regulated.toFixed(2)} vs ${base.toFixed(2)}: red tape should still cost something`);
   });
 
   test("a hated ordinance costs more than a welcome one", () => {

@@ -176,7 +176,7 @@ function advancePeople(city) {
   const before = { ...city.people.strikes };
   updateStrikes(city);
   const news = [];
-  for (const [dept, label] of [["education", "Teachers"], ["health", "Hospital staff"]]) {
+  for (const [dept, label] of [["education", "Teachers"], ["health", "Hospital staff"], ["transit", "Bus drivers and conductors"]]) {
     if (!before[dept] && city.people.strikes[dept]) news.push(`${label} walk out over budget cuts.`);
     else if (before[dept] && !city.people.strikes[dept]) news.push(`${label} return to work.`);
   }
