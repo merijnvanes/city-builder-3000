@@ -20,9 +20,10 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 | Zone stages | Land value gates how far a zone builds out within its density | **Done.** See below |
 | Waste | Landfills store trash, fill up, decompose and cannot be bulldozed; incinerators age | **Done.** See below |
 | Aura | A per-neighbourhood mood map whose average is the mayoral approval rating | **Done.** See below |
+| Land value | Pylons blight the ground around them | **Done.** See below |
 | Public safety | Budget sets precinct size and effectiveness; overlaps are additive; jails cap police effectiveness | **Done.** See below |
 
-| Fire | Per-building flammability, halved by water and cut by ordinance; relief scaled by preparedness | **Done.** See below |
+| Fire | Per-building flammability, halved by water and cut by ordinance; relief scaled by preparedness; one crew per station plus the volunteers | **Done.** See below |
 | Disasters | Permanent radiation after a meltdown; an early warning siren that can be abused | **Done.** See below |
 | Siting | Stops need roads, stations need track | **Done.** See below |
 | Ports | Airports and seaports are zones the Sims develop, with a minimum footprint | **Done.** See below |
@@ -414,6 +415,34 @@ take it upon themselves to assist you in the clean up costs. Be forewarned, a
 Mayor that is well prepared generally receives better treatment."* Losing six
 or more lots to a disaster now draws a relief grant, and a city with funded
 fire and police coverage receives about twice what a neglectful one gets.
+
+## Two more from the advisors' Q&A, September 7
+
+**Fire crews are counted, and there are not many.** Maria Montoya, Public
+Safety, answering *"A fire broke out but I was only able to dispatch a single
+fire truck"*:
+
+> *"That is because you have no fire stations, and therefore, had to rely on
+> your volunteer brigade. If you want to be able to dispatch more units, you
+> must build fire stations. You will have one dispatch unit for each fire
+> station you build, plus one for the volunteer group."*
+
+The mayor could send a crew to every fire in the city, every month, for $300
+each. There is now exactly one crew for every fire station plus one for the
+volunteers, they are committed for the month they are sent out, and the count
+comes back with the new month. It is carried in the save, so reloading does not
+refill the trucks. The tool hint counts them down as they go.
+
+**Pylons blight the ground under them.** Gus Speedwaggon, Utilities, answering
+*"Is it my imagination or do Sims not want to live near power lines?"*:
+
+> *"Good catch. You are talking about the high-tension power lines that are big
+> and ugly and take up a lot of space. Yes, they will lower an area's land
+> value. Try to keep them away from Residential and Commercial zones."*
+
+Land value had no idea power lines existed. A line now takes nine points off
+the ground it stands on, falling away over two tiles, which puts a real cost on
+running the grid straight through the nice part of town.
 
 ## The commute decides where a city grows, September 7
 

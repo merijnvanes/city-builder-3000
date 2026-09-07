@@ -98,6 +98,8 @@ export function blankCity({ seed = 42, size = DEFAULT_SIZE, layout, name = "New 
     ...defaultPolicies(),
     people: blankPopulation(),
     roadCondition: 100,
+    // Fire crews sent out this month; see fire.js.
+    dispatched: 0,
     siren: blankSiren(),
     population: 0, happiness: 50,
     demand: Object.fromEntries([...ZONED_TYPES].map((k) => [k, 0])),
@@ -173,6 +175,7 @@ export function serialize(city) {
     deals: city.deals ?? {},
     people: serializePopulation(city.people),
     roadCondition: city.roadCondition ?? 100,
+    dispatched: city.dispatched ?? 0,
     siren: serializeSiren(city.siren ?? blankSiren()),
   });
 }
@@ -285,6 +288,8 @@ export function deserialize(raw) {
     settings: { yearEndBudget: d.settings?.yearEndBudget !== false },
     people: parsePopulation(d.people),
     roadCondition: Number.isFinite(d.roadCondition) && d.roadCondition >= 0 && d.roadCondition <= 100 ? d.roadCondition : 100,
+    // Crews already out this month, so a save cannot refill the fire trucks.
+    dispatched: Number.isInteger(d.dispatched) && d.dispatched >= 0 && d.dispatched <= 999 ? d.dispatched : 0,
     siren: parseSiren(d.siren),
     // A contract keeps the price it was signed at, so the terms travel with
     // it. They are money, so a save cannot be trusted to set them freely.

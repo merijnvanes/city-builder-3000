@@ -67,6 +67,24 @@ export function reliefGrant(city, stats, lotsLost) {
   return Math.round(lotsLost * RELIEF_PER_LOT * (0.35 + ready * 0.85));
 }
 
+// "A fire broke out but I was only able to dispatch a single fire truck."
+// "That is because you have no fire stations, and therefore, had to rely on
+// your volunteer brigade. If you want to be able to dispatch more units, you
+// must build fire stations. You will have one dispatch unit for each fire
+// station you build, plus one for the volunteer group."
+//
+// So the volunteers are always there, and every station adds a crew. A crew is
+// committed for the month it is sent out; the count resets with the month.
+export const VOLUNTEER_CREWS = 1;
+
+export function fireCrews(city) {
+  let stations = 0;
+  for (const t of city.tiles) if (isAnchor(t) && t.type === "fire") stations++;
+  return VOLUNTEER_CREWS + stations;
+}
+
+export const crewsAvailable = (city) => Math.max(0, fireCrews(city) - (city.dispatched || 0));
+
 export function developedLots(city) {
   let n = 0;
   for (const t of city.tiles) if (isAnchor(t) && (!ZONED_TYPES.has(t.type) || t.level > 0)) n++;

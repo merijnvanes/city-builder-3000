@@ -27,7 +27,7 @@ import { fillLandfills, landfillLoad, landfillNews } from "./waste.js";
 import { advanceRoads, roadCapacity } from "./roads.js";
 import { sitingNote } from "./siting.js";
 import { sound, advanceSiren, sirenSounding, blankSiren } from "./siren.js";
-import { flammability, reliefGrant, developedLots } from "./fire.js";
+import { flammability, reliefGrant, developedLots, fireCrews, crewsAvailable } from "./fire.js";
 import { ageFactor } from "./wear.js";
 import { PORTS, portJobs, portUpkeep, portNote, portReady, portObstacle } from "./ports.js";
 
@@ -80,6 +80,9 @@ export function tick(city) {
   // mutated afterwards would leave a save whose derived state settle() cannot
   // reproduce on load, and the two copies would drift apart.
   const growth = updateGrowth(city, city.demand, rng);
+  // Last month's crews come back on duty: "one dispatch unit for each fire
+  // station you build, plus one for the volunteer group", every month.
+  city.dispatched = 0;
   const fireMessage = advanceFires(city, rng);
   // Sims age once a year: children are schooled, adults forget, and life
   // expectancy drifts toward what the city's hospitals and air support.
@@ -230,6 +233,9 @@ export function getStats(city) {
       }];
     })),
     siren: { sounding: sirenSounding(city), trust: city.siren?.trust ?? 1, until: city.siren?.until ?? 0 },
+    // "One dispatch unit for each fire station you build, plus one for the
+    // volunteer group", and how many of them are still at the station.
+    crews: { total: fireCrews(city), free: crewsAvailable(city) },
     advice: "",
   };
   stats.advisors = generateAdvisors(city, stats);

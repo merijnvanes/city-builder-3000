@@ -38,6 +38,7 @@ import { refreshCity } from "./refresh.js";
 import { specialAvailable } from "./events.js";
 import { isLandfill } from "./waste.js";
 import { findBore, bore, MIN_BORE } from "./tunnels.js";
+import { crewsAvailable, fireCrews } from "./fire.js";
 
 export const DEMOLISH_FEE = 5;
 export const BRIDGE_MULTIPLIER = 5;
@@ -149,7 +150,16 @@ export function evaluate(city, x, y, tool, options = {}) {
   if (tool === "dispatch") {
     const a = t.lot ? anchorOf(city, t) : t;
     if (!a?.fire) return fail("Nothing is burning here.");
-    return { ok: true, noop: false, cost: BUILDINGS.dispatch.cost, message: "Send a fire crew", tiles: a.lot ? lotTiles(city, a.lot).map((n) => ({ x: n.x, y: n.y })) : here };
+    // "You will have one dispatch unit for each fire station you build, plus
+    // one for the volunteer group."
+    const free = crewsAvailable(city);
+    if (free <= 0) {
+      const crews = fireCrews(city);
+      return fail(crews > 1
+        ? `All ${crews} fire crews are already out this month. Build more fire stations.`
+        : "The volunteer brigade is already out. Build a fire station to dispatch more units.");
+    }
+    return { ok: true, noop: false, cost: BUILDINGS.dispatch.cost, message: `Send a fire crew (${free} of ${fireCrews(city)} left)`, tiles: a.lot ? lotTiles(city, a.lot).map((n) => ({ x: n.x, y: n.y })) : here };
   }
 
   if (tool === "bulldoze") {
@@ -232,6 +242,7 @@ export function place(city, x, y, tool, options = {}) {
   } else if (tool === "dispatch") {
     const a = t.lot ? anchorOf(city, t) : t;
     a.fire = 0;
+    city.dispatched = (city.dispatched || 0) + 1;
   } else if (tool === "bulldoze") {
     if (t.lot) {
       const a = anchorOf(city, t);

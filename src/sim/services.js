@@ -19,6 +19,9 @@ export const SERVICE_CAP = 160;
 // Aura a plain, adequately served neighbourhood sits at before anything
 // local or city-wide moves it.
 export const AURA_BASE = 62;
+// What a pylon on the doorstep takes off an address, falling away over two
+// tiles. Big and ugly, and they take up a lot of space.
+export const PYLON_BLIGHT = 9;
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 export const SERVICE_KINDS = ["police", "fire", "health", "education", "culture", "park", "bus", "rail"];
 
@@ -197,14 +200,20 @@ export function updateServices(city) {
   //    current state and a reload reproduces it exactly) ───────────
   const waterNear = new Float32Array(tiles.length);
   const industryNear = new Float32Array(tiles.length);
+  // "Is it my imagination or do Sims not want to live near power lines?"
+  // "Good catch. You are talking about the high-tension power lines that are
+  // big and ugly and take up a lot of space. Yes, they will lower an area's
+  // land value. Try to keep them away from Residential and Commercial zones."
+  const pylonNear = new Float32Array(tiles.length);
   for (const t of tiles) {
     if (t.terrain === "water") forRadius(city, t.x, t.y, 3, (n, d) => { const v = 14 - d * 4; if (v > waterNear[n.y * size + n.x]) waterNear[n.y * size + n.x] = v; });
     if (isAnchor(t) && t.type === "industrial" && t.level) forRadius(city, t.x, t.y, 4, (n, d) => { const v = 14 - d * 3; if (v > industryNear[n.y * size + n.x]) industryNear[n.y * size + n.x] = v; });
+    if (t.powerline) forRadius(city, t.x, t.y, 2, (n, d) => { const v = PYLON_BLIGHT - d * 3; if (v > pylonNear[n.y * size + n.x]) pylonNear[n.y * size + n.x] = v; });
   }
   const baseValue = new Float32Array(tiles.length);
   for (const t of tiles) {
     const i = t.y * size + t.x;
-    let v = 34 + waterNear[i] - industryNear[i];
+    let v = 34 + waterNear[i] - industryNear[i] - pylonNear[i];
     v += t.svc.park * 0.28 + t.svc.culture * 0.2 + t.svc.education * 0.08 + t.svc.health * 0.06;
     v += t.trees * 2.5 + valueBump[i] + (t.elev || 0) * 2;
     v -= t.pollution * 0.38 + (t.traffic || 0) * 0.08;

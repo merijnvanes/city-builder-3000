@@ -873,6 +873,23 @@ export function mountUI(actions) {
   });
 
   let _lastStats = null;
+  let _selectedTool = "inspect";
+
+  // The tool hint. The fire crew line carries a live count, because there are
+  // only so many trucks: one per station, plus the volunteers.
+  function writeHint() {
+    const id = _selectedTool;
+    const tool = TOOLS.find((t) => t.id === id);
+    if (!tool) return;
+    const b = BUILDINGS[id];
+    const size = b && b.w > 1 ? ` (${b.w}×${b.h})` : "";
+    const crews = _lastStats?.crews;
+    hintLine.textContent = id === "inspect"
+      ? "Click a tile to inspect it"
+      : id === "dispatch"
+      ? `Fire Crew — ${fmtMoney(tool.cost)} — click a fire${crews ? ` — ${crews.free} of ${crews.total} crews free this month` : ""}`
+      : `${tool.label}${size} — ${tool.cost > 0 ? fmtMoney(tool.cost) : "Free"} — ${PATH_TOOLS.has(id) ? "drag a route" : RECT_TOOLS.has(id) ? "drag an area" : "click to place"}`;
+  }
 
   function buildReport() {
     const s = _lastStats;
@@ -1272,6 +1289,7 @@ export function mountUI(actions) {
   return {
     update(city, stats) {
       _lastStats = stats;
+      if (_selectedTool === "dispatch") writeHint();
       refreshSiren(stats);
 
       // Top metrics
@@ -1453,14 +1471,8 @@ export function mountUI(actions) {
       inspectBtn.classList.toggle("active", id === "inspect");
 
       // Hint
-      const tool = TOOLS.find((t) => t.id === id);
-      if (tool) {
-        const b = BUILDINGS[id];
-        const size = b && b.w > 1 ? ` (${b.w}×${b.h})` : "";
-        hintLine.textContent = id === "inspect"
-          ? "Click a tile to inspect it"
-          : `${tool.label}${size} — ${tool.cost > 0 ? fmtMoney(tool.cost) : "Free"} — ${PATH_TOOLS.has(id) ? "drag a route" : RECT_TOOLS.has(id) ? "drag an area" : "click to place"}`;
-      }
+      _selectedTool = id;
+      writeHint();
 
       // Density strip visibility. Ports are zones with a single density, so
       // the strip has nothing to offer while one is selected.
