@@ -28,6 +28,8 @@ export function createPortrait(canvas) {
       const lot = tile?.lot;
       if (!lot) return false;
       lastRequest = [tile, night, rotation];
+      // Only the current query view should keep artwork active in the shared cache.
+      r.paintEpoch = (r.paintEpoch || 0) + 1;
       r.night = night; r.rotation = rotation;
       const key = JSON.stringify([tile.x, tile.y, lot.w, lot.h, tile.type, tile.density, tile.level, tile.variant, tile.abandoned, tile.age === 0, rotation, night, tile.powered]);
       if (key !== lastKey) {

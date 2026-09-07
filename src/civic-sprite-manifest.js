@@ -239,6 +239,124 @@ export const CIVIC_SPRITES = {
     "label": "Bus Stop",
     "description": "A cantilevered glass shelter with sheltered seats, timetable and a clear boarding edge."
   },
+  "cityhall": {
+    "tiles": 3,
+    "scale": 3,
+    "height": 99,
+    "frames": {
+      "day-0": {
+        "file": "cityhall-day-0.2f1ff8c9df.webp",
+        "width": 570,
+        "height": 458,
+        "anchor": [
+          285.0,
+          311.7649
+        ]
+      },
+      "day-1": {
+        "file": "cityhall-day-1.e0521c8b53.webp",
+        "width": 570,
+        "height": 427,
+        "anchor": [
+          285.0,
+          280.7648
+        ]
+      },
+      "day-2": {
+        "file": "cityhall-day-2.db1a51426c.webp",
+        "width": 570,
+        "height": 430,
+        "anchor": [
+          285.0,
+          283.7648
+        ]
+      },
+      "day-3": {
+        "file": "cityhall-day-3.a3925657dc.webp",
+        "width": 570,
+        "height": 461,
+        "anchor": [
+          285.0,
+          314.7649
+        ]
+      },
+      "night-0": {
+        "file": "cityhall-night-0.78d4218569.webp",
+        "width": 570,
+        "height": 458,
+        "anchor": [
+          285.0,
+          311.7649
+        ]
+      },
+      "night-1": {
+        "file": "cityhall-night-1.fb93e66df2.webp",
+        "width": 570,
+        "height": 427,
+        "anchor": [
+          285.0,
+          280.7648
+        ]
+      },
+      "night-2": {
+        "file": "cityhall-night-2.03d64d04a1.webp",
+        "width": 570,
+        "height": 430,
+        "anchor": [
+          285.0,
+          283.7648
+        ]
+      },
+      "night-3": {
+        "file": "cityhall-night-3.cb535d1a49.webp",
+        "width": 570,
+        "height": 461,
+        "anchor": [
+          285.0,
+          314.7649
+        ]
+      },
+      "unpowered-0": {
+        "file": "cityhall-unpowered-0.13e6faf5d0.webp",
+        "width": 570,
+        "height": 458,
+        "anchor": [
+          285.0,
+          311.7649
+        ]
+      },
+      "unpowered-1": {
+        "file": "cityhall-unpowered-1.ce7a8a74f9.webp",
+        "width": 570,
+        "height": 427,
+        "anchor": [
+          285.0,
+          280.7648
+        ]
+      },
+      "unpowered-2": {
+        "file": "cityhall-unpowered-2.6048794a06.webp",
+        "width": 570,
+        "height": 430,
+        "anchor": [
+          285.0,
+          283.7648
+        ]
+      },
+      "unpowered-3": {
+        "file": "cityhall-unpowered-3.dae6a75ab9.webp",
+        "width": 570,
+        "height": 461,
+        "anchor": [
+          285.0,
+          314.7649
+        ]
+      }
+    },
+    "family": "rewards",
+    "label": "City Hall",
+    "description": "A limestone municipal hall crowned by a square clock tower and copper lantern."
+  },
   "coal": {
     "tiles": 4,
     "scale": 3,
@@ -474,6 +592,124 @@ export const CIVIC_SPRITES = {
     "family": "civic",
     "label": "College",
     "description": "A collegiate quadrangle, copper clock tower, cloisters, and a shaded court."
+  },
+  "courthouse": {
+    "tiles": 3,
+    "scale": 3,
+    "height": 49,
+    "frames": {
+      "day-0": {
+        "file": "courthouse-day-0.cc656d682f.webp",
+        "width": 571,
+        "height": 386,
+        "anchor": [
+          285.0,
+          239.9384
+        ]
+      },
+      "day-1": {
+        "file": "courthouse-day-1.1820782c67.webp",
+        "width": 571,
+        "height": 343,
+        "anchor": [
+          285.0,
+          196.9383
+        ]
+      },
+      "day-2": {
+        "file": "courthouse-day-2.d38b5d890e.webp",
+        "width": 571,
+        "height": 343,
+        "anchor": [
+          285.0,
+          196.9383
+        ]
+      },
+      "day-3": {
+        "file": "courthouse-day-3.5bf60093b9.webp",
+        "width": 571,
+        "height": 386,
+        "anchor": [
+          285.0,
+          239.9384
+        ]
+      },
+      "night-0": {
+        "file": "courthouse-night-0.58755d9abf.webp",
+        "width": 571,
+        "height": 386,
+        "anchor": [
+          285.0,
+          239.9384
+        ]
+      },
+      "night-1": {
+        "file": "courthouse-night-1.84dd56f866.webp",
+        "width": 571,
+        "height": 343,
+        "anchor": [
+          285.0,
+          196.9383
+        ]
+      },
+      "night-2": {
+        "file": "courthouse-night-2.8081052ebb.webp",
+        "width": 571,
+        "height": 343,
+        "anchor": [
+          285.0,
+          196.9383
+        ]
+      },
+      "night-3": {
+        "file": "courthouse-night-3.dc5ce0368e.webp",
+        "width": 571,
+        "height": 386,
+        "anchor": [
+          285.0,
+          239.9384
+        ]
+      },
+      "unpowered-0": {
+        "file": "courthouse-unpowered-0.1eca42f459.webp",
+        "width": 571,
+        "height": 386,
+        "anchor": [
+          285.0,
+          239.9384
+        ]
+      },
+      "unpowered-1": {
+        "file": "courthouse-unpowered-1.5080dae8c0.webp",
+        "width": 571,
+        "height": 343,
+        "anchor": [
+          285.0,
+          196.9383
+        ]
+      },
+      "unpowered-2": {
+        "file": "courthouse-unpowered-2.6d1679af56.webp",
+        "width": 571,
+        "height": 343,
+        "anchor": [
+          285.0,
+          196.9383
+        ]
+      },
+      "unpowered-3": {
+        "file": "courthouse-unpowered-3.108764e199.webp",
+        "width": 571,
+        "height": 386,
+        "anchor": [
+          285.0,
+          239.9384
+        ]
+      }
+    },
+    "family": "rewards",
+    "label": "Courthouse",
+    "description": "A six-column stone portico, carved pediment and broad public stair."
   },
   "desalination": {
     "tiles": 3,
@@ -1654,6 +1890,360 @@ export const CIVIC_SPRITES = {
     "family": "civic",
     "label": "Library",
     "description": "A copper-vaulted reading room, timber archive wing, and a small public terrace."
+  },
+  "marina": {
+    "tiles": 3,
+    "scale": 3,
+    "height": 39,
+    "frames": {
+      "day-0": {
+        "file": "marina-day-0.79661c011a.webp",
+        "width": 570,
+        "height": 300,
+        "anchor": [
+          285.0,
+          152.9475
+        ]
+      },
+      "day-1": {
+        "file": "marina-day-1.e4db4192fb.webp",
+        "width": 570,
+        "height": 361,
+        "anchor": [
+          285.0,
+          213.9474
+        ]
+      },
+      "day-2": {
+        "file": "marina-day-2.3ec4dd33ef.webp",
+        "width": 570,
+        "height": 327,
+        "anchor": [
+          285.0,
+          179.9474
+        ]
+      },
+      "day-3": {
+        "file": "marina-day-3.6a8ad6a87b.webp",
+        "width": 570,
+        "height": 293,
+        "anchor": [
+          285.0,
+          145.9475
+        ]
+      },
+      "night-0": {
+        "file": "marina-night-0.f30bf57446.webp",
+        "width": 570,
+        "height": 300,
+        "anchor": [
+          285.0,
+          152.9475
+        ]
+      },
+      "night-1": {
+        "file": "marina-night-1.66bf756a3c.webp",
+        "width": 570,
+        "height": 361,
+        "anchor": [
+          285.0,
+          213.9474
+        ]
+      },
+      "night-2": {
+        "file": "marina-night-2.c06d898315.webp",
+        "width": 570,
+        "height": 327,
+        "anchor": [
+          285.0,
+          179.9474
+        ]
+      },
+      "night-3": {
+        "file": "marina-night-3.9375ee9960.webp",
+        "width": 570,
+        "height": 293,
+        "anchor": [
+          285.0,
+          145.9475
+        ]
+      },
+      "unpowered-0": {
+        "file": "marina-unpowered-0.0ac585afb4.webp",
+        "width": 570,
+        "height": 300,
+        "anchor": [
+          285.0,
+          152.9475
+        ]
+      },
+      "unpowered-1": {
+        "file": "marina-unpowered-1.4f49640a3b.webp",
+        "width": 570,
+        "height": 361,
+        "anchor": [
+          285.0,
+          213.9474
+        ]
+      },
+      "unpowered-2": {
+        "file": "marina-unpowered-2.6aacdb55e4.webp",
+        "width": 570,
+        "height": 327,
+        "anchor": [
+          285.0,
+          179.9474
+        ]
+      },
+      "unpowered-3": {
+        "file": "marina-unpowered-3.6ca66fd2bb.webp",
+        "width": 570,
+        "height": 293,
+        "anchor": [
+          285.0,
+          145.9475
+        ]
+      }
+    },
+    "family": "rewards",
+    "label": "Marina",
+    "description": "A copper-roofed clubhouse, timber jetties and sculpted sailing yachts in a sheltered basin."
+  },
+  "mayorhouse": {
+    "tiles": 2,
+    "scale": 3,
+    "height": 53,
+    "frames": {
+      "day-0": {
+        "file": "mayorhouse-day-0.2c81af76e4.webp",
+        "width": 378,
+        "height": 284,
+        "anchor": [
+          189.0,
+          185.9641
+        ]
+      },
+      "day-1": {
+        "file": "mayorhouse-day-1.a05e077e7a.webp",
+        "width": 378,
+        "height": 280,
+        "anchor": [
+          189.0,
+          181.964
+        ]
+      },
+      "day-2": {
+        "file": "mayorhouse-day-2.e62ce253d1.webp",
+        "width": 378,
+        "height": 279,
+        "anchor": [
+          189.0,
+          180.964
+        ]
+      },
+      "day-3": {
+        "file": "mayorhouse-day-3.fdb30a5095.webp",
+        "width": 378,
+        "height": 288,
+        "anchor": [
+          189.0,
+          189.9641
+        ]
+      },
+      "night-0": {
+        "file": "mayorhouse-night-0.eafc951774.webp",
+        "width": 378,
+        "height": 284,
+        "anchor": [
+          189.0,
+          185.9641
+        ]
+      },
+      "night-1": {
+        "file": "mayorhouse-night-1.abf4e8766f.webp",
+        "width": 378,
+        "height": 280,
+        "anchor": [
+          189.0,
+          181.964
+        ]
+      },
+      "night-2": {
+        "file": "mayorhouse-night-2.bd60d8b9c0.webp",
+        "width": 378,
+        "height": 279,
+        "anchor": [
+          189.0,
+          180.964
+        ]
+      },
+      "night-3": {
+        "file": "mayorhouse-night-3.8699e5a1ae.webp",
+        "width": 378,
+        "height": 288,
+        "anchor": [
+          189.0,
+          189.9641
+        ]
+      },
+      "unpowered-0": {
+        "file": "mayorhouse-unpowered-0.3df353d934.webp",
+        "width": 378,
+        "height": 284,
+        "anchor": [
+          189.0,
+          185.9641
+        ]
+      },
+      "unpowered-1": {
+        "file": "mayorhouse-unpowered-1.f7eb6e9788.webp",
+        "width": 378,
+        "height": 280,
+        "anchor": [
+          189.0,
+          181.964
+        ]
+      },
+      "unpowered-2": {
+        "file": "mayorhouse-unpowered-2.7c0124438c.webp",
+        "width": 378,
+        "height": 279,
+        "anchor": [
+          189.0,
+          180.964
+        ]
+      },
+      "unpowered-3": {
+        "file": "mayorhouse-unpowered-3.3cd47d3f9a.webp",
+        "width": 378,
+        "height": 288,
+        "anchor": [
+          189.0,
+          189.9641
+        ]
+      }
+    },
+    "family": "rewards",
+    "label": "Mayor's House",
+    "description": "A warm domestic manor with a columned veranda, terracotta roof and private garden."
+  },
+  "medcenter": {
+    "tiles": 4,
+    "scale": 3,
+    "height": 78,
+    "frames": {
+      "day-0": {
+        "file": "medcenter-day-0.57473e6bda.webp",
+        "width": 762,
+        "height": 575,
+        "anchor": [
+          381.0,
+          380.1952
+        ]
+      },
+      "day-1": {
+        "file": "medcenter-day-1.ce841665c7.webp",
+        "width": 762,
+        "height": 488,
+        "anchor": [
+          381.0,
+          293.1952
+        ]
+      },
+      "day-2": {
+        "file": "medcenter-day-2.20ae2f5a44.webp",
+        "width": 762,
+        "height": 421,
+        "anchor": [
+          381.0,
+          226.1952
+        ]
+      },
+      "day-3": {
+        "file": "medcenter-day-3.ef997f81b6.webp",
+        "width": 762,
+        "height": 527,
+        "anchor": [
+          381.0,
+          332.1952
+        ]
+      },
+      "night-0": {
+        "file": "medcenter-night-0.f5948ef27e.webp",
+        "width": 762,
+        "height": 575,
+        "anchor": [
+          381.0,
+          380.1952
+        ]
+      },
+      "night-1": {
+        "file": "medcenter-night-1.99b1d26b66.webp",
+        "width": 762,
+        "height": 488,
+        "anchor": [
+          381.0,
+          293.1952
+        ]
+      },
+      "night-2": {
+        "file": "medcenter-night-2.01045fc576.webp",
+        "width": 762,
+        "height": 421,
+        "anchor": [
+          381.0,
+          226.1952
+        ]
+      },
+      "night-3": {
+        "file": "medcenter-night-3.581ba09074.webp",
+        "width": 762,
+        "height": 527,
+        "anchor": [
+          381.0,
+          332.1952
+        ]
+      },
+      "unpowered-0": {
+        "file": "medcenter-unpowered-0.ef84024621.webp",
+        "width": 762,
+        "height": 575,
+        "anchor": [
+          381.0,
+          380.1952
+        ]
+      },
+      "unpowered-1": {
+        "file": "medcenter-unpowered-1.9e3d3a47dc.webp",
+        "width": 762,
+        "height": 488,
+        "anchor": [
+          381.0,
+          293.1952
+        ]
+      },
+      "unpowered-2": {
+        "file": "medcenter-unpowered-2.06fb1fa1f9.webp",
+        "width": 762,
+        "height": 421,
+        "anchor": [
+          381.0,
+          226.1952
+        ]
+      },
+      "unpowered-3": {
+        "file": "medcenter-unpowered-3.b469ecef9c.webp",
+        "width": 762,
+        "height": 527,
+        "anchor": [
+          381.0,
+          332.1952
+        ]
+      }
+    },
+    "family": "rewards",
+    "label": "Medical Research Center",
+    "description": "Paired laboratories, glazed skybridge, rooftop plant and a northlit public research hall."
   },
   "microwave": {
     "tiles": 4,
@@ -3645,6 +4235,362 @@ export const CIVIC_SPRITES = {
     "label": "Solar array",
     "description": "Tilted blue photovoltaic rows on steel supports, with an inverter service lane."
   },
+  "stadium": {
+    "tiles": 5,
+    "scale": 3,
+    "height": 60,
+    "frames": {
+      "day-0": {
+        "file": "stadium-day-0.542f26d1b9.webp",
+        "width": 955,
+        "height": 639,
+        "anchor": [
+          477.9999,
+          396.1528
+        ]
+      },
+      "day-1": {
+        "file": "stadium-day-1.e00272c0d5.webp",
+        "width": 955,
+        "height": 639,
+        "anchor": [
+          477.9999,
+          396.1529
+        ]
+      },
+      "day-2": {
+        "file": "stadium-day-2.53cfac342a.webp",
+        "width": 955,
+        "height": 639,
+        "anchor": [
+          478.0001,
+          396.1529
+        ]
+      },
+      "day-3": {
+        "file": "stadium-day-3.5c8d96afdd.webp",
+        "width": 955,
+        "height": 639,
+        "anchor": [
+          478.0001,
+          396.1528
+        ]
+      },
+      "night-0": {
+        "file": "stadium-night-0.726c9c27bb.webp",
+        "width": 955,
+        "height": 639,
+        "anchor": [
+          477.9999,
+          396.1528
+        ]
+      },
+      "night-1": {
+        "file": "stadium-night-1.fa14800275.webp",
+        "width": 955,
+        "height": 639,
+        "anchor": [
+          477.9999,
+          396.1529
+        ]
+      },
+      "night-2": {
+        "file": "stadium-night-2.d9919ebe9e.webp",
+        "width": 955,
+        "height": 639,
+        "anchor": [
+          478.0001,
+          396.1529
+        ]
+      },
+      "night-3": {
+        "file": "stadium-night-3.1b80e469ea.webp",
+        "width": 955,
+        "height": 639,
+        "anchor": [
+          478.0001,
+          396.1528
+        ]
+      },
+      "unpowered-0": {
+        "file": "stadium-unpowered-0.9c984ecade.webp",
+        "width": 955,
+        "height": 639,
+        "anchor": [
+          477.9999,
+          396.1528
+        ]
+      },
+      "unpowered-1": {
+        "file": "stadium-unpowered-1.ee33624e8f.webp",
+        "width": 955,
+        "height": 639,
+        "anchor": [
+          477.9999,
+          396.1529
+        ]
+      },
+      "unpowered-2": {
+        "file": "stadium-unpowered-2.992d304531.webp",
+        "width": 955,
+        "height": 639,
+        "anchor": [
+          478.0001,
+          396.1529
+        ]
+      },
+      "unpowered-3": {
+        "file": "stadium-unpowered-3.b0f989d6b6.webp",
+        "width": 955,
+        "height": 639,
+        "anchor": [
+          478.0001,
+          396.1528
+        ]
+      },
+      "day-0-v1": {
+        "file": "stadium-day-0-v1.d0588018b8.webp",
+        "width": 955,
+        "height": 639,
+        "anchor": [
+          477.9999,
+          396.1528
+        ]
+      },
+      "day-1-v1": {
+        "file": "stadium-day-1-v1.d8391cd610.webp",
+        "width": 955,
+        "height": 639,
+        "anchor": [
+          477.9999,
+          396.1529
+        ]
+      },
+      "day-2-v1": {
+        "file": "stadium-day-2-v1.8f9055c04d.webp",
+        "width": 955,
+        "height": 639,
+        "anchor": [
+          478.0001,
+          396.1529
+        ]
+      },
+      "day-3-v1": {
+        "file": "stadium-day-3-v1.9d66f82022.webp",
+        "width": 955,
+        "height": 639,
+        "anchor": [
+          478.0001,
+          396.1528
+        ]
+      },
+      "night-0-v1": {
+        "file": "stadium-night-0-v1.5d15d22438.webp",
+        "width": 955,
+        "height": 639,
+        "anchor": [
+          477.9999,
+          396.1528
+        ]
+      },
+      "night-1-v1": {
+        "file": "stadium-night-1-v1.2808ac5d9c.webp",
+        "width": 955,
+        "height": 639,
+        "anchor": [
+          477.9999,
+          396.1529
+        ]
+      },
+      "night-2-v1": {
+        "file": "stadium-night-2-v1.28b3e13eff.webp",
+        "width": 955,
+        "height": 639,
+        "anchor": [
+          478.0001,
+          396.1529
+        ]
+      },
+      "night-3-v1": {
+        "file": "stadium-night-3-v1.4e9ebe437b.webp",
+        "width": 955,
+        "height": 639,
+        "anchor": [
+          478.0001,
+          396.1528
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "stadium-unpowered-0-v1.2e2a5366d6.webp",
+        "width": 955,
+        "height": 639,
+        "anchor": [
+          477.9999,
+          396.1528
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "stadium-unpowered-1-v1.bf3a723d8a.webp",
+        "width": 955,
+        "height": 639,
+        "anchor": [
+          477.9999,
+          396.1529
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "stadium-unpowered-2-v1.f5aac3e8fc.webp",
+        "width": 955,
+        "height": 639,
+        "anchor": [
+          478.0001,
+          396.1529
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "stadium-unpowered-3-v1.6e341aa391.webp",
+        "width": 955,
+        "height": 639,
+        "anchor": [
+          478.0001,
+          396.1528
+        ]
+      }
+    },
+    "family": "rewards",
+    "label": "Stadium",
+    "description": "An open elliptical bowl with a striped pitch, tiered seating, canopies and floodlights.",
+    "variants": [
+      {
+        "model": "stadium",
+        "label": "Teal seating",
+        "description": "The original lower-half seed palette, with teal seating around the open pitch."
+      },
+      {
+        "model": "stadium_red",
+        "label": "Red seating",
+        "description": "The original upper-half seed palette, with warm red seating around the open pitch."
+      }
+    ]
+  },
+  "statue": {
+    "tiles": 1,
+    "scale": 3,
+    "height": 33,
+    "frames": {
+      "day-0": {
+        "file": "statue-day-0.7d134082d6.webp",
+        "width": 186,
+        "height": 150,
+        "anchor": [
+          93.0,
+          99.9862
+        ]
+      },
+      "day-1": {
+        "file": "statue-day-1.bd26b05261.webp",
+        "width": 186,
+        "height": 151,
+        "anchor": [
+          93.0,
+          100.986
+        ]
+      },
+      "day-2": {
+        "file": "statue-day-2.1abbb58890.webp",
+        "width": 186,
+        "height": 159,
+        "anchor": [
+          93.0,
+          108.986
+        ]
+      },
+      "day-3": {
+        "file": "statue-day-3.22df699a03.webp",
+        "width": 186,
+        "height": 157,
+        "anchor": [
+          93.0,
+          106.9862
+        ]
+      },
+      "night-0": {
+        "file": "statue-night-0.a83ed28243.webp",
+        "width": 186,
+        "height": 150,
+        "anchor": [
+          93.0,
+          99.9862
+        ]
+      },
+      "night-1": {
+        "file": "statue-night-1.96a1d96e79.webp",
+        "width": 186,
+        "height": 151,
+        "anchor": [
+          93.0,
+          100.986
+        ]
+      },
+      "night-2": {
+        "file": "statue-night-2.72f77146ad.webp",
+        "width": 186,
+        "height": 159,
+        "anchor": [
+          93.0,
+          108.986
+        ]
+      },
+      "night-3": {
+        "file": "statue-night-3.6c0443b661.webp",
+        "width": 186,
+        "height": 157,
+        "anchor": [
+          93.0,
+          106.9862
+        ]
+      },
+      "unpowered-0": {
+        "file": "statue-unpowered-0.8ad6c56f7d.webp",
+        "width": 186,
+        "height": 150,
+        "anchor": [
+          93.0,
+          99.9862
+        ]
+      },
+      "unpowered-1": {
+        "file": "statue-unpowered-1.620bedeec5.webp",
+        "width": 186,
+        "height": 151,
+        "anchor": [
+          93.0,
+          100.986
+        ]
+      },
+      "unpowered-2": {
+        "file": "statue-unpowered-2.eb5e7c5595.webp",
+        "width": 186,
+        "height": 159,
+        "anchor": [
+          93.0,
+          108.986
+        ]
+      },
+      "unpowered-3": {
+        "file": "statue-unpowered-3.b8ce83d7a6.webp",
+        "width": 186,
+        "height": 157,
+        "anchor": [
+          93.0,
+          106.9862
+        ]
+      }
+    },
+    "family": "rewards",
+    "label": "Mayor's Statue",
+    "description": "A bronze civic figure on a layered stone plinth, with a plaque and low uplights."
+  },
   "substation": {
     "tiles": 1,
     "scale": 3,
@@ -3880,6 +4826,124 @@ export const CIVIC_SPRITES = {
     "family": "water",
     "label": "Water treatment",
     "description": "Twin open clarifiers, bridge-mounted drives, and baffled aeration channels beside a brick blower house."
+  },
+  "university": {
+    "tiles": 4,
+    "scale": 3,
+    "height": 69,
+    "frames": {
+      "day-0": {
+        "file": "university-day-0.237527c62d.webp",
+        "width": 762,
+        "height": 454,
+        "anchor": [
+          380.9999,
+          259.482
+        ]
+      },
+      "day-1": {
+        "file": "university-day-1.8414c4bb0e.webp",
+        "width": 762,
+        "height": 392,
+        "anchor": [
+          380.9999,
+          197.4822
+        ]
+      },
+      "day-2": {
+        "file": "university-day-2.3884cfcde5.webp",
+        "width": 762,
+        "height": 393,
+        "anchor": [
+          381.0001,
+          198.4822
+        ]
+      },
+      "day-3": {
+        "file": "university-day-3.68e49c19cd.webp",
+        "width": 762,
+        "height": 454,
+        "anchor": [
+          381.0001,
+          259.482
+        ]
+      },
+      "night-0": {
+        "file": "university-night-0.aa5d4ca7d9.webp",
+        "width": 762,
+        "height": 454,
+        "anchor": [
+          380.9999,
+          259.482
+        ]
+      },
+      "night-1": {
+        "file": "university-night-1.fdd77bdebd.webp",
+        "width": 762,
+        "height": 392,
+        "anchor": [
+          380.9999,
+          197.4822
+        ]
+      },
+      "night-2": {
+        "file": "university-night-2.69b4444888.webp",
+        "width": 762,
+        "height": 393,
+        "anchor": [
+          381.0001,
+          198.4822
+        ]
+      },
+      "night-3": {
+        "file": "university-night-3.cff89b89f3.webp",
+        "width": 762,
+        "height": 454,
+        "anchor": [
+          381.0001,
+          259.482
+        ]
+      },
+      "unpowered-0": {
+        "file": "university-unpowered-0.97b1764f21.webp",
+        "width": 762,
+        "height": 454,
+        "anchor": [
+          380.9999,
+          259.482
+        ]
+      },
+      "unpowered-1": {
+        "file": "university-unpowered-1.4ed856ac4f.webp",
+        "width": 762,
+        "height": 392,
+        "anchor": [
+          380.9999,
+          197.4822
+        ]
+      },
+      "unpowered-2": {
+        "file": "university-unpowered-2.5b52e01c2e.webp",
+        "width": 762,
+        "height": 393,
+        "anchor": [
+          381.0001,
+          198.4822
+        ]
+      },
+      "unpowered-3": {
+        "file": "university-unpowered-3.5a58a7024f.webp",
+        "width": 762,
+        "height": 454,
+        "anchor": [
+          381.0001,
+          259.482
+        ]
+      }
+    },
+    "family": "rewards",
+    "label": "University",
+    "description": "A domed academic rotunda, faculty wings, lecture theatre and reading garden."
   },
   "wasteenergy": {
     "tiles": 3,

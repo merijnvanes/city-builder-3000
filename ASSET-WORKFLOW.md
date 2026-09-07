@@ -31,7 +31,7 @@ monument: houses should feel domestic and industrial plants should reveal proces
 
 This is a migration checklist from `src/sim/catalog.js` on the civic-art branch.
 Reconcile it with the current catalog and rendering dispatch before implementing;
-another agent is developing the simulation on `main`. Power, water, parks and fixed-lot transport are complete; other rows remain to do.
+another agent is developing the simulation on `main`. Power, water, parks, fixed-lot transport and rewards are complete; other rows remain to do.
 The twelve catalog entries in group `civic` are also done; similarly named
 rewards and landmarks are separate assets.
 
@@ -44,7 +44,7 @@ rewards and landmarks are separate assets.
 | Water | Complete: `waterpump`, `watertower`, `desalination`, `treatment`; see [WATER-ART.md](WATER-ART.md) |
 | Transport buildings | Complete on this branch: `bus`, `railstation`, `substation`, `airport` (6×5), `seaport`; see [TRANSPORT-ART.md](TRANSPORT-ART.md) for the growing-port integration boundary |
 | Parks | Complete: `park` (three layouts), `largepark`, `zoo`; see [PARKS-ART.md](PARKS-ART.md) |
-| Rewards | `mayorhouse`, `cityhall`, `courthouse`, `stadium`, `statue`, `marina`, `university`, `medcenter` |
+| Rewards | Complete: `mayorhouse`, `cityhall`, `courthouse`, `stadium` (two palettes), `statue`, `marina`, `university`, `medcenter`; see [REWARDS-ART.md](REWARDS-ART.md) |
 | Landmarks | `clocktower`, `operahouse`, `observatory`, `cathedral`, `aquarium` |
 | Business deals | `prison`, `casino`, `toxicdump`, `armybase`, `gigamall` |
 
@@ -53,17 +53,16 @@ crews are related environment assets, not interchangeable standalone buildings.
 Audit them at the end for visual compatibility and record remaining work explicitly;
 do not silently count these tools as migrated buildings or replace network logic.
 
-Suggested order: transport (including rectangular lots);
-rewards and landmarks; then zoned neighborhoods as complete families. A residential
+Suggested next families: landmarks, then zoned neighborhoods as complete families. A residential
 pilot earlier can establish the everyday city palette. This order is a working
 recommendation, not a restriction; finish and validate each chosen slice before
 committing and pushing it.
 
 ## Pipeline extension requirements
 
-The `tools/civic_art/registry.json` registry covers twelve civic, eight power, four water, three park and five transport
+The `tools/civic_art/registry.json` registry covers twelve civic, eight power, four water, three park, five transport and eight reward
 assets. The shared export, loader and gallery support legacy square lots (1×1,
-2×2, 3×3 and 4×4) and explicit rectangular footprint metadata. New families still need explicit coverage and contract checks. Share primitives and export machinery;
+2×2, 3×3, 4×4 and 5×5) and explicit rectangular footprint metadata. New families still need explicit coverage and contract checks. Share primitives and export machinery;
 keep authored models in small family modules. Avoid a second divergent renderer
 or a giant switch containing every model. Preserve existing civic exports during
 incremental migration.
@@ -86,7 +85,9 @@ incremental migration.
 - Keep on-demand loading, shared decoded frames and bounded memory. Current civic
   assets use a 32 MiB decoded LRU, active-view preference and one blit per lot.
   Re-measure working sets as the catalog grows; do not preload all types, angles
-  and lighting states or create a canvas for every building instance.
+  and lighting states or create a canvas for every building instance. Under
+  pressure, surplus active-image resolution can be reduced to the current display
+  need; closer views restore full exports asynchronously. See [REWARDS-ART.md](REWARDS-ART.md).
 - Keep async redraw and portrait refresh, fallback cleanup, failed-load fallback,
   alpha picking, device-pixel snapping and subdirectory-safe asset URLs. Expand the
   loader/manifest tests alongside the new contract, not by weakening civic checks.

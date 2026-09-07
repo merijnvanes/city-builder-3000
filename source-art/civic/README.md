@@ -33,6 +33,7 @@ The shared registry and power-family sources are documented in [POWER-ART.md](..
 Water sources and export commands are documented in [WATER-ART.md](../../WATER-ART.md).
 Park sources and export commands are documented in [PARKS-ART.md](../../PARKS-ART.md).
 Transport sources and export commands are documented in [TRANSPORT-ART.md](../../TRANSPORT-ART.md).
+Reward sources, export commands and expanded-cache validation are documented in [REWARDS-ART.md](../../REWARDS-ART.md).
 `render.py` owns the exact 2:1 ground projection, consistent screen-relative
 lighting, four rotations, and day / powered night / unpowered night states.
 `package.py` exports alpha-cropped WebP with screen anchors and measured heights.

@@ -14,7 +14,7 @@
 <footer>Original architecture · Four camera angles · Three lighting states · Shared, compressed browser assets</footer>
 <script type="module">
 const requestedFamily=new URLSearchParams(location.search).get('family');
-const family=['civic','power','water','parks','transport'].includes(requestedFamily)?requestedFamily:'civic';
+const family=['civic','power','water','parks','transport','rewards'].includes(requestedFamily)?requestedFamily:'civic';
 let catalog,state='day',rotation=0,detail=false;
 const cards=[];
 function update(){
@@ -33,7 +33,7 @@ function update(){
 }
 try{
   const response=await fetch('./assets/civic/catalog.json');if(!response.ok)throw new Error('Asset catalog could not be loaded.');catalog=await response.json();
-  for(const other of ['civic','power','water','parks','transport'].filter(value=>value!==family)){
+  for(const other of ['civic','power','water','parks','transport','rewards'].filter(value=>value!==family)){
     const link=document.createElement('a');link.href=`?family=${other}`;link.textContent=`View ${other} collection →`;link.style.cssText='color:var(--accent);margin-right:12px';document.querySelector('nav').prepend(link);
   }
   if(family==='power'){
@@ -47,6 +47,12 @@ try{
     document.querySelector('.eyebrow').textContent='City Builder 3000 · Asset Collection 03';
     document.querySelector('h1').textContent='Water for a growing city.';
     document.querySelector('header p').textContent='Four purposeful water works: freshwater pumps, elevated storage, membrane filtration, and open treatment basins. Crafted in brick, concrete, and teal metalwork.';
+  }
+  if(family==='rewards'){
+    document.title='Rewards Collection · City Builder 3000';
+    document.querySelector('.eyebrow').textContent='City Builder 3000 · Asset Collection 06';
+    document.querySelector('h1').textContent='Places a city earns.';
+    document.querySelector('header p').textContent='A mayor’s home, public monuments, places of learning and research, and destinations for sport and sailing. Eight rewards for a growing city.';
   }
   if(family==='transport'){
     document.title='Transport Collection · City Builder 3000';

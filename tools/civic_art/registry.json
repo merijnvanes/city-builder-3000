@@ -269,5 +269,73 @@
         "description": "Five original deterministic container palettes, with shared yard circulation and lifting equipment."
       }
     ]
+  },
+  "mayorhouse": {
+    "family": "rewards",
+    "module": "reward_government",
+    "tiles": 2,
+    "label": "Mayor's House",
+    "description": "A warm domestic manor with a columned veranda, terracotta roof and private garden."
+  },
+  "cityhall": {
+    "family": "rewards",
+    "module": "reward_government",
+    "tiles": 3,
+    "label": "City Hall",
+    "description": "A limestone municipal hall crowned by a square clock tower and copper lantern."
+  },
+  "courthouse": {
+    "family": "rewards",
+    "module": "reward_government",
+    "tiles": 3,
+    "label": "Courthouse",
+    "description": "A six-column stone portico, carved pediment and broad public stair."
+  },
+  "statue": {
+    "family": "rewards",
+    "module": "reward_government",
+    "tiles": 1,
+    "label": "Mayor's Statue",
+    "description": "A bronze civic figure on a layered stone plinth, with a plaque and low uplights."
+  },
+  "university": {
+    "family": "rewards",
+    "module": "reward_campuses",
+    "tiles": 4,
+    "label": "University",
+    "description": "A domed academic rotunda, faculty wings, lecture theatre and reading garden."
+  },
+  "medcenter": {
+    "family": "rewards",
+    "module": "reward_campuses",
+    "tiles": 4,
+    "label": "Medical Research Center",
+    "description": "Paired laboratories, glazed skybridge, rooftop plant and a northlit public research hall."
+  },
+  "stadium": {
+    "family": "rewards",
+    "module": "reward_recreation",
+    "tiles": 5,
+    "label": "Stadium",
+    "description": "An open elliptical bowl with a striped pitch, tiered seating, canopies and floodlights.",
+    "variants": [
+      {
+        "model": "stadium",
+        "label": "Teal seating",
+        "description": "The original lower-half seed palette, with teal seating around the open pitch."
+      },
+      {
+        "model": "stadium_red",
+        "label": "Red seating",
+        "description": "The original upper-half seed palette, with warm red seating around the open pitch."
+      }
+    ]
+  },
+  "marina": {
+    "family": "rewards",
+    "module": "reward_recreation",
+    "tiles": 3,
+    "label": "Marina",
+    "description": "A copper-roofed clubhouse, timber jetties and sculpted sailing yachts in a sheltered basin."
   }
 }

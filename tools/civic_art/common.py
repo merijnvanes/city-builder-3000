@@ -227,13 +227,18 @@ def clock(x,y,z,r=.35,face='front'):
             rel=obj.location-Vector((x,y,z));c,s=math.cos(angle),math.sin(angle)
             obj.location=(x+rel.x*c-rel.y*s,y+rel.x*s+rel.y*c,z+rel.z);obj.rotation_euler.z+=angle
 
-def door(x,y,z=.2,w=.85,h=1.6,mat='blue'):
+def door(x,y,z=.2,w=.85,h=1.6,mat='blue',face='front'):
+    before=set(bpy.context.scene.objects) if face=='back' else None
     box(x-w/2-.1,y-.09,z,w+.2,.12,h+.12,'ivory')
     box(x-w/2,y-.115,z,w,.05,h,mat)
     for dx in [-w*.25,w*.25]:
         box(x+dx-w*.18,y-.15,z+.62,w*.36,.026,h-.75,'glasslight')
         beam((x+dx,y-.18,z+.65),(x+dx,y-.18,z+.9),.012,'gold')
     box(x-.025,y-.18,z,.05,.025,h,'ivory')
+    if before is not None:
+        for obj in set(bpy.context.scene.objects)-before:
+            obj.location.x=2*x-obj.location.x;obj.location.y=2*y-obj.location.y
+            obj.rotation_euler.z+=math.pi
 
 def stair(x,y,w,n=4):
     for i in range(n):box(x,y+i*.22,.16,w,.22,(i+1)*.09,'ivory')

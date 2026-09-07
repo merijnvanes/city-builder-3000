@@ -42,3 +42,12 @@ test('seaport cargo palettes preserve all five normalized seed ranges', () => {
   }
   for (let x = 0; x < 20; x++) assert.equal(spriteVariant({ x, y: 13 }, 5), Math.floor(random(x, 13) * 5));
 });
+
+
+test('stadium palettes preserve the original half-seed boundary', () => {
+  for (const [variant, expected] of [[0,0],[.5-Number.EPSILON,0],[.5,1],[.9999,1]]) {
+    const tile = { x: 3, y: 5, variant };
+    assert.equal(spriteVariant(tile, 2), expected);
+    assert.equal(spriteVariant(JSON.parse(JSON.stringify(tile)), 2), expected);
+  }
+});

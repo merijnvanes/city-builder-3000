@@ -22,7 +22,10 @@
     "test:parks": "node --test tests/architecture-variation.test.js && node tests/park-variants.mjs && ART_FAMILY=parks node tests/power-sprites.mjs && ART_FAMILY=parks node tests/civic-art.mjs",
     "test:art-contract": "node --test tests/civic-footprint.test.js tests/civic-sprite-manifest.test.js && python3 tests/civic-package.py",
     "art:transport": "blender --background --factory-startup --python tools/civic_art/render.py -- --types transport --states day,night,unpowered --rotations 0,1,2,3 --samples 32 && python3 tools/civic_art/package.py --types transport",
-    "test:transport": "node --test tests/architecture-variation.test.js && ART_FAMILY=transport node tests/power-sprites.mjs && ART_FAMILY=transport node tests/civic-art.mjs"
+    "test:transport": "node --test tests/architecture-variation.test.js && ART_FAMILY=transport node tests/power-sprites.mjs && ART_FAMILY=transport node tests/civic-art.mjs",
+    "art:rewards": "blender --background --factory-startup --python tools/civic_art/render.py -- --types rewards --states day,night,unpowered --rotations 0,1,2,3 --samples 32 && python3 tools/civic_art/package.py --types rewards",
+    "test:rewards": "node --test tests/architecture-variation.test.js && ART_FAMILY=rewards node tests/power-sprites.mjs && ART_FAMILY=rewards node tests/civic-art.mjs",
+    "test:working-set": "node tests/civic-working-set.mjs"
   },
   "devDependencies": {
     "vite": "^7.0.0",

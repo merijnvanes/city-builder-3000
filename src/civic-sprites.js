@@ -17,13 +17,104 @@ function markActive(entry, owner) {
   entry.owners.set(new WeakRef(owner), owner.paintEpoch || 0);
 }
 
-function active(entry) {
+function requestedQuality(owner, scale) {
+  if (!owner) return 1; // Explicit inspection preloads retain the full export.
+  return Math.min(1, ((owner.zoom ?? 1) * (owner.dpr || 1)) / scale);
+}
+
+function activeQuality(entry) {
+  let quality = null;
   for (const [ref, epoch] of entry.owners) {
     const owner = ref.deref();
     if (!owner) { entry.owners.delete(ref); continue; }
-    if ((owner.rotation || 0) === entry.rotation && !!owner.night === entry.night && epoch >= (owner.paintEpoch || 0) - 1) return true;
+    if ((owner.rotation || 0) === entry.rotation && !!owner.night === entry.night && epoch >= (owner.paintEpoch || 0) - 1) {
+      quality = Math.max(quality ?? 0, requestedQuality(owner, entry.scale));
+    }
   }
-  return false;
+  return quality;
+}
+
+// Picking records share the current buffer; retiring a frame must also release
+// their references before its bytes leave the cache accounting.
+function replaceCanvas(entry, canvas) {
+  const previous = entry.canvas;
+  for (const [ref] of entry.owners) {
+    const owner = ref.deref();
+    if (!owner) continue;
+    for (const hit of owner.pickables || []) {
+      if (previous && hit.canvas === previous) hit.canvas = canvas;
+    }
+    owner.dirty = true;
+  }
+  entry.canvas = canvas;
+}
+
+function trimFrames(current) {
+  while (bytes > MAX_DECODED_BYTES) {
+    let inactive, active, reducible;
+    for (const [key, entry] of entries) {
+      if (entry === current || !entry.canvas) continue;
+      const quality = activeQuality(entry);
+      if (quality === null) {
+        if (!inactive || entry.used < inactive.entry.used) inactive = { key, entry };
+      } else {
+        if (!active || entry.used < active.entry.used) active = { key, entry };
+        const width = Math.ceil(entry.frame.width * quality), height = Math.ceil(entry.frame.height * quality);
+        const saved = entry.bytes - width * height * 4;
+        if (width < entry.canvas.width && height < entry.canvas.height && saved > (reducible?.saved || 0)) reducible = { entry, width, height, saved };
+      }
+    }
+    if (!inactive && reducible) {
+      // Keep visible frames at sufficient screen resolution. Full exports stay
+      // on disk, and a closer view asynchronously restores their native pixels.
+      const { entry, width, height, saved } = reducible;
+      const canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height;
+      const context = canvas.getContext('2d', { willReadFrequently: true });
+      context.imageSmoothingQuality = 'high';
+      context.drawImage(entry.canvas, 0, 0, width, height);
+      replaceCanvas(entry, canvas); entry.bytes -= saved; bytes -= saved;
+      continue;
+    }
+    const victim = inactive || active;
+    if (!victim) break;
+    replaceCanvas(victim.entry, null);
+    entries.delete(victim.key); bytes -= victim.entry.bytes;
+  }
+}
+
+function loadFrame(key, entry) {
+  entry.loading = true;
+  entry.ready = new Promise(resolve => {
+    const image = new Image();
+    image.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = entry.frame.width; canvas.height = entry.frame.height;
+      canvas.getContext('2d', { willReadFrequently: true }).drawImage(image, 0, 0);
+      // An upgrade can be evicted while its image is loading. Its late result
+      // must not add untracked bytes or resurrect an off-screen cache entry.
+      const retained = entries.get(key) === entry;
+      if (retained) {
+        bytes += canvas.width * canvas.height * 4 - entry.bytes;
+        replaceCanvas(entry, canvas); entry.bytes = canvas.width * canvas.height * 4;
+        trimFrames(entry);
+      }
+      entry.loading = false;
+      for (const renderer of entry.waiters) {
+        renderer.dirty = true;
+        renderer.onArtworkReady?.();
+      }
+      entry.waiters.clear(); image.onload = null; image.onerror = null;
+      // Readiness promises must not retain a full buffer after cache reduction.
+      resolve();
+    };
+    image.onerror = () => {
+      // Initial failures keep procedural fallback. Failed upgrades keep their
+      // usable smaller image, and neither failure retries on every paint.
+      entry.loading = false; entry.failed = true; entry.waiters.clear();
+      image.onload = null; image.onerror = null; resolve(null);
+    };
+    image.src = `${import.meta.env?.BASE_URL || './'}assets/civic/${entry.frame.file}`;
+  });
 }
 
 function requestFrame(type, state, rotation, owner, variant = 0) {
@@ -35,46 +126,18 @@ function requestFrame(type, state, rotation, owner, variant = 0) {
   if (entry) {
     entry.used = ++clock;
     markActive(entry, owner);
-    if (owner && !entry.canvas && !entry.failed) entry.waiters.add(owner);
+    if (owner && !entry.failed && (!entry.canvas || entry.loading)) entry.waiters.add(owner);
+    const quality = requestedQuality(owner, spec.scale);
+    if (entry.canvas && !entry.loading && !entry.failed && (entry.canvas.width < Math.ceil(frame.width * quality) || entry.canvas.height < Math.ceil(frame.height * quality))) {
+      if (owner) entry.waiters.add(owner);
+      loadFrame(key, entry);
+    }
     return entry;
   }
-  entry = { frame, canvas: null, used: ++clock, waiters: new Set(owner ? [owner] : []), bytes: 0, owners: new Map(), rotation, night: state !== 'day' };
+  entry = { frame, scale: spec.scale, canvas: null, used: ++clock, waiters: new Set(owner ? [owner] : []), bytes: 0, owners: new Map(), rotation, night: state !== 'day' };
   markActive(entry, owner);
   entries.set(key, entry);
-  entry.ready = new Promise(resolve => {
-    const image = new Image();
-    image.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = frame.width; canvas.height = frame.height;
-      canvas.getContext('2d', { willReadFrequently: true }).drawImage(image, 0, 0);
-      entry.canvas = canvas; entry.bytes = canvas.width * canvas.height * 4;
-      bytes += entry.bytes;
-      // Picking may still retain a canvas during a frame. Let GC release it
-      // after the renderer replaces that frame, rather than zeroing it here.
-      while (bytes > MAX_DECODED_BYTES) {
-        let victim;
-        for (const [key, candidate] of entries) {
-          if (candidate === entry || !candidate.canvas) continue;
-          const protectedView = active(candidate);
-          if (!victim || Number(protectedView) < Number(victim[2]) || (protectedView === victim[2] && candidate.used < victim[1].used)) victim = [key, candidate, protectedView];
-        }
-        if (!victim) break;
-        entries.delete(victim[0]); bytes -= victim[1].bytes;
-      }
-      for (const renderer of entry.waiters) {
-        renderer.dirty = true;
-        renderer.onArtworkReady?.();
-      }
-      entry.waiters.clear(); image.onload = null; image.onerror = null;
-      resolve(canvas);
-    };
-    image.onerror = () => {
-      // Keep the procedural fallback if an asset cannot load. Failed entries
-      // are retained so a missing file cannot trigger a request every frame.
-      entry.failed = true; entry.waiters.clear(); image.onload = null; image.onerror = null; resolve(null);
-    };
-    image.src = `${import.meta.env?.BASE_URL || './'}assets/civic/${frame.file}`;
-  });
+  loadFrame(key, entry);
   return entry;
 }
 
