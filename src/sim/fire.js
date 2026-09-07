@@ -78,12 +78,24 @@ export function reliefGrant(city, stats, lotsLost) {
 export const VOLUNTEER_CREWS = 1;
 
 export function fireCrews(city) {
-  let stations = 0;
-  for (const t of city.tiles) if (isAnchor(t) && t.type === "fire") stations++;
-  return VOLUNTEER_CREWS + stations;
+  return VOLUNTEER_CREWS + stationsOf(city, "fire");
+}
+
+// "Fires and riots are the only disasters where you can make a difference by
+// dispatching fire and police units." Police units are counted the same way,
+// off the precincts.
+export function policeUnits(city) {
+  return VOLUNTEER_CREWS + stationsOf(city, "police");
+}
+
+function stationsOf(city, type) {
+  let n = 0;
+  for (const t of city.tiles) if (isAnchor(t) && t.type === type) n++;
+  return n;
 }
 
 export const crewsAvailable = (city) => Math.max(0, fireCrews(city) - (city.dispatched || 0));
+export const unitsAvailable = (city) => Math.max(0, policeUnits(city) - (city.patrolled || 0));
 
 export function developedLots(city) {
   let n = 0;

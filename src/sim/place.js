@@ -38,7 +38,8 @@ import { refreshCity } from "./refresh.js";
 import { specialAvailable } from "./events.js";
 import { isLandfill } from "./waste.js";
 import { findBore, bore, MIN_BORE } from "./tunnels.js";
-import { crewsAvailable, fireCrews } from "./fire.js";
+import { crewsAvailable, fireCrews, unitsAvailable, policeUnits } from "./fire.js";
+import { riotAt, RIOT_REACH } from "./disasters.js";
 
 export const DEMOLISH_FEE = 5;
 export const BRIDGE_MULTIPLIER = 5;
@@ -171,6 +172,21 @@ export function evaluate(city, x, y, tool, options = {}) {
     return { ok: true, noop: false, cost: BUILDINGS.dispatch.cost, message: `Send a fire crew (${free} of ${fireCrews(city)} left)`, tiles: a.lot ? lotTiles(city, a.lot).map((n) => ({ x: n.x, y: n.y })) : here };
   }
 
+  // "Fires and riots are the only disasters where you can make a difference by
+  // dispatching fire and police units."
+  if (tool === "patrol") {
+    const riot = riotAt(city, x, y);
+    if (!riot) return fail(`No riot within ${RIOT_REACH} tiles of here.`);
+    const free = unitsAvailable(city);
+    if (free <= 0) {
+      const units = policeUnits(city);
+      return fail(units > 1
+        ? `All ${units} police units are already out this month. Build more police stations.`
+        : "The only patrol car is already out. Build a police station to send more.");
+    }
+    return { ok: true, noop: false, cost: BUILDINGS.patrol.cost, message: `Break up the riot (${free} of ${policeUnits(city)} units left)`, tiles: here, riot };
+  }
+
   if (tool === "bulldoze") {
     // "You can't bulldoze over landfills; however, you can decommission them
     // by removing road or rail access. Over time the landfill will decompose
@@ -253,6 +269,10 @@ export function place(city, x, y, tool, options = {}) {
     const a = t.lot ? anchorOf(city, t) : t;
     a.fire = 0;
     city.dispatched = (city.dispatched || 0) + 1;
+  } else if (tool === "patrol") {
+    // The crowd disperses; the fires it has already set still burn.
+    ev.riot.ttl = 1;
+    city.patrolled = (city.patrolled || 0) + 1;
   } else if (tool === "bulldoze") {
     if (t.lot) {
       const a = anchorOf(city, t);

@@ -105,8 +105,8 @@ export function blankCity({ seed = 42, size = DEFAULT_SIZE, layout, name = "New 
     roadCondition: 100,
     // How congested the roads have been, which sets how far Sims will drive.
     trafficLevel: 0,
-    // Fire crews sent out this month; see fire.js.
-    dispatched: 0,
+    // Fire crews and police units sent out this month; see fire.js.
+    dispatched: 0, patrolled: 0,
     siren: blankSiren(),
     population: 0, happiness: 50,
     demand: Object.fromEntries([...ZONED_TYPES].map((k) => [k, 0])),
@@ -187,6 +187,7 @@ export function serialize(city) {
     roadCondition: city.roadCondition ?? 100,
     trafficLevel: city.trafficLevel ?? 0,
     dispatched: city.dispatched ?? 0,
+    patrolled: city.patrolled ?? 0,
     siren: serializeSiren(city.siren ?? blankSiren()),
   });
 }
@@ -312,6 +313,7 @@ export function deserialize(raw) {
     trafficLevel: Number.isFinite(d.trafficLevel) && d.trafficLevel >= 0 && d.trafficLevel <= 100 ? d.trafficLevel : 0,
     // Crews already out this month, so a save cannot refill the fire trucks.
     dispatched: Number.isInteger(d.dispatched) && d.dispatched >= 0 && d.dispatched <= 999 ? d.dispatched : 0,
+    patrolled: Number.isInteger(d.patrolled) && d.patrolled >= 0 && d.patrolled <= 999 ? d.patrolled : 0,
     siren: parseSiren(d.siren),
     // A contract keeps the price it was signed at, so the terms travel with
     // it. They are money, so a save cannot be trusted to set them freely.

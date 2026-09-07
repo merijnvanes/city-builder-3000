@@ -715,6 +715,27 @@ export class CityRenderer {
           ctx.fillStyle = `rgba(70,60,55,${0.5 - rise / 200})`;
           ctx.beginPath(); ctx.ellipse(top.x + Math.sin(i * 2 + time * 0.002) * 6 * z, top.y - rise * z * 0.8, (8 + rise * 0.25) * z, (5 + rise * 0.15) * z, 0, 0, Math.PI * 2); ctx.fill();
         }
+      } else if (e.type === "riot") {
+        // The block that is out of hand, and a crowd milling about in it, so
+        // the mayor can see where a patrol car has to go.
+        const z = this.zoom, reach = 3;
+        const pulse = 0.16 + 0.06 * Math.sin(time * 0.004);
+        for (let dy = -reach; dy <= reach; dy++) {
+          for (let dx = -reach; dx <= reach; dx++) {
+            if (Math.abs(dx) + Math.abs(dy) > reach) continue;
+            // Onto the live overlay, not the cache: this repaints every frame.
+            this.flat(e.x + dx, e.y + dy, 1, 1, 0.45, `rgba(214,72,58,${pulse})`, null, ctx);
+          }
+        }
+        for (let i = 0; i < 34; i++) {
+          const a = i * 2.4 + time * 0.0012 * (i % 2 ? 1 : -1), d = 0.4 + (i % 6) * 0.45;
+          const bob = (i + Math.floor(time / 180)) % 2;
+          const p = this.project(e.x + 0.5 + Math.cos(a) * d, e.y + 0.5 + Math.sin(a) * d, 1 + bob);
+          ctx.fillStyle = ["#3a3f46", "#7a4c42", "#4a5560", "#6b5a44"][i % 4];
+          ctx.fillRect(p.x - 1.1 * z, p.y - 6 * z, 2.2 * z, 6 * z);
+          ctx.fillStyle = "#c9a98a";
+          ctx.fillRect(p.x - 1.1 * z, p.y - 8 * z, 2.2 * z, 2 * z);
+        }
       } else if (e.type === "toxic") {
         const z = this.zoom, c = this.project(e.x + 0.5, e.y + 0.5, 16);
         for (let i = 0; i < 16; i++) {

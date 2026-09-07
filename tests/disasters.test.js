@@ -1,6 +1,7 @@
-import test from 'node:test';
+import test, { describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { createCity, serialize, deserialize, refresh } from '../src/sim/index.js';
+import { createCity, tick, place, disaster, serialize, deserialize, refresh } from '../src/sim/index.js';
+import { policeUnits, unitsAvailable } from '../src/sim/fire.js';
 import { triggerDisaster, advanceEffects, randomDisaster, fireRiskOf } from '../src/sim/disasters.js';
 import { assignLot } from '../src/sim/lots.js';
 
@@ -99,4 +100,90 @@ test('toxic waste dumps qualify as sources for toxic leaks', () => {
   triggerDisaster(c, 'toxic', () => 0);
   assert.equal(c.effects[0].x, 20);
   assert.equal(c.effects[0].y, 20);
+});
+
+describe("a riot runs until the police break it up", () => {
+  // "Fires and riots are the only disasters where you can make a difference by
+  // dispatching fire and police units. It doesn't matter how many police
+  // officers you send to an earthquake or alien attack, it won't make any
+  // difference once the disaster hits."
+  const town = () => {
+    const c = createCity(21, true);
+    // Trouble needs somewhere to start, so make the town miserable.
+    for (const t of c.tiles) if (t.lot && t.type === "residential") t.crime = 80;
+    return c;
+  };
+  const riots = (c) => (c.effects || []).filter((e) => e.type === "riot");
+
+  test("it leaves a riot standing, not just a scatter of fires", () => {
+    const c = town();
+    disaster(c, "riot");
+    assert.equal(riots(c).length, 1);
+    assert.ok(riots(c)[0].ttl > 1, "and it is still going next month");
+  });
+
+  test("and sets fresh fires every month it lasts", () => {
+    const c = town();
+    disaster(c, "riot");
+    for (const t of c.tiles) t.fire = 0;
+    tick(c);
+    assert.ok(c.tiles.some((t) => t.fire > 0), "the riot should still be burning things");
+    assert.ok(c.news.some((n) => /sets \d+ more fires/.test(n)));
+  });
+
+  test("a police unit sent to it ends it", () => {
+    const c = town();
+    disaster(c, "riot");
+    const e = riots(c)[0];
+    c.money = 5_000_000;
+    const before = policeUnits(c);
+    assert.ok(before > 1, "the sample town has precincts");
+    assert.equal(place(c, e.x, e.y, "patrol").ok, true);
+    assert.equal(e.ttl, 1, "it is over at the end of this month");
+    assert.equal(unitsAvailable(c), before - 1);
+  });
+
+  test("but only within reach of it", () => {
+    const c = town();
+    disaster(c, "riot");
+    const e = riots(c)[0];
+    const far = { x: (e.x + 30) % c.size, y: (e.y + 30) % c.size };
+    const r = place(c, far.x, far.y, "patrol");
+    assert.equal(r.ok, false);
+    assert.match(r.message, /No riot within/);
+  });
+
+  test("and only as many units as there are precincts, plus one", () => {
+    const c = town();
+    c.money = 5_000_000;
+    const units = policeUnits(c);
+    for (let i = 0; i < units; i++) {
+      disaster(c, "riot");
+      const e = riots(c).find((x) => x.ttl > 1);
+      if (!e) break;
+      assert.equal(place(c, e.x, e.y, "patrol").ok, true, `unit ${i + 1}`);
+    }
+    assert.equal(unitsAvailable(c), 0);
+    disaster(c, "riot");
+    const e = riots(c).find((x) => x.ttl > 1);
+    if (e) assert.match(place(c, e.x, e.y, "patrol").message, /already out this month/);
+  });
+
+  test("the units come back next month, and a save cannot refill them", () => {
+    const c = town();
+    disaster(c, "riot");
+    const e = riots(c)[0];
+    c.money = 5_000_000;
+    place(c, e.x, e.y, "patrol");
+    assert.equal(deserialize(serialize(c)).patrolled, 1);
+    tick(c);
+    assert.equal(unitsAvailable(c), policeUnits(c));
+  });
+
+  test("a riot survives a save", () => {
+    const c = town();
+    disaster(c, "riot");
+    const back = deserialize(serialize(c));
+    assert.deepEqual(back.effects.filter((e) => e.type === "riot"), riots(c));
+  });
 });

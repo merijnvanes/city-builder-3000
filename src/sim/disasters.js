@@ -57,9 +57,50 @@ function fireTargets(city) {
 }
 
 // Visual effects for the renderer: { type, x, y, ttl (months), ... }.
+// How long a riot runs unless the police reach it.
+export const RIOT_MONTHS = 4;
+export const RIOT_FIRES = 4;
+
+// Fires set in and around the seat of a riot.
+export function riotFires(city, seat, rng, spared = 0) {
+  const near = [];
+  forRadius(city, seat.x, seat.y, 6, (n) => { if (n.lot || n.trees) near.push(n); });
+  const pool = near.length ? near : [seat];
+  let fires = 0;
+  for (let i = 0; i < RIOT_FIRES; i++) {
+    if (rng() < spared) continue;
+    if (ignite(city, pool[Math.floor(rng() * pool.length)], 3)) fires++;
+  }
+  return fires;
+}
+
+// A riot in progress at this tile, or null.
+export function riotAt(city, x, y) {
+  for (const e of city.effects || []) {
+    if (e.type !== "riot") continue;
+    if (Math.abs(e.x - x) + Math.abs(e.y - y) <= RIOT_REACH) return e;
+  }
+  return null;
+}
+// How close a police unit has to be sent to break one up.
+export const RIOT_REACH = 6;
+
 export function addEffect(city, effect) {
   if (!city.effects) city.effects = [];
   city.effects.push(effect);
+}
+
+// A month of unrest: every riot still running sets more fires. Returns news.
+export function advanceRiots(city, rng) {
+  const news = [];
+  for (const e of city.effects || []) {
+    if (e.type !== "riot" || e.ttl <= 1) continue;
+    const seat = tileAt(city, e.x, e.y);
+    if (!seat) continue;
+    const fires = riotFires(city, seat, rng, shelter(city));
+    if (fires) news.push(`The riot around (${e.x}, ${e.y}) sets ${fires} more fires.`);
+  }
+  return news;
 }
 
 export function advanceEffects(city) {
@@ -197,13 +238,19 @@ export function triggerDisaster(city, id, rng) {
     city.revision++;
     return `A volcano erupted at (${center.x}, ${center.y}) and buried ${hit} buildings under lava.`;
   }
+  // "Fires and riots are the only disasters where you can make a difference by
+  // dispatching fire and police units." So a riot is not over in a month: it
+  // runs until the police break it up or it burns itself out, setting fresh
+  // fires every month it lasts.
   if (id === "riot") {
     const hot = targets.filter((t) => ZONE_TYPES.has(t.type) && t.crime > 40);
     const pool = hot.length ? hot : targets;
-    let fires = 0;
-    for (let i = 0; i < 4; i++) if (ignite(city, pool[Math.floor(rng() * pool.length)], 3)) fires++;
+    if (!pool.length) return "Unrest, but there is nothing standing to riot in.";
+    const seat = pool[Math.floor(rng() * pool.length)];
+    const fires = riotFires(city, seat, rng, spared);
+    addEffect(city, { type: "riot", x: seat.x, y: seat.y, ttl: RIOT_MONTHS });
     city.revision++;
-    return `Rioting in high-crime districts. ${fires} fires set.`;
+    return `Rioting around (${seat.x}, ${seat.y}). ${fires} fires set. Send police units to break it up.`;
   }
   const pool = fireTargets(city);
   const origin = pool.length ? pool[Math.floor(rng() * pool.length)] : center;

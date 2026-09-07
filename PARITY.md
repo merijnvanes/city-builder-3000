@@ -25,7 +25,7 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 | Public safety | Budget sets precinct size and effectiveness; overlaps are additive; jails cap police effectiveness; coverage raises land value | **Done.** See below |
 
 | Fire | Per-building flammability, halved by water and cut by ordinance; relief scaled by preparedness; one crew per station plus the volunteers | **Done.** See below |
-| Disasters | Permanent radiation after a meltdown; an early warning siren that can be abused | **Done.** See below |
+| Disasters | Permanent radiation after a meltdown; an early warning siren that can be abused; riots the police can break up | **Done.** See below |
 | Siting | Stops need roads, stations need track | **Done.** See below |
 | Ports | Airports and seaports are zones the Sims develop, with a minimum footprint | **Done.** See below |
 | Neighbour deals | Purchases meter the deficit with a minimum fee; sales are an obligation; cancelling costs a large penalty | **Done.** See below |
@@ -416,6 +416,34 @@ take it upon themselves to assist you in the clean up costs. Be forewarned, a
 Mayor that is well prepared generally receives better treatment."* Losing six
 or more lots to a disaster now draws a relief grant, and a city with funded
 fire and police coverage receives about twice what a neglectful one gets.
+
+## Riots the police can break up, September 7
+
+> *"Fires and riots are the only disasters where you can make a difference by
+> dispatching fire and police units. It doesn't matter how many police officers
+> you send to an earthquake or alien attack, it won't make any difference once
+> the disaster hits, though the Early Warning Siren helps if activated
+> beforehand."*
+
+A riot used to set four fires and be over. There was nothing to dispatch to,
+and the manual's whole point about riots is that there is.
+
+A riot now stands: it takes a seat in the worst block it can find and keeps
+setting fires around it for four months, or until the police reach it. A new
+**Police Unit** joins the Fire Crew in the emergency tools, counted the same
+way as fire crews are - one per precinct plus one - committed for the month it
+goes out, and carried in the save so a reload does not refill the patrol cars.
+Sending one within six tiles of the seat disperses the crowd; the fires it has
+already set still have to be put out by the fire crews.
+
+A sounding siren spares a share of the fires a riot sets, as it does for every
+other disaster: *"the Early Warning Siren helps if activated beforehand."*
+
+The riot draws as a tinted district with a crowd milling in the streets, which
+is how the mayor finds the block to send a car to. Finding that needed fixing a
+real bug first: the overlay was painting into the retained background layer
+instead of the live one, so every frame of a "translucent" wash stacked into
+the cache until the district was solid red.
 
 ## Highways over streets, September 7
 

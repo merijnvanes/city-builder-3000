@@ -8,7 +8,7 @@ import { computeMetrics, dateOf, yearOf } from "./metrics.js";
 import { computeDemand, updateGrowth, conditionsOk, connected } from "./growth.js";
 import { computeBudget, amortize, takeLoan, repayLoan } from "./economy.js";
 import { generateAdvisors, generateNews, ADVISORS } from "./advisors.js";
-import { triggerDisaster, advanceFires, randomDisaster, advanceEffects, DISASTERS } from "./disasters.js";
+import { triggerDisaster, advanceFires, advanceRiots, randomDisaster, advanceEffects, DISASTERS } from "./disasters.js";
 import { buildStarterTown } from "./starter.js";
 import { lcg } from "./terrain.js";
 import { nextRandom, tileAt, inBounds } from "./grid.js";
@@ -27,7 +27,7 @@ import { fillLandfills, landfillLoad, landfillNews } from "./waste.js";
 import { advanceRoads, roadCapacity } from "./roads.js";
 import { sitingNote } from "./siting.js";
 import { sound, advanceSiren, sirenSounding, blankSiren } from "./siren.js";
-import { flammability, reliefGrant, developedLots, fireCrews, crewsAvailable } from "./fire.js";
+import { flammability, reliefGrant, developedLots, fireCrews, crewsAvailable, policeUnits, unitsAvailable } from "./fire.js";
 import { ageFactor } from "./wear.js";
 import { PORTS, portJobs, portUpkeep, portNote, portReady, portObstacle } from "./ports.js";
 
@@ -84,13 +84,17 @@ export function tick(city) {
   // city would take a step the running one had not.
   city.trafficLevel = settleTraffic(city.trafficLevel, city._metrics?.traffic ?? city.trafficLevel);
   const growth = updateGrowth(city, city.demand, rng);
-  // Last month's crews come back on duty: "one dispatch unit for each fire
-  // station you build, plus one for the volunteer group", every month.
+  // Last month's crews and patrol cars come back on duty: "one dispatch unit
+  // for each fire station you build, plus one for the volunteer group", and
+  // the same off the precincts, every month.
   city.dispatched = 0;
+  city.patrolled = 0;
   const fireMessage = advanceFires(city, rng);
+  // A riot still running sets fresh fires until the police break it up.
+  const unrest = advanceRiots(city, rng);
   // Sims age once a year: children are schooled, adults forget, and life
   // expectancy drifts toward what the city's hospitals and air support.
-  const monthNews = advancePeople(city);
+  const monthNews = [...unrest, ...advancePeople(city)];
   // Plants and pumps age; a grid overdrawn for a year loses a plant.
   monthNews.push(...agePlants(city, rng));
   monthNews.push(...agePumps(city));
@@ -250,6 +254,7 @@ export function getStats(city) {
     // "One dispatch unit for each fire station you build, plus one for the
     // volunteer group", and how many of them are still at the station.
     crews: { total: fireCrews(city), free: crewsAvailable(city) },
+    units: { total: policeUnits(city), free: unitsAvailable(city) },
     advice: "",
   };
   stats.advisors = generateAdvisors(city, stats);

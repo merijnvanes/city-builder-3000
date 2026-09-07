@@ -122,6 +122,9 @@ export const BUILDINGS = {
   zoo:         { label: "Zoo",             group: "landscape", cost: 3000, w: 4, h: 4, upkeep: 70,  dept: "parks", service: { kind: "park", radius: 10, strength: 90 }, powerUse: 3, waterUse: 3 },
   tree:        { label: "Plant Trees",     group: "landscape", cost: 3,    w: 1, h: 1, upkeep: 0,   dept: "parks", rect: true, overlay: true },
   dispatch:    { label: "Fire Crew",       group: "emergency", cost: 300,  w: 1, h: 1, upkeep: 0,   dept: "fire", emergency: true },
+  // "Fires and riots are the only disasters where you can make a difference
+  // by dispatching fire and police units."
+  patrol:      { label: "Police Unit",     group: "emergency", cost: 300,  w: 1, h: 1, upkeep: 0,   dept: "police", emergency: true },
   makewater:   { label: "Dig Water",       group: "landscape", cost: 120,  w: 1, h: 1, upkeep: 0,   dept: "parks", rect: true, terrain: "water" },
   makeland:    { label: "Fill Land",       group: "landscape", cost: 180,  w: 1, h: 1, upkeep: 0,   dept: "parks", rect: true, terrain: "land" },
   raise:       { label: "Raise Terrain",   group: "landscape", cost: 25,   w: 1, h: 1, upkeep: 0,   dept: "parks", rect: true, terrain: "raise" },
@@ -172,7 +175,7 @@ export const TOOLS = [
   ...Object.entries(BUILDINGS).map(([id, b]) => ({
     id, label: b.label, cost: b.cost, group: b.group,
     description: `${b.label} ($${b.cost.toLocaleString()}${b.path || b.rect ? " per tile" : ""}${b.w > 1 ? `, ${b.w}×${b.h}` : ""})`,
-    shortcut: { road: "r", rail: "t", highway: "y", onramp: "g", tunnel: "j", coal: "e", waterpump: "u", police: "l", fire: "f", park: "p", powerline: "w", pipe: "q", dispatch: "x" }[id] || "",
+    shortcut: { road: "r", rail: "t", highway: "y", onramp: "g", tunnel: "j", coal: "e", waterpump: "u", police: "l", fire: "f", park: "p", powerline: "w", pipe: "q", dispatch: "x", patrol: "v" }[id] || "",
     w: b.w, h: b.h,
   })),
   { id: "bulldoze",    label: "Bulldoze",       cost: 5,  group: "demolish",  description: "Demolish ($5 per tile plus building fee)", shortcut: "b" },

@@ -36,13 +36,13 @@ const GROUP_DEFS = [
   { id: "landscape", label: "Parks & Land", tools: ["park", "largepark", "zoo", "tree", "makewater", "makeland", "raise", "lower", "level"] },
   { id: "landmark",  label: "Landmarks", tools: ["clocktower", "operahouse", "observatory", "cathedral", "aquarium"] },
   { id: "special",   label: "Rewards & Deals", tools: SPECIAL_TYPES },
-  { id: "emergency", label: "Emergency", tools: ["dispatch"] },
+  { id: "emergency", label: "Emergency", tools: ["dispatch", "patrol"] },
 ];
 
 // Icons fall back to a lettered badge so every catalog entry gets a button.
 function iconFor(id, label) {
   if (ICONS[id]) return ICONS[id];
-  const alias = { coal: "power", oil: "power", gas: "power", nuclear: "power", wind: "power", solar: "power", waterpump: "water", watertower: "water", treatment: "water", railstation: "rail", subway: "rail", substation: "rail", highway: "road", largepark: "park", zoo: "park", tree: "park", college: "school", library: "school", museum: "school", incinerator: "landfill", recycling: "landfill", dispatch: "fire" }[id];
+  const alias = { coal: "power", oil: "power", gas: "power", nuclear: "power", wind: "power", solar: "power", waterpump: "water", watertower: "water", treatment: "water", railstation: "rail", subway: "rail", substation: "rail", highway: "road", largepark: "park", zoo: "park", tree: "park", college: "school", library: "school", museum: "school", incinerator: "landfill", recycling: "landfill", dispatch: "fire", patrol: "police" }[id];
   if (alias && ICONS[alias]) return ICONS[alias];
   const letter = (label || id).charAt(0).toUpperCase();
   return `<svg viewBox="0 0 20 20" fill="currentColor"><rect x="3" y="3" width="14" height="14" rx="3" opacity=".35"/><text x="10" y="14.5" text-anchor="middle" font-size="11" font-weight="700" fill="currentColor">${letter}</text></svg>`;
@@ -889,11 +889,13 @@ export function mountUI(actions) {
     if (!tool) return;
     const b = BUILDINGS[id];
     const size = b && b.w > 1 ? ` (${b.w}×${b.h})` : "";
-    const crews = _lastStats?.crews;
+    const crews = _lastStats?.crews, units = _lastStats?.units;
     hintLine.textContent = id === "inspect"
       ? "Click a tile to inspect it"
       : id === "dispatch"
       ? `Fire Crew — ${fmtMoney(tool.cost)} — click a fire${crews ? ` — ${crews.free} of ${crews.total} crews free this month` : ""}`
+      : id === "patrol"
+      ? `Police Unit — ${fmtMoney(tool.cost)} — click a riot${units ? ` — ${units.free} of ${units.total} units free this month` : ""}`
       : `${tool.label}${size} — ${tool.cost > 0 ? fmtMoney(tool.cost) : "Free"} — ${PATH_TOOLS.has(id) ? "drag a route" : RECT_TOOLS.has(id) ? "drag an area" : "click to place"}`;
   }
 
@@ -1295,7 +1297,7 @@ export function mountUI(actions) {
   return {
     update(city, stats) {
       _lastStats = stats;
-      if (_selectedTool === "dispatch") writeHint();
+      if (_selectedTool === "dispatch" || _selectedTool === "patrol") writeHint();
       refreshSiren(stats);
 
       // Top metrics
