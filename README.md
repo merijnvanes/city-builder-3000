@@ -1,6 +1,6 @@
 # City Builder 3000
 
-A browser city builder in the spirit of the classic isometric city games. Vanilla JS, Canvas 2D, no runtime dependencies, no external assets. All art is procedural and original.
+A browser city builder in the spirit of the classic isometric city games. Vanilla JS, Canvas 2D, no runtime dependencies and original artwork. Production civic buildings use offline-rendered Blender models; other artwork is currently procedural.
 
 ## Quick start
 
@@ -27,6 +27,14 @@ pnpm test:performance # Chrome renderer benchmark against the running dev server
 With Chrome installed, run `pnpm dev --port 4173` in one terminal and `pnpm test:browser` in another for a scripted gameplay check. Screenshots land in `artifacts/`. Run `pnpm test:visuals` against the same server for Canvas pixel checks of courtyard occlusion and earthquake layering, in all camera orientations and day/night lighting. Set `CIVIC_TEST_URL` to use another server port.
 
 Gameplay fidelity and remaining verified gaps are tracked in [PARITY.md](PARITY.md).
+
+## Building artwork
+
+The civic collection establishes the visual standard for the remaining buildings.
+See [CIVIC-ART.md](CIVIC-ART.md) for the shipped assets and interactive gallery, and
+[ASSET-WORKFLOW.md](ASSET-WORKFLOW.md) for art direction, remaining coverage and the
+production workflow. Editable sources and bake commands are documented in
+[source-art/civic/README.md](source-art/civic/README.md).
 
 ## The game
 
@@ -66,7 +74,7 @@ Tool shortcuts are shown in the tooltips of the tool dock.
 
 - `src/sim/` — the simulation: `catalog.js` (buildings), `terrain.js`, `lots.js`, `place.js`, `utilities.js`, `services.js`, `traffic.js`, `growth.js`, `economy.js`, `events.js`, `neighbors.js`, `disasters.js`, `index.js` (public API)
 - `src/construction.js` — plan, apply and undo player actions
-- `src/renderer.js`, `src/building-art.js` — isometric renderer and procedural architecture
+- `src/renderer.js`, `src/building-art.js` — isometric renderer, baked building sprites and procedural fallbacks
 - `src/street-art.js`, `src/foliage.js`, `src/architecture-cache.js` — street details and bounded artwork caches
 - `src/ui.js`, `src/style.css` — the interface
 - `src/main.js` — game loop, saves, wiring

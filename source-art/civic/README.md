@@ -22,6 +22,10 @@ receives transparent WebP images, not 3D scenes.
 - Warm limestone and restrained metalwork unite the set; masonry, copper,
   terracotta, glazing and steel give individual buildings their own character.
 
+For other building families, coverage and integration requirements are tracked in
+[ASSET-WORKFLOW.md](../../ASSET-WORKFLOW.md). It also documents preview isolation
+and the visual checks required before shipping.
+
 ## Source and export
 
 Model sources: `common.py`, `services.py`, `culture.py`, `sanitation.py`.

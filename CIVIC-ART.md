@@ -4,6 +4,10 @@ The twelve civic buildings use original Blender models baked into transparent
 WebP sprites. Their editable model sources and art direction are documented in
 [source-art/civic/README.md](source-art/civic/README.md).
 
+For extending this standard to all other buildings, follow
+[ASSET-WORKFLOW.md](ASSET-WORKFLOW.md). This collection covers the twelve catalog
+entries in group `civic`; rewards such as City Hall and University remain to do.
+
 Each building has four camera angles and three lighting states: daylight,
 powered night, and unpowered night. The 144 sprites total about 2.82 MiB.
 No 3D library or model data is loaded by the browser.
