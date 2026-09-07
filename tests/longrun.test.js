@@ -10,10 +10,14 @@
 // exploded and the city emptied out.
 //
 // So the assertions here are about shape over time, and they are deliberately
-// loose. The measured spread across nine seeds at sixty years was end/peak
-// 0.83-1.00, trough/peak 0.75-0.84 and a worst year-on-year swing of 2.3-8.4%.
+// loose. The measured spread across nine seeds at sixty years is end/peak
+// 0.84-1.00, trough/peak 0.80-0.96, and a worst year-on-year swing of 0.9-20.4%.
 // The bounds sit well outside that: they are there to catch a collapse or an
 // oscillation, not to pin down balance, which moves whenever the model does.
+//
+// That 20.4% is seed 99 taking two earthquakes in the same year, so the swing
+// bound has to clear a genuinely bad year while still catching a feedback loop
+// with no damping, which is a far larger and repeating figure.
 //
 // `maintainUtilities` stands in for a mayor who reads the news and keeps the
 // lights on. That makes these end-to-end tests of the simulation *and* of what
@@ -58,7 +62,7 @@ describe("a maintained city holds its shape for sixty years", () => {
       const where = (p) => `year ${pops.indexOf(p)}`;
       assert.ok(peak > 5000, `the starter town never grew: peak ${peak}`);
       assert.ok(end >= peak * 0.6, `ended at ${end}, down from a peak of ${peak}`);
-      assert.ok(trough >= peak * 0.5, `bottomed out at ${trough} (${where(trough)}) against a peak of ${peak}`);
+      assert.ok(trough >= peak * 0.65, `bottomed out at ${trough} (${where(trough)}) against a peak of ${peak}`);
     });
 
     test(`seed ${seed} keeps the lights on`, () => {
@@ -78,7 +82,7 @@ describe("a maintained city holds its shape for sixty years", () => {
         const swing = Math.abs(log[i].pop - log[i - 1].pop) / Math.max(1, log[i - 1].pop);
         if (swing > worst) { worst = swing; at = log[i].year; }
       }
-      assert.ok(worst < 0.25, `population swung ${Math.round(worst * 100)}% in year ${at}`);
+      assert.ok(worst < 0.35, `population swung ${Math.round(worst * 100)}% in year ${at}`);
     });
   }
 });
