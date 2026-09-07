@@ -19,7 +19,7 @@ export function heightOf(t) {
   if (t.type === "residential") return t.density === 1 ? 10 + level * 3 : t.density === 2 ? 18 + level * 6 : 30 + level * 18;
   if (t.type === "commercial") return t.density === 1 ? 10 + level * 2 : t.density === 2 ? 20 + level * 7 : 40 + level * 24;
   if (t.type === "industrial") return t.density === 1 ? 12 : t.density === 2 ? 18 : 26;
-  return { coal: 46, oil: 34, gas: 30, nuclear: 60, wind: 42, solar: 6, waterpump: 10, watertower: 47, treatment: 14,
+  return { coal: 46, oil: 34, gas: 30, nuclear: 60, wind: 42, solar: 6, microwave: 45, fusion: 40, waterpump: 10, watertower: 47, treatment: 14,
     police: 24, fire: 21, hospital: 40, school: 22, college: 30, library: 18, museum: 26, landfill: 6, incinerator: 40, recycling: 16,
     park: 14, largepark: 16, zoo: 14, bus: 9, railstation: 16, airport: 18, seaport: 16, substation: 8,
     mayorhouse: 24, cityhall: 46, courthouse: 27, stadium: 30, statue: 25, prison: 20, casino: 36, toxicdump: 10, armybase: 14,
@@ -480,6 +480,37 @@ const RECIPES = {
       d.flat(a + 0.02, b + 0.02, 0.2, 0.16, 3.4, "#3a6a9c");
     }
     d.box(0.42, 0.9, 0.16, 0.08, 6, "#c4c2b0");
+  },
+  // A ground station: a dish aimed at the collector satellite, ringed by
+  // rectifier arrays that turn the beam back into current.
+  microwave(d, t, n) {
+    d.flat(0.02, 0.02, 0.96, 0.96, 0.3, "#8e9490");
+    for (let row = 0; row < 2; row++) for (let col = 0; col < 3; col++) {
+      const a = 0.06 + col * 0.3, b = 0.06 + row * 0.22;
+      d.box(a, b, 0.24, 0.16, 2.5, "#79837f"); d.flat(a + 0.01, b + 0.01, 0.22, 0.14, 2.8, "#40525c");
+    }
+    d.cyl(0.5, 0.68, 0.1, 16, "#c9ccc2");
+    d.cyl(0.5, 0.68, 0.19, 3, "#dfe2d6", 16);
+    d.cyl(0.5, 0.68, 0.13, 4, "#aeb6ac", 19);
+    d.line(0.5, 0.68, 23, 0.5, 0.68, 40, "#e8ecdf", 1.2);
+    d.box(0.08, 0.84, 0.3, 0.12, 9, "#b6bbb0"); d.windows(0.08, 0.84, 0.3, 0.12, 9, t.x + t.y, true);
+    d.fence(0.03, 0.97, 0.94, 0, "#7f867e");
+  },
+  // Containment torus under a vented hall, with the cryogenic plant beside it.
+  fusion(d, t, n) {
+    d.flat(0.02, 0.02, 0.96, 0.96, 0.3, "#93998f");
+    d.cyl(0.42, 0.44, 0.3, 26, "#cfd4c8");
+    d.cyl(0.42, 0.44, 0.22, 6, "#9fb6bd", 26);
+    d.cyl(0.42, 0.44, 0.12, 5, "#cfe6ea", 32);
+    for (let i = 0; i < 6; i++) {
+      const a = i * 1.047 + n;
+      d.box(0.42 + Math.cos(a) * 0.26 - 0.03, 0.44 + Math.sin(a) * 0.26 - 0.03, 0.06, 0.06, 30, "#b8bdb2");
+    }
+    d.box(0.06, 0.78, 0.34, 0.16, 15, "#c2c6ba"); d.windows(0.06, 0.78, 0.34, 0.16, 15, t.x + t.y, true);
+    d.roof(0.04, 0.76, 0.38, 0.2, 15, 5, "#6c7570");
+    d.cyl(0.86, 0.16, 0.07, 22, "#dde0d4"); d.cyl(0.86, 0.16, 0.075, 3, "#8fb0b8", 22);
+    d.box(0.76, 0.72, 0.2, 0.22, 10, "#b6bbb0");
+    d.fence(0.03, 0.97, 0.94, 0, "#828a80");
   },
   waterpump(d, t, n) {
     d.flat(0.08, 0.08, 0.84, 0.84, 0.2, "#7f9585");

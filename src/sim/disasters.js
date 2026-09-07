@@ -194,6 +194,9 @@ export function advanceFires(city, rng) {
   if (!burning.length) return null;
   let destroyed = 0, contained = 0;
   for (const t of burning) {
+    // Clearing a lot earlier in this pass puts out fires on the rest of its
+    // footprint, so a tile listed here may already be out.
+    if (t.fire <= 0) continue;
     const cover = t.svc?.fire || 0;
     if (rng() < cover / 110) { t.fire = 0; contained++; continue; }
     // Spread to neighbouring buildings and woods.
@@ -209,7 +212,9 @@ export function advanceFires(city, rng) {
     if (t.fire === 0) {
       if (t.lot) damageLot(city, anchorOf(city, t) || t, rng);
       else if (t.type === "empty") t.trees = 0;
-      else if (t.type !== "road") t.type = "empty";
+      // Burning out a zoned but undeveloped tile has to clear its density
+      // too, or the tile is left as empty land still marked high density.
+      else if (t.type !== "road") { t.type = "empty"; t.density = 0; }
       destroyed++;
     }
   }

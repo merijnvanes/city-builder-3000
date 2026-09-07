@@ -20,6 +20,7 @@ import { DEALS, SIDES, signDeal, cancelDeal, auditDeals, dealAvailable } from ".
 import { buildingName } from "./names.js";
 import { advanceYear, updateStrikes, readPopulation, blankPopulation, serviceQuality } from "./population.js";
 import { INDUSTRY, industryOf, ensureIndustry } from "./industry.js";
+import { agePlants, plantOutput, OVERLOAD_MONTHS } from "./power.js";
 
 export { TOOLS, TOOL_MAP, BUILDINGS, ZONE_TYPES, ORDINANCES, ADVISORS, DISASTERS, START_YEAR, DEFAULT_SIZE, FUNDED_DEPARTMENTS, SPECIAL_TYPES, PETITIONS, DEALS, SIDES, serialize, place, evaluate, isZone };
 
@@ -37,9 +38,9 @@ function settle(city) {
   ensureEvents(city);
   if (!city.people) city.people = blankPopulation();
   refreshCity(city);
-  ensureIndustry(city, dateYear(city), city._metrics?.eq ?? 55);
-  const share = readPopulation(city, city.population || 0).workforceShare;
-  city._traffic = updateTraffic(city, share);
+  const people = readPopulation(city, city.population || 0);
+  ensureIndustry(city, dateYear(city), people.eq);
+  city._traffic = updateTraffic(city, people.workforceShare);
   refreshCity(city);
   const m = computeMetrics(city);
   city.population = m.population;
@@ -65,15 +66,21 @@ export function deserialize(raw) {
 export function tick(city) {
   const rng = lcg(nextRandom(city) * 4294967296);
   if (!city._metrics) settle(city);
+  // Every change to the city happens here, above the refreshes. Anything
+  // mutated afterwards would leave a save whose derived state settle() cannot
+  // reproduce on load, and the two copies would drift apart.
   const growth = updateGrowth(city, city.demand, rng);
   const fireMessage = advanceFires(city, rng);
+  // Sims age once a year: children are schooled, adults forget, and life
+  // expectancy drifts toward what the city's hospitals and air support.
+  const monthNews = advancePeople(city);
+  // Plants age and, if the grid stayed overdrawn for a year, fail.
+  monthNews.push(...agePlants(city, rng));
   advanceEffects(city);
+
   refreshCity(city);
   city._traffic = updateTraffic(city, readPopulation(city, city.population || 0).workforceShare);
   refreshCity(city);
-  // Sims age once a year: children are schooled, adults forget, and life
-  // expectancy drifts toward what the city's hospitals and air support.
-  const strikeNews = advancePeople(city);
   const m = computeMetrics(city);
   const demand = computeDemand(city, m);
   const budget = computeBudget(city);
@@ -88,7 +95,7 @@ export function tick(city) {
   city._metrics = m;
   city._budget = budget;
 
-  const news = [...strikeNews];
+  const news = [...monthNews];
   news.push(...generateNews(city, statsForNews, city._prev));
   news.push(...updateEvents(city, statsForNews, rng));
   news.push(...auditDeals(city, city._connections));
@@ -264,7 +271,13 @@ export function inspectTile(city, x, y) {
   } else if (BUILDINGS[t.type]) {
     const b = BUILDINGS[t.type];
     description = `${b.label}, ${b.w}×${b.h}. Upkeep $${b.upkeep}/month.`;
-    if (b.powerOut) details.push(`Power output: ${b.powerOut.toLocaleString()}`);
+    if (b.powerOut) {
+      // The manual: query a plant for current capacity vs. potential capacity.
+      const out = Math.round(plantOutput(t));
+      const years = Math.floor((t.age || 0) / 12);
+      details.push(`Power output: ${out.toLocaleString()} of ${b.powerOut.toLocaleString()} (age ${years} of ${b.lifespan ?? 50} years)`);
+      if (t.strain) details.push(`OVERLOADED for ${t.strain} month${t.strain === 1 ? "" : "s"} — it will explode at ${OVERLOAD_MONTHS}.`);
+    }
     if (b.waterOut) details.push(`Water output: ${b.waterOut.toLocaleString()}${b.nearWater ? " (near water)" : ""}`);
     if (b.service) details.push(`${b.service.kind} coverage radius ${b.service.radius}`);
     // The manual tells players to query a school or hospital for its grade:

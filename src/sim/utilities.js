@@ -11,6 +11,7 @@ import { components, forSquare, forRadius, tileAt } from "./grid.js";
 import { BUILDINGS, ZONE_TYPES } from "./catalog.js";
 import { isAnchor, anchorOf, drawOf } from "./lots.js";
 import { DEALS } from "./neighbors.js";
+import { plantOutput, OVERLOAD_RATIO } from "./power.js";
 
 export const WATER_RADIUS = 6;
 
@@ -81,6 +82,7 @@ function powerComponents(city) {
 function allocate(city, netIds, count, supply, consumers) {
   const budget = Float64Array.from(supply);
   const demand = new Float64Array(count);
+  const strain = new Float64Array(count);
   for (const c of consumers) demand[c.net] += c.draw;
   const full = new Uint8Array(count);
   for (let n = 0; n < count; n++) if (supply[n] > 0 && supply[n] >= demand[n]) full[n] = 1;
@@ -90,8 +92,8 @@ function allocate(city, netIds, count, supply, consumers) {
     if (budget[c.net] >= c.draw) { budget[c.net] -= c.draw; served.add(c.anchor); }
   }
   let totalSupply = 0, totalDemand = 0;
-  for (let n = 0; n < count; n++) { totalSupply += supply[n]; totalDemand += demand[n]; }
-  return { full, served, totalSupply, totalDemand };
+  for (let n = 0; n < count; n++) { totalSupply += supply[n]; totalDemand += demand[n]; strain[n] = supply[n] > 0 ? demand[n] / supply[n] : 0; }
+  return { full, served, totalSupply, totalDemand, strain };
 }
 
 export function updateUtilities(city) {
@@ -107,7 +109,8 @@ export function updateUtilities(city) {
     const net = power.ids[t.y * size + t.x];
     if (net < 0) continue;
     const b = BUILDINGS[t.type];
-    if (b?.powerOut) powerSupply[net] += b.powerOut;
+    // An aging plant delivers less than its nameplate rating.
+    if (b?.powerOut) powerSupply[net] += plantOutput(t);
     const draw = drawOf(t).power;
     if (draw > 0) powerConsumers.push({ anchor: t, net, draw });
   }
@@ -161,7 +164,13 @@ export function updateUtilities(city) {
 
   // A sale is honoured only when the network can carry it.
   const sold = (deal, served) => deal?.kind === "sell" ? [...served].some((a) => a.deal) : deal?.kind === "buy" ? true : null;
+  // Networks asked for more than their plants could give this month. Sustained
+  // across a year, one of their plants gives way: see power.js.
+  const overdrawn = new Set();
+  for (let n = 0; n < power.count; n++) if (p.strain[n] >= OVERLOAD_RATIO) overdrawn.add(n);
   return {
+    netOf: power.ids,
+    overdrawn,
     power: { supply: Math.round(p.totalSupply), demand: Math.round(p.totalDemand), deal: powerDeal ? { ...powerDeal, met: sold(powerDeal, p.served) } : null },
     water: { supply: Math.round(w.totalSupply), demand: Math.round(w.totalDemand), deal: waterDeal ? { ...waterDeal, met: sold(waterDeal, w.served) } : null },
   };

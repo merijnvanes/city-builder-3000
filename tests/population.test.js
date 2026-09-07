@@ -1,32 +1,9 @@
 // Age structure, Education Quotient and Life Expectancy.
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
-import { createCity, tick, getStats, place, serialize, deserialize, setPolicy } from "../src/sim.js";
+import { createCity, tick, getStats, serialize, deserialize, setPolicy } from "../src/sim.js";
 import { stationaryPyramid, shares, meanLifespan, MAX_AGE, BASE_LIFE_EXPECTANCY, retirementAge } from "../src/sim/population.js";
-
-const years = (city, n) => { for (let i = 0; i < n * 12; i++) tick(city); };
-
-// Scatter civic buildings across empty land, each with a road along its front
-// and a power line along its back, so they are actually staffed and powered.
-function endow(city, type, count) {
-  const span = { school: 3, college: 4, hospital: 3, library: 2, museum: 3 }[type];
-  const step = span + 2;
-  let placed = 0;
-  city.money = Math.max(city.money, 200000);
-  for (let y = 1; y + span + 1 < city.size && placed < count; y += step) {
-    for (let x = 1; x + span + 1 < city.size && placed < count; x += step) {
-      if (!place(city, x, y, type).ok) continue;
-      for (let i = -1; i <= span; i++) {
-        place(city, x + i, y + span, "road");
-        place(city, x + i, y - 1, "powerline");
-      }
-      for (let i = 0; i < span; i++) place(city, x - 1, y + i, "powerline");
-      placed++;
-    }
-  }
-  assert.equal(placed, count, `only placed ${placed} of ${count} ${type}`);
-  return placed;
-}
+import { build, years } from "./city-helpers.mjs";
 
 describe("age structure", () => {
   test("the pyramid keeps a realistic shape at every life expectancy", () => {
@@ -63,8 +40,8 @@ describe("age structure", () => {
 describe("education quotient", () => {
   test("schools raise the workforce slowly, over a working lifetime", () => {
     const c = createCity(21, true);
-    endow(c, "school", 8);
-    endow(c, "college", 3);
+    build(c, "school", 8);
+    build(c, "college", 3);
     const start = getStats(c).eq;
     years(c, 5);
     const early = getStats(c).eq;
@@ -77,7 +54,7 @@ describe("education quotient", () => {
 
   test("children learn before the workforce does", () => {
     const c = createCity(22, true);
-    endow(c, "school", 8);
+    build(c, "school", 8);
     years(c, 6);
     const s = getStats(c);
     assert.ok(s.youthEq > s.eq + 5, `youth ${s.youthEq} vs workforce ${s.eq}`);
@@ -105,7 +82,7 @@ describe("education quotient", () => {
 describe("life expectancy", () => {
   test("hospitals raise it and their absence lowers it", () => {
     const good = createCity(31, true);
-    endow(good, "hospital", 6);
+    build(good, "hospital", 6);
     years(good, 30);
     const bad = createCity(31, true);
     years(bad, 30);
@@ -115,7 +92,7 @@ describe("life expectancy", () => {
 
   test("it never leaves the range the manual gives", () => {
     const c = createCity(32, true);
-    endow(c, "hospital", 12);
+    build(c, "hospital", 12);
     for (const k of ["freeClinics", "smokingBan", "juniorSports", "cprTraining"]) setPolicy(c, `ordinance.${k}`, true);
     years(c, 40);
     const le = getStats(c).lifeExpectancy;
@@ -125,7 +102,7 @@ describe("life expectancy", () => {
 
   test("cutting health funding to nothing calls a strike and shortens lives", () => {
     const c = createCity(33, true);
-    endow(c, "hospital", 6);
+    build(c, "hospital", 6);
     years(c, 20);
     const healthy = getStats(c).lifeExpectancy;
     setPolicy(c, "funding.health", 0);
@@ -139,7 +116,7 @@ describe("life expectancy", () => {
 describe("population saves", () => {
   test("age structure, schooling and strikes survive a round trip", () => {
     const c = createCity(41, true);
-    endow(c, "school", 4);
+    build(c, "school", 4);
     setPolicy(c, "funding.education", 20);
     years(c, 8);
     const raw = serialize(c);

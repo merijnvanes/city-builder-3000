@@ -8,7 +8,7 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 | --- | --- | --- |
 | Highways | Elevated routes; ramps provide road access | Flat single-tile routes connect directly to roads |
 | Tunnels | Transport can pass through terrain | No tunnel construction or routing |
-| Power | Eight plant types; aging reduces capacity; prolonged overload can destroy plants | Six types; output is fixed and overload produces brownouts |
+| Power | Eight plant types; aging reduces capacity; prolonged overload can destroy plants | **Done.** All eight types with the manual's invention years; output slides after 55% of a plant's life; a year of overdraw destroys one |
 | Water | Freshwater pumps, towers, coastal desalinization; pumps age | No saltwater distinction or desalinization; fixed lifespan |
 | Education | Childhood learning and adult knowledge retention; strikes from sustained underfunding | **Done.** EQ is taught to children aged 5-17, colleges take 18-22, adults decay without libraries or museums, and teachers strike after 18 months below 40% funding |
 | Health | Average city reaches 59 years, a well-run one 90; hospitals need beds and funding; pollution and traffic pull it down | **Done.** Life expectancy is a cohort statistic on the same anchors, with healthcare strikes |
@@ -58,6 +58,32 @@ That is the manual's promise on page 92 reproduced: *"nasty polluting
 industries turning into cleaner, high-tech industries."* The kind also sets
 jobs per tile and tax yield, so a laboratory is worth more per worker than a
 foundry, and farms employ few.
+
+## Power plants, September 7
+
+All eight types the manual lists, with its invention years: coal and oil
+1900, gas 1955, nuclear 1965, wind 1980, solar 1990, microwave 2020, fusion
+2050. Microwave and fusion are new, with original artwork.
+
+- A plant runs at nameplate output for the first 55% of its life, then slides
+  to 35%. The news warns twice: past its prime, then worn out. Querying one
+  shows current against potential capacity, as the manual tells players to do.
+- A network held above capacity for twelve straight months destroys a plant
+  on it. A nuclear one takes the neighbourhood with it and leaves fallout.
+- Wind turbines do better on hills, which is the manual's siting advice.
+
+Two bugs surfaced by the longer test runs this needed, both pre-existing:
+
+- A fire burning out a zoned but undeveloped tile emptied its type and left
+  its density, writing a save the loader rejected.
+- Clearing a lot put out fires on the rest of its footprint, so a tile still
+  in that month's burning list decremented its counter below zero. Same
+  outcome: an unloadable save.
+
+And one this work introduced, now covered by tests: `tick()` aged plants
+*after* the refresh that allocates power, so a save's ages did not match its
+saved allocation and a reloaded city drifted within a year. Every mutation
+now happens above the refreshes; `settle()` runs only the derive half.
 
 ## Visual and performance work, September 7
 

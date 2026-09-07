@@ -17,8 +17,11 @@ export const LOT_SIZES_BY_TYPE = { industrial: { 1: [3, 1], 2: [2, 1], 3: [3, 2,
 
 // First year a technology is available. Anything unlisted is always there.
 export const TECH_YEAR = {
-  coal: 1900, oil: 1925, gas: 1950, nuclear: 1975, wind: 1985, solar: 2000, highway: 1940, subway: 1920, substation: 1920,
-  treatment: 1940, incinerator: 1930, recycling: 1980, airport: 1935, railstation: 1900, bus: 1920,
+  // Power plant years are the manual's, page 38-39.
+  coal: 1900, oil: 1900, gas: 1955, nuclear: 1965, wind: 1980, solar: 1990, microwave: 2020, fusion: 2050,
+  highway: 1940, subway: 1920, substation: 1920,
+  treatment: 1935, incinerator: 1920, recycling: 1970,
+  airport: 1930, railstation: 1900, bus: 1920,
   college: 1900, hospital: 1900, museum: 1900, zoo: 1900, casino: 1930, toxicdump: 1960, prison: 1900, armybase: 1900,
 };
 
@@ -51,12 +54,16 @@ export const BUILDINGS = {
   airport:     { label: "Airport",         group: "transport", cost: 10000, w: 6, h: 5, upkeep: 200, dept: "transport", unique: true, effects: { jobs: 500, traffic: 40, pollution: 25, radius: 8, demand: { commercial: 18 } }, powerUse: 12, waterUse: 6 },
   seaport:     { label: "Seaport",         group: "transport", cost: 5000, w: 4, h: 4, upkeep: 120, dept: "transport", unique: true, requiresWater: true, effects: { jobs: 350, traffic: 25, pollution: 15, radius: 6, demand: { industrial: 18 } }, powerUse: 8, waterUse: 4 },
 
-  coal:        { label: "Coal Plant",      group: "utilities", cost: 4000,  w: 4, h: 4, upkeep: 180, dept: "utilities", powerOut: 6000,  pollution: 60 },
-  oil:         { label: "Oil Plant",       group: "utilities", cost: 6600,  w: 4, h: 4, upkeep: 220, dept: "utilities", powerOut: 7000,  pollution: 40 },
-  gas:         { label: "Gas Plant",       group: "utilities", cost: 3000,  w: 3, h: 3, upkeep: 120, dept: "utilities", powerOut: 3000,  pollution: 18 },
-  nuclear:     { label: "Nuclear Plant",   group: "utilities", cost: 15000, w: 4, h: 4, upkeep: 420, dept: "utilities", powerOut: 16000, pollution: 0 },
-  wind:        { label: "Wind Turbine",    group: "utilities", cost: 500,   w: 1, h: 1, upkeep: 8,   dept: "utilities", powerOut: 200,   pollution: 0 },
-  solar:       { label: "Solar Array",     group: "utilities", cost: 1300,  w: 3, h: 3, upkeep: 15,  dept: "utilities", powerOut: 1000,  pollution: 0 },
+  // lifespan is in years: a plant runs at full output for the first 55% of it,
+  // then slides to 35% of nameplate capacity. Query one to see the gap.
+  coal:        { label: "Coal Plant",      group: "utilities", cost: 4000,  w: 4, h: 4, upkeep: 180, dept: "utilities", powerOut: 6000,  pollution: 60, lifespan: 50 },
+  oil:         { label: "Oil Plant",       group: "utilities", cost: 6600,  w: 4, h: 4, upkeep: 220, dept: "utilities", powerOut: 7000,  pollution: 40, lifespan: 50 },
+  gas:         { label: "Gas Plant",       group: "utilities", cost: 3000,  w: 3, h: 3, upkeep: 120, dept: "utilities", powerOut: 3000,  pollution: 18, lifespan: 50 },
+  nuclear:     { label: "Nuclear Plant",   group: "utilities", cost: 15000, w: 4, h: 4, upkeep: 420, dept: "utilities", powerOut: 16000, pollution: 0,  lifespan: 60 },
+  wind:        { label: "Wind Turbine",    group: "utilities", cost: 500,   w: 1, h: 1, upkeep: 8,   dept: "utilities", powerOut: 200,   pollution: 0,  lifespan: 35, hilltop: true },
+  solar:       { label: "Solar Array",     group: "utilities", cost: 1300,  w: 3, h: 3, upkeep: 15,  dept: "utilities", powerOut: 1000,  pollution: 0,  lifespan: 40 },
+  microwave:   { label: "Microwave Plant", group: "utilities", cost: 28000, w: 4, h: 4, upkeep: 300, dept: "utilities", powerOut: 22000, pollution: 6,  lifespan: 60 },
+  fusion:      { label: "Fusion Plant",    group: "utilities", cost: 40000, w: 4, h: 4, upkeep: 500, dept: "utilities", powerOut: 45000, pollution: 0,  lifespan: 80 },
   powerline:   { label: "Power Line",      group: "utilities", cost: 5,     w: 1, h: 1, upkeep: 0,   dept: "utilities", path: true, overlay: true, water: true },
   waterpump:   { label: "Water Pump",      group: "utilities", cost: 150,   w: 1, h: 1, upkeep: 12,  dept: "utilities", waterOut: 2500, nearWater: true, powerUse: 2 },
   watertower:  { label: "Water Tower",     group: "utilities", cost: 100,   w: 1, h: 1, upkeep: 5,   dept: "utilities", waterOut: 600, powerUse: 1 },

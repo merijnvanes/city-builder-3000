@@ -1,29 +1,9 @@
 // Industrial subtypes: farms, heavy industry, manufacturing and high tech.
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
-import { createCity, tick, getStats, place, serialize, deserialize, setPolicy, inspectTile } from "../src/sim.js";
+import { createCity, getStats, serialize, deserialize, setPolicy, inspectTile } from "../src/sim.js";
 import { nationalMix, industryWeights, pickIndustry, convertIndustry, INDUSTRY } from "../src/sim/industry.js";
-
-const years = (city, n) => { for (let i = 0; i < n * 12; i++) tick(city); };
-
-// A campus of civic buildings, each with road and power, well funded.
-function educate(city) {
-  const put = (type, span, count) => {
-    let placed = 0;
-    for (let y = 1; y + span + 1 < city.size && placed < count; y += span + 2) {
-      for (let x = 1; x + span + 1 < city.size && placed < count; x += span + 2) {
-        city.money = 2_000_000;
-        if (!place(city, x, y, type).ok) continue;
-        for (let i = -1; i <= span; i++) { place(city, x + i, y + span, "road"); place(city, x + i, y - 1, "powerline"); }
-        for (let i = 0; i < span; i++) place(city, x - 1, y + i, "powerline");
-        placed++;
-      }
-    }
-    return placed;
-  };
-  put("school", 3, 14); put("college", 4, 5); put("library", 2, 14); put("museum", 3, 6);
-  setPolicy(city, "funding.education", 120);
-}
+import { educate, years } from "./city-helpers.mjs";
 
 describe("the national economy", () => {
   test("moves from smoke to silicon over the century", () => {
