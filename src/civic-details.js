@@ -8,11 +8,11 @@ export function campus(d, accent = CIVIC.lawn) {
   d.flat(0.45, 0.04, 0.1, 0.91, 0.4, '#e4dcc7');
 }
 
-export function hall(d, t, x, y, w, h, height, wall, roof = CIVIC.slate) {
-  d.box(x, y, w, h, height, wall);
-  d.windows(x, y, w, h, height, t.x + t.y, false);
-  d.box(x - 0.01, y - 0.01, w + 0.02, h + 0.02, 1.5, CIVIC.trim, height);
-  d.flat(x, y, w, h, height + 1.6, roof);
+export function hall(d, t, x, y, w, h, height, wall, roof = CIVIC.slate, base = 0) {
+  d.box(x, y, w, h, height, wall, base);
+  d.windows(x, y, w, h, height, t.x + t.y, false, base);
+  d.box(x - 0.01, y - 0.01, w + 0.02, h + 0.02, 1.5, CIVIC.trim, base + height);
+  d.flat(x, y, w, h, base + height + 1.6, roof);
 }
 
 export function steps(d, x, y, w, count = 3) {
