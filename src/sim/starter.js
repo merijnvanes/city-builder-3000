@@ -119,7 +119,9 @@ export function buildStarterTown(city) {
   const blockAt = (i, j) => ({ x: ox + 1 + i * 4, y: oy + 1 + j * 4 });
 
   // Civic sites first so zones do not claim them.
-  const civic = { "1,1": "police", "5,1": "fire", "1,5": "school", "5,5": "hospital", "3,6": "largepark", "0,6": "landfill", "4,0": "school" };
+  // A jail comes with the police station: without cells to put people in,
+  // arrests are released and the precinct loses its effect.
+  const civic = { "1,1": "police", "2,0": "jail", "5,1": "fire", "1,5": "school", "5,5": "hospital", "3,6": "largepark", "0,6": "landfill", "4,0": "school" };
   for (const [key, type] of Object.entries(civic)) {
     const [i, j] = key.split(",").map(Number);
     const b = blockAt(i, j);

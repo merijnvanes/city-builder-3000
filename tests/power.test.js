@@ -1,7 +1,7 @@
 // Power plants: invention years, ageing, hilltop wind and overload failure.
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
-import { createCity, tick, place, serialize, deserialize, evaluate, setPolicy } from "../src/sim.js";
+import { createCity, tick, getStats, place, serialize, deserialize, evaluate } from "../src/sim.js";
 import { BUILDINGS, TECH_YEAR } from "../src/sim/catalog.js";
 import { plantOutput, OVERLOAD_MONTHS, isPlant } from "../src/sim/power.js";
 import { ageFactor, lifespanOf, WORN } from "../src/sim/wear.js";
@@ -69,45 +69,66 @@ describe("ageing", () => {
 });
 
 describe("overload", () => {
-  // A starter town left to itself outgrows the plant it was founded with.
-  // The manual: run a plant beyond capacity for months on end and it explodes.
-  const outgrow = (seed) => {
+  // Replace a starter town's plant with a much smaller one on the very same
+  // footprint. The grid keeps its shape, so the town is instantly drawing far
+  // more than the plant can give, which is the state the manual warns about.
+  function starveGrid(seed) {
     const c = createCity(seed, true);
-    for (let year = 0; year < 40; year++) {
-      for (let m = 0; m < 12; m++) tick(c);
-      if (!anchors(c, "gas").length && !anchors(c, "coal").length) return { c, year };
-    }
-    return { c, year: null };
-  };
+    const plant = c.tiles.find((t) => t.lot?.x === t.x && t.lot?.y === t.y && isPlant(t));
+    assert.ok(plant, "the starter town should have a power plant");
+    const { x, y } = plant;
+    c.money = 500_000;
+    assert.equal(place(c, x, y, "bulldoze").ok, true);
+    assert.equal(place(c, x, y, "solar").ok, true);
+    const { supply, demand } = getStats(c).utilities.power;
+    assert.ok(demand > supply, `the grid should be overdrawn: ${demand} vs ${supply}`);
+    return { c, at: () => c.tiles.find((t) => t.lot?.x === t.x && t.lot?.y === t.y && isPlant(t)) };
+  }
 
   test("a grid held past capacity for a year destroys a plant", () => {
-    const { c, year } = outgrow(21);
-    assert.ok(year != null, "the plant survived being overdrawn for forty years");
+    const { c, at } = starveGrid(21);
+    for (let i = 0; i < OVERLOAD_MONTHS - 1; i++) tick(c);
+    assert.ok(at(), "it should not fail before a full year");
+    for (let i = 0; i < 3; i++) tick(c);
+    assert.equal(at(), undefined, "the plant survived a year of overdraw");
     assert.ok(c.news.some((n) => /exploded/.test(n)), c.news.slice(-6).join(" | "));
   });
 
-  test("strain builds up before the plant gives way, and clears when relieved", () => {
-    const c = createCity(21, true);
-    const plant = () => c.tiles.find((t) => t.lot?.x === t.x && t.lot?.y === t.y && isPlant(t));
-    let strained = null;
-    for (let i = 0; i < 12 * 30 && !strained; i++) { tick(c); if (plant()?.strain >= 3) strained = plant(); }
-    assert.ok(strained, "the town never overdrew its plant");
-    assert.ok(strained.strain < OVERLOAD_MONTHS, "it should not fail before a full year");
-    // Take the load off and the counter resets rather than creeping on.
-    setPolicy(c, "ordinance.energyConservation", true);
+  test("strain clears when the load is taken off", () => {
+    const { c, at } = starveGrid(42);
+    for (let i = 0; i < 4; i++) tick(c);
+    assert.ok(at().strain >= 3, `strain only reached ${at().strain}`);
+    assert.ok(at().strain < OVERLOAD_MONTHS);
+    // Restore capacity and the counter resets rather than creeping on.
+    const { x, y } = at();
+    c.money = 500_000;
+    place(c, x, y, "bulldoze");
+    place(c, x, y, "nuclear");
     tick(c);
-    assert.equal(plant().strain, 0);
+    assert.equal(at().strain, 0);
   });
 
   test("strain survives a save and keeps counting", () => {
-    const c = createCity(21, true);
-    const plant = (city) => city.tiles.find((t) => t.lot?.x === t.x && t.lot?.y === t.y && isPlant(t));
-    for (let i = 0; i < 12 * 30 && !(plant(c)?.strain >= 3); i++) tick(c);
-    assert.ok(plant(c)?.strain >= 3, "the town never overdrew its plant");
+    const { c, at } = starveGrid(44);
+    for (let i = 0; i < 5; i++) tick(c);
+    assert.ok(at().strain >= 4, `strain only reached ${at().strain}`);
     const d = deserialize(serialize(c));
-    assert.equal(plant(d).strain, plant(c).strain);
+    const dPlant = d.tiles.find((t) => t.lot?.x === t.x && t.lot?.y === t.y && isPlant(t));
+    assert.equal(dPlant.strain, at().strain);
     tick(c); tick(d);
     assert.equal(serialize(d), serialize(c));
+  });
+
+  test("a grid with headroom never blows a plant up", () => {
+    const c = createCity(21, true);
+    const plant = c.tiles.find((t) => t.lot?.x === t.x && t.lot?.y === t.y && isPlant(t));
+    c.money = 500_000;
+    place(c, plant.x, plant.y, "bulldoze");
+    place(c, plant.x, plant.y, "nuclear");
+    for (let i = 0; i < 60; i++) tick(c);
+    const now = c.tiles.find((t) => t.lot?.x === t.x && t.lot?.y === t.y && isPlant(t));
+    assert.equal(now.type, "nuclear");
+    assert.equal(now.strain, 0);
   });
 
   test("a tampered strain counter is rejected", () => {

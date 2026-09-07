@@ -227,12 +227,18 @@ export function advanceFires(city, rng) {
   return null;
 }
 
+// "Though a fire is just as likely to break out in an area with fire
+// protection as in one without" - stations decide whether a blaze does damage,
+// not whether it starts. What raises the risk is dry development: "Zones that
+// are not watered... are at a high risk of fire disasters."
+export const fireRiskOf = (stats) => 0.0015 * (0.75 + (stats.dryShare || 0) * 2.4);
+
 // Random disaster roll for a month. Returns message or null.
 export function randomDisaster(city, stats, rng) {
   if (city.disasters === false) return null;
   if (stats.population < 200) return null;
   const roll = rng();
-  const fireRisk = 0.0015 * (1.5 - (stats.fireCover || 0) / 100);
+  const fireRisk = fireRiskOf(stats);
   if (roll < fireRisk) return triggerDisaster(city, "fire", rng);
   if (roll < fireRisk + 0.0008) return triggerDisaster(city, "earthquake", rng);
   if (roll < fireRisk + 0.0016) return triggerDisaster(city, "tornado", rng);

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createCity, serialize, deserialize, refresh } from '../src/sim/index.js';
-import { triggerDisaster, advanceEffects, randomDisaster } from '../src/sim/disasters.js';
+import { triggerDisaster, advanceEffects, randomDisaster, fireRiskOf } from '../src/sim/disasters.js';
 import { assignLot } from '../src/sim/lots.js';
 
 function site() {
@@ -84,8 +84,8 @@ test('volcano slopes remain gentle where a cone meets existing hills', () => {
 });
 
 test('ineligible disasters do not transfer their probability to a saucer', () => {
-  const c = site(), stats = { population: 1000, fireCover: 100, pollution: 0, crime: 0 };
-  const fireRisk = 0.0015 * 0.5;
+  const c = site(), stats = { population: 1000, dryShare: 0, pollution: 0, crime: 0 };
+  const fireRisk = fireRiskOf(stats);
   assert.equal(randomDisaster(c, stats, () => fireRisk + 0.002), null, 'no water means no flood');
   assert.equal(randomDisaster(c, stats, () => fireRisk + 0.0025), null, 'clean air means no toxic leak');
   assert.equal(c.effects?.length || 0, 0);

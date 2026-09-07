@@ -5,6 +5,11 @@ import { isAnchor, lotTiles, capacityOf } from "./lots.js";
 import { industryTraits } from "./industry.js";
 
 export const ROAD_REACH = 3;
+// Share of residents who pass through the courts in a year and need a cell.
+export const ARREST_RATE = 0.02;
+// Overlapping precincts stack, but not without limit.
+export const SERVICE_CAP = 160;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 export const SERVICE_KINDS = ["police", "fire", "health", "education", "culture", "park", "bus", "rail"];
 
 const blankServices = () => ({ police: 0, fire: 0, health: 0, education: 0, culture: 0, park: 0, bus: 0, rail: 0 });
@@ -30,18 +35,45 @@ export function updateServices(city) {
   }
 
   // ── Service coverage ──────────────────────────────────────────
+  // The manual, pages 85-87: "The size of a precinct expands as you raise the
+  // police budget... Funding not only affects a precinct's size, but also its
+  // effectiveness... Police stations placed near one another may have
+  // precincts that overlap, and effectiveness in these overlapping areas is
+  // additive." Fire coverage works the same way, with a ceiling on how far it
+  // can be stretched.
+  //
+  // Jails come first, because a city with nowhere to put the people it
+  // arrests loses police effectiveness everywhere: "the police will be forced
+  // to release any new criminals they catch back onto the street."
+  let cells = 0;
+  for (const t of tiles) {
+    if (!isAnchor(t)) continue;
+    const b = BUILDINGS[t.type];
+    if (b?.cells) cells += b.cells * (t.powered || !b.powerUse ? 1 : 0.4) * Math.min(1.25, pct(b.dept));
+  }
+  let arrestable = 0;
+  for (const t of tiles) if (isAnchor(t) && t.type === "residential") arrestable += capacityOf(t) * ARREST_RATE;
+  const jailFactor = arrestable > 0 ? clamp(0.35 + 0.65 * (cells / arrestable), 0.35, 1) : 1;
+
   for (const t of tiles) {
     if (!isAnchor(t)) continue;
     const b = BUILDINGS[t.type];
     if (!b?.service) continue;
     const s = b.service;
-    const eff = Math.min(1.25, pct(b.dept)) * (b.powerUse && !t.powered ? 0.35 : 1);
-    const strength = (s.strength ?? 100) * eff;
+    const budget = Math.min(1.25, pct(b.dept));
+    const powered = b.powerUse && !t.powered ? 0.35 : 1;
+    let strength = (s.strength ?? 100) * budget * powered;
+    if (s.kind === "police") strength *= jailFactor;
     if (strength <= 0) continue;
+    // A well-funded department reaches further; a starved one pulls back to
+    // the streets around its own station.
+    const reach = s.radius * clamp(0.35 + 0.65 * budget, 0.3, 1.35);
+    const radius = Math.max(1, Math.round(Math.min(reach, s.maxRadius ?? reach)));
     const cx = t.x + Math.floor(t.lot.w / 2), cy = t.y + Math.floor(t.lot.h / 2);
-    forRadius(city, cx, cy, s.radius, (n, d) => {
-      const v = strength * (1 - d / (s.radius + 1));
-      if (v > n.svc[s.kind]) n.svc[s.kind] = v;
+    forRadius(city, cx, cy, radius, (n, d) => {
+      const v = strength * (1 - d / (radius + 1));
+      if (s.additive) n.svc[s.kind] = Math.min(SERVICE_CAP, n.svc[s.kind] + v);
+      else if (v > n.svc[s.kind]) n.svc[s.kind] = v;
     });
   }
 
@@ -146,5 +178,6 @@ export function updateServices(city) {
   for (const t of tiles) t.landValue = Math.max(0, Math.min(100, Math.round(baseValue[t.y * size + t.x] - t.crime * 0.2)));
 
   return { garbage, garbageProduced: Math.round(garbageProduced), garbageCapacity: Math.round(garbageCapacity), industrialLots,
-           waterPollution: city._util?.waterPollution || 0 };
+           waterPollution: city._util?.waterPollution || 0,
+           cells: Math.round(cells), arrestable: Math.round(arrestable), jailFactor };
 }

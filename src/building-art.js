@@ -20,7 +20,7 @@ export function heightOf(t) {
   if (t.type === "commercial") return t.density === 1 ? 10 + level * 2 : t.density === 2 ? 20 + level * 7 : 40 + level * 24;
   if (t.type === "industrial") return t.density === 1 ? 12 : t.density === 2 ? 18 : 26;
   return { coal: 46, oil: 34, gas: 30, nuclear: 60, wind: 42, solar: 6, microwave: 45, fusion: 40, waterpump: 10, watertower: 47, treatment: 14, desalination: 20,
-    police: 24, fire: 21, hospital: 40, school: 22, college: 30, library: 18, museum: 26, landfill: 6, incinerator: 40, recycling: 16,
+    police: 24, fire: 21, jail: 25, hospital: 40, school: 22, college: 30, library: 18, museum: 26, landfill: 6, incinerator: 40, recycling: 16,
     park: 14, largepark: 16, zoo: 14, bus: 9, railstation: 16, airport: 18, seaport: 16, substation: 8,
     mayorhouse: 24, cityhall: 46, courthouse: 27, stadium: 30, statue: 25, prison: 20, casino: 36, toxicdump: 10, armybase: 14,
     marina: 14, university: 34, medcenter: 40, gigamall: 20,
@@ -545,6 +545,17 @@ const RECIPES = {
     d.box(0.1, 0.82, 0.5, 0.12, 5, "#9fa9a2");
     d.line(0.6, 0.88, 2.5, 0.96, 0.88, 2.5, "#6f8f9c", 2.2);
     d.fence(0.03, 0.97, 0.94, 0, "#7d877f");
+  },
+  // A county jail: a low cell block behind a walled yard, with a watchtower.
+  jail(d, t, n) {
+    d.flat(0.02, 0.02, 0.96, 0.96, 0.2, "#9c9a8c");
+    d.flat(0.08, 0.6, 0.84, 0.34, 0.4, "#8b8a80");
+    d.box(0.1, 0.12, 0.8, 0.4, 16, "#a9a597"); d.windows(0.1, 0.12, 0.8, 0.4, 16, t.x + t.y, false, 0, true, 8);
+    d.roof(0.08, 0.1, 0.84, 0.44, 16, 4, "#5c5f5c");
+    d.box(0.1, 0.52, 0.16, 0.1, 20, "#b4b0a1");
+    d.hip(0.08, 0.5, 0.2, 0.14, 20, 5, "#585c58");
+    for (let i = 0; i < 5; i++) d.box(0.14 + i * 0.17, 0.66, 0.02, 0.24, 7, "#7c7f78");
+    d.fence(0.06, 0.94, 0.88, 0, "#8f9186");
   },
   police(d, t, n) {
     d.flat(0.03, 0.03, 0.94, 0.94, 0.2, "#a6ac97");

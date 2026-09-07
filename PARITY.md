@@ -15,7 +15,9 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 
 | Industry | Farms, heavy industry, manufacturing and high tech, the last attracted by an educated workforce | **Done.** See below |
 
-Other systems needing controlled comparisons against the original game include growth thresholds, lot stages, service capacity, land value, pollution, budgets, rewards, neighbor contracts and disasters. The manual describes behaviors but does not expose all numerical formulas. Exact balance requires repeatable reference-game experiments, not guessed constants.
+| Public safety | Budget sets precinct size and effectiveness; overlaps are additive; jails cap police effectiveness | **Done.** See below |
+
+Other systems needing controlled comparisons against the original game include growth thresholds, lot stages, land value, budgets, rewards, neighbor contracts and disasters. The manual describes behaviors but does not expose all numerical formulas. Exact balance requires repeatable reference-game experiments, not guessed constants.
 
 ## Demographics, September 7
 
@@ -120,6 +122,23 @@ Two more determinism bugs, both pre-existing:
 - `advanceEffects` returned early when a city had no effects list, so flood
   water never drained on a city that had never shown an on-screen effect —
   while a reloaded copy, which always gets a list, drained normally.
+
+## Police and fire, September 7
+
+Three rules the manual states plainly that the code contradicted:
+
+| Manual | Was | Now |
+| --- | --- | --- |
+| "The size of a precinct expands as you raise the police budget" | fixed radius | radius scales 0.35× to 1.13× with the department budget; fire stops at a limit |
+| "precincts that overlap... effectiveness in these overlapping areas is additive" | coverage took the maximum | police and fire add, capped at 160 |
+| "a fire is just as likely to break out in an area with fire protection as in one without" | fire coverage reduced ignition | coverage decides damage only; unwatered zones raise the risk, as the manual says elsewhere |
+
+Jails are new. "If you do not have enough jails in your city, the police will
+be forced to release any new criminals they catch back onto the street." A
+city short of cells loses police effectiveness everywhere, down to 35%. Two
+percent of residents need a cell; a jail holds 400 and the maximum security
+prison 1,200. Starter towns come with one, and querying a jail shows the
+city's cells against its arrests.
 
 ## Visual and performance work, September 7
 

@@ -21,6 +21,7 @@ export function computeMetrics(city) {
   const counts = {};
   const zones = { residential: { tiles: 0, developed: 0, abandoned: 0 }, commercial: { tiles: 0, developed: 0, abandoned: 0 }, industrial: { tiles: 0, developed: 0, abandoned: 0 } };
   let abandonedLots = 0, landValueSum = 0, landTiles = 0, specialJobs = 0, specialHappiness = 0;
+  let developedTiles = 0, dryTiles = 0;
   const industryMix = Object.fromEntries(INDUSTRY_TYPES.map((k) => [k, 0]));
   const demandBonus = {};
 
@@ -33,6 +34,9 @@ export function computeMetrics(city) {
       if (t.lot && t.abandoned) z.abandoned++;
       needPower++; if (t.powered) havePower++;
       if (t.density >= 2 || t.level >= 2) { needWater++; if (t.watered) haveWater++; }
+      // "Zones that are not watered will never reach full development and are
+      // at a high risk of fire disasters."
+      if (t.lot) { developedTiles++; if (!t.watered) dryTiles++; }
     }
     if (!isAnchor(t)) continue;
     counts[t.type] = (counts[t.type] || 0) + 1;
@@ -108,6 +112,8 @@ export function computeMetrics(city) {
     workers: traffic.workers, employed: traffic.employed, unemployment: traffic.unemployment,
     traffic: traffic.traffic, congestion: traffic.congestion,
     pollution, crime, education, health, parks, police, fireCover, industryMix,
+    dryShare: developedTiles ? dryTiles / developedTiles : 0,
+    cells: svc.cells || 0, arrestable: svc.arrestable || 0, jailFactor: svc.jailFactor ?? 1,
     eq, lifeExpectancy, strikes: people.strikes,
     workforceShare: people.workforceShare, workingAgeShare: people.workingAgeShare,
     retirementAge: people.retirementAge, childShare: people.childShare, seniorShare: people.seniorShare,

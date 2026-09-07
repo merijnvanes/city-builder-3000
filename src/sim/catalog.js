@@ -22,7 +22,7 @@ export const TECH_YEAR = {
   highway: 1940, subway: 1920, substation: 1920,
   treatment: 1935, desalination: 1960, incinerator: 1920, recycling: 1970,
   airport: 1930, railstation: 1900, bus: 1920,
-  college: 1900, hospital: 1900, museum: 1900, zoo: 1900, casino: 1930, toxicdump: 1960, prison: 1900, armybase: 1900,
+  college: 1900, hospital: 1900, museum: 1900, zoo: 1900, casino: 1930, toxicdump: 1960, prison: 1900, armybase: 1900, jail: 1900,
 };
 
 // Residents or jobs per tile per development level (levels 1..4 scale by level/4).
@@ -74,8 +74,13 @@ export const BUILDINGS = {
   treatment:   { label: "Water Treatment", group: "utilities", cost: 5000,  w: 3, h: 3, upkeep: 120, dept: "utilities", powerUse: 8, cleansWater: true, pollution: 4 },
   pipe:        { label: "Water Pipe",      group: "utilities", cost: 5,     w: 1, h: 1, upkeep: 0,   dept: "utilities", path: true, overlay: true, water: true },
 
-  police:      { label: "Police Station",  group: "civic", cost: 500,  w: 3, h: 3, upkeep: 90,  dept: "police",    service: { kind: "police", radius: 12, strength: 100 }, powerUse: 3, waterUse: 2 },
-  fire:        { label: "Fire Station",    group: "civic", cost: 500,  w: 3, h: 3, upkeep: 90,  dept: "fire",      service: { kind: "fire", radius: 12, strength: 100 }, powerUse: 3, waterUse: 2 },
+  // Precincts and fire coverage are additive where they overlap, and their
+  // radius grows with the department budget, as the manual describes.
+  police:      { label: "Police Station",  group: "civic", cost: 500,  w: 3, h: 3, upkeep: 90,  dept: "police",    service: { kind: "police", radius: 12, strength: 100, additive: true }, powerUse: 3, waterUse: 2 },
+  fire:        { label: "Fire Station",    group: "civic", cost: 500,  w: 3, h: 3, upkeep: 90,  dept: "fire",      service: { kind: "fire", radius: 12, strength: 100, additive: true, maxRadius: 16 }, powerUse: 3, waterUse: 2 },
+  // "If you do not have enough jails in your city, the police will be forced
+  // to release any new criminals they catch back onto the street."
+  jail:        { label: "Jail",            group: "civic", cost: 800,  w: 3, h: 3, upkeep: 110, dept: "police",    cells: 400, effects: { crime: 6, radius: 6, landValue: -6 }, powerUse: 3, waterUse: 2 },
   hospital:    { label: "Hospital",        group: "civic", cost: 600,  w: 3, h: 3, upkeep: 150, dept: "health",    service: { kind: "health", radius: 14, strength: 100 }, capacity: { kind: "hospital", seats: 12000 }, powerUse: 6, waterUse: 4 },
   school:      { label: "School",          group: "civic", cost: 250,  w: 3, h: 3, upkeep: 70,  dept: "education", service: { kind: "education", radius: 12, strength: 80 }, capacity: { kind: "school", seats: 1500 }, powerUse: 3, waterUse: 2 },
   college:     { label: "College",         group: "civic", cost: 1000, w: 4, h: 4, upkeep: 140, dept: "education", service: { kind: "education", radius: 18, strength: 100 }, capacity: { kind: "college", seats: 5000 }, powerUse: 6, waterUse: 4 },
@@ -114,7 +119,7 @@ export const BUILDINGS = {
   aquarium:    { label: "Aquarium",        group: "landmark", cost: 9000,  w: 3, h: 3, upkeep: 60,  dept: "parks", unique: true, requiresWater: true, service: { kind: "park", radius: 10, strength: 80 }, effects: { landValue: 10, radius: 8, demand: { commercial: 5 }, jobs: 80 }, powerUse: 5, waterUse: 6 },
 
   // Business deals: offered by petitioners; pay monthly but cost the city otherwise.
-  prison:      { label: "Maximum Security Prison", group: "special", cost: 0, w: 4, h: 4, upkeep: 0, dept: "police", unique: true, offer: { income: 600 }, effects: { crime: 18, radius: 10, landValue: -12, jobs: 120 }, powerUse: 6, waterUse: 4 },
+  prison:      { label: "Maximum Security Prison", group: "special", cost: 0, w: 4, h: 4, upkeep: 0, dept: "police", unique: true, offer: { income: 600 }, cells: 1200, effects: { crime: 18, radius: 10, landValue: -12, jobs: 120 }, powerUse: 6, waterUse: 4 },
   casino:      { label: "Casino",          group: "special", cost: 0,    w: 3, h: 3, upkeep: 0,   dept: "parks", unique: true, offer: { income: 450 }, effects: { crime: 10, radius: 8, jobs: 200, traffic: 20, happiness: -1 }, powerUse: 6, waterUse: 3 },
   toxicdump:   { label: "Toxic Waste Dump", group: "special", cost: 0,   w: 3, h: 3, upkeep: 0,   dept: "sanitation", unique: true, offer: { income: 550 }, effects: { pollution: 55, radius: 9, landValue: -15, jobs: 30 }, garbage: 200 },
   armybase:    { label: "Army Base",       group: "special", cost: 0,    w: 5, h: 5, upkeep: 0,   dept: "police", unique: true, offer: { income: 350 }, effects: { crime: 6, radius: 8, pollution: 12, jobs: 400, landValue: -5 }, powerUse: 8, waterUse: 6 },
