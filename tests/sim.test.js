@@ -289,7 +289,7 @@ describe("economy", () => {
     const s = getStats(c);
     assert.ok(s.budget.income.residential > 0);
     assert.ok(s.budget.expenses.police > 0);
-    assert.ok(s.budget.expenses.transport > 0);
+    assert.ok(s.budget.expenses.road > 0);
     assert.equal(s.balance, s.income - s.expenses);
   });
   test("funding scales department cost and coverage", () => {

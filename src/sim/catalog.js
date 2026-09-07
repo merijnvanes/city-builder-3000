@@ -46,21 +46,21 @@ export const DRAW = {
 // capacity = { kind, seats }: how many students or patients the building can
 // take, which caps education and health however wide its coverage reaches.
 export const BUILDINGS = {
-  road:        { label: "Road",            group: "transport", cost: 10,   w: 1, h: 1, upkeep: 0.5, dept: "transport", path: true, water: true },
-  rail:        { label: "Rail",            group: "transport", cost: 25,   w: 1, h: 1, upkeep: 1,   dept: "transport", path: true },
-  highway:     { label: "Highway",         group: "transport", cost: 60,   w: 1, h: 1, upkeep: 2,   dept: "transport", path: true, water: true },
+  road:        { label: "Road",            group: "transport", cost: 10,   w: 1, h: 1, upkeep: 0.5, dept: "road", path: true, water: true },
+  rail:        { label: "Rail",            group: "transport", cost: 25,   w: 1, h: 1, upkeep: 1,   dept: "transit", path: true },
+  highway:     { label: "Highway",         group: "transport", cost: 60,   w: 1, h: 1, upkeep: 2,   dept: "road", path: true, water: true },
   // "Highways may be built over roads, but if you want your Sims to be able
   // to get from one to the other, the intersection requires an on-ramp."
-  onramp:      { label: "On-Ramp",         group: "transport", cost: 120,  w: 1, h: 1, upkeep: 3,   dept: "transport", path: true, ramp: true },
+  onramp:      { label: "On-Ramp",         group: "transport", cost: 120,  w: 1, h: 1, upkeep: 3,   dept: "road", path: true, ramp: true },
   // Bored through high ground, six tiles at least. Cost is per tile of bore.
-  tunnel:      { label: "Road Tunnel",     group: "transport", cost: 220,  w: 1, h: 1, upkeep: 2,   dept: "transport", bores: "road" },
-  railtunnel:  { label: "Rail Tunnel",     group: "transport", cost: 260,  w: 1, h: 1, upkeep: 2,   dept: "transport", bores: "rail" },
-  bus:         { label: "Bus Stop",        group: "transport", cost: 150,  w: 1, h: 1, upkeep: 5,   dept: "transport", service: { kind: "bus", radius: 8 }, powerUse: 1 },
-  railstation: { label: "Rail Station",    group: "transport", cost: 500,  w: 2, h: 2, upkeep: 15,  dept: "transport", service: { kind: "rail", radius: 10 }, powerUse: 4 },
-  subway:      { label: "Subway",          group: "transport", cost: 40,   w: 1, h: 1, upkeep: 1,   dept: "transport", path: true, overlay: true, underground: true },
-  substation:  { label: "Subway Station",  group: "transport", cost: 400,  w: 1, h: 1, upkeep: 12,  dept: "transport", service: { kind: "rail", radius: 8 }, powerUse: 3 },
-  airport:     { label: "Airport",         group: "transport", cost: 10000, w: 6, h: 5, upkeep: 200, dept: "transport", unique: true, effects: { jobs: 500, traffic: 40, pollution: 25, radius: 8, demand: { commercial: 18 } }, powerUse: 12, waterUse: 6 },
-  seaport:     { label: "Seaport",         group: "transport", cost: 5000, w: 4, h: 4, upkeep: 120, dept: "transport", unique: true, requiresWater: true, effects: { jobs: 350, traffic: 25, pollution: 15, radius: 6, demand: { industrial: 18 } }, powerUse: 8, waterUse: 4 },
+  tunnel:      { label: "Road Tunnel",     group: "transport", cost: 220,  w: 1, h: 1, upkeep: 2,   dept: "road", bores: "road" },
+  railtunnel:  { label: "Rail Tunnel",     group: "transport", cost: 260,  w: 1, h: 1, upkeep: 2,   dept: "transit", bores: "rail" },
+  bus:         { label: "Bus Stop",        group: "transport", cost: 150,  w: 1, h: 1, upkeep: 5,   dept: "transit", service: { kind: "bus", radius: 8 }, powerUse: 1 },
+  railstation: { label: "Rail Station",    group: "transport", cost: 500,  w: 2, h: 2, upkeep: 15,  dept: "transit", service: { kind: "rail", radius: 10 }, powerUse: 4 },
+  subway:      { label: "Subway",          group: "transport", cost: 40,   w: 1, h: 1, upkeep: 1,   dept: "transit", path: true, overlay: true, underground: true },
+  substation:  { label: "Subway Station",  group: "transport", cost: 400,  w: 1, h: 1, upkeep: 12,  dept: "transit", service: { kind: "rail", radius: 8 }, powerUse: 3 },
+  airport:     { label: "Airport",         group: "transport", cost: 10000, w: 6, h: 5, upkeep: 200, dept: "transit", unique: true, effects: { jobs: 500, traffic: 40, pollution: 25, radius: 8, demand: { commercial: 18 } }, powerUse: 12, waterUse: 6 },
+  seaport:     { label: "Seaport",         group: "transport", cost: 5000, w: 4, h: 4, upkeep: 120, dept: "transit", unique: true, requiresWater: true, effects: { jobs: 350, traffic: 25, pollution: 15, radius: 6, demand: { industrial: 18 } }, powerUse: 8, waterUse: 4 },
 
   // lifespan is in years: a plant runs at full output for the first 55% of it,
   // then slides to 35% of nameplate capacity. Query one to see the gap.
@@ -141,8 +141,11 @@ export const BUILDINGS = {
 
 export const SPECIAL_TYPES = Object.entries(BUILDINGS).filter(([, b]) => b.reward || b.offer).map(([id]) => id);
 
-export const DEPARTMENTS = ["police", "fire", "health", "education", "transport", "utilities", "sanitation", "parks"];
-export const FUNDED_DEPARTMENTS = ["police", "fire", "health", "education", "transport", "sanitation"];
+export const DEPARTMENTS = ["police", "fire", "health", "education", "road", "transit", "utilities", "sanitation", "parks"];
+// "The Mayor makes the final decision on how to fund six city services":
+// Education, Public Health, Fire, Road, Police and Mass Transit. Utilities,
+// sanitation and parks cost what they cost; there is no slider for them.
+export const FUNDED_DEPARTMENTS = ["police", "fire", "health", "education", "road", "transit"];
 
 // Tools shown in the UI. Zones and demolition are not buildings.
 export const TOOLS = [

@@ -17,7 +17,7 @@ const DRIFT = 0.12;
 // Condition the current road budget will sustain, 0..100. Paying more than
 // the department asks for buys nothing: the surplus is waste.
 export function targetCondition(city) {
-  const pct = Math.min(1, Math.max(0, (city.funding?.transport ?? 100) / 100));
+  const pct = Math.min(1, Math.max(0, (city.funding?.road ?? 100) / 100));
   return WORST + (100 - WORST) * pct;
 }
 
@@ -30,7 +30,7 @@ export function advanceRoads(city) {
   city.roadCondition = Math.round(Math.max(WORST, Math.min(100, after)) * 100) / 100;
   const news = [];
   for (const [mark, message] of [[45, "The roads are breaking up. Traffic is crawling over the potholes."],
-                                 [70, "Road surfaces are deteriorating. Raise the transport budget."]]) {
+                                 [70, "Road surfaces are deteriorating. Raise the road budget."]]) {
     if (before > mark && city.roadCondition <= mark) { news.push(message); break; }
   }
   if (before < 92 && city.roadCondition >= 92) news.push("Road repairs are complete; the network is in good order.");

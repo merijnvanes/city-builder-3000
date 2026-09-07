@@ -668,7 +668,7 @@ export function mountUI(actions) {
   [
     ["income.residential", "Residential tax"], ["income.commercial", "Commercial tax"], ["income.industrial", "Industrial tax"], ["income.ordinances", "Ordinance income"], ["income.deals", "Business deals"],
     ["expenses.police", "Police"], ["expenses.fire", "Fire"], ["expenses.health", "Health"], ["expenses.education", "Education"],
-    ["expenses.transport", "Transportation"], ["expenses.utilities", "Utilities"], ["expenses.sanitation", "Sanitation"], ["expenses.parks", "Parks"],
+    ["expenses.road", "Roads"], ["expenses.transit", "Mass transit"], ["expenses.utilities", "Utilities"], ["expenses.sanitation", "Sanitation"], ["expenses.parks", "Parks"],
     ["expenses.ordinances", "Ordinance costs"], ["expenses.loans", "Loan payments"],
     ["income.neighbors", "Neighbor sales"], ["expenses.neighbors", "Neighbor purchases"],
   ].forEach(([k, label]) => {

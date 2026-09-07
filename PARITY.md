@@ -16,7 +16,7 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 | Commerce | Shops and offices, sorted by density and land value | **Done.** See below |
 | Industry | Farms, heavy industry, manufacturing and high tech, the last attracted by an educated workforce | **Done.** See below |
 
-| Budget | Over-funding wastes money; the road budget keeps roads from falling apart | **Done.** See below |
+| Budget | Six named services; over-funding wastes money; the road budget keeps roads from falling apart | **Done.** See below |
 | Zone stages | Land value gates how far a zone builds out within its density | **Done.** See below |
 | Waste | Landfills store trash, fill up, decompose and cannot be bulldozed; incinerators age | **Done.** See below |
 | Aura | A per-neighbourhood mood map whose average is the mayoral approval rating | **Done.** See below |
@@ -282,6 +282,23 @@ corner shop does not become a tower and back again every decade. Without that,
 the office share oscillated: offices bring less pollution, which raises land
 value, which attracts more offices, and the loop overshoots in both
 directions.
+
+## Six city services, September 7
+
+*"The Mayor makes the final decision on how to fund six city services"*, and
+the manual names them: Education, Public Health, Fire, Road, Police, Mass
+Transit. The game had six sliders, but not those six: one merged Transport
+covering everything from kerbstones to airports, plus a Sanitation slider the
+original does not have.
+
+Transport splits. **Road** pays for roads, highways, ramps and road tunnels,
+and is what keeps the surface from breaking up. **Mass transit** pays for
+rail, stations, subways, buses, the airport and the seaport, and starving it
+shrinks the reach of every stop and station.
+
+Sanitation loses its slider, as in the original. Landfills, incinerators and
+recycling centres cost what they cost and work at full effect; garbage is a
+building problem, not a budget one.
 
 ## Visual and performance work, September 7
 
