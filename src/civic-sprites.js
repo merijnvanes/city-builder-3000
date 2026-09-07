@@ -91,9 +91,15 @@ export function civicSpriteStats() {
   return { entries: entries.size, decodedBytes: bytes, maxDecodedBytes: MAX_DECODED_BYTES };
 }
 
-export function drawCivicSprite(r, t) {
+// Drawing, culling heights and shadow direction must agree on eligibility.
+export function civicSpriteSpec(t) {
   const spec = CIVIC_SPRITES[t.type];
-  if (!spec || !t.lot || !r.base?.drawImage || t.lot.w !== (spec.footprint?.w ?? spec.tiles) || t.lot.h !== (spec.footprint?.h ?? spec.tiles)) return null;
+  return spec && t.lot && t.lot.w === (spec.footprint?.w ?? spec.tiles) && t.lot.h === (spec.footprint?.h ?? spec.tiles) ? spec : null;
+}
+
+export function drawCivicSprite(r, t) {
+  const spec = civicSpriteSpec(t);
+  if (!spec || !r.base?.drawImage) return null;
   const state = r.night ? t.powered === false ? 'unpowered' : 'night' : 'day';
   const entry = requestFrame(t.type, state, r.rotation || 0, r.atlasOwner || r, spriteVariant(t, spec.variants?.length || 1));
   if (!entry?.canvas) return null;

@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { CIVIC_SPRITES } from '../src/civic-sprite-manifest.js';
-import { drawCivicSprite, preloadCivicSprites } from '../src/civic-sprites.js';
+import { drawCivicSprite, preloadCivicSprites, civicSpriteSpec } from '../src/civic-sprites.js';
+import { heightOf } from '../src/building-art.js';
 import { CityRenderer } from '../src/renderer.js';
 
 test('rectangular frames retain their scale and world-center anchor in every view', async () => {
@@ -37,5 +38,20 @@ test('rectangular frames retain their scale and world-center anchor in every vie
   } finally {
     delete CIVIC_SPRITES.rectangleFixture;
     globalThis.Image = previousImage; globalThis.document = previousDocument;
+  }
+});
+
+
+test('unmatched ports retain procedural height and shadow eligibility', () => {
+  for (const [type, w, h, fallbackHeight] of [['airport', 6, 5, 18], ['seaport', 4, 4, 16]]) {
+    const tile = { type, lot: { x: 0, y: 0, w, h } };
+    assert.equal(civicSpriteSpec(tile), CIVIC_SPRITES[type]);
+    assert.equal(heightOf(tile), CIVIC_SPRITES[type].height);
+    for (const lot of [{ ...tile.lot, w: 8, h: 8 }, { ...tile.lot, w: w + 1 }]) {
+      assert.equal(civicSpriteSpec({ ...tile, lot }), null);
+      assert.equal(heightOf({ ...tile, lot }), fallbackHeight);
+    }
+    assert.equal(civicSpriteSpec({ type }), null);
+    assert.equal(heightOf({ type }), 0);
   }
 });

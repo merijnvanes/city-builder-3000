@@ -1,4 +1,4 @@
-import { CIVIC_SPRITES } from './civic-sprite-manifest.js';
+import { civicSpriteSpec } from './civic-sprites.js';
 import { drawMapBackdrop, drawBoat, drawOutageMarkers, drawAirplane } from "./scene-art.js";
 // Isometric Canvas 2D renderer. Static ground and buildings are painted into
 // a cache whenever the city revision changes; animated cars, water sparkle,
@@ -461,9 +461,10 @@ export class CityRenderer {
       if (h) {
         const { w, h: d } = t.lot;
         const a = this.project(t.x + 0.15, t.y + 0.15), b = this.project(t.x + w - 0.15, t.y + 0.15), c = this.project(t.x + w - 0.15, t.y + d - 0.15), e = this.project(t.x + 0.15, t.y + d - 0.15);
-        const dx = (CIVIC_SPRITES[t.type] ? 1 : -1) * h * 0.3 * this.zoom, dy = h * 0.15 * this.zoom;
+        const authored = civicSpriteSpec(t);
+        const dx = (authored ? 1 : -1) * h * 0.3 * this.zoom, dy = h * 0.15 * this.zoom;
         let shadow = [a, b, c, { x: c.x + dx, y: c.y + dy }, { x: e.x + dx, y: e.y + dy }, e];
-        if (CIVIC_SPRITES[t.type]) {
+        if (authored) {
           // New civic assets establish a soft upper-left key light. Extrude
           // the screen-right edge regardless of the map's current rotation.
           const corners = [a, b, c, e].sort((p, q) => p.y - q.y);

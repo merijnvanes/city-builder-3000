@@ -9,7 +9,8 @@ try {
   await page.waitForFunction(() => window.civic);
   const results = await page.evaluate(async () => {
     const { CityRenderer } = await import('/src/renderer.js');
-    const { preloadCivicSprites } = await import('/src/building-art.js');
+    const { preloadCivicSprites, civicSpriteSpec } = await import('/src/building-art.js');
+    const { spriteVariant } = await import('/src/architecture-variation.js');
     const canvas = document.createElement('canvas');
     canvas.style.cssText = 'position:fixed;inset:0;width:1440px;height:1000px;z-index:99999';
     document.body.append(canvas);
@@ -35,8 +36,16 @@ try {
       r.focusOn(built.reduce((s, t) => s + t.x, 0) / built.length, built.reduce((s, t) => s + t.y, 0) / built.length, 0.85);
       if (!Number.isFinite(r.panX + r.panY)) throw new Error("Benchmark camera must be finite");
       for (const night of [false, true]) {
-        await preloadCivicSprites({ night });
-        r.night = night; r.paint(city);
+        r.night = night;
+        const requests = new Map();
+        for (const tile of city.tiles) {
+          if (tile.lot?.x !== tile.x || tile.lot?.y !== tile.y) continue;
+          const spec = civicSpriteSpec(tile); if (!spec) continue;
+          const variant = spriteVariant(tile, spec.variants?.length || 1), powered = tile.powered !== false;
+          requests.set(`${tile.type}:${variant}:${powered}`, { types: [tile.type], variant, powered, night, owner: r });
+        }
+        await Promise.all([...requests.values()].map(request => preloadCivicSprites(request)));
+        r.paint(city);
         const paint = [], idle = [], intervals = [];
         for (let i = 0; i < 40; i++) {
           r.pan(1, 0);

@@ -31,7 +31,7 @@ monument: houses should feel domestic and industrial plants should reveal proces
 
 This is a migration checklist from `src/sim/catalog.js` on the civic-art branch.
 Reconcile it with the current catalog and rendering dispatch before implementing;
-another agent is developing the simulation on `main`. Power, water and parks are complete; other rows remain to do.
+another agent is developing the simulation on `main`. Power, water, parks and fixed-lot transport are complete; other rows remain to do.
 The twelve catalog entries in group `civic` are also done; similarly named
 rewards and landmarks are separate assets.
 
@@ -42,7 +42,7 @@ rewards and landmarks are separate assets.
 | Industrial zones | All three densities, levels 1–4 and variants; preserve both 3×3 low-density farms and 1×1 workshops |
 | Power | Complete: `coal`, `oil`, `gas`, `nuclear`, `wind`, `solar`, `microwave`, `fusion`; see [POWER-ART.md](POWER-ART.md) |
 | Water | Complete: `waterpump`, `watertower`, `desalination`, `treatment`; see [WATER-ART.md](WATER-ART.md) |
-| Transport buildings | `bus`, `railstation`, `substation`, `airport` (6×5), `seaport` |
+| Transport buildings | Complete on this branch: `bus`, `railstation`, `substation`, `airport` (6×5), `seaport`; see [TRANSPORT-ART.md](TRANSPORT-ART.md) for the growing-port integration boundary |
 | Parks | Complete: `park` (three layouts), `largepark`, `zoo`; see [PARKS-ART.md](PARKS-ART.md) |
 | Rewards | `mayorhouse`, `cityhall`, `courthouse`, `stadium`, `statue`, `marina`, `university`, `medcenter` |
 | Landmarks | `clocktower`, `operahouse`, `observatory`, `cathedral`, `aquarium` |
@@ -61,7 +61,7 @@ committing and pushing it.
 
 ## Pipeline extension requirements
 
-The `tools/civic_art/registry.json` registry covers twelve civic, eight power, four water and three park
+The `tools/civic_art/registry.json` registry covers twelve civic, eight power, four water, three park and five transport
 assets. The shared export, loader and gallery support legacy square lots (1×1,
 2×2, 3×3 and 4×4) and explicit rectangular footprint metadata. New families still need explicit coverage and contract checks. Share primitives and export machinery;
 keep authored models in small family modules. Avoid a second divergent renderer

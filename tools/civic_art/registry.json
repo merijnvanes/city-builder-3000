@@ -204,5 +204,70 @@
     "family": "parks",
     "label": "Zoo",
     "description": "Twin entrance lodges, an open aviary, elephant and giraffe habitats, and a rocky penguin pool."
+  },
+  "bus": {
+    "family": "transport",
+    "module": "transport",
+    "tiles": 1,
+    "label": "Bus Stop",
+    "description": "A cantilevered glass shelter with sheltered seats, timetable and a clear boarding edge."
+  },
+  "substation": {
+    "family": "transport",
+    "module": "transport",
+    "tiles": 1,
+    "label": "Subway Station",
+    "description": "An open stair descends beneath a teal metro portal, with handrails and a ticket machine."
+  },
+  "railstation": {
+    "family": "transport",
+    "module": "transport",
+    "tiles": 2,
+    "label": "Rail Station",
+    "description": "A brick ticket hall with a clock gable and a butterfly canopy over the boarding platform."
+  },
+  "airport": {
+    "family": "transport",
+    "module": "transport_ports",
+    "footprint": {
+      "w": 6,
+      "h": 5
+    },
+    "label": "Airport",
+    "description": "A glazed terminal, control tower, hangar and marked runway on a rectangular airfield."
+  },
+  "seaport": {
+    "family": "transport",
+    "module": "transport_ports",
+    "tiles": 4,
+    "label": "Seaport",
+    "description": "A working cargo yard with brick freight shed, stacked containers and a braced loading gantry.",
+    "variants": [
+      {
+        "model": "seaport",
+        "label": "Cargo arrangement 1",
+        "description": "Five original deterministic container palettes, with shared yard circulation and lifting equipment."
+      },
+      {
+        "model": "seaport_v1",
+        "label": "Cargo arrangement 2",
+        "description": "Five original deterministic container palettes, with shared yard circulation and lifting equipment."
+      },
+      {
+        "model": "seaport_v2",
+        "label": "Cargo arrangement 3",
+        "description": "Five original deterministic container palettes, with shared yard circulation and lifting equipment."
+      },
+      {
+        "model": "seaport_v3",
+        "label": "Cargo arrangement 4",
+        "description": "Five original deterministic container palettes, with shared yard circulation and lifting equipment."
+      },
+      {
+        "model": "seaport_v4",
+        "label": "Cargo arrangement 5",
+        "description": "Five original deterministic container palettes, with shared yard circulation and lifting equipment."
+      }
+    ]
   }
 }

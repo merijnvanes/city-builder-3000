@@ -31,3 +31,14 @@ test('single-layout assets keep legacy frame keys; variants have distinct stable
     assert.equal(spriteFrameKey(state,rotation,2),`${state}-${rotation}-v2`);
   }
 });
+
+
+test('seaport cargo palettes preserve all five normalized seed ranges', () => {
+  for (let index = 0; index < 5; index++) {
+    const tile = { x: 7, y: 13, variant: index / 5 };
+    assert.equal(spriteVariant(tile, 5), index);
+    assert.equal(spriteVariant(JSON.parse(JSON.stringify(tile)), 5), index);
+    if (index) assert.equal(spriteVariant({ ...tile, variant: index / 5 - Number.EPSILON }, 5), index - 1);
+  }
+  for (let x = 0; x < 20; x++) assert.equal(spriteVariant({ x, y: 13 }, 5), Math.floor(random(x, 13) * 5));
+});

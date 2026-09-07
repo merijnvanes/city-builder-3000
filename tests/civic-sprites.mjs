@@ -62,8 +62,10 @@ try {
     const pinnedCanvas = pinned.pickables[0].canvas;
     const hashes = [];
     for (const state of ['day', 'night', 'unpowered']) for (let rotation = 0; rotation < 4; rotation++) {
-      await preloadCivicSprites({ rotation, night: state !== 'day', powered: state !== 'unpowered' });
       for (const [type, spec] of Object.entries(CIVIC_SPRITES)) {
+        // The whole catalog no longer fits at once; exercise on-demand loads
+        // and LRU churn without requiring every family to stay resident.
+        await preloadCivicSprites({ types: [type], variant: 0, rotation, night: state !== 'day', powered: state !== 'unpowered' });
         r.rotation = rotation; r.night = state !== 'day'; r.pickables = [];
         drawCachedArchitecture(r, { ...tile, type, powered: state !== 'unpowered', lot: { x: 0, y: 0, w: spec.footprint?.w ?? spec.tiles, h: spec.footprint?.h ?? spec.tiles } }, { tiles: [] });
         if (!r.pickables[0]?.canvas) throw new Error(`${type} ${state} ${rotation}: missing sprite`);
