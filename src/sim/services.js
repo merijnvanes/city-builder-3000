@@ -238,14 +238,25 @@ export function updateServices(city) {
   }
 
   // ── Crime ─────────────────────────────────────────────────────
+  //
+  // "Enacting some ordinances can reduce crime, though you should weigh the
+  // cost of the ordinance against the cost of providing additional police
+  // protection. Be aware that some ordinances, like some buildings, tend to
+  // increase crime levels."
+  //
+  // Three of them say so on their own cards. The Neighborhood Watch names its
+  // figure; the curfew promises "a little", which has to be worse than the
+  // Watch or nobody would pay two points of approval for it; and legalized
+  // gambling promises the city trouble in exchange for the money, on the scale
+  // of the casino it lets in (crime 10 over a radius of 8).
   const unemployment = city._traffic?.unemployment ?? 0;
-  const watch = ord.neighborhoodWatch ? 0.85 : 1;
+  const lawful = (ord.neighborhoodWatch ? 0.85 : 1) * (ord.youthCurfew ? 0.92 : 1) * (ord.gambling ? 1.15 : 1);
   for (const t of tiles) {
     if (!ZONE_TYPES.has(t.type) || !t.lot) { t.crime = 0; continue; }
     let c = 4 + t.density * 5 + (100 - baseValue[t.y * size + t.x]) * 0.18 + unemployment * 0.35 + crimeBump[t.y * size + t.x];
     if (t.abandoned) c += 20;
     c -= t.svc.police * 0.55;
-    c *= watch;
+    c *= lawful;
     t.crime = Math.max(0, Math.min(100, Math.round(c)));
   }
   for (const t of tiles) t.landValue = Math.max(0, Math.min(100, Math.round(baseValue[t.y * size + t.x] - t.crime * 0.2)));

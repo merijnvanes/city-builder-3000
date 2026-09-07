@@ -986,6 +986,45 @@ every year. Adult decay is real and visible — EQ falls 55 to 52.5 in five year
 57.4 by year 25. The rig now bulldozes the teaching buildings, which is what it
 always claimed to be measuring.
 
+### Two ordinances charged for nothing, September 7
+
+An ordinance is a promise printed on a button. The player reads it, pays for it
+every month, and has no way to check. Auditing all twenty against their own
+description found two that were charging for a effect that did not exist:
+
+- **Youth Curfew**, *"Lowers crime a little; residents grumble."* The grumbling
+  worked. The word `youthCurfew` appeared nowhere in the crime model.
+- **Legalized Gambling**, *"Earns $0.05 per resident. Raises crime."* The money
+  worked. `gambling` appeared nowhere in the crime model either.
+
+Both directions are in the manual:
+
+> *"Enacting some ordinances can reduce crime, though you should weigh the cost
+> of the ordinance against the cost of providing additional police protection.
+> Be aware that some ordinances, like some buildings, tend to increase crime
+> levels."*
+
+"Like some buildings" gives the scale: the casino this ordinance lets in carries
+`crime: 10` over a radius of 8. Crime now multiplies by 0.92 under a curfew and
+1.15 under legalized gambling, beside the Neighborhood Watch's 0.85. Measured
+over five years on seed 21: the Watch −14% (it claims 15%), the curfew −5%
+("a little", and worse than the Watch, which it has to be or nobody would pay
+two points of approval for it), gambling +19% against $804 a month.
+
+The other eighteen hold up. Measured: energy and water conservation cut demand
+by exactly 15%, carpooling −10% and alternate-day driving −30%, the Fire Code
+−30% on flammability, the Clean Air Act −22% on pollution, Tourism Promotion
+commercial demand 28 → 36. Three needed a rig the first sweep did not give
+them and are fine: the Recycling Program cuts garbage *production* by exactly
+25% (the displayed figure is a ratio, so it only moves five points), Trash
+Presort has nothing to prove once two recycling centres already take a starter
+town to zero, and the Pro-Reading Campaign moves EQ 59.9 → 61.2 over ten years
+because coverage teaches children and children take a working lifetime to
+become the workforce.
+
+`tests/ordinances.test.js` now measures each headline claim against a city that
+differs only by that one law.
+
 ## Visual and performance work, September 7
 
 - Preserved and verified the previous agent's query-card sizing/rotation work.
