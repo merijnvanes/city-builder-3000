@@ -7,7 +7,7 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 | Area | Reference behavior | Current gap |
 | --- | --- | --- |
 | Highways | Elevated routes; ramps provide road access | **Done.** Streets and highways interchange only at on-ramps |
-| Tunnels | Transport can pass through terrain | No tunnel construction or routing |
+| Tunnels | Transport can pass through terrain | **Done.** Road and rail bores through high ground, six tiles minimum |
 | Power | Eight plant types; aging reduces capacity; prolonged overload can destroy plants | **Done.** All eight types with the manual's invention years; output slides after 55% of a plant's life; a year of overdraw destroys one |
 | Water | Freshwater pumps, towers, coastal desalinization; pumps age | **Done.** Sea and fresh water are distinct; three sources with the manual's weaknesses; pumps age and slow in dirty water; pipes reach seven tiles |
 | Education | Childhood learning and adult knowledge retention; strikes from sustained underfunding | **Done.** EQ is taught to children aged 5-17, colleges take 18-22, adults decay without libraries or museums, and teachers strike after 18 months below 40% funding |
@@ -231,7 +231,29 @@ access, power jumps it, it carries traffic and pollution, and it costs
 transport upkeep. Highways still give no lot access on their own.
 
 Still open here: highways are not yet drawn elevated over the roads they
-cross, and tunnels through steep ground are not implemented.
+cross.
+
+## Tunnels, September 7
+
+*"A road or rail tunnel will be recommended by the city engineers when
+traversing mountainous terrain... If the underground distance is sufficient
+for the tunnel to be constructed, six tiles minimum, the city engineers will
+ask if you wish to bore a tunnel and let you know the cost."*
+
+Before a tunnel could be worth anything, hills had to cost something. The
+router now charges a step per level climbed and again per level descended, so
+a route over a ridge is slower than the same distance on the flat.
+
+The tunnel tools then look straight ahead from where you click for the first
+level ground with at least six tiles of higher ground in between, quote a
+price per tile of bore, and cut it: an entrance, an exit, and a line beneath
+the untouched hillside. Nothing joins that line except at the two portals.
+
+Measured on a ridge eight tiles wide and eight levels high, with jobs near the
+edge of a worker's range: on the flat every worker reaches a job, over the
+ridge 23 of 154 cannot, and through the bore every one does again.
+
+Portals are drawn as a retaining wall with the bore cut into it.
 
 ## Visual and performance work, September 7
 

@@ -52,6 +52,9 @@ export const BUILDINGS = {
   // "Highways may be built over roads, but if you want your Sims to be able
   // to get from one to the other, the intersection requires an on-ramp."
   onramp:      { label: "On-Ramp",         group: "transport", cost: 120,  w: 1, h: 1, upkeep: 3,   dept: "transport", path: true, ramp: true },
+  // Bored through high ground, six tiles at least. Cost is per tile of bore.
+  tunnel:      { label: "Road Tunnel",     group: "transport", cost: 220,  w: 1, h: 1, upkeep: 2,   dept: "transport", bores: "road" },
+  railtunnel:  { label: "Rail Tunnel",     group: "transport", cost: 260,  w: 1, h: 1, upkeep: 2,   dept: "transport", bores: "rail" },
   bus:         { label: "Bus Stop",        group: "transport", cost: 150,  w: 1, h: 1, upkeep: 5,   dept: "transport", service: { kind: "bus", radius: 8 }, powerUse: 1 },
   railstation: { label: "Rail Station",    group: "transport", cost: 500,  w: 2, h: 2, upkeep: 15,  dept: "transport", service: { kind: "rail", radius: 10 }, powerUse: 4 },
   subway:      { label: "Subway",          group: "transport", cost: 40,   w: 1, h: 1, upkeep: 1,   dept: "transport", path: true, overlay: true, underground: true },
@@ -150,7 +153,7 @@ export const TOOLS = [
   ...Object.entries(BUILDINGS).map(([id, b]) => ({
     id, label: b.label, cost: b.cost, group: b.group,
     description: `${b.label} ($${b.cost.toLocaleString()}${b.path || b.rect ? " per tile" : ""}${b.w > 1 ? `, ${b.w}×${b.h}` : ""})`,
-    shortcut: { road: "r", rail: "t", highway: "y", onramp: "g", coal: "e", waterpump: "u", police: "l", fire: "f", park: "p", powerline: "w", pipe: "q", dispatch: "x" }[id] || "",
+    shortcut: { road: "r", rail: "t", highway: "y", onramp: "g", tunnel: "j", coal: "e", waterpump: "u", police: "l", fire: "f", park: "p", powerline: "w", pipe: "q", dispatch: "x" }[id] || "",
     w: b.w, h: b.h,
   })),
   { id: "bulldoze",    label: "Bulldoze",       cost: 5,  group: "demolish",  description: "Demolish ($5 per tile plus building fee)", shortcut: "b" },

@@ -20,7 +20,7 @@ const RAIL_PER_POINT = 20;   // trains carry more per tile
 const HIGHWAY_PER_POINT = 18;
 
 // Travel cost per tile: highways, rail and subways are twice as fast as streets.
-const ROAD = 1, RAIL = 2, STATION = 3, HIGHWAY = 4, SUBSTATION = 5, TUNNEL = 6, RAMP = 7;
+const ROAD = 1, RAIL = 2, STATION = 3, HIGHWAY = 4, SUBSTATION = 5, TUNNEL = 6, RAMP = 7, BORE = 8;
 
 // Cost of entering a tile of each kind, indexed by the constants above.
 // Highways, rail and tunnels move people at twice the speed of a street.
@@ -29,6 +29,8 @@ STEP_COST[0] = 0;
 STEP_COST[ROAD] = 2; STEP_COST[RAIL] = 1; STEP_COST[STATION] = 2;
 STEP_COST[HIGHWAY] = 1; STEP_COST[SUBSTATION] = 2; STEP_COST[TUNNEL] = 1;
 STEP_COST[RAMP] = 2;
+// A bore runs flat under the hill, so it never pays the climbing penalty.
+STEP_COST[BORE] = 2;
 const MAX_COST = MAX_TRIP * 2;
 
 // Nearest road tile index within reach of a lot, or -1.
@@ -56,6 +58,7 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
     else if (t.type === "highway") kind[i] = HIGHWAY;
     else if (t.type === "substation") kind[i] = SUBSTATION;
     else if (t.type === "onramp") kind[i] = RAMP;
+    else if (t.tunnel) kind[i] = BORE;
     if (t.subway || t.type === "substation") kind[N + i] = TUNNEL;
   }
 
@@ -111,6 +114,9 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
     // to get from one to the other, the intersection requires an on-ramp."
     // A ramp is the only tile both a street and a highway will step onto.
     if (a === RAMP || b === RAMP) return true;
+    // A bore is a road or rail line under the hill. It joins the portals at
+    // its ends and the rest of its own run; nothing enters it from above.
+    if (a === BORE || b === BORE) return true;
     if ((a === HIGHWAY) !== (b === HIGHWAY)) return false;
     return true; // road <-> road, highway <-> highway
   };
@@ -168,7 +174,11 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
           }
           for (const ni of neighborsOf(i)) {
             if (settled[ni]) continue;
-            const nd = d + STEP_COST[kind[ni]] + (jam && jam[ni] ? 1 : 0);
+            // Climbing a hill costs a step per level. A tunnel avoids it,
+            // which is the whole reason to bore one.
+            const climb = ni < N && i < N && kind[i] !== BORE && kind[ni] !== BORE
+              ? Math.abs((tiles[ni].elev || 0) - (tiles[i].elev || 0)) : 0;
+            const nd = d + STEP_COST[kind[ni]] + climb + (jam && jam[ni] ? 1 : 0);
             if (nd > MAX_COST) continue;
             if (dist[ni] === -1 || nd < dist[ni]) {
               if (dist[ni] === -1) touched.push(ni);
@@ -191,7 +201,7 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
   const surface = roadCapacity(city);
   const trafficOf = (i, load) => {
     const t = tiles[i];
-    if (kind[i] === ROAD || kind[i] === RAMP) { let v = load[i] / (TRAFFIC_PER_POINT * surface) * carScale; if (t.svc?.bus) v *= 0.75; return v; }
+    if (kind[i] === ROAD || kind[i] === RAMP || kind[i] === BORE) { let v = load[i] / (TRAFFIC_PER_POINT * surface) * carScale; if (t.svc?.bus) v *= 0.75; return v; }
     if (kind[i] === HIGHWAY) return load[i] / (HIGHWAY_PER_POINT * surface) * carScale;
     if (kind[i] === RAIL) return load[i] / RAIL_PER_POINT;
     return 0;

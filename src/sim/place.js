@@ -37,6 +37,7 @@ import { lotTiles, assignLot, clearLot, anchorOf } from "./lots.js";
 import { refreshCity } from "./refresh.js";
 import { specialAvailable } from "./events.js";
 import { isLandfill } from "./waste.js";
+import { findBore, bore, MIN_BORE } from "./tunnels.js";
 
 export const DEMOLISH_FEE = 5;
 export const BRIDGE_MULTIPLIER = 5;
@@ -98,6 +99,20 @@ export function evaluate(city, x, y, tool, options = {}) {
     if (t.terrain !== "water") return noop("Already dry land.", here);
     if (t.type !== "empty") return fail("Remove the bridge first.");
     return { ok: true, noop: false, cost: BUILDINGS.makeland.cost, message: "", tiles: here };
+  }
+
+  // "If the underground distance is sufficient for the tunnel to be
+  // constructed, six tiles minimum, the city engineers will ask if you wish
+  // to bore a tunnel and let you know the cost."
+  const bores = BUILDINGS[tool]?.bores;
+  if (bores) {
+    if (t.terrain === "water") return fail("A tunnel has to start on dry land.");
+    const run = findBore(city, x, y, bores);
+    if (!run) return fail(`No high ground to bore through. A tunnel needs at least ${MIN_BORE} tiles of higher ground and level ground on the far side.`);
+    const cost = BUILDINGS[tool].cost * run.length;
+    const tiles = [{ x: run.entrance.x, y: run.entrance.y }, { x: run.exit.x, y: run.exit.y },
+      ...run.buried.map((n) => ({ x: n.x, y: n.y }))];
+    return { ok: true, noop: false, cost, message: `Bore a ${run.length}-tile ${bores} tunnel`, tiles, run };
   }
 
   // An on-ramp is the only place cars move between a street and a highway.
@@ -205,6 +220,8 @@ export function place(city, x, y, tool, options = {}) {
     t.terrain = "sand";
   } else if (tool === "raise" || tool === "lower" || tool === "level") {
     for (const c of ev.changes) c.tile.elev = c.elev;
+  } else if (BUILDINGS[tool]?.bores) {
+    bore(city, ev.run, BUILDINGS[tool].bores);
   } else if (tool === "road" || tool === "rail" || tool === "highway" || tool === "onramp") {
     t.type = tool; t.trees = 0; t.density = 0; t.level = 0;
   } else if (tool === "dispatch") {

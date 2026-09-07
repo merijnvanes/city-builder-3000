@@ -1,5 +1,29 @@
 // Connected street surfaces and small, camera-aware street furniture.
 const DIRECTIONS = [[1, 0], [0, 1], [-1, 0], [0, -1]];
+
+// A portal is a route tile with a bore running out of one side. Draw the
+// mouth of the tunnel into the hillside so the line does not simply stop.
+export function tunnelPortal(t, city) {
+  for (const [dx, dy] of DIRECTIONS) {
+    const x = t.x + dx, y = t.y + dy;
+    if (x < 0 || y < 0 || x >= city.size || y >= city.size) continue;
+    const n = city.tiles[y * city.size + x];
+    if (n.tunnel) return { dx, dy, rail: n.tunnel === 2 };
+  }
+  return null;
+}
+
+export function drawTunnelMouth(r, t, city, portal) {
+  const { x, y } = t, { dx, dy } = portal;
+  // A retaining wall across the hillside, with the dark bore cut into it.
+  const wx = x + 0.5 + dx * 0.42, wy = y + 0.5 + dy * 0.42;
+  const across = 0.34;
+  const ax = dy ? across : 0.06, ay = dx ? across : 0.06;
+  r.box(wx - ax, wy - ay, ax * 2, ay * 2, 9, "#8c8d80");
+  const mx = dy ? 0.2 : 0.05, my = dx ? 0.2 : 0.05;
+  r.box(wx - mx, wy - my, mx * 2, my * 2, 6, "#26302f");
+  r.flat(wx - mx, wy - my, mx * 2, my * 2, 6.1, portal.rail ? "#3a3f42" : "#1d2523");
+}
 export function streetConnections(t, city) {
   return DIRECTIONS.map(([dx, dy]) => {
     const x = t.x + dx, y = t.y + dy;
