@@ -791,6 +791,18 @@ and zero dark years, so the bounds sit well clear of normal variation.
 Checked against the fault it was written for: with the old totals-based
 maintenance, seed 44 breaks all five assertions and the other three seeds pass.
 
+One more thing the harness was measuring by accident: every long-run city sat
+at 85% uncollected garbage from year eight onward. The waste model is right —
+a landfill is a store with a slow drain, not a monthly allowance, so the
+founders' nine tiles hold 45,000 against a city making 590 a month and a tip
+decomposes only `DECAY` a tile a month. Six years of runway, then the streets
+fill up, and the advisor correctly says to zone more or build an incinerator.
+Nothing in the harness was listening. It now builds one, wired to power and
+with a road of its own, and the tips decompose back from 44,910 to 11,430 over
+the following thirty years, which is the manual's *"Over time the landfill will
+decompose all of its accumulated garbage, at which time you can de-zone it."*
+Cities across nine seeds went from 0.83–1.00 end/peak to 0.88–1.00.
+
 `maintainUtilities` in `tests/city-helpers.mjs` was blind in the same way the
 advisor was, and for the same reason. It now reads the worst-off network, and
 places its replacement plant near the grid that is short with a line run back

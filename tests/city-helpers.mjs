@@ -99,9 +99,45 @@ function plantOn(city, near, type = "coal") {
   return false;
 }
 
+// Burn what the tips can no longer bury.
+//
+// "When a landfill is full, garbage will accumulate around the city unless you
+// have other means in place to dispose of it." A landfill is a store with a
+// slow drain, not a monthly allowance: the founders' nine tiles hold 45,000
+// against a city making about 590 a month, and a tip decomposes only DECAY a
+// tile a month. So it buys six years and then the streets fill up, and a
+// starter town left alone sits at 85% uncollected for the rest of its life.
+// A mayor reading the news builds an incinerator, which burns 900 a month.
+//
+// It needs power and a road of its own: "like landfills, incinerators need to
+// be near a road so garbage trucks can deliver garbage to them."
+function burnGarbage(city) {
+  const lit = city.tiles.find((t) => t.powered && t.roadAccess && t.lot);
+  if (!lit) return 0;
+  const { w, h } = BUILDINGS.incinerator;
+  for (let r = 3; r < 30; r++) {
+    for (const [dx, dy] of [[r, 0], [-r, 0], [0, r], [0, -r], [r, r], [-r, -r], [r, -r], [-r, r]]) {
+      const x = lit.x + dx, y = lit.y + dy;
+      if (x < 1 || y < 1 || x + w >= city.size || y + h >= city.size) continue;
+      city.money = 5_000_000;
+      if (!place(city, x, y, "incinerator").ok) continue;
+      for (let i = -1; i <= w; i++) place(city, x + i, y + h, "road");
+      const sx = x + (w >> 1), sy = y + (h >> 1);
+      for (let px = Math.min(sx, lit.x); px <= Math.max(sx, lit.x); px++) place(city, px, sy, "powerline");
+      for (let py = Math.min(sy, lit.y); py <= Math.max(sy, lit.y); py++) place(city, lit.x, py, "powerline");
+      refresh(city);
+      const built = city.tiles[y * city.size + x];
+      if (built.powered && built.roadAccess) return 1;
+      place(city, x, y, "bulldoze");
+      refresh(city);
+    }
+  }
+  return 0;
+}
+
 // Keep the utilities in repair, as a player watching the news would: replace
-// what has worn out, and add capacity before a network is overdrawn long
-// enough to destroy a plant.
+// what has worn out, add capacity before a network is overdrawn long enough to
+// destroy a plant, and keep the garbage off the streets.
 //
 // Read the worst-off network, not the city-wide total. A total says the city
 // has power to spare while the one grid carrying it runs past capacity, which
@@ -109,12 +145,14 @@ function plantOn(city, near, type = "coal") {
 // Returns how many buildings went up.
 export function maintainUtilities(city) {
   let built = replaceWorn(city);
-  const { power, water } = getStats(city).utilities;
+  const stats = getStats(city);
+  const { power, water } = stats.utilities;
   const short = power.worst && power.worst.demand > power.worst.supply * 0.85;
   if (short && plantOn(city, power.worst)) built++;
   if (water.demand > water.supply * 0.85) {
     built += addWaterTowers(city, Math.max(1, Math.ceil((water.demand - water.supply * 0.85) / 500)));
   }
+  if (stats.garbage > 25) built += burnGarbage(city);
   return built;
 }
 
