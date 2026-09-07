@@ -9,7 +9,7 @@ try {
   await page.goto(process.env.CIVIC_TEST_URL || 'http://127.0.0.1:4173');
   const results = await page.evaluate(async () => {
     const { CityRenderer } = await import('/src/renderer.js');
-    const { drawArchitecture } = await import('/src/building-art.js');
+    const { drawArchitecture, shadeHex, NIGHT_EXPOSURE } = await import('/src/building-art.js');
     document.body.replaceChildren();
     document.documentElement.style.cssText = 'height:auto;overflow:visible';
     Object.assign(document.body.style, { display: 'grid', gridTemplateColumns: 'repeat(4, 300px)', background: '#20313d', margin: '0', height: 'auto', overflow: 'visible' });
@@ -31,26 +31,28 @@ try {
       drawArchitecture(r, t);
       const actual = r.base.getImageData(0, 0, 600, 800).data;
       r.base.clearRect(0, 0, 300, 400);
+      // Materials pass through the same night exposure the lot helpers apply.
+      const tone = (c) => (night ? shadeHex(c, NIGHT_EXPOSURE) : c);
       if (model === 'courtyard') {
         const rear = rotation === 1 || rotation === 2;
         const a = rotation === 3 ? 0.06 : 0.66;
         const x = rear ? 0.12 : a * 2, y = rear ? 0.12 : 0.76;
         const w = rear ? 1.76 : 0.56, d = rear ? 0.64 : 1;
         const h = rear ? 48 : 44;
-        r.box(x, y, w, d, h, rear ? '#d0b690' : '#aa8066');
+        r.box(x, y, w, d, h, tone(rear ? '#d0b690' : '#aa8066'));
         r.windows(x, y, w, d, h, 0);
-        if (rear) for (let z = 8; z < 48; z += 8) for (const f of r.faces(x, y, w, d, 0, z)) r.line(f.points[0], f.points[1], '#c2baa1', 1);
-        r.flat(x + 0.02, y + 0.02, w - 0.04, d - 0.04, h + 0.1, '#7b7e6c');
+        if (rear) for (let z = 8; z < 48; z += 8) for (const f of r.faces(x, y, w, d, 0, z)) r.line(f.points[0], f.points[1], tone('#c2baa1'), 1);
+        r.flat(x + 0.02, y + 0.02, w - 0.04, d - 0.04, h + 0.1, tone('#7b7e6c'));
       } else if (model === 'garden slab') {
-        r.box(0.12, 0.2, 1.76, 0.84, 56, '#e0d2b8');
+        r.box(0.12, 0.2, 1.76, 0.84, 56, tone('#e0d2b8'));
         r.windows(0.12, 0.2, 1.76, 0.84, 56, 0);
-        for (let z = 8; z < 56; z += 8) for (const f of r.faces(0.12, 0.2, 1.76, 0.84, 0, z)) r.line(f.points[0], f.points[1], '#c2baa1', 1);
-        r.flat(0.14, 0.22, 1.72, 0.8, 56.1, '#7b7e6c');
+        for (let z = 8; z < 56; z += 8) for (const f of r.faces(0.12, 0.2, 1.76, 0.84, 0, z)) r.line(f.points[0], f.points[1], tone('#c2baa1'), 1);
+        r.flat(0.14, 0.22, 1.72, 0.8, 56.1, tone('#7b7e6c'));
       } else {
-        r.box(0.18, 0.4, 1.64, 1, 102, '#a69583');
+        r.box(0.18, 0.4, 1.64, 1, 102, tone('#a69583'));
         r.windows(0.18, 0.4, 1.64, 1, 102, 0);
-        r.flat(0.2, 0.42, 1.6, 0.96, 102.1, '#6f7368');
-        r.box(0.8, 0.8, 0.4, 0.28, 5, '#a39e88', 102);
+        r.flat(0.2, 0.42, 1.6, 0.96, 102.1, tone('#6f7368'));
+        r.box(0.8, 0.8, 0.4, 0.28, 5, tone('#a39e88'), 102);
       }
       const expected = r.base.getImageData(0, 0, 600, 800).data;
       let checked = 0, mismatched = 0;

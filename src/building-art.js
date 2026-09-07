@@ -1,3 +1,6 @@
+import { drawFireStation, drawCollege, drawStadium } from "./civic-art.js";
+import { drawIndustrialYard, drawPort, drawMarina } from "./industrial-art.js";
+import { drawPocketPark, drawGardenPark } from "./park-art.js";
 // Original procedural architecture for every lot. A recipe draws into the
 // lot rectangle using fractions of its width/depth, so the same recipe fits
 // 1×1, 2×2 and 3×3 lots. Heights are in renderer z units (≈ pixels at zoom 1).
@@ -25,11 +28,11 @@ export function heightOf(t) {
 }
 
 // Scaled drawing helpers for one lot.
-function scoped(r, lot, dim) {
+function scoped(r, lot, dim, powered = true) {
   const { x, y, w, h } = lot;
   const s = (a, b) => [x + a * w, y + b * h];
-  const k = dim ? 0.55 : 1;
-  const tone = (c) => (dim ? shadeHex(c, k) : c);
+  const k = (dim ? 0.55 : 1) * (r.night ? NIGHT_EXPOSURE : 1);
+  const tone = (c) => (k !== 1 ? shadeHex(c, k) : c);
   return {
     w, h, x, y,
     // Keep each solid and its surface details together as the camera rotates.
@@ -45,16 +48,32 @@ function scoped(r, lot, dim) {
     tree: (a, b, n = 0) => r.tree(x + a * w, y + b * h, n),
     fence: (a, b, fw, fd, c) => r.fence(x + a * w, y + b * h, fw * w, fd * h, tone(c)),
     line: (a, b, z, a2, b2, z2, c, width = 1) => r.line(r.project(x + a * w, y + b * h, z), r.project(x + a2 * w, y + b2 * h, z2), tone(c), width),
-    windows: (a, b, fw, fd, hh, seed, glass = false, z = 0, lit = !dim, floorHeight = 8) => r.windows(x + a * w, y + b * h, fw * w, fd * h, hh, seed, glass, z, lit, floorHeight),
+    windows: (a, b, fw, fd, hh, seed, glass = false, z = 0, lit = !dim, floorHeight = 8) => r.windows(x + a * w, y + b * h, fw * w, fd * h, hh, seed, glass, z, lit && powered, floorHeight),
     bands: (a, b, fw, fd, from, to, step, c) => { for (let z = from; z < to; z += step) for (const f of r.faces(x + a * w, y + b * h, fw * w, fd * h, 0, z)) r.line(f.points[0], f.points[1], tone(c), 1); },
+    fins: (a, b, fw, fd, hh, z, c, width = 0.8) => {
+      const ax = x + a * w, ay = y + b * h, ww = fw * w, dd = fd * h;
+      for (const face of r.faces(ax, ay, ww, dd, hh, z)) {
+        const alongX = face.name === "north" || face.name === "south";
+        const length = alongX ? ww : dd, count = Math.max(1, Math.floor(length * 6));
+        for (let i = 0; i < count; i++) {
+          const offset = (i + 0.5) * length / count;
+          const px = alongX ? ax + offset : face.name === "east" ? ax + ww : ax;
+          const py = alongX ? face.name === "south" ? ay + dd : ay : ay + offset;
+          r.line(r.project(px, py, z + 1), r.project(px, py, z + hh), tone(c), width);
+        }
+      }
+    },
     pt: (a, b, z = 0) => r.project(x + a * w, y + b * h, z),
   };
 }
 
-function shadeHex(hex, k) {
-  const n = parseInt(hex.slice(1), 16);
+// One definition of the night exposure so drawing code and tests agree.
+export const NIGHT_EXPOSURE = 0.62;
+export function shadeHex(hex, k) {
+  if (typeof hex !== "string" || !/^#[0-9a-f]{6}([0-9a-f]{2})?$/i.test(hex)) return hex;
+  const n = parseInt(hex.slice(1, 7), 16);
   const c = [n >> 16, (n >> 8) & 255, n & 255].map((v) => clamp(v * k, 0, 255) | 0);
-  return "#" + c.map((v) => v.toString(16).padStart(2, "0")).join("");
+  return "#" + c.map((v) => v.toString(16).padStart(2, "0")).join("") + hex.slice(7);
 }
 
 const WALLS = ["#d0b690", "#c2b69c", "#d8c6a6", "#a69583", "#c1baa5", "#d8c4b0", "#e0d2b8", "#b9a98f"];
@@ -228,17 +247,85 @@ function residential(d, t, n, level, r) {
     ]);
     return;
   }
-  d.box(0.08, 0.08, 0.84, 0.84, 8, brick); d.windows(0.08, 0.08, 0.84, 0.84, 8, t.x + t.y);
-  d.flat(0.09, 0.09, 0.82, 0.82, 8.1, "#858978");
-  const tw = d.w >= 3 && level === 4 ? 0.34 : 0.56, tx = d.w >= 3 && level === 4 ? 0.12 : 0.22;
-  d.box(tx, 0.2, tw, 0.58, hh, n > 0.5 ? glass : wall, 8); d.windows(tx, 0.2, tw, 0.58, hh, t.x + t.y, n > 0.5, 8);
-  d.bands(tx, 0.2, tw, 0.58, 16, hh + 8, 8, "#d1c4a0");
-  d.flat(tx + 0.02, 0.22, tw - 0.04, 0.54, hh + 8.1, "#6f7368"); d.box(tx + tw * 0.35, 0.42, tw * 0.3, 0.16, 5, "#a39e88", hh + 8);
-  if (d.w >= 3 && level === 4) {
-    d.box(0.54, 0.2, 0.34, 0.58, hh - 12, wall, 8); d.windows(0.54, 0.2, 0.34, 0.58, hh - 12, t.y * 5, false, 8);
-    d.flat(0.56, 0.22, 0.3, 0.54, hh - 3.9, "#6f7368");
-  }
-  d.tree(0.1, 0.9, 0); d.tree(0.9, 0.1, 2);
+  d.parts([
+    [0.5, 0.5, () => {
+      d.box(0.08, 0.08, 0.84, 0.84, 8, brick);
+      d.windows(0.08, 0.08, 0.84, 0.84, 8, t.x + t.y);
+      d.flat(0.09, 0.09, 0.82, 0.82, 8.1, "#858978");
+      const twin = d.w >= 3 && level === 4, tw = twin ? 0.34 : 0.56, tx = twin ? 0.12 : 0.22;
+      const towers = [[tx + tw / 2, 0.49, () => {
+        d.box(tx, 0.2, tw, 0.58, hh, n > 0.5 ? glass : wall, 8);
+        d.windows(tx, 0.2, tw, 0.58, hh, t.x + t.y, n > 0.5, 8);
+        d.bands(tx - 0.003, 0.197, tw + 0.006, 0.586, 16, hh + 8, 8, "#d1c4a0");
+        d.flat(tx + 0.02, 0.22, tw - 0.04, 0.54, hh + 8.1, "#6f7368");
+        d.box(tx + tw * 0.35, 0.42, tw * 0.3, 0.16, 5, "#a39e88", hh + 8);
+      }]];
+      if (twin) towers.push([0.71, 0.49, () => {
+        d.box(0.54, 0.2, 0.34, 0.58, hh - 12, wall, 8);
+        d.windows(0.54, 0.2, 0.34, 0.58, hh - 12, t.y * 5, false, 8);
+        d.flat(0.56, 0.22, 0.3, 0.54, hh - 3.9, "#6f7368");
+      }]);
+      d.parts(towers);
+    }],
+    [0.1, 0.9, () => d.tree(0.1, 0.9, 0)],
+    [0.9, 0.1, () => d.tree(0.9, 0.1, 2)],
+  ]);
+}
+
+// Distinct silhouettes break up the repeated office slabs in mature districts.
+function signatureTower(d, t, n, level) {
+  const style = Math.floor(n * 3), height = 42 + level * 24;
+  const stone = pick(["#d8c9aa", "#c6b8a1", "#d6d5c8"], n);
+  const glass = pick(["#527f91", "#548c94", "#678a9c"], n);
+  d.flat(0.02, 0.02, 0.96, 0.96, 0.25, "#bbb9a7");
+  d.flat(0.07, 0.78, 0.86, 0.13, 0.4, "#d8d0b7");
+  d.parts([
+    [0.5, 0.48, () => {
+      d.box(0.07, 0.07, 0.86, 0.74, 10, stone);
+      d.windows(0.07, 0.07, 0.86, 0.74, 10, t.x + t.y, true);
+      d.flat(0.08, 0.08, 0.84, 0.72, 10.1, "#84958b");
+      if (style === 0) {
+        // Limestone setbacks and a patinated copper crown.
+        const tiers = [[0.15, 0.12, 0.7, 0.62, height * 0.58], [0.23, 0.2, 0.54, 0.46, height * 0.27], [0.33, 0.28, 0.34, 0.3, height * 0.15]];
+        let base = 10;
+        for (const [x, y, w, h, rise] of tiers) {
+          d.box(x, y, w, h, rise, stone, base);
+          d.windows(x, y, w, h, rise, t.x * 3 + t.y, false, base, true, 7);
+          d.fins(x, y, w, h, rise, base, "#e7dcc6", 0.8);
+          d.box(x - 0.008, y - 0.008, w + 0.016, h + 0.016, 1.4, "#e1d5bb", base + rise);
+          base += rise + 1.4;
+        }
+        d.hip(0.33, 0.28, 0.34, 0.3, base, 13, "#538b80", 0.06);
+        d.line(0.5, 0.43, base + 13, 0.5, 0.43, base + 30, "#c8d1c5", 1);
+      } else if (style === 1) {
+        // Slim blue-glass tower with a recessed mechanical crown.
+        d.box(0.2, 0.15, 0.6, 0.54, height, glass, 10);
+        d.windows(0.2, 0.15, 0.6, 0.54, height, t.x + t.y * 5, true, 10, true, 6);
+        d.bands(0.2, 0.15, 0.6, 0.54, 16, height + 10, 12, "#94b4bc");
+        for (const x of [0.2, 0.8]) for (const y of [0.15, 0.69]) d.line(x, y, 10, x, y, height + 16, "#b7cdd0", 1.25);
+        d.box(0.24, 0.19, 0.52, 0.46, 6, "#658a94", height + 10);
+        d.flat(0.25, 0.2, 0.5, 0.44, height + 16.1, "#98b8b7");
+        d.box(0.33, 0.29, 0.34, 0.25, 5, "#405a67", height + 16);
+      } else {
+        // Stacked garden terraces: each roof stays visible around the next tier.
+        let base = 10;
+        for (let tier = 0; tier < 3; tier++) {
+          const x = 0.14 + tier * 0.075, y = 0.12 + tier * 0.07;
+          const w = 0.72 - tier * 0.15, h = 0.62 - tier * 0.14, rise = height / 3;
+          d.box(x, y, w, h, rise, glass, base);
+          d.windows(x, y, w, h, rise, t.x + tier * 11, true, base, true, 6);
+          d.bands(x, y, w, h, base + 6, base + rise, 6, "#b2c6c0");
+          base += rise;
+          d.flat(x, y, w, h, base + 0.1, "#a9baa2");
+          d.box(x + 0.02, y + h - 0.05, w - 0.04, 0.035, 2.2, "#57815a", base + 0.2);
+          d.box(x + w - 0.05, y + 0.02, 0.035, h - 0.09, 2.2, "#678b5f", base + 0.2);
+        }
+        d.box(0.41, 0.36, 0.18, 0.15, 5, "#778f94", base);
+      }
+    }],
+    [0.1, 0.9, () => d.tree(0.1, 0.9, 0)],
+    [0.88, 0.88, () => d.tree(0.88, 0.88, 1)],
+  ]);
 }
 
 function commercial(d, t, n, level, r) {
@@ -298,6 +385,7 @@ function commercial(d, t, n, level, r) {
     }
     return;
   }
+  if (d.w >= 2 && random(t.x, t.y, 37) < 0.45) { signatureTower(d, t, n, level); return; }
   // Skyscrapers: setbacks, glass curtain walls, spire at level 4.
   const hh = 40 + level * 24 + Math.floor(n * 4) * 6;
   const fam = Math.floor(n * 3);
@@ -340,31 +428,7 @@ function industrial(d, t, n, level, r) {
     if (level >= 3) d.cyl(0.85, 0.8, 0.06, 9, "#b4b6a0");
     return;
   }
-  if (density === 2) {
-    d.flat(0.06, 0.7, 0.88, 0.24, 0.4, "#818371");
-    if (Math.floor(n * 3) === 1) {
-      // Warehouse: long low shed, loading docks, container stack.
-      d.box(0.06, 0.1, 0.88, 0.5, 12, pick(["#9aa3a8", "#b6b1a0", "#8f9a8c"], n)); d.windows(0.06, 0.1, 0.88, 0.5, 12, t.x + t.y);
-      d.flat(0.07, 0.11, 0.86, 0.48, 12.1, "#6f7773");
-      for (let a = 0; a < 4; a++) d.box(0.1 + a * 0.22, 0.6, 0.14, 0.05, 6, "#5f6a66");
-      d.box(0.64, 0.74, 0.28, 0.16, 5, pick(["#b0473a", "#3a6fa0", "#c9a53a"], n)); d.box(0.64, 0.74, 0.28, 0.16, 4, "#5a8f5a", 5);
-      return;
-    }
-    // Factories with smokestacks and loading bays.
-    d.box(0.08, 0.1, 0.84, 0.55, 15 + level * 2, brick); d.windows(0.08, 0.1, 0.84, 0.55, 15, t.x + t.y);
-    for (let a = 0; a < 3; a++) d.roof(0.08 + a * 0.28, 0.1, 0.28, 0.55, 15 + level * 2, 5, "#8d9685");
-    for (let a = 0; a < 2; a++) d.cyl(0.22 + a * 0.38, 0.34, 0.05, 26 + level * 4, "#ad9577", 14);
-    d.box(0.62, 0.72, 0.28, 0.2, 5, "#777e6b"); d.box(0.14, 0.74, 0.2, 0.16, 4, "#9c6542");
-    return;
-  }
-  // Heavy industry: sheds, tanks, stacks, pipes.
-  d.flat(0.04, 0.04, 0.92, 0.92, 0.3, "#8f8b74");
-  d.box(0.06, 0.08, 0.56, 0.5, 20 + level * 2, brick); d.windows(0.06, 0.08, 0.56, 0.5, 20, t.x + t.y);
-  d.flat(0.07, 0.09, 0.54, 0.48, 20.1 + level * 2, "#7d8577");
-  for (let a = 0; a < 3; a++) d.cyl(0.14 + a * 0.2, 0.3, 0.04, 30 + level * 5 + a * 3, "#a89a80", 20 + level * 2);
-  d.cyl(0.78, 0.25, 0.1, 14, "#b4b6a0"); d.cyl(0.78, 0.55, 0.1, 18, "#a5aa98");
-  d.box(0.08, 0.66, 0.5, 0.26, 9, "#6f7d7a"); d.roof(0.08, 0.66, 0.5, 0.26, 9, 3, "#8d9685");
-  d.line(0.68, 0.72, 6, 0.9, 0.72, 6, "#8e8f80", 2); d.line(0.68, 0.8, 6, 0.9, 0.8, 6, "#8e8f80", 2);
+  drawIndustrialYard(d, t, n, level);
 }
 
 // ── Catalog buildings ─────────────────────────────────────────────────────────
@@ -441,13 +505,7 @@ const RECIPES = {
     d.flat(0.1, 0.78, 0.78, 0.16, 0.3, "#727b72"); for (let a = 0; a < 4; a++) d.box(0.13 + a * 0.19, 0.8, 0.12, 0.1, 3, "#dfe3ea");
     d.line(0.9, 0.5, 0, 0.9, 0.5, 26, "#c9c9c9", 1);
   },
-  fire(d, t, n) {
-    d.flat(0.03, 0.03, 0.94, 0.94, 0.2, "#a6ac97");
-    d.box(0.1, 0.14, 0.78, 0.6, 18, "#a97456"); d.windows(0.1, 0.14, 0.78, 0.6, 18, t.x + t.y, true);
-    d.flat(0.08, 0.12, 0.82, 0.64, 18.1, "#926146"); d.box(0.72, 0.2, 0.14, 0.14, 12, "#b08466", 18);
-    for (let a = 0; a < 2; a++) d.box(0.16 + a * 0.32, 0.74, 0.24, 0.18, 3, "#c14432");
-    d.flat(0.1, 0.72, 0.78, 0.22, 0.3, "#727b72");
-  },
+  fire: drawFireStation,
   hospital(d, t, n) {
     d.flat(0.02, 0.02, 0.96, 0.96, 0.2, "#aaad99");
     d.box(0.08, 0.12, 0.84, 0.6, 12, "#d0d1bc"); d.windows(0.08, 0.12, 0.84, 0.6, 12, t.x + t.y);
@@ -462,14 +520,7 @@ const RECIPES = {
     d.flat(0.1, 0.55, 0.8, 0.38, 0.3, "#87976f"); d.flat(0.16, 0.6, 0.68, 0.28, 0.5, "#a0ad83");
     d.line(0.2, 0.68, 0, 0.2, 0.68, 12, "#c5c5b2", 1); d.tree(0.9, 0.9, 1);
   },
-  college(d, t, n) {
-    d.flat(0.02, 0.02, 0.96, 0.96, 0.2, "#a2a98e");
-    d.box(0.06, 0.06, 0.4, 0.3, 18, "#c6b89c"); d.roof(0.04, 0.04, 0.44, 0.34, 18, 6, "#6c7666"); d.windows(0.06, 0.06, 0.4, 0.3, 18, t.x);
-    d.box(0.56, 0.06, 0.38, 0.3, 18, "#c6b89c"); d.roof(0.54, 0.04, 0.42, 0.34, 18, 6, "#6c7666"); d.windows(0.56, 0.06, 0.38, 0.3, 18, t.y);
-    d.box(0.42, 0.4, 0.16, 0.16, 34, "#d3c8b0"); d.roof(0.4, 0.38, 0.2, 0.2, 34, 9, "#5b6c63");
-    d.box(0.06, 0.62, 0.88, 0.3, 14, "#bfb094"); d.windows(0.06, 0.62, 0.88, 0.3, 14, t.x + t.y); d.roof(0.04, 0.6, 0.92, 0.34, 14, 5, "#6c7666");
-    d.flat(0.12, 0.4, 0.28, 0.18, 0.3, "#8faa5c"); d.flat(0.6, 0.4, 0.28, 0.18, 0.3, "#8faa5c"); d.tree(0.25, 0.48, 1); d.tree(0.75, 0.48, 2);
-  },
+  college: drawCollege,
   library(d, t, n) {
     d.flat(0.04, 0.04, 0.92, 0.92, 0.2, "#aab09a");
     d.box(0.12, 0.12, 0.76, 0.66, 14, "#d4c9b2"); d.windows(0.12, 0.12, 0.76, 0.66, 14, t.x + t.y);
@@ -500,19 +551,8 @@ const RECIPES = {
     d.box(0.1, 0.12, 0.8, 0.44, 12, "#a5ad9c"); d.windows(0.1, 0.12, 0.8, 0.44, 12, t.x + t.y); d.roof(0.1, 0.12, 0.8, 0.44, 12, 4, "#6b8071");
     for (let i = 0; i < 4; i++) d.box(0.12 + i * 0.2, 0.68, 0.14, 0.2, 5, pick(["#3f7a5c", "#4d6f9a", "#b28e48", "#a24d3e"], i / 4));
   },
-  park(d, t, n) {
-    d.flat(0.03, 0.03, 0.94, 0.94, 0.2, "#557c38");
-    d.flat(0.44, 0.02, 0.12, 0.96, 0.3, "#bfb798"); d.flat(0.02, 0.44, 0.96, 0.12, 0.3, "#bfb798");
-    if (n < 0.33) { d.cyl(0.5, 0.5, 0.16, 2, "#aaa88a"); d.cyl(0.5, 0.5, 0.125, 1, "#60999e", 2); d.cyl(0.5, 0.5, 0.035, 6, "#c2c9b3", 2); }
-    d.tree(0.2, 0.2, 1); d.tree(0.8, 0.75, 0); d.tree(0.2, 0.78, 2); d.box(0.68, 0.22, 0.21, 0.045, 3, "#90704d");
-  },
-  largepark(d, t, n) {
-    d.flat(0.02, 0.02, 0.96, 0.96, 0.2, "#5b8340");
-    d.flat(0.47, 0.02, 0.06, 0.96, 0.3, "#c4bd9c"); d.flat(0.02, 0.47, 0.96, 0.06, 0.3, "#c4bd9c");
-    d.flat(0.58, 0.58, 0.32, 0.28, 0.35, "#5fa0b5"); d.flat(0.56, 0.56, 0.36, 0.32, 0.25, "#a9b48f");
-    for (const [a, b, k] of [[0.12, 0.12, 0], [0.3, 0.2, 1], [0.15, 0.35, 2], [0.7, 0.15, 1], [0.85, 0.3, 0], [0.2, 0.7, 2], [0.32, 0.88, 1], [0.12, 0.88, 0], [0.9, 0.9, 2], [0.62, 0.9, 1]]) d.tree(a, b, k);
-    d.cyl(0.25, 0.55, 0.05, 2, "#aaa88a"); d.box(0.6, 0.3, 0.14, 0.03, 3, "#90704d"); d.box(0.78, 0.6, 0.03, 0.12, 3, "#90704d");
-  },
+  park: drawPocketPark,
+  largepark: drawGardenPark,
   zoo(d, t, n) {
     d.flat(0.02, 0.02, 0.96, 0.96, 0.2, "#7f9a54");
     for (const [a, b] of [[0.06, 0.06], [0.52, 0.06], [0.06, 0.52]]) { d.flat(a, b, 0.42, 0.42, 0.3, pick(["#c8b98a", "#9db56b", "#b9c39a"], a + b)); d.fence(a, b + 0.42, 0.42, 0, "#8e8a72"); d.fence(a + 0.42, b, 0, 0.42, "#8e8a72"); }
@@ -585,14 +625,7 @@ const RECIPES = {
     d.box(0.64, 0.34, 0.3, 0.16, 10, "#a7aba2"); d.roof(0.64, 0.34, 0.3, 0.16, 10, 4, "#7e8479");
     d.box(0.3, 0.36, 0.14, 0.05, 3, "#e8e8e0"); d.box(0.36, 0.33, 0.03, 0.11, 2, "#e8e8e0", 2); d.box(0.28, 0.375, 0.03, 0.03, 4, "#e8e8e0", 3);
   },
-  seaport(d, t, n) {
-    d.flat(0.02, 0.02, 0.96, 0.96, 0.2, "#8c9088");
-    d.flat(0.05, 0.05, 0.9, 0.24, 0.4, "#7a7f7b");
-    for (let i = 0; i < 6; i++) d.box(0.08 + (i % 3) * 0.16, 0.08 + Math.floor(i / 3) * 0.1, 0.14, 0.08, 4 + (i % 2) * 3, pick(["#b0473a", "#3a6fa0", "#c9a53a", "#5a8f5a"], random(t.x, t.y, i)));
-    d.box(0.1, 0.4, 0.5, 0.3, 10, "#a9aa9b"); d.roof(0.1, 0.4, 0.5, 0.3, 10, 4, "#6d7470"); d.windows(0.1, 0.4, 0.5, 0.3, 10, t.x + t.y);
-    d.line(0.78, 0.5, 0, 0.78, 0.5, 30, "#8e8f80", 1.4); d.line(0.78, 0.5, 30, 0.95, 0.35, 24, "#8e8f80", 1.2);
-    d.cyl(0.8, 0.8, 0.08, 10, "#c3c4b4"); d.cyl(0.62, 0.84, 0.06, 8, "#b0b3a3");
-  },
+  seaport: drawPort,
   mayorhouse(d, t, n) {
     d.flat(0.03, 0.03, 0.94, 0.94, 0.2, "#6f8f48");
     d.box(0.16, 0.16, 0.56, 0.5, 16, "#e6dcc4"); d.windows(0.16, 0.16, 0.56, 0.5, 16, t.x + t.y); d.roof(0.13, 0.13, 0.62, 0.56, 16, 8, "#6b4a3c");
@@ -617,14 +650,7 @@ const RECIPES = {
     d.roof(0.08, 0.1, 0.84, 0.66, 20, 7, "#5d6b66");
     d.flat(0.1, 0.82, 0.8, 0.12, 0.3, "#c2bda6");
   },
-  stadium(d, t, n) {
-    d.flat(0.02, 0.02, 0.96, 0.96, 0.2, "#8a9a7d");
-    d.box(0.08, 0.08, 0.84, 0.84, 6, "#b5b6a6");
-    d.box(0.1, 0.1, 0.8, 0.14, 18, "#a9aa9b", 6); d.box(0.1, 0.76, 0.8, 0.14, 18, "#a9aa9b", 6);
-    d.box(0.1, 0.24, 0.14, 0.52, 14, "#a9aa9b", 6); d.box(0.76, 0.24, 0.14, 0.52, 14, "#a9aa9b", 6);
-    d.flat(0.26, 0.26, 0.48, 0.48, 6.2, "#4f9a4a"); d.flat(0.3, 0.3, 0.4, 0.4, 6.3, "#5fae58");
-    for (const [a, b] of [[0.12, 0.12], [0.86, 0.12], [0.12, 0.86], [0.86, 0.86]]) d.line(a, b, 24, a, b, 44, "#dcdccc", 1.2);
-  },
+  stadium: drawStadium,
   statue(d, t, n) {
     d.flat(0.1, 0.1, 0.8, 0.8, 0.3, "#c9c4ad");
     d.box(0.35, 0.35, 0.3, 0.3, 6, "#b9b3a0"); d.box(0.42, 0.42, 0.16, 0.16, 14, "#8e9a94", 6); d.cyl(0.5, 0.5, 0.06, 5, "#9fa8a2", 20);
@@ -667,22 +693,7 @@ const RECIPES = {
     d.box(0.08, 0.6, 0.84, 0.05, 6, "#c94a3c", 12); d.flat(0.36, 0.58, 0.28, 0.06, 20, "#f2d36b");
     d.tree(0.03, 0.97, 1); d.tree(0.97, 0.97, 2);
   },
-  marina(d, t, n) {
-    d.flat(0.02, 0.02, 0.96, 0.96, 0.2, "#4f8fb0");
-    d.flat(0.02, 0.02, 0.96, 0.3, 0.3, "#b9b39c");
-    d.box(0.1, 0.06, 0.34, 0.22, 10, "#e6e0cc"); d.windows(0.1, 0.06, 0.34, 0.22, 10, t.x + t.y); d.roof(0.08, 0.04, 0.38, 0.26, 10, 5, "#7a5340");
-    d.line(0.5, 0.2, 0, 0.5, 0.2, 22, "#d8d4c0", 1); d.flat(0.5, 0.15, 0.08, 0.05, 20, "#3f6f9a");
-    // Piers with moored boats.
-    for (const a of [0.22, 0.5, 0.78]) {
-      d.flat(a - 0.03, 0.3, 0.06, 0.62, 1.2, "#a58c66");
-      for (const b of [0.42, 0.66]) {
-        const side = (Math.floor((a + b) * 7) % 2) ? 0.06 : -0.14;
-        d.flat(a + side, b, 0.08, 0.16, 1, pick(["#f2efe4", "#dfe6ea", "#e8d9b8", "#cfe1d6"], (n + a + b) % 1));
-        d.line(a + side + 0.04, b + 0.06, 1, a + side + 0.04, b + 0.06, 16, "#e4e2d6", 0.8);
-      }
-    }
-    d.tree(0.9, 0.12, 1);
-  },
+  marina: drawMarina,
   university(d, t, n) {
     d.flat(0.02, 0.02, 0.96, 0.96, 0.2, "#7c9a56");
     d.flat(0.3, 0.3, 0.4, 0.4, 0.3, "#c9c3a6"); d.flat(0.47, 0.1, 0.06, 0.8, 0.35, "#c9c3a6"); d.flat(0.1, 0.47, 0.8, 0.06, 0.35, "#c9c3a6");
@@ -722,7 +733,7 @@ export function drawArchitecture(r, t) {
   if (!lot) { drawZoneMarker(r, t); return; }
   const n = t.variant ?? random(t.x, t.y);
   const level = Math.max(1, t.level || 1);
-  const d = scoped(r, lot, !!t.abandoned);
+  const d = scoped(r, lot, !!t.abandoned, t.powered !== false);
   if (t.type === "residential") residential(d, t, n, level, r);
   else if (t.type === "commercial") commercial(d, t, n, level, r);
   else if (t.type === "industrial") industrial(d, t, n, level, r);

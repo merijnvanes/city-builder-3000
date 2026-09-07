@@ -23,6 +23,16 @@ try {
   // Zoom out so open land around the town is in view for placement tests.
   await page.evaluate(() => civic.renderer.zoomAt(Math.log(0.5 / civic.renderer.zoom)));
 
+  // Keyboard panning is continuous and stops on release or dialog focus.
+  const cameraX = () => page.evaluate(() => civic.renderer.panX);
+  const beforePan = await cameraX();
+  await page.keyboard.down('ArrowRight'); await page.waitForTimeout(180); await page.keyboard.up('ArrowRight');
+  assert.ok((await cameraX()) < beforePan - 25, 'held arrow pans continuously');
+  const stopped = await cameraX(); await page.waitForTimeout(80);
+  assert.equal(await cameraX(), stopped, 'camera stops on release');
+  await page.getByTitle('Home view [H]', { exact: true }).click();
+  await page.evaluate(() => civic.renderer.zoomAt(Math.log(0.5 / civic.renderer.zoom)));
+
   // Pick an empty grass tile in view.
   await page.getByRole("button", { name: "Transport", exact: true }).click();
   await page.locator('[data-tool="road"]').click();

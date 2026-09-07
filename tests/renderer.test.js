@@ -86,3 +86,16 @@ test('earthquake shake expires while paused and does not mutate saved effects', 
   r.shakeOffset({ effects: [] }, 1101);
   assert.equal(r.shakeUntil, 0, 'loading another city clears camera shake');
 });
+
+
+test('changing map size clears old elevation geometry before centering', () => {
+  const r = camera();
+  r.corners = new Float32Array(65 * 65).fill(8);
+  r.tiles = [];
+  r.size = 128;
+  assert.equal(r.corners, null);
+  r.focusOn(90, 90, 0.8);
+  assert.ok(Number.isFinite(r.panX) && Number.isFinite(r.panY));
+  const point = r.project(90.5, 90.5);
+  assert.equal(point.x, r.cx); assert.equal(point.y, r.cy);
+});

@@ -22,7 +22,9 @@ export function createMinimap(renderer) {
   panel.innerHTML = '<div class="district-map-label">REGION OVERVIEW <span>↗</span></div><canvas width="160" height="160" role="img" aria-label="City overview. Click to move the camera."></canvas>';
   document.querySelector("#navigator").prepend(panel);
   const canvas = panel.querySelector("canvas"), ctx = canvas.getContext("2d");
-  let city, lastKey = "";
+  const terrain = document.createElement('canvas'); terrain.width = terrain.height = 160;
+  const map = terrain.getContext('2d');
+  let city, mapCity, mapRevision, lastKey = "";
   canvas.addEventListener("pointerdown", (event) => {
     if (!city) return;
     const rect = canvas.getBoundingClientRect();
@@ -35,9 +37,10 @@ export function createMinimap(renderer) {
     update(nextCity) {
       city = nextCity;
       const key = [city.seed, city.revision, renderer.panX, renderer.panY, renderer.zoom, renderer.rotation, renderer.w, renderer.h].join(":");
-      if (key === lastKey) return;
+      if (key === lastKey && mapCity === city) return;
       lastKey = key;
       const s = 160 / city.size;
+      if (mapCity !== city || mapRevision !== city.revision) {
       for (const tile of city.tiles) {
         let c = colors[tile.type];
         if (!c) {
@@ -45,10 +48,13 @@ export function createMinimap(renderer) {
           else c = UTILITIES.has(tile.type) ? utilityColor : civicColor;
         }
         if (tile.abandoned) c = "#6c6a5e";
-        ctx.fillStyle = c;
-        ctx.fillRect(tile.x * s, tile.y * s, s, s);
-        if (tile.elev && tile.terrain !== "water") { ctx.fillStyle = `rgba(255,255,255,${Math.min(0.5, tile.elev * 0.06)})`; ctx.fillRect(tile.x * s, tile.y * s, s, s); }
+        map.fillStyle = c;
+        map.fillRect(tile.x * s, tile.y * s, s, s);
+        if (tile.elev && tile.terrain !== "water") { map.fillStyle = `rgba(255,255,255,${Math.min(0.5, tile.elev * 0.06)})`; map.fillRect(tile.x * s, tile.y * s, s, s); }
       }
+        mapCity = city; mapRevision = city.revision;
+      }
+      ctx.clearRect(0, 0, 160, 160); ctx.drawImage(terrain, 0, 0);
       ctx.beginPath();
       const left = renderer.w > 800 ? 200 : 0;
       [[left, 32], [renderer.w, 32], [renderer.w, renderer.h - 30], [left, renderer.h - 30]].forEach(([x, y], i) => {

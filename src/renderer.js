@@ -1,10 +1,13 @@
+import { drawMapBackdrop, drawBoat, drawOutageMarkers, drawAirplane } from "./scene-art.js";
 // Isometric Canvas 2D renderer. Static ground and buildings are painted into
 // a cache whenever the city revision changes; animated cars, water sparkle,
 // fires and the construction preview are drawn every frame on top.
+import { drawCachedArchitecture, hitUncachedArchitecture } from "./architecture-cache.js";
 import { drawArchitecture, heightOf, random } from "./building-art.js";
 import { BUILDINGS } from "./sim/catalog.js";
 import { drawTree } from "./foliage.js";
 import { surfaceColor, drawShoreline } from "./terrain-art.js";
+import { drawStreet, hasStreetLamp, drawStreetLamp, drawVehicle } from "./street-art.js";
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const shade = (hex, k) => {
@@ -37,6 +40,12 @@ export class CityRenderer {
     this.resizeObserver = new ResizeObserver(() => this.resize());
     this.resizeObserver.observe(canvas);
     this.resize();
+  }
+
+  get size() { return this._size || 64; }
+  set size(value) {
+    if (this._size !== value) { this.corners = null; this.tiles = null; }
+    this._size = value;
   }
 
   // Screen origin of the map: centred in the space right of the toolbar.
@@ -131,6 +140,24 @@ export class CityRenderer {
     }
     return p;
   }
+  // Front-to-back alpha picking selects the visible roof or facade, rather
+  // than the ground tile several blocks behind a tall building.
+  pickObject(sx, sy) {
+    if (this.dirty || !this.pickables || this.overlay === "water" || ["pipe", "subway", "substation"].includes(this.tool)) return this.pick(sx, sy);
+    for (let i = this.pickables.length - 1; i >= 0; i--) {
+      const hit = this.pickables[i];
+      if (!hit.t.lot || sx < hit.x || sy < hit.y || sx >= hit.x + hit.w || sy >= hit.y + hit.h) continue;
+      let opaque;
+      if (hit.canvas) {
+        const px = Math.min(hit.canvas.width - 1, Math.floor((sx - hit.x) / hit.w * hit.canvas.width));
+        const py = Math.min(hit.canvas.height - 1, Math.floor((sy - hit.y) / hit.h * hit.canvas.height));
+        opaque = hit.canvas.getContext("2d").getImageData(px, py, 1, 1).data[3] > 24;
+      } else opaque = hitUncachedArchitecture(this, hit.t, sx, sy);
+      if (opaque) return { x: hit.t.x, y: hit.t.y };
+    }
+    return this.pick(sx, sy);
+  }
+
   zoomAt(delta, sx = this.cx, sy = this.cy) {
     const old = this.zoom;
     this.zoom = clamp(this.zoom * Math.exp(delta), this.minZoom, this.maxZoom);
@@ -182,7 +209,11 @@ export class CityRenderer {
   box(x, y, w, d, h, color, z = 0) {
     for (const face of this.faces(x, y, w, d, h, z)) {
       const left = face.points[0].x + face.points[1].x < this.project(x + w / 2, y + d / 2).x * 2;
-      this.poly(face.points, shade(color, left ? 0.65 : 0.86));
+      const top = Math.min(...face.points.map(p => p.y)), bottom = Math.max(...face.points.map(p => p.y));
+      const light = this.base.createLinearGradient(0, top, 0, Math.max(top + 1, bottom));
+      light.addColorStop(0, shade(color, left ? 0.78 : 1.02));
+      light.addColorStop(1, shade(color, left ? 0.57 : 0.79));
+      this.poly(face.points, light);
     }
     this.flat(x, y, w, d, z + h, shade(color, 1.09));
   }
@@ -231,8 +262,10 @@ export class CityRenderer {
           const a = alongX ? x + offset : face.name === "east" ? x + w + 0.002 : x - 0.002;
           const b = alongX ? (face.name === "south" ? y + d + 0.002 : y - 0.002) : y + offset;
           const on = this.night && lit && random(seed + row, col) > 0.35;
-          const color = on ? "#edcd77" : glass ? ["#38545a", "#496c70", "#69908e", "#89a5a0"][(row + col + seed) % 4 | 0] : "#425751";
-          this.poly([this.project(a, b, z + paneHeight), this.project(a + (alongX ? span : 0), b + (alongX ? 0 : span), z + paneHeight), this.project(a + (alongX ? span : 0), b + (alongX ? 0 : span), z), this.project(a, b, z)], color);
+          const reflect = row / Math.max(1, rows - 1);
+          const color = on ? (random(seed, row, col) > 0.6 ? "#ffe5aa" : "#d8b97c") : glass ? shade("#85b2c1", (0.48 + reflect * 0.5 + random(seed, col) * 0.12) * (this.night ? 0.42 : 1)) : this.night ? "#223039" : "#3d5359";
+          const points = [this.project(a, b, z + paneHeight), this.project(a + (alongX ? span : 0), b + (alongX ? 0 : span), z + paneHeight), this.project(a + (alongX ? span : 0), b + (alongX ? 0 : span), z), this.project(a, b, z)];
+          this.poly(points, color);
         }
       }
     }
@@ -250,7 +283,7 @@ export class CityRenderer {
   }
   terrain(t, city) {
     const { x, y } = t, water = t.terrain === "water";
-    let color = surfaceColor(t, city);
+    let color = this.surfaceColors?.[y * city.size + x] || surfaceColor(t, city);
     if (!water) {
       const k = this.slopeShade(x, y);
       if (k !== 1) color = shade(color, k);
@@ -261,22 +294,13 @@ export class CityRenderer {
     if (!water && t.type === "empty" && !t.trees) for (let i = 0; i < 3; i++) { const a = random(x, y, i + 1), b = random(y, x, i + 7); this.flat(x + a * 0.85, y + b * 0.85, 0.1, 0.045, 0.05, "#a8ae642b"); }
     if (this.tool !== "inspect" && !water && this.zoom > 0.55) this.flat(x, y, 1, 1, 0.1, null, "#344b2833");
     if (!ROAD.has(t.type)) return;
-    const isRail = t.type === "rail";
+    if (t.type !== "rail") { drawStreet(this, t, city); return; }
     const joins = (a, b) => a === b || (a !== "rail" && b !== "rail" && ROAD.has(a) && ROAD.has(b));
     const adjacent = (dx, dy) => x + dx >= 0 && y + dy >= 0 && x + dx < city.size && y + dy < city.size && joins(city.tiles[(y + dy) * city.size + x + dx]?.type, t.type);
-    if (t.type === "highway") {
-      const ew = adjacent(1, 0) || adjacent(-1, 0), ns = adjacent(0, 1) || adjacent(0, -1);
-      this.flat(x, y, 1, 1, 0.3, "#5c6266");
-      this.flat(x + 0.04, y + 0.04, 0.92, 0.92, 0.45, "#3f4549");
-      if (ew) { this.line(this.project(x, y + 0.5, 0.8), this.project(x + 1, y + 0.5, 0.8), "#d9c34a", 1); this.line(this.project(x, y + 0.26, 0.7), this.project(x + 1, y + 0.26, 0.7), "#8a9296", 0.5); this.line(this.project(x, y + 0.74, 0.7), this.project(x + 1, y + 0.74, 0.7), "#8a9296", 0.5); }
-      if (ns) { this.line(this.project(x + 0.5, y, 0.8), this.project(x + 0.5, y + 1, 0.8), "#d9c34a", 1); this.line(this.project(x + 0.26, y, 0.7), this.project(x + 0.26, y + 1, 0.7), "#8a9296", 0.5); this.line(this.project(x + 0.74, y, 0.7), this.project(x + 0.74, y + 1, 0.7), "#8a9296", 0.5); }
-      if (water) { this.line(this.project(x, y + 0.03, 5), this.project(x + 1, y + 0.03, 5), "#b9bda8", 1.8); this.line(this.project(x, y + 0.97, 5), this.project(x + 1, y + 0.97, 5), "#b9bda8", 1.8); }
-      return;
-    }
-    this.flat(x + 0.015, y + 0.015, 0.97, 0.97, 0.3, isRail ? "#857f67" : "#a3a796");
-    this.flat(x + 0.1, y + 0.1, 0.8, 0.8, 0.4, isRail ? "#736e5c" : "#69736b");
+    this.flat(x + 0.015, y + 0.015, 0.97, 0.97, 0.3, "#857f67");
+    this.flat(x + 0.1, y + 0.1, 0.8, 0.8, 0.4, "#736e5c");
     const ew = adjacent(1, 0) || adjacent(-1, 0), ns = adjacent(0, 1) || adjacent(0, -1);
-    if (isRail) {
+    {
       for (let a = 0.08; a < 1; a += 0.15) {
         if (ew) this.line(this.project(x + a, y + 0.2, 0.6), this.project(x + a, y + 0.8, 0.6), "#514c3f", 2);
         if (ns) this.line(this.project(x + 0.2, y + a, 0.6), this.project(x + 0.8, y + a, 0.6), "#514c3f", 2);
@@ -285,13 +309,6 @@ export class CityRenderer {
         if (ew) this.line(this.project(x, y + a, 1), this.project(x + 1, y + a, 1), "#b5b7a5", 1);
         if (ns) this.line(this.project(x + a, y, 1), this.project(x + a, y + 1, 1), "#b5b7a5", 1);
       }
-    } else {
-      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-        if (!adjacent(dx, dy)) continue;
-        this.flat(x + (dx === 1 ? 0.5 : dx === -1 ? 0 : 0.1), y + (dy === 1 ? 0.5 : dy === -1 ? 0 : 0.1), dx === 0 ? 0.8 : 0.5, dy === 0 ? 0.8 : 0.5, 0.5, "#69736b");
-        if (this.zoom > 0.6) this.line(this.project(x + 0.5 + dx * 0.15, y + 0.5 + dy * 0.15, 0.6), this.project(x + 0.5 + dx * 0.42, y + 0.5 + dy * 0.42, 0.6), "#c9c6a4", 0.65);
-      }
-      if (ew && ns && this.zoom > 0.6) for (const a of [0.14, 0.24, 0.34]) { this.flat(x + a, y + 0.75, 0.045, 0.12, 0.7, "#bebfa5"); this.flat(x + 0.75, y + a, 0.12, 0.045, 0.7, "#bebfa5"); }
     }
     if (water) {
       if (ew) { this.line(this.project(x, y + 0.055, 4), this.project(x + 1, y + 0.055, 4), "#b9bda8", 1.7); this.line(this.project(x, y + 0.94, 4), this.project(x + 1, y + 0.94, 4), "#b9bda8", 1.7); }
@@ -391,33 +408,60 @@ export class CityRenderer {
 
   // ── Static layer ──────────────────────────────────────────────
   paint(city) {
+    this.paintEpoch = (this.paintEpoch || 0) + 1;
+    this.pickables = [];
     this.size = city.size;
     if (!this.corners || this.tiles !== city.tiles || city.revision !== this.lastRevision) this.buildCorners(city);
     const ctx = this.base;
     ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     ctx.clearRect(0, 0, this.w, this.h);
-    ctx.fillStyle = this.night ? "#233640" : "#526c60";
-    ctx.fillRect(0, 0, this.w, this.h);
+    drawMapBackdrop(this, city);
 
-    const key = (t) => this.depthKey(t.x, t.y);
-    this.sorted = [...city.tiles].sort((a, b) => key(a) - key(b));
+    // Terrain order only depends on the grid and orientation, not camera motion.
+    if (this.sortedTiles !== city.tiles || this.sortedRotation !== this.rotation) {
+      this.sorted = city.tiles.map(t => ({ t, k: this.depthKey(t.x, t.y) }))
+        .sort((a, b) => a.k - b.k).map(entry => entry.t);
+      this.sortedTiles = city.tiles; this.sortedRotation = this.rotation;
+    }
+    if (this.colorTiles !== city.tiles || this.colorRevision !== city.revision) {
+      const terrainChanged = this.colorTiles !== city.tiles || this.colorSeed !== city.seed ||
+        city.tiles.some((t, i) => this.colorTerrain[i] !== t.terrain);
+      if (terrainChanged) {
+        this.surfaceColors = city.tiles.map(t => surfaceColor(t, city));
+        this.colorTerrain = city.tiles.map(t => t.terrain);
+        this.colorSeed = city.seed;
+      }
+      this.colorTiles = city.tiles; this.colorRevision = city.revision;
+    }
     const visible = (x, y) => { const p = this.project(x, y); return p.x > -260 * this.zoom && p.x < this.w + 260 * this.zoom && p.y > -80 * this.zoom && p.y < this.h + 420 * this.zoom; };
 
     for (const t of this.sorted) if (visible(t.x + 0.5, t.y + 0.5)) this.terrain(t, city);
 
-    // Platforms and shadows for every lot.
+    // All platforms precede cast shadows, so adjacent lots cannot erase them.
+    for (const t of this.sorted) {
+      if (t.lot?.x === t.x && t.lot?.y === t.y && visible(t.x, t.y)) this.platformFor(t);
+      this.platform = null;
+    }
+    // Shadows for every lot.
     for (const t of this.sorted) {
       if (!t.lot || t.lot.x !== t.x || t.lot.y !== t.y) continue;
       if (!visible(t.x, t.y)) continue;
-      this.platformFor(t);
+      this.platform = t.elev * ELEV_PX;
       const h = heightOf(t);
       if (h) {
         const { w, h: d } = t.lot;
         const a = this.project(t.x + 0.15, t.y + 0.15), b = this.project(t.x + w - 0.15, t.y + 0.15), c = this.project(t.x + w - 0.15, t.y + d - 0.15), e = this.project(t.x + 0.15, t.y + d - 0.15);
         const dx = -h * 0.3 * this.zoom, dy = h * 0.15 * this.zoom;
-        this.poly([a, b, c, { x: c.x + dx, y: c.y + dy }, { x: e.x + dx, y: e.y + dy }, e], "#26352539");
+        this.poly([a, b, c, { x: c.x + dx, y: c.y + dy }, { x: e.x + dx, y: e.y + dy }, e], this.night ? "#12202f22" : "#203a4a45");
       }
       this.platform = null;
+    }
+
+    if (this.night) {
+      ctx.fillStyle = '#10284288'; ctx.fillRect(0, 0, this.w, this.h);
+    }
+    if (this.night && this.zoom > 0.5) for (const t of this.sorted) {
+      if (hasStreetLamp(t) && visible(t.x, t.y)) drawStreetLamp(this, t, true);
     }
 
     if (this.overlay !== "none") {
@@ -436,8 +480,10 @@ export class CityRenderer {
     ctx.clearRect(0, 0, this.w, this.h);
     if (showPipes) ctx.globalAlpha = 0.3;
 
+    this.paintingSolids = true;
     // Buildings, trees and poles sorted by their front-most corner.
-    const items = [];
+    if (this.itemTiles !== city.tiles || this.itemRevision !== city.revision || this.itemRotation !== this.rotation) {
+      const items = [];
     for (const t of city.tiles) {
       if (t.lot) {
         if (t.lot.x === t.x && t.lot.y === t.y) items.push({ k: this.depthKey(t.x, t.y, t.lot.w, t.lot.h), t, kind: "lot" });
@@ -446,13 +492,20 @@ export class CityRenderer {
       } else if (t.type === "empty" && t.trees) {
         items.push({ k: this.depthKey(t.x, t.y), t, kind: "trees" });
       }
+      if (hasStreetLamp(t)) items.push({ k: this.depthKey(t.x, t.y) - 0.8, t, kind: "lamp" });
       if (t.powerline) items.push({ k: this.depthKey(t.x, t.y) + 0.01, t, kind: "pole" });
     }
     items.sort((a, b) => a.k - b.k || a.t.x - b.t.x);
+      this.flightAltitude = items.reduce((height, it) => it.kind === "lot" ? Math.max(height, heightOf(it.t) * 1.7 + 80 + it.t.elev * ELEV_PX) : height, 210);
+      this.outages = items.filter(it => it.kind === "lot" && !it.t.powered && !it.t.abandoned && (ZONE_TINT[it.t.type] || BUILDINGS[it.t.type]?.powerUse))
+        .map(it => ({ t: it.t, height: heightOf(it.t) }));
+      this.items = items; this.itemTiles = city.tiles; this.itemRevision = city.revision; this.itemRotation = this.rotation;
+    }
+    const items = this.items;
     for (const it of items) {
       const t = it.t;
       if (!visible(t.x + (t.lot?.w || 1) / 2, t.y + (t.lot?.h || 1) / 2)) continue;
-      if (it.kind === "lot") { this.platform = t.elev * ELEV_PX; drawArchitecture(this, t); this.platform = null; }
+      if (it.kind === "lot") { this.platform = t.elev * ELEV_PX; drawCachedArchitecture(this, t, city); this.platform = null; }
       else if (it.kind === "zone") drawArchitecture(this, t);
       else if (it.kind === "trees") {
         const n = Math.floor(random(t.y, t.x) * 3);
@@ -460,8 +513,10 @@ export class CityRenderer {
         if (t.trees >= 1) this.tree(t.x + 0.2 + jx, t.y + 0.3 + jy, n);
         if (t.trees >= 2) this.tree(t.x + 0.55 + jy * 0.8, t.y + 0.6 + jx * 0.8, (n + 1) % 3);
         if (t.trees >= 3) this.tree(t.x + 0.65 - jx * 0.5, t.y + 0.15 + jy * 0.5, (n + 2) % 3);
-      } else this.powerline(t, city);
+      } else if (it.kind === "lamp") { if (this.zoom > 0.5) drawStreetLamp(this, t); }
+      else this.powerline(t, city);
     }
+    this.paintingSolids = false;
     ctx.globalAlpha = 1;
     this.lastRevision = city.revision;
     this.dirty = false;
@@ -517,10 +572,7 @@ export class CityRenderer {
         const a = back ? 1 - f : f, p = this.project(t.x + (vertical ? (back ? 0.68 : 0.32) : a), t.y + (vertical ? a : back ? 0.68 : 0.32), 2.1);
         if (p.x < -20 || p.x > this.w + 20 || p.y < -20 || p.y > this.h + 20) continue;
         const bus = i % 17 === 0;
-        ctx.fillStyle = bus ? "#487b91" : ["#dfd3aa", "#ac5743", "#658694", "#d4c8af", "#445351"][i % 5];
-        ctx.fillRect(p.x - 3 * this.zoom, p.y - 2 * this.zoom, (bus ? 9 : 6) * this.zoom, 3.5 * this.zoom);
-        ctx.fillStyle = "#bcc9ba"; ctx.fillRect(p.x - this.zoom, p.y - 2 * this.zoom, 2 * this.zoom, this.zoom);
-        if (this.night) { ctx.fillStyle = "#eddca0"; ctx.fillRect(p.x + 3 * this.zoom, p.y, 1.7 * this.zoom, this.zoom); }
+        drawVehicle(this, t.x + (vertical ? (back ? 0.68 : 0.32) : a), t.y + (vertical ? a : back ? 0.68 : 0.32), vertical, back, bus ? "#4f9db1" : ["#e9dfbc", "#c5684e", "#739bab", "#e6e4d7", "#dfb45b"][i % 5], bus);
       }
     }
 
@@ -533,50 +585,31 @@ export class CityRenderer {
       const f = (time * 0.0002 + random(t.x, t.y, 6)) % 1;
       const p = this.project(t.x + (east ? f : 0.5), t.y + (east ? 0.5 : f), 3);
       if (p.x < -20 || p.x > this.w + 20 || p.y < -20 || p.y > this.h + 20) continue;
-      ctx.fillStyle = "#3b4a52"; ctx.fillRect(p.x - 6 * this.zoom, p.y - 4 * this.zoom, 12 * this.zoom, 5 * this.zoom);
-      ctx.fillStyle = "#c9a23a"; ctx.fillRect(p.x - 5 * this.zoom, p.y - 5 * this.zoom, 3 * this.zoom, 1.5 * this.zoom);
+      drawVehicle(this, t.x + (east ? f : 0.5), t.y + (east ? 0.5 : f), !east, false, "#d0ab54", true);
     }
-    // Boats near seaports, planes over airports.
+    // Surface traffic remains below buildings; cruising aircraft are above them.
+    const aircraft = [];
     for (const t of city.tiles) {
       if (!t.lot || t.lot.x !== t.x || t.lot.y !== t.y) continue;
       if (t.type === "seaport") {
         const a = time * 0.0004 + t.x;
-        const p = this.project(t.x + t.lot.w / 2 + Math.cos(a) * 4, t.y + t.lot.h / 2 + Math.sin(a) * 4, 1);
-        const tile = city.tiles[Math.floor(t.y + t.lot.h / 2 + Math.sin(a) * 4) * city.size + Math.floor(t.x + t.lot.w / 2 + Math.cos(a) * 4)];
-        if (tile?.terrain === "water") {
-          ctx.fillStyle = "#e9e6d8"; ctx.fillRect(p.x - 5 * this.zoom, p.y - 2 * this.zoom, 10 * this.zoom, 3 * this.zoom);
-          ctx.fillStyle = "#5b6f7a"; ctx.fillRect(p.x - 2 * this.zoom, p.y - 4 * this.zoom, 3 * this.zoom, 2 * this.zoom);
-        }
+        const x = t.x + t.lot.w / 2 + Math.cos(a) * 4, y = t.y + t.lot.h / 2 + Math.sin(a) * 4;
+        const tx = Math.floor(x), ty = Math.floor(y);
+        const tile = tx >= 0 && ty >= 0 && tx < city.size && ty < city.size ? city.tiles[ty * city.size + tx] : null;
+        if (tile?.terrain === "water" && !ROAD.has(tile.type)) drawBoat(this, x, y, a + Math.PI / 2, time, t.x);
       } else if (t.type === "airport") {
-        const a = time * 0.0005 + t.y;
-        const p = this.project(t.x + 3 + Math.cos(a) * 9, t.y + 2 + Math.sin(a) * 6, 60 + Math.sin(a * 2) * 10);
-        const s = this.project(t.x + 3 + Math.cos(a) * 9, t.y + 2 + Math.sin(a) * 6, 0);
-        ctx.fillStyle = "#00000022"; ctx.beginPath(); ctx.ellipse(s.x, s.y, 5 * this.zoom, 2 * this.zoom, 0, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = "#f2f2ec";
-        ctx.fillRect(p.x - 6 * this.zoom, p.y - 1 * this.zoom, 12 * this.zoom, 2 * this.zoom);
-        ctx.fillRect(p.x - 1 * this.zoom, p.y - 4 * this.zoom, 2 * this.zoom, 8 * this.zoom);
-        if (this.night) { ctx.fillStyle = Math.floor(time / 400) % 2 ? "#ff6060" : "#f2f2ec"; ctx.fillRect(p.x - 7 * this.zoom, p.y - 1.5 * this.zoom, 2 * this.zoom, 2 * this.zoom); }
+        const a = time * 0.00028 + t.y;
+        const x = t.x + 3 + Math.cos(a) * 9, y = t.y + 2 + Math.sin(a) * 6;
+        const p = this.project(x, y, this.flightAltitude + Math.sin(a * 2) * 8);
+        const next = this.project(x - Math.sin(a) * 0.09, y + Math.cos(a) * 0.06, this.flightAltitude + Math.sin(a * 2) * 8);
+        const shadow = this.project(x, y);
+        ctx.fillStyle = "#20333d22"; ctx.beginPath(); ctx.ellipse(shadow.x, shadow.y, 7 * this.zoom, 2.5 * this.zoom, 0, 0, Math.PI * 2); ctx.fill();
+        aircraft.push({ p, heading: Math.atan2(next.y - p.y, next.x - p.x) });
       }
     }
 
     ctx.drawImage(this.cache, 0, 0, this.w, this.h);
-    if (this.night) {
-      ctx.fillStyle = "#12253d45"; ctx.fillRect(0, 0, this.w, this.h);
-      // Street lamps at intersections and every third road tile.
-      if (this.zoom > 0.5) {
-        for (let i = 0; i < city.tiles.length; i++) {
-          const t = city.tiles[i];
-          if ((t.type !== "road" && t.type !== "highway") || (t.x + t.y) % 3 !== 0) continue;
-          const p = this.project(t.x + 0.5, t.y + 0.5, 0);
-          if (p.x < -40 || p.x > this.w + 40 || p.y < -40 || p.y > this.h + 40) continue;
-          const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 22 * this.zoom);
-          g.addColorStop(0, "rgba(255,214,140,0.28)"); g.addColorStop(1, "rgba(255,214,140,0)");
-          ctx.fillStyle = g;
-          ctx.beginPath(); ctx.ellipse(p.x, p.y, 22 * this.zoom, 11 * this.zoom, 0, 0, Math.PI * 2); ctx.fill();
-          ctx.fillStyle = "#ffe4a0"; ctx.fillRect(p.x - 0.8 * this.zoom, p.y - 12 * this.zoom, 1.6 * this.zoom, 1.6 * this.zoom);
-        }
-      }
-    }
+    for (const plane of aircraft) drawAirplane(this, plane.p, plane.heading, time);
 
     // Neighbour names along the map edges.
     if (city._connections && this.zoom > 0.4) {
@@ -672,6 +705,8 @@ export class CityRenderer {
       }
     }
 
+    drawOutageMarkers(this, time);
+
     // Construction preview or hover.
     const preview = this.preview?.tiles;
     if (preview?.length) {
@@ -697,7 +732,12 @@ export class CityRenderer {
       }
     } else if (this.hover && this.hover.x >= 0 && this.hover.y >= 0 && this.hover.x < city.size && this.hover.y < city.size) {
       const { x, y } = this.hover;
-      this.flat(x, y, 1, 1, 1, this.tool === "bulldoze" ? "#d65e4166" : "#e9e6ae33", "#efecc0", ctx);
+      const tile = city.tiles[y * city.size + x];
+      if (this.tool === "inspect" && tile.lot) {
+        this.platform = city.tiles[tile.lot.y * city.size + tile.lot.x].elev * ELEV_PX;
+        this.flat(tile.lot.x, tile.lot.y, tile.lot.w, tile.lot.h, 1, null, "#fff0bd", ctx);
+        this.platform = null;
+      } else this.flat(x, y, 1, 1, 1, this.tool === "bulldoze" ? "#d65e4166" : "#e9e6ae33", "#efecc0", ctx);
     }
   }
 }

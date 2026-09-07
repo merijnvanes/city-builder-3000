@@ -2,7 +2,7 @@
 // Screen-space crowns stay legible at city scale as the map rotates.
 import { random } from './building-art.js';
 
-export function drawTree(r, x, y, variant = 0) {
+function paintTree(r, x, y, variant = 0) {
   const z = r.zoom, ctx = r.base;
   const seed = random(x, y, variant);
   const species = ((variant % 3) + 3) % 3;
@@ -60,4 +60,33 @@ export function drawTree(r, x, y, variant = 0) {
       r.poly([points[4], points[5], points[6], points[7], { x: cx, y: cy }], colors[Math.min(4, 2 + (i % 3))]);
     }
   }
+}
+
+// A small atlas of deterministic crowns keeps forests cheap while panning.
+// Cache belongs to the renderer and is discarded on scale/lighting changes.
+const atlases = new WeakMap();
+export function drawTree(r, x, y, variant = 0) {
+  if (typeof document === 'undefined') return paintTree(r, x, y, variant);
+  const dpr = Math.max(2, r.dpr || 1), scale = 2;
+  const key = `${scale}:${dpr}:${!!r.night}`;
+  const owner = r.atlasOwner || r;
+  let atlas = atlases.get(owner);
+  if (!atlas || atlas.key !== key) { atlas = { key, sprites: new Map() }; atlases.set(owner, atlas); }
+  const species = ((variant % 3) + 3) % 3;
+  const variation = Math.floor(random(x, y, variant) * 24), id = species * 24 + variation;
+  let sprite = atlas.sprites.get(id);
+  if (!sprite) {
+    const canvas = document.createElement('canvas');
+    const width = 44 * scale, height = 58 * scale;
+    canvas.width = Math.ceil(width * dpr); canvas.height = Math.ceil(height * dpr);
+    const base = canvas.getContext('2d'); base.scale(dpr, dpr);
+    const proxy = Object.assign(Object.create(r), { base, zoom: scale });
+    proxy.project = (_x, _y, z = 0) => ({ x: 22 * scale, y: (46 - z) * scale });
+    paintTree(proxy, variation + 0.25, species + 0.5, species);
+    sprite = { canvas, width: canvas.width / dpr, height: canvas.height / dpr };
+    atlas.sprites.set(id, sprite);
+  }
+  const p = r.project(x, y);
+  const ratio = r.zoom / scale, snap = value => Math.round(value * dpr) / dpr;
+  r.base.drawImage(sprite.canvas, snap(p.x - 22 * r.zoom), snap(p.y - 46 * r.zoom), sprite.width * ratio, sprite.height * ratio);
 }

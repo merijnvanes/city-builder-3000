@@ -32,7 +32,13 @@ export function drawShoreline(r, tile, city) {
     const alongX = dy !== 0;
     const ax = x + (dx === 1 ? 1 : 0), ay = y + (dy === 1 ? 1 : 0);
     const bx = ax + (alongX ? 1 : 0), by = ay + (alongX ? 0 : 1);
-    r.line(r.project(ax, ay, 0.1), r.project(bx, by, 0.1), '#c3d1b788', 1.15);
+    // A shallow shelf fades into the channel instead of a bright tile border.
+    const edge = r.project((ax + bx) / 2, (ay + by) / 2, 0.08);
+    const inner = r.project((ax + bx) / 2 - dx * 0.24, (ay + by) / 2 - dy * 0.24, 0.08);
+    const shelf = r.base.createLinearGradient(edge.x, edge.y, inner.x, inner.y);
+    shelf.addColorStop(0, '#bad5bf70'); shelf.addColorStop(1, '#75b2b000');
+    r.poly([r.project(ax, ay, 0.08), r.project(bx, by, 0.08), r.project(bx - dx * 0.24, by - dy * 0.24, 0.08), r.project(ax - dx * 0.24, ay - dy * 0.24, 0.08)], shelf);
+    r.line(r.project(ax, ay, 0.1), r.project(bx, by, 0.1), '#d1dbc577', 0.65);
     if (r.zoom > 0.65) {
       r.line(r.project(ax - dx * 0.08, ay - dy * 0.08, 0.1), r.project(bx - dx * 0.08, by - dy * 0.08, 0.1), '#9fc8bd55', 0.6);
     }

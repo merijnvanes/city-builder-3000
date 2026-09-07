@@ -1440,7 +1440,7 @@ export function mountUI(actions) {
       }
       inspPanel.classList.add("visible");
       inspPortrait.classList.toggle("visible", !!info.anchor);
-      if (info.anchor) lotCard.draw(info.anchor, info.night);
+      if (info.anchor) lotCard.draw(info.anchor, info.night, info.rotation);
       inspTitle.textContent = info.title || "--";
       inspDesc.textContent  = info.description || "";
       inspDetails.innerHTML = "";

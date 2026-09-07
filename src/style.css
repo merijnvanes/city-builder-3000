@@ -1574,3 +1574,24 @@ input[type="range"].chrome-slider::-moz-range-thumb {
   #rci-section { width: 110px; }
   #money-date { display: none; }
 }
+
+/* Quiet chrome keeps the city prominent; stable digits keep budgets legible. */
+.status-money, .top-metric-val, #money-display, .status-mini-val {
+  font-variant-numeric: tabular-nums;
+}
+#top-bar {
+  background: linear-gradient(180deg, #334b57, #203440);
+  border-bottom-color: #172b36;
+}
+#toolbar {
+  background: linear-gradient(160deg, #2b414d, #22333f 70%);
+  box-shadow: 3px 0 12px #14283033;
+}
+#inspector-panel {
+  box-shadow: 0 8px 24px #12232e66;
+  border-top-color: #769a9c;
+}
+button:focus-visible {
+  outline: 2px solid #a7d8d0;
+  outline-offset: 2px;
+}

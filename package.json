@@ -10,7 +10,8 @@
     "test": "node --test tests/*.test.js",
     "test:browser": "node tests/browser.mjs",
     "test:architecture": "node tests/architecture.mjs",
-    "test:visuals": "node tests/architecture.mjs && node tests/disaster-rendering.mjs"
+    "test:visuals": "node tests/architecture.mjs && node tests/architecture-cache.mjs && node tests/disaster-rendering.mjs",
+    "test:performance": "node tests/performance.mjs"
   },
   "devDependencies": {
     "vite": "^7.0.0",

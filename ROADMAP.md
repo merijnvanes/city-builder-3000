@@ -1,6 +1,6 @@
 # Roadmap
 
-What the game has and what could still bring it closer to the classic it follows.
+What the game has and what could still bring it closer to the classic it follows. See [PARITY.md](PARITY.md) for reference-backed gameplay gaps and the current visual/performance handoff.
 
 ## Done
 
@@ -19,9 +19,9 @@ What the game has and what could still bring it closer to the classic it follows
 
 ## Ideas
 
-- Rail bridges and tunnels; highway ramps as a rule
-- Lot outlines while zoning; per-lot query cards with a picture
-- More rewards (marina, TV station), more petition types
+- Tunnels and elevated highways with explicit ramps
+- Additional architecture and terrain polish; query cards and zoning lot outlines are implemented
+- More rewards (TV station), more petition types
 - Regional map with several cities sharing a save
 - Balance passes on 50-year games and 128×128 maps
 - Touch-first polish for phones

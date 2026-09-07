@@ -15,16 +15,17 @@ const slotKey = (slot) => (slot === 0 ? `${SAVE_KEY}-autosave` : slot === 1 ? SA
 
 let city = startScenario(sim.createCity(42, true));
 let tool = "inspect", density = 1, speed = 0;
-let lastTick = performance.now(), animationTime = 0, previousTime = performance.now(), lastFrame = 0;
+let lastTick = performance.now(), animationTime = 0, previousTime = performance.now();
 const undo = createUndoManager(20);
 const audio = new CityAudio();
 const canvas = document.querySelector("#city-canvas");
 const renderer = new CityRenderer(canvas);
-let ui, input;
+let ui, input, selection = null;
 
 // Start the camera on the built-up centre of the city (or the map centre).
 function lookAtCity() {
   renderer.size = city.size;
+  renderer.buildCorners(city);
   let sx = 0, sy = 0, n = 0;
   for (const t of city.tiles) if (t.type !== "empty") { sx += t.x; sy += t.y; n++; }
   if (n) renderer.focusOn(sx / n, sy / n, 0.85);
@@ -32,9 +33,15 @@ function lookAtCity() {
 }
 lookAtCity();
 
+function refreshSelection() {
+  if (!selection || tool !== "inspect") return;
+  ui?.setSelection({ ...sim.inspectTile(city, selection.x, selection.y), night: renderer.night, rotation: renderer.rotation });
+}
+
 function refresh() {
   const stats = sim.getStats(city);
   ui?.update(city, stats);
+  refreshSelection();
   audio.setAmbience({ traffic: stats.traffic, population: stats.population, night: renderer.night });
   return stats;
 }
@@ -42,6 +49,7 @@ function refresh() {
 function choose(id) {
   input?.cancel();
   tool = id;
+  if (id !== "inspect") selection = null;
   renderer.tool = id;
   renderer.dirty = true;
   ui?.setTool(id);
@@ -61,6 +69,7 @@ function restore() {
   setSpeed(0);
   renderer.size = city.size;
   renderer.dirty = true;
+  selection = null;
   ui?.setSelection(null);
   refresh();
 }
@@ -168,8 +177,8 @@ const actions = {
   setOverlay: (id) => { renderer.overlay = id; renderer.dirty = true; ui?.setOverlay(id); },
   zoom: (d) => renderer.zoomAt(d * 0.18),
   home: () => lookAtCity(),
-  rotate: (d) => { input?.cancel(); renderer.rotate(d); },
-  toggleDay: () => { renderer.night = !renderer.night; renderer.dirty = true; audio.setAmbience({ night: renderer.night }); },
+  rotate: (d) => { input?.cancel(); renderer.rotate(d); refreshSelection(); },
+  toggleDay: () => { renderer.night = !renderer.night; renderer.dirty = true; audio.setAmbience({ night: renderer.night }); refreshSelection(); },
   toggleSound: async () => {
     try { const enabled = await audio.toggle(); ui.notify(enabled ? "Soundtrack on." : "Sound muted."); return enabled; }
     catch { ui.notify("Audio could not start in this browser."); return false; }
@@ -189,7 +198,7 @@ input = attachInput(canvas, renderer, {
   getCity: () => city, getTool: () => tool, getDensity: () => density, getTools: () => sim.TOOLS,
   onChoose: choose, onSpeed: setSpeed, onUndo: undoLast, onHome: actions.home, onRotate: actions.rotate,
   onPreview: (plan) => ui.setBuildPreview?.(plan || { count: 0, cost: 0, valid: true, message: "" }),
-  onInspect: (tile) => ui.setSelection({ ...sim.inspectTile(city, tile.x, tile.y), night: renderer.night }),
+  onInspect: (tile) => { selection = { x: tile.x, y: tile.y }; refreshSelection(); },
   onCommit: (plan) => {
     const before = structuredClone(city);
     const result = applyConstruction(city, plan);
@@ -227,7 +236,7 @@ function frame(now) {
     // Autosave every January.
     if (city.month % 12 === 0) { try { localStorage.setItem(slotKey(0), sim.serialize(city)); } catch { /* storage full or blocked */ } }
   }
-  if (now - lastFrame > 32) { renderer.render(city, animationTime); minimap.update(city); lastFrame = now; }
+  if (!document.hidden) { input.update(delta); renderer.render(city, animationTime); minimap.update(city); }
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);

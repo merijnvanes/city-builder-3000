@@ -21,9 +21,12 @@ pnpm build         # outputs to dist/
 
 ```bash
 pnpm test          # node:test unit tests for the simulation, construction and camera
+pnpm test:performance # Chrome renderer benchmark against the running dev server
 ```
 
 With Chrome installed, run `pnpm dev --port 4173` in one terminal and `pnpm test:browser` in another for a scripted gameplay check. Screenshots land in `artifacts/`. Run `pnpm test:visuals` against the same server for Canvas pixel checks of courtyard occlusion and earthquake layering, in all camera orientations and day/night lighting. Set `CIVIC_TEST_URL` to use another server port.
+
+Gameplay fidelity and remaining verified gaps are tracked in [PARITY.md](PARITY.md).
 
 ## The game
 
@@ -64,6 +67,7 @@ Tool shortcuts are shown in the tooltips of the tool dock.
 - `src/sim/` — the simulation: `catalog.js` (buildings), `terrain.js`, `lots.js`, `place.js`, `utilities.js`, `services.js`, `traffic.js`, `growth.js`, `economy.js`, `events.js`, `neighbors.js`, `disasters.js`, `index.js` (public API)
 - `src/construction.js` — plan, apply and undo player actions
 - `src/renderer.js`, `src/building-art.js` — isometric renderer and procedural architecture
+- `src/street-art.js`, `src/foliage.js`, `src/architecture-cache.js` — street details and bounded artwork caches
 - `src/ui.js`, `src/style.css` — the interface
 - `src/main.js` — game loop, saves, wiring
 
