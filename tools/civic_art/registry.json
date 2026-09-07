@@ -1309,5 +1309,1021 @@
         "description": "Residential density 3, growth stage 4, authored specifically for a 3\u00d73 lot. Brick setbacks."
       }
     ]
+  },
+  "commercial-d1-l1-s1": {
+    "module": "zone_commercial",
+    "tiles": 1,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 1 \u00b7 stage 1 \u00b7 1\u00d71",
+    "description": "Commercial density 1, growth stage 1, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 1,
+      "level": 1
+    },
+    "variants": [
+      {
+        "model": "commercial-d1-l1-s1",
+        "label": "Corner market",
+        "description": "Corner market."
+      },
+      {
+        "model": "commercial-d1-l1-s1_v1",
+        "label": "Scarlet diner",
+        "description": "Scarlet diner."
+      },
+      {
+        "model": "commercial-d1-l1-s1_v2",
+        "label": "Filling station",
+        "description": "Filling station."
+      },
+      {
+        "model": "commercial-d1-l1-s1_v3",
+        "label": "Plum shops",
+        "description": "Plum shops."
+      },
+      {
+        "model": "commercial-d1-l1-s1_v4",
+        "label": "Blue diner",
+        "description": "Blue diner."
+      }
+    ]
+  },
+  "commercial-d1-l2-s1": {
+    "module": "zone_commercial",
+    "tiles": 1,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 1 \u00b7 stage 2 \u00b7 1\u00d71",
+    "description": "Commercial density 1, growth stage 2, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 1,
+      "level": 2
+    },
+    "variants": [
+      {
+        "model": "commercial-d1-l2-s1",
+        "label": "Corner market",
+        "description": "Corner market."
+      },
+      {
+        "model": "commercial-d1-l2-s1_v1",
+        "label": "Scarlet diner",
+        "description": "Scarlet diner."
+      },
+      {
+        "model": "commercial-d1-l2-s1_v2",
+        "label": "Filling station",
+        "description": "Filling station."
+      },
+      {
+        "model": "commercial-d1-l2-s1_v3",
+        "label": "Plum shops",
+        "description": "Plum shops."
+      },
+      {
+        "model": "commercial-d1-l2-s1_v4",
+        "label": "Blue diner",
+        "description": "Blue diner."
+      }
+    ]
+  },
+  "commercial-d1-l3-s1": {
+    "module": "zone_commercial",
+    "tiles": 1,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 1 \u00b7 stage 3 \u00b7 1\u00d71",
+    "description": "Commercial density 1, growth stage 3, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 1,
+      "level": 3
+    },
+    "variants": [
+      {
+        "model": "commercial-d1-l3-s1",
+        "label": "Corner market",
+        "description": "Corner market."
+      },
+      {
+        "model": "commercial-d1-l3-s1_v1",
+        "label": "Scarlet diner",
+        "description": "Scarlet diner."
+      },
+      {
+        "model": "commercial-d1-l3-s1_v2",
+        "label": "Retail upgrade",
+        "description": "Retail upgrade."
+      },
+      {
+        "model": "commercial-d1-l3-s1_v3",
+        "label": "Plum shops",
+        "description": "Plum shops."
+      },
+      {
+        "model": "commercial-d1-l3-s1_v4",
+        "label": "Blue diner",
+        "description": "Blue diner."
+      }
+    ]
+  },
+  "commercial-d1-l4-s1": {
+    "module": "zone_commercial",
+    "tiles": 1,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 1 \u00b7 stage 4 \u00b7 1\u00d71",
+    "description": "Commercial density 1, growth stage 4, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 1,
+      "level": 4
+    },
+    "variants": [
+      {
+        "model": "commercial-d1-l4-s1",
+        "label": "Corner market",
+        "description": "Corner market."
+      },
+      {
+        "model": "commercial-d1-l4-s1_v1",
+        "label": "Scarlet diner",
+        "description": "Scarlet diner."
+      },
+      {
+        "model": "commercial-d1-l4-s1_v2",
+        "label": "Retail upgrade",
+        "description": "Retail upgrade."
+      },
+      {
+        "model": "commercial-d1-l4-s1_v3",
+        "label": "Plum shops",
+        "description": "Plum shops."
+      },
+      {
+        "model": "commercial-d1-l4-s1_v4",
+        "label": "Blue diner",
+        "description": "Blue diner."
+      }
+    ]
+  },
+  "commercial-d2-l1-s1": {
+    "module": "zone_commercial",
+    "tiles": 1,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 2 \u00b7 stage 1 \u00b7 1\u00d71",
+    "description": "Commercial density 2, growth stage 1, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 2,
+      "level": 1
+    },
+    "variants": [
+      {
+        "model": "commercial-d2-l1-s1",
+        "label": "Limestone offices",
+        "description": "Limestone offices."
+      },
+      {
+        "model": "commercial-d2-l1-s1_v1",
+        "label": "Brick hotel",
+        "description": "Brick hotel."
+      },
+      {
+        "model": "commercial-d2-l1-s1_v2",
+        "label": "Department store",
+        "description": "Department store."
+      },
+      {
+        "model": "commercial-d2-l1-s1_v3",
+        "label": "Glazed offices",
+        "description": "Glazed offices."
+      },
+      {
+        "model": "commercial-d2-l1-s1_v4",
+        "label": "Grand hotel",
+        "description": "Grand hotel."
+      },
+      {
+        "model": "commercial-d2-l1-s1_v5",
+        "label": "City department store",
+        "description": "City department store."
+      },
+      {
+        "model": "commercial-d2-l1-s1_v6",
+        "label": "Teal offices",
+        "description": "Teal offices."
+      }
+    ]
+  },
+  "commercial-d2-l1-s2": {
+    "module": "zone_commercial",
+    "tiles": 2,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 2 \u00b7 stage 1 \u00b7 2\u00d72",
+    "description": "Commercial density 2, growth stage 1, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 2,
+      "level": 1
+    },
+    "variants": [
+      {
+        "model": "commercial-d2-l1-s2",
+        "label": "Limestone offices",
+        "description": "Limestone offices."
+      },
+      {
+        "model": "commercial-d2-l1-s2_v1",
+        "label": "Brick hotel",
+        "description": "Brick hotel."
+      },
+      {
+        "model": "commercial-d2-l1-s2_v2",
+        "label": "Department store",
+        "description": "Department store."
+      },
+      {
+        "model": "commercial-d2-l1-s2_v3",
+        "label": "Glazed offices",
+        "description": "Glazed offices."
+      },
+      {
+        "model": "commercial-d2-l1-s2_v4",
+        "label": "Grand hotel",
+        "description": "Grand hotel."
+      },
+      {
+        "model": "commercial-d2-l1-s2_v5",
+        "label": "City department store",
+        "description": "City department store."
+      },
+      {
+        "model": "commercial-d2-l1-s2_v6",
+        "label": "Teal offices",
+        "description": "Teal offices."
+      }
+    ]
+  },
+  "commercial-d2-l2-s1": {
+    "module": "zone_commercial",
+    "tiles": 1,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 2 \u00b7 stage 2 \u00b7 1\u00d71",
+    "description": "Commercial density 2, growth stage 2, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 2,
+      "level": 2
+    },
+    "variants": [
+      {
+        "model": "commercial-d2-l2-s1",
+        "label": "Limestone offices",
+        "description": "Limestone offices."
+      },
+      {
+        "model": "commercial-d2-l2-s1_v1",
+        "label": "Brick hotel",
+        "description": "Brick hotel."
+      },
+      {
+        "model": "commercial-d2-l2-s1_v2",
+        "label": "Department store",
+        "description": "Department store."
+      },
+      {
+        "model": "commercial-d2-l2-s1_v3",
+        "label": "Glazed offices",
+        "description": "Glazed offices."
+      },
+      {
+        "model": "commercial-d2-l2-s1_v4",
+        "label": "Grand hotel",
+        "description": "Grand hotel."
+      },
+      {
+        "model": "commercial-d2-l2-s1_v5",
+        "label": "City department store",
+        "description": "City department store."
+      },
+      {
+        "model": "commercial-d2-l2-s1_v6",
+        "label": "Teal offices",
+        "description": "Teal offices."
+      }
+    ]
+  },
+  "commercial-d2-l2-s2": {
+    "module": "zone_commercial",
+    "tiles": 2,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 2 \u00b7 stage 2 \u00b7 2\u00d72",
+    "description": "Commercial density 2, growth stage 2, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 2,
+      "level": 2
+    },
+    "variants": [
+      {
+        "model": "commercial-d2-l2-s2",
+        "label": "Limestone offices",
+        "description": "Limestone offices."
+      },
+      {
+        "model": "commercial-d2-l2-s2_v1",
+        "label": "Brick hotel",
+        "description": "Brick hotel."
+      },
+      {
+        "model": "commercial-d2-l2-s2_v2",
+        "label": "Department store",
+        "description": "Department store."
+      },
+      {
+        "model": "commercial-d2-l2-s2_v3",
+        "label": "Glazed offices",
+        "description": "Glazed offices."
+      },
+      {
+        "model": "commercial-d2-l2-s2_v4",
+        "label": "Grand hotel",
+        "description": "Grand hotel."
+      },
+      {
+        "model": "commercial-d2-l2-s2_v5",
+        "label": "City department store",
+        "description": "City department store."
+      },
+      {
+        "model": "commercial-d2-l2-s2_v6",
+        "label": "Teal offices",
+        "description": "Teal offices."
+      }
+    ]
+  },
+  "commercial-d2-l3-s1": {
+    "module": "zone_commercial",
+    "tiles": 1,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 2 \u00b7 stage 3 \u00b7 1\u00d71",
+    "description": "Commercial density 2, growth stage 3, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 2,
+      "level": 3
+    },
+    "variants": [
+      {
+        "model": "commercial-d2-l3-s1",
+        "label": "Limestone offices",
+        "description": "Limestone offices."
+      },
+      {
+        "model": "commercial-d2-l3-s1_v1",
+        "label": "Brick hotel",
+        "description": "Brick hotel."
+      },
+      {
+        "model": "commercial-d2-l3-s1_v2",
+        "label": "Department store",
+        "description": "Department store."
+      },
+      {
+        "model": "commercial-d2-l3-s1_v3",
+        "label": "Glazed offices",
+        "description": "Glazed offices."
+      },
+      {
+        "model": "commercial-d2-l3-s1_v4",
+        "label": "Grand hotel",
+        "description": "Grand hotel."
+      },
+      {
+        "model": "commercial-d2-l3-s1_v5",
+        "label": "City department store",
+        "description": "City department store."
+      },
+      {
+        "model": "commercial-d2-l3-s1_v6",
+        "label": "Teal offices",
+        "description": "Teal offices."
+      }
+    ]
+  },
+  "commercial-d2-l3-s2": {
+    "module": "zone_commercial",
+    "tiles": 2,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 2 \u00b7 stage 3 \u00b7 2\u00d72",
+    "description": "Commercial density 2, growth stage 3, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 2,
+      "level": 3
+    },
+    "variants": [
+      {
+        "model": "commercial-d2-l3-s2",
+        "label": "Limestone offices",
+        "description": "Limestone offices."
+      },
+      {
+        "model": "commercial-d2-l3-s2_v1",
+        "label": "Brick hotel",
+        "description": "Brick hotel."
+      },
+      {
+        "model": "commercial-d2-l3-s2_v2",
+        "label": "Department store",
+        "description": "Department store."
+      },
+      {
+        "model": "commercial-d2-l3-s2_v3",
+        "label": "Glazed offices",
+        "description": "Glazed offices."
+      },
+      {
+        "model": "commercial-d2-l3-s2_v4",
+        "label": "Grand hotel",
+        "description": "Grand hotel."
+      },
+      {
+        "model": "commercial-d2-l3-s2_v5",
+        "label": "City department store",
+        "description": "City department store."
+      },
+      {
+        "model": "commercial-d2-l3-s2_v6",
+        "label": "Teal offices",
+        "description": "Teal offices."
+      }
+    ]
+  },
+  "commercial-d2-l4-s1": {
+    "module": "zone_commercial",
+    "tiles": 1,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 2 \u00b7 stage 4 \u00b7 1\u00d71",
+    "description": "Commercial density 2, growth stage 4, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 2,
+      "level": 4
+    },
+    "variants": [
+      {
+        "model": "commercial-d2-l4-s1",
+        "label": "Limestone offices",
+        "description": "Limestone offices."
+      },
+      {
+        "model": "commercial-d2-l4-s1_v1",
+        "label": "Brick hotel",
+        "description": "Brick hotel."
+      },
+      {
+        "model": "commercial-d2-l4-s1_v2",
+        "label": "Department store",
+        "description": "Department store."
+      },
+      {
+        "model": "commercial-d2-l4-s1_v3",
+        "label": "Glazed offices",
+        "description": "Glazed offices."
+      },
+      {
+        "model": "commercial-d2-l4-s1_v4",
+        "label": "Grand hotel",
+        "description": "Grand hotel."
+      },
+      {
+        "model": "commercial-d2-l4-s1_v5",
+        "label": "City department store",
+        "description": "City department store."
+      },
+      {
+        "model": "commercial-d2-l4-s1_v6",
+        "label": "Teal offices",
+        "description": "Teal offices."
+      }
+    ]
+  },
+  "commercial-d2-l4-s2": {
+    "module": "zone_commercial",
+    "tiles": 2,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 2 \u00b7 stage 4 \u00b7 2\u00d72",
+    "description": "Commercial density 2, growth stage 4, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 2,
+      "level": 4
+    },
+    "variants": [
+      {
+        "model": "commercial-d2-l4-s2",
+        "label": "Limestone offices",
+        "description": "Limestone offices."
+      },
+      {
+        "model": "commercial-d2-l4-s2_v1",
+        "label": "Brick hotel",
+        "description": "Brick hotel."
+      },
+      {
+        "model": "commercial-d2-l4-s2_v2",
+        "label": "Department store",
+        "description": "Department store."
+      },
+      {
+        "model": "commercial-d2-l4-s2_v3",
+        "label": "Glazed offices",
+        "description": "Glazed offices."
+      },
+      {
+        "model": "commercial-d2-l4-s2_v4",
+        "label": "Grand hotel",
+        "description": "Grand hotel."
+      },
+      {
+        "model": "commercial-d2-l4-s2_v5",
+        "label": "City department store",
+        "description": "City department store."
+      },
+      {
+        "model": "commercial-d2-l4-s2_v6",
+        "label": "Teal offices",
+        "description": "Teal offices."
+      }
+    ]
+  },
+  "commercial-d3-l1-s1": {
+    "module": "zone_commercial",
+    "tiles": 1,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 3 \u00b7 stage 1 \u00b7 1\u00d71",
+    "description": "Commercial density 3, growth stage 1, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 3,
+      "level": 1
+    },
+    "variants": [
+      {
+        "model": "commercial-d3-l1-s1",
+        "label": "Curtain-wall tower",
+        "description": "Curtain-wall tower."
+      },
+      {
+        "model": "commercial-d3-l1-s1_v1",
+        "label": "Stepped spire",
+        "description": "Stepped spire."
+      },
+      {
+        "model": "commercial-d3-l1-s1_v2",
+        "label": "Copper gable",
+        "description": "Copper gable."
+      }
+    ]
+  },
+  "commercial-d3-l1-s2": {
+    "module": "zone_commercial",
+    "tiles": 2,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 3 \u00b7 stage 1 \u00b7 2\u00d72",
+    "description": "Commercial density 3, growth stage 1, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 3,
+      "level": 1
+    },
+    "variants": [
+      {
+        "model": "commercial-d3-l1-s2",
+        "label": "Curtain-wall tower",
+        "description": "Curtain-wall tower."
+      },
+      {
+        "model": "commercial-d3-l1-s2_v1",
+        "label": "Stepped spire",
+        "description": "Stepped spire."
+      },
+      {
+        "model": "commercial-d3-l1-s2_v2",
+        "label": "Copper gable",
+        "description": "Copper gable."
+      },
+      {
+        "model": "commercial-d3-l1-s2_v3",
+        "label": "Limestone crown",
+        "description": "Limestone crown."
+      },
+      {
+        "model": "commercial-d3-l1-s2_v4",
+        "label": "Recessed glass crown",
+        "description": "Recessed glass crown."
+      },
+      {
+        "model": "commercial-d3-l1-s2_v5",
+        "label": "Garden terraces",
+        "description": "Garden terraces."
+      }
+    ]
+  },
+  "commercial-d3-l1-s3": {
+    "module": "zone_commercial",
+    "tiles": 3,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 3 \u00b7 stage 1 \u00b7 3\u00d73",
+    "description": "Commercial density 3, growth stage 1, authored specifically for a 3\u00d73 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 3,
+      "level": 1
+    },
+    "variants": [
+      {
+        "model": "commercial-d3-l1-s3",
+        "label": "Curtain-wall tower",
+        "description": "Curtain-wall tower."
+      },
+      {
+        "model": "commercial-d3-l1-s3_v1",
+        "label": "Stepped spire",
+        "description": "Stepped spire."
+      },
+      {
+        "model": "commercial-d3-l1-s3_v2",
+        "label": "Copper gable",
+        "description": "Copper gable."
+      },
+      {
+        "model": "commercial-d3-l1-s3_v3",
+        "label": "Limestone crown",
+        "description": "Limestone crown."
+      },
+      {
+        "model": "commercial-d3-l1-s3_v4",
+        "label": "Recessed glass crown",
+        "description": "Recessed glass crown."
+      },
+      {
+        "model": "commercial-d3-l1-s3_v5",
+        "label": "Garden terraces",
+        "description": "Garden terraces."
+      }
+    ]
+  },
+  "commercial-d3-l2-s1": {
+    "module": "zone_commercial",
+    "tiles": 1,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 3 \u00b7 stage 2 \u00b7 1\u00d71",
+    "description": "Commercial density 3, growth stage 2, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 3,
+      "level": 2
+    },
+    "variants": [
+      {
+        "model": "commercial-d3-l2-s1",
+        "label": "Curtain-wall tower",
+        "description": "Curtain-wall tower."
+      },
+      {
+        "model": "commercial-d3-l2-s1_v1",
+        "label": "Stepped spire",
+        "description": "Stepped spire."
+      },
+      {
+        "model": "commercial-d3-l2-s1_v2",
+        "label": "Copper gable",
+        "description": "Copper gable."
+      }
+    ]
+  },
+  "commercial-d3-l2-s2": {
+    "module": "zone_commercial",
+    "tiles": 2,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 3 \u00b7 stage 2 \u00b7 2\u00d72",
+    "description": "Commercial density 3, growth stage 2, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 3,
+      "level": 2
+    },
+    "variants": [
+      {
+        "model": "commercial-d3-l2-s2",
+        "label": "Curtain-wall tower",
+        "description": "Curtain-wall tower."
+      },
+      {
+        "model": "commercial-d3-l2-s2_v1",
+        "label": "Stepped spire",
+        "description": "Stepped spire."
+      },
+      {
+        "model": "commercial-d3-l2-s2_v2",
+        "label": "Copper gable",
+        "description": "Copper gable."
+      },
+      {
+        "model": "commercial-d3-l2-s2_v3",
+        "label": "Limestone crown",
+        "description": "Limestone crown."
+      },
+      {
+        "model": "commercial-d3-l2-s2_v4",
+        "label": "Recessed glass crown",
+        "description": "Recessed glass crown."
+      },
+      {
+        "model": "commercial-d3-l2-s2_v5",
+        "label": "Garden terraces",
+        "description": "Garden terraces."
+      }
+    ]
+  },
+  "commercial-d3-l2-s3": {
+    "module": "zone_commercial",
+    "tiles": 3,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 3 \u00b7 stage 2 \u00b7 3\u00d73",
+    "description": "Commercial density 3, growth stage 2, authored specifically for a 3\u00d73 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 3,
+      "level": 2
+    },
+    "variants": [
+      {
+        "model": "commercial-d3-l2-s3",
+        "label": "Curtain-wall tower",
+        "description": "Curtain-wall tower."
+      },
+      {
+        "model": "commercial-d3-l2-s3_v1",
+        "label": "Stepped spire",
+        "description": "Stepped spire."
+      },
+      {
+        "model": "commercial-d3-l2-s3_v2",
+        "label": "Copper gable",
+        "description": "Copper gable."
+      },
+      {
+        "model": "commercial-d3-l2-s3_v3",
+        "label": "Limestone crown",
+        "description": "Limestone crown."
+      },
+      {
+        "model": "commercial-d3-l2-s3_v4",
+        "label": "Recessed glass crown",
+        "description": "Recessed glass crown."
+      },
+      {
+        "model": "commercial-d3-l2-s3_v5",
+        "label": "Garden terraces",
+        "description": "Garden terraces."
+      }
+    ]
+  },
+  "commercial-d3-l3-s1": {
+    "module": "zone_commercial",
+    "tiles": 1,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 3 \u00b7 stage 3 \u00b7 1\u00d71",
+    "description": "Commercial density 3, growth stage 3, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 3,
+      "level": 3
+    },
+    "variants": [
+      {
+        "model": "commercial-d3-l3-s1",
+        "label": "Curtain-wall tower",
+        "description": "Curtain-wall tower."
+      },
+      {
+        "model": "commercial-d3-l3-s1_v1",
+        "label": "Stepped spire",
+        "description": "Stepped spire."
+      },
+      {
+        "model": "commercial-d3-l3-s1_v2",
+        "label": "Copper gable",
+        "description": "Copper gable."
+      }
+    ]
+  },
+  "commercial-d3-l3-s2": {
+    "module": "zone_commercial",
+    "tiles": 2,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 3 \u00b7 stage 3 \u00b7 2\u00d72",
+    "description": "Commercial density 3, growth stage 3, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 3,
+      "level": 3
+    },
+    "variants": [
+      {
+        "model": "commercial-d3-l3-s2",
+        "label": "Curtain-wall tower",
+        "description": "Curtain-wall tower."
+      },
+      {
+        "model": "commercial-d3-l3-s2_v1",
+        "label": "Stepped spire",
+        "description": "Stepped spire."
+      },
+      {
+        "model": "commercial-d3-l3-s2_v2",
+        "label": "Copper gable",
+        "description": "Copper gable."
+      },
+      {
+        "model": "commercial-d3-l3-s2_v3",
+        "label": "Limestone crown",
+        "description": "Limestone crown."
+      },
+      {
+        "model": "commercial-d3-l3-s2_v4",
+        "label": "Recessed glass crown",
+        "description": "Recessed glass crown."
+      },
+      {
+        "model": "commercial-d3-l3-s2_v5",
+        "label": "Garden terraces",
+        "description": "Garden terraces."
+      }
+    ]
+  },
+  "commercial-d3-l3-s3": {
+    "module": "zone_commercial",
+    "tiles": 3,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 3 \u00b7 stage 3 \u00b7 3\u00d73",
+    "description": "Commercial density 3, growth stage 3, authored specifically for a 3\u00d73 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 3,
+      "level": 3
+    },
+    "variants": [
+      {
+        "model": "commercial-d3-l3-s3",
+        "label": "Curtain-wall tower",
+        "description": "Curtain-wall tower."
+      },
+      {
+        "model": "commercial-d3-l3-s3_v1",
+        "label": "Stepped spire",
+        "description": "Stepped spire."
+      },
+      {
+        "model": "commercial-d3-l3-s3_v2",
+        "label": "Copper gable",
+        "description": "Copper gable."
+      },
+      {
+        "model": "commercial-d3-l3-s3_v3",
+        "label": "Limestone crown",
+        "description": "Limestone crown."
+      },
+      {
+        "model": "commercial-d3-l3-s3_v4",
+        "label": "Recessed glass crown",
+        "description": "Recessed glass crown."
+      },
+      {
+        "model": "commercial-d3-l3-s3_v5",
+        "label": "Garden terraces",
+        "description": "Garden terraces."
+      }
+    ]
+  },
+  "commercial-d3-l4-s1": {
+    "module": "zone_commercial",
+    "tiles": 1,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 3 \u00b7 stage 4 \u00b7 1\u00d71",
+    "description": "Commercial density 3, growth stage 4, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 3,
+      "level": 4
+    },
+    "variants": [
+      {
+        "model": "commercial-d3-l4-s1",
+        "label": "Curtain-wall tower",
+        "description": "Curtain-wall tower."
+      },
+      {
+        "model": "commercial-d3-l4-s1_v1",
+        "label": "Stepped spire",
+        "description": "Stepped spire."
+      },
+      {
+        "model": "commercial-d3-l4-s1_v2",
+        "label": "Copper gable",
+        "description": "Copper gable."
+      }
+    ]
+  },
+  "commercial-d3-l4-s2": {
+    "module": "zone_commercial",
+    "tiles": 2,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 3 \u00b7 stage 4 \u00b7 2\u00d72",
+    "description": "Commercial density 3, growth stage 4, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 3,
+      "level": 4
+    },
+    "variants": [
+      {
+        "model": "commercial-d3-l4-s2",
+        "label": "Curtain-wall tower",
+        "description": "Curtain-wall tower."
+      },
+      {
+        "model": "commercial-d3-l4-s2_v1",
+        "label": "Stepped spire",
+        "description": "Stepped spire."
+      },
+      {
+        "model": "commercial-d3-l4-s2_v2",
+        "label": "Copper gable",
+        "description": "Copper gable."
+      },
+      {
+        "model": "commercial-d3-l4-s2_v3",
+        "label": "Limestone crown",
+        "description": "Limestone crown."
+      },
+      {
+        "model": "commercial-d3-l4-s2_v4",
+        "label": "Recessed glass crown",
+        "description": "Recessed glass crown."
+      },
+      {
+        "model": "commercial-d3-l4-s2_v5",
+        "label": "Garden terraces",
+        "description": "Garden terraces."
+      }
+    ]
+  },
+  "commercial-d3-l4-s3": {
+    "module": "zone_commercial",
+    "tiles": 3,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 3 \u00b7 stage 4 \u00b7 3\u00d73",
+    "description": "Commercial density 3, growth stage 4, authored specifically for a 3\u00d73 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 3,
+      "level": 4
+    },
+    "variants": [
+      {
+        "model": "commercial-d3-l4-s3",
+        "label": "Curtain-wall tower",
+        "description": "Curtain-wall tower."
+      },
+      {
+        "model": "commercial-d3-l4-s3_v1",
+        "label": "Stepped spire",
+        "description": "Stepped spire."
+      },
+      {
+        "model": "commercial-d3-l4-s3_v2",
+        "label": "Copper gable",
+        "description": "Copper gable."
+      },
+      {
+        "model": "commercial-d3-l4-s3_v3",
+        "label": "Limestone crown",
+        "description": "Limestone crown."
+      },
+      {
+        "model": "commercial-d3-l4-s3_v4",
+        "label": "Recessed glass crown",
+        "description": "Recessed glass crown."
+      },
+      {
+        "model": "commercial-d3-l4-s3_v5",
+        "label": "Garden terraces",
+        "description": "Garden terraces."
+      }
+    ]
   }
 }

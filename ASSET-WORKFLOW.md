@@ -31,14 +31,14 @@ monument: houses should feel domestic and industrial plants should reveal proces
 
 This is a migration checklist from `src/sim/catalog.js` on the civic-art branch.
 Reconcile it with the current catalog and rendering dispatch before implementing;
-another agent is developing the simulation on `main`. Power, water, parks, fixed-lot transport, rewards, business deals and landmarks are complete; other rows remain to do.
+another agent is developing the simulation on `main`. Power, water, parks, fixed-lot transport, rewards, business deals, landmarks, residential and commercial are complete; other rows remain to do.
 The twelve catalog entries in group `civic` are also done; similarly named
 rewards and landmarks are separate assets.
 
 | Family | Remaining assets / coverage |
 | --- | --- |
 | Residential zones | Complete: all densities, levels 1–4, supported lot sizes and 100 authored layouts; see [RESIDENTIAL-ART.md](RESIDENTIAL-ART.md) |
-| Commercial zones | All three densities, levels 1–4, supported lot sizes and variants, including tower families |
+| Commercial zones | Complete: all densities, levels 1–4, supported footprints and 136 authored layouts; see [COMMERCIAL-ART.md](COMMERCIAL-ART.md) |
 | Industrial zones | All three densities, levels 1–4 and variants; preserve both 3×3 low-density farms and 1×1 workshops |
 | Power | Complete: `coal`, `oil`, `gas`, `nuclear`, `wind`, `solar`, `microwave`, `fusion`; see [POWER-ART.md](POWER-ART.md) |
 | Water | Complete: `waterpump`, `watertower`, `desalination`, `treatment`; see [WATER-ART.md](WATER-ART.md) |
@@ -61,7 +61,7 @@ committing and pushing it.
 ## Pipeline extension requirements
 
 The `tools/civic_art/registry.json` registry covers twelve civic, eight power, four water, three park, five transport, eight reward, five business-deal and five landmark
-fixed assets plus 24 residential state/footprint entries. The shared export, loader and gallery support legacy square lots (1×1,
+fixed assets plus 48 residential/commercial state/footprint entries. The shared export, loader and gallery support legacy square lots (1×1,
 2×2, 3×3, 4×4 and 5×5) and explicit rectangular footprint metadata. New families still need explicit coverage and contract checks. Share primitives and export machinery;
 keep authored models in small family modules. Avoid a second divergent renderer
 or a giant switch containing every model. Preserve existing civic exports during

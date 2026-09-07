@@ -4,7 +4,7 @@ import { chromium } from '@playwright/test';
 import assert from 'node:assert/strict';
 import { FAMILY_LAYOUT_COUNTS } from './art-families.mjs';
 const family = process.env.ART_FAMILY || 'power';
-assert.ok(['power','water','parks','transport','rewards','deals','landmarks','residential'].includes(family));
+assert.ok(['power','water','parks','transport','rewards','deals','landmarks','residential','commercial'].includes(family));
 const expectedFrames = FAMILY_LAYOUT_COUNTS[family] * 12;
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
 try {
@@ -23,6 +23,7 @@ try {
     const { spriteFrameKey } = await import('/src/architecture-variation.js');
     const { familyBuildings, EXPECTED_VARIANTS } = await import('/tests/art-families.mjs');
     const buildings = familyBuildings(family);
+    const {zoneVariantFixture}=await import('/tests/zone-art-contract.mjs');
     const canvas = document.createElement('canvas');canvas.width = canvas.height = 800;
     const r = Object.assign(Object.create(CityRenderer.prototype), { base: canvas.getContext('2d'), w: 800, h: 800, size: 16, zoom: 1.75, minZoom: .3, maxZoom: 2.8, dpr: 2, panX: 0, panY: 0, platform: 0, pickables: [], rotation: 0 });
     r.pick = () => ({ miss: true });
@@ -36,8 +37,8 @@ try {
       for (const state of ['day','night','unpowered']) for (let rotation = 0; rotation < 4; rotation++) {
         const night = state !== 'day', powered = state !== 'unpowered';
         await preloadCivicSprites({types:[type],rotation,night,powered,variant});
-        Object.assign(r,{rotation,night,pickables:[]});r.focusOn(2+spec.w/2,2+spec.h/2,1.75);
-        const tile={x:2,y:2,lot:{x:2,y:2,w:spec.w,h:spec.h},type,...spec.zone,age:20,elev:0,powered,variant:(variant+.5)/variants};
+        Object.assign(r,{rotation,night,pickables:[]});const placement=zoneVariantFixture({...spec,artVariants:variants},variant);r.focusOn(placement.x+spec.w/2,placement.y+spec.h/2,1.75);
+        const tile={...placement,lot:{x:placement.x,y:placement.y,w:spec.w,h:spec.h},type,...spec.zone,age:20,elev:0,powered};
         let blits=0;const draw=r.base.drawImage.bind(r.base);
         r.base.drawImage=(...args)=>{blits++;draw(...args);};
         drawCachedArchitecture(r,tile,{tiles:[]});r.base.drawImage=draw;

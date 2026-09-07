@@ -10,6 +10,7 @@ try {
   const {drawCachedArchitecture}=await import('/src/architecture-cache.js');
   const {civicSpriteSpec,civicSpriteKey,preloadCivicSprites,civicSpriteStats}=await import('/src/building-art.js');
   const {CIVIC_SPRITES}=await import('/src/civic-sprite-manifest.js');
+  const {zoneVariantFixture}=await import('/tests/zone-art-contract.mjs');
   const canvas=document.createElement('canvas');canvas.width=1200;canvas.height=1000;
   const r=Object.assign(Object.create(CityRenderer.prototype),{base:canvas.getContext('2d'),w:1200,h:1000,zoom:1.5,minZoom:.3,maxZoom:2.8,dpr:1,size:64,panX:0,panY:0,rotation:0,night:false,platform:0,pickables:[],paintEpoch:1});
   r.pick=()=>({miss:true});r.focusOn(2.5,2.5,1.5);
@@ -35,7 +36,8 @@ try {
   const fixtures=[];
   for(const [key,spec] of Object.entries(CIVIC_SPRITES))for(let v=0;v<(spec.zone?spec.variants.length:1);v++){
    const size=spec.tiles??spec.footprint.w;
-   fixtures.push({key,v,t:{x:2,y:2,type:key,...spec.zone,variant:(v+.5)/(spec.variants?.length||1),age:10,powered:true,lot:{x:2,y:2,w:size,h:spec.footprint?.h??size}}});
+   const placement=zoneVariantFixture(spec,v);
+   fixtures.push({key,v,t:{...placement,type:key,...spec.zone,elev:0,age:10,powered:true,lot:{x:placement.x,y:placement.y,w:size,h:spec.footprint?.h??size}}});
   }
   requests=0;
   let peak=0;

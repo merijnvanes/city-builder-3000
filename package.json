@@ -31,7 +31,11 @@
     "art:landmarks": "blender --background --factory-startup --python tools/civic_art/render.py -- --types landmarks --states day,night,unpowered --rotations 0,1,2,3 --samples 32 && python3 tools/civic_art/package.py --types landmarks",
     "test:landmarks": "node --test tests/architecture-variation.test.js && ART_FAMILY=landmarks node tests/power-sprites.mjs && ART_FAMILY=landmarks node tests/civic-art.mjs",
     "art:residential": "blender --background --factory-startup --python tools/civic_art/render.py -- --types residential --states day,night,unpowered --rotations 0,1,2,3 --samples 32 && python3 tools/civic_art/package.py --types residential",
-    "test:residential": "node --test tests/zone-art.test.js && ART_FAMILY=residential node tests/power-sprites.mjs && ART_FAMILY=residential node tests/zone-gallery.mjs && node tests/zone-lifecycle.mjs"
+    "test:residential": "node --test tests/zone-art.test.js && ART_FAMILY=residential node tests/power-sprites.mjs && ART_FAMILY=residential node tests/zone-gallery.mjs && node tests/zone-lifecycle.mjs",
+    "art:commercial": "blender --background --factory-startup --python tools/civic_art/render.py -- --types commercial --states day,night,unpowered --rotations 0,1,2,3 --samples 32 && python3 tools/civic_art/package.py --types commercial",
+    "test:commercial": "node --test tests/zone-art.test.js tests/commercial-variation.test.js && ART_FAMILY=commercial node tests/power-sprites.mjs && ART_FAMILY=commercial node tests/zone-gallery.mjs && node tests/zone-lifecycle.mjs && ART_FAMILY=commercial node tests/zone-city.mjs",
+    "test:art-production": "node tests/art-production.mjs",
+    "test:starter-art": "node tests/starter-art.mjs"
   },
   "devDependencies": {
     "vite": "^7.0.0",

@@ -59,3 +59,10 @@ test('real residential save/load keeps the legacy terminal seed balcony family',
     assert.equal(civicSpriteKey(restored),'residential-d3-l4-s1');
   }
 });
+
+
+test('terminal medium residential seed retains courtyard on larger lots and balconies on one tile',()=>{
+ const tile={type:'residential',density:2,variant:1};
+ assert.equal(spriteVariant({...tile,lot:{w:2,h:2}},3),0);
+ assert.equal(spriteVariant({...tile,lot:{w:1,h:1}},3),2);
+});

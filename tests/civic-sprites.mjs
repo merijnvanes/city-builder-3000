@@ -15,6 +15,7 @@ try {
     const { drawArchitecture, preloadCivicSprites, civicSpriteStats } = await import('/src/building-art.js');
     const { drawCachedArchitecture, architectureCacheStats } = await import('/src/architecture-cache.js');
     const { CIVIC_SPRITES } = await import('/src/civic-sprite-manifest.js');
+    const {zoneVariantFixture}=await import('/tests/zone-art-contract.mjs');
     const canvas = document.createElement('canvas'); canvas.width = 900; canvas.height = 600;
     const r = Object.assign(Object.create(CityRenderer.prototype), { base: canvas.getContext('2d'), zoom: 1, dpr: 1, w: 700, h: 600, size: 3, panX: 0, panY: 70, platform: 0, rotation: 0, night: false, pickables: [], dirty: false });
     const tile = { x: 0, y: 0, lot: { x: 0, y: 0, w: 3, h: 3 }, type: 'fire', age: 20, powered: true };
@@ -68,7 +69,8 @@ try {
         // and LRU churn without requiring every family to stay resident.
         await preloadCivicSprites({ types: [type], variant: 0, rotation, night: state !== 'day', powered: state !== 'unpowered' });
         r.rotation = rotation; r.night = state !== 'day'; r.pickables = [];
-        drawCachedArchitecture(r, { ...tile, type, ...spec.zone, powered: state !== 'unpowered', lot: { x: 0, y: 0, w: spec.footprint?.w ?? spec.tiles, h: spec.footprint?.h ?? spec.tiles } }, { tiles: [] });
+        const placement=zoneVariantFixture(spec,0,0,0);
+        drawCachedArchitecture(r, { ...tile, ...placement, type, ...spec.zone, powered: state !== 'unpowered', lot: { x: placement.x, y: placement.y, w: spec.footprint?.w ?? spec.tiles, h: spec.footprint?.h ?? spec.tiles } }, { tiles: [] });
         if (!r.pickables[0]?.canvas) throw new Error(`${type} ${state} ${rotation}: missing sprite`);
         if (type === 'fire') {
           const p = r.pickables[0].canvas;
