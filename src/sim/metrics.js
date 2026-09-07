@@ -124,6 +124,11 @@ export function computeMetrics(city) {
     tradeConnections, externalJobs: traffic.externalJobs || 0, connections, ports,
     workers: traffic.workers, employed: traffic.employed, unemployment: traffic.unemployment,
     traffic: traffic.traffic, congestion: traffic.congestion, range: traffic.range ?? null,
+    // "If you place bus stops and Sims don't seem to use them, they may be too
+    // far apart." The commute already counts who boards; without this the
+    // mayor pays the mass transit budget every month with no way to find out
+    // whether anybody is riding.
+    railRiders: traffic.railRiders || 0, subwayRiders: traffic.subwayRiders || 0,
     pollution, crime, education, health, parks, police, fireCover, industryMix, commerceMix,
     dryShare: developedTiles ? dryTiles / developedTiles : 0,
     cells: svc.cells || 0, arrestable: svc.arrestable || 0, jailFactor: svc.jailFactor ?? 1,

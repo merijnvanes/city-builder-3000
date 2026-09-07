@@ -65,6 +65,23 @@ STEP_COST[HIGHWAY] = 1; STEP_COST[SUBSTATION] = 2; STEP_COST[TUNNEL] = 1;
 STEP_COST[RAMP] = 2;
 // A bore runs flat under the hill, so it never pays the climbing penalty.
 STEP_COST[BORE] = 2;
+// "If the mass transit budget is low, things will start deteriorating and Sims
+// will be less likely to use the system. If the budget is far below adequate,
+// transit workers will go out on strike."
+//
+// Two states, and only the strike was modelled: below it the trains ran exactly
+// as well on a tenth of the money as on all of it. Deterioration is not a
+// walkout, it is a service not worth the walk, so a starved system charges more
+// to board. Sims who would have taken the train drive instead, and the traffic
+// the network was there to remove comes back onto the street. Added to the cost
+// of a station at no funding at all, against a trip budget of MAX_TRIP * 2.
+export const TRANSIT_NEGLECT = 6;
+// Coverage at which a bus stop takes its full quarter off the street. A stop
+// puts out 100 at its own tile and fades to a tenth of that at the rim of its
+// radius: "if you place bus stops and Sims don't seem to use them, they may be
+// too far apart." Below this the stop is too far to be worth walking to, and
+// the same scale carries the transit budget, since coverage is cut by it.
+export const BUS_FULL = 60;
 const MAX_COST = MAX_TRIP * 2;
 // Sims reach the network from up to this far off it; the same rule gives a
 // lot its road access. See ROAD_REACH in services.js.
@@ -98,6 +115,11 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
   // "If the budget is far below adequate, transit workers will go out on
   // strike." Nobody boards a train that is not running.
   const strike = (city.people?.strikes?.transit || 0) > 0;
+  // A starved system still runs; it is just not worth the walk. Boarding costs
+  // more the further the mass transit budget is below adequate.
+  const transitBudget = Math.min(1, (city.funding?.transit ?? 100) / 100);
+  const stepCost = STEP_COST.slice();
+  stepCost[STATION] = stepCost[SUBSTATION] = STEP_COST[STATION] + Math.round(TRANSIT_NEGLECT * (1 - transitBudget));
   for (let i = 0; i < N; i++) {
     const t = tiles[i];
     if (t.type === "road") kind[i] = ROAD;
@@ -251,7 +273,7 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
         for (const ni of neighborsOf(i)) {
           const climb = onGround(i) && onGround(ni) && kind[i] !== BORE && kind[ni] !== BORE
             ? Math.abs((tiles[ni < N ? ni : ni - UNDER].elev || 0) - (tiles[i < N ? i : i - UNDER].elev || 0)) : 0;
-          const nd = d + STEP_COST[kind[ni]] + climb;
+          const nd = d + stepCost[kind[ni]] + climb;
           if (nd > maxCost) continue;
           if (cost[ni] === -1 || nd < cost[ni]) { cost[ni] = nd; buckets[nd].push(ni); }
         }
@@ -294,7 +316,7 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
             // which is the whole reason to bore one.
             const climb = onGround(i) && onGround(ni) && kind[i] !== BORE && kind[ni] !== BORE
               ? Math.abs((tiles[ni < N ? ni : ni - UNDER].elev || 0) - (tiles[i < N ? i : i - UNDER].elev || 0)) : 0;
-            const nd = d + STEP_COST[kind[ni]] + climb + (jam && jam[ni] ? 1 : 0);
+            const nd = d + stepCost[kind[ni]] + climb + (jam && jam[ni] ? 1 : 0);
             if (nd > maxCost) continue;
             if (dist[ni] === -1 || nd < dist[ni]) {
               if (dist[ni] === -1) touched.push(ni);
@@ -317,7 +339,7 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
   const surface = roadCapacity(city);
   const trafficOf = (i, load) => {
     const t = tiles[i < N ? i : i - UNDER];
-    if (kind[i] === ROAD || kind[i] === RAMP || kind[i] === BORE) { let v = load[i] / (TRAFFIC_PER_POINT * surface) * carScale; if (t.svc?.bus) v *= 0.75; return v; }
+    if (kind[i] === ROAD || kind[i] === RAMP || kind[i] === BORE) { let v = load[i] / (TRAFFIC_PER_POINT * surface) * carScale; if (t.svc?.bus) v *= 1 - 0.25 * Math.min(1, t.svc.bus / BUS_FULL); return v; }
     if (kind[i] === HIGHWAY) return load[i] / (HIGHWAY_PER_POINT * surface) * carScale;
     if (kind[i] === RAIL) return load[i] / RAIL_PER_POINT;
     return 0;

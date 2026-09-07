@@ -13,7 +13,7 @@
 // traffic means Sims are willing to travel further."
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
-import { createCity, place, tick, refresh, getStats, inspectTile } from "../src/sim.js";
+import { createCity, place, tick, refresh, getStats, inspectTile, setPolicy, serialize, deserialize } from "../src/sim.js";
 import { tripRange, MAX_TRIP, MIN_TRIP, PATIENCE, GRIDLOCK } from "../src/sim/traffic.js";
 import { connected, commuteAppeal } from "../src/sim/growth.js";
 
@@ -157,5 +157,77 @@ describe("a longer trip is a worse address", () => {
     const far = corridor(50);
     years(far, 25);
     assert.ok(population(far) > 1000, `the far block still gets there eventually: ${population(far)}`);
+  });
+});
+
+// "The mass transit budget pays for the upkeep of rail and subway track, and
+// also the salaries of conductors, and bus drivers. If the mass transit budget
+// is low, things will start deteriorating and Sims will be less likely to use
+// the system. If the budget is far below adequate, transit workers will go out
+// on strike."
+//
+// Two states, and only the strike was modelled. Below it the trains ran exactly
+// as well on a tenth of the money as on all of it: every funding level from 0%
+// to 120% produced byte-identical traffic. Deterioration is not a walkout, it
+// is a service not worth the walk, so a starved system costs more to board and
+// the Sims who would have taken the train drive instead.
+describe("a starved transit system is used less", () => {
+  // Homes at one end, jobs at the other, one road between them, and a rail line
+  // down the middle with its stations against that road so Sims can board.
+  function railCorridor() {
+    const c = plains();
+    for (let x = 6; x <= 44; x++) put(c, x, 30, "road");
+    put(c, 3, 25, "coal");
+    for (let x = 2; x <= 50; x++) { put(c, x, 29, "powerline"); put(c, x, 29, "pipe"); }
+    for (let x = 6; x <= 46; x += 8) {
+      put(c, x, 26, "watertower");
+      for (const y of [27, 28]) { put(c, x, y, "powerline"); put(c, x, y, "pipe"); }
+    }
+    for (let x = 16; x <= 34; x++) put(c, x, 27, "rail");
+    for (const x of [16, 33]) assert.equal(put(c, x, 28, "railstation").ok, true, `no station at ${x},28`);
+    for (let y = 31; y <= 34; y++) for (let x = 8; x <= 13; x++) put(c, x, y, "residential", { density: 3 });
+    for (let y = 31; y <= 34; y++) for (let x = 38; x <= 43; x++) put(c, x, y, "industrial", { density: 3 });
+    refresh(c);
+    for (let i = 0; i < 120; i++) tick(c);
+    return c;
+  }
+
+  // One city, one month, the budget the only thing that differs. Ten years of
+  // divergent growth would confound this: the point is the commute, not the
+  // city that grows out of it.
+  function ridersAt(city, pct) {
+    const c = deserialize(serialize(city));
+    setPolicy(c, "funding.transit", pct);
+    tick(c);
+    return getStats(c).railRiders;
+  }
+
+  test("ridership falls as the budget does", () => {
+    const c = railCorridor();
+    const full = ridersAt(c, 100);
+    assert.ok(full > 0, "nobody was riding the train even at full funding");
+    let last = full;
+    for (const pct of [80, 60, 40, 20]) {
+      const riders = ridersAt(c, pct);
+      assert.ok(riders <= last, `ridership rose from ${last} to ${riders} when funding fell to ${pct}%`);
+      last = riders;
+    }
+    assert.ok(last < full * 0.5, `a system at 20% still carried ${last} of ${full}`);
+  });
+
+  // "An over funded branch will waste money."
+  test("paying more than the system asks for buys nothing", () => {
+    const c = railCorridor();
+    assert.equal(ridersAt(c, 120), ridersAt(c, 100));
+  });
+
+  // The manual tells the player to watch whether the system is used at all:
+  // "If you place bus stops and Sims don't seem to use them, they may be too
+  // far apart." They need to be able to see it.
+  test("the city reports how many Sims ride", () => {
+    const s = getStats(railCorridor());
+    assert.equal(typeof s.railRiders, "number");
+    assert.equal(typeof s.subwayRiders, "number");
+    assert.ok(s.railRiders > 0, `rail carried ${s.railRiders}`);
   });
 });

@@ -1025,6 +1025,46 @@ become the workforce.
 `tests/ordinances.test.js` now measures each headline claim against a city that
 differs only by that one law.
 
+### The mass transit budget did nothing, September 7
+
+> *"The mass transit budget pays for the upkeep of rail and subway track, and
+> also the salaries of conductors, and bus drivers. If the mass transit budget
+> is low, things will start deteriorating and Sims will be less likely to use
+> the system. If the budget is far below adequate, transit workers will go out
+> on strike."*
+
+Two states, and only the strike was modelled. Below it the trains ran exactly as
+well on a tenth of the money as on all of it. Measured on one identical city,
+one month, with the budget the only thing varied: every level from 0% to 120%
+produced **byte-identical** traffic.
+
+Deterioration is not a walkout. It is a service not worth the walk, so a starved
+system now costs more to board, and the Sims who would have taken the train
+drive instead. The same city and month, after:
+
+| transit budget | rail riders | unemployment |
+| --- | --- | --- |
+| 120% | 23,436 | 18% |
+| 100% | 23,436 | 18% |
+| 80% | 17,724 | 22% |
+| 60% | 9,996 | 56% |
+| 40% | 9,282 | 59% |
+| 20% | 2,856 | 88% |
+
+Monotonic, and 120% buys nothing over 100%, which is the budget chapter's *"an
+over funded branch will waste money."*
+
+A bus stop's effect was flat in the same way: any tile with any bus coverage at
+all got the full quarter off its traffic, whether the stop was next door on a
+full budget or eight tiles away on a tenth of one. It now scales with the
+coverage the stop actually provides, which is the manual's *"if you place bus
+stops and Sims don't seem to use them, they may be too far apart."*
+
+And `railRiders` and `subwayRiders` were computed every month and thrown away.
+The mayor paid the mass transit budget with no way to find out whether anybody
+was riding, which is the one thing the manual tells them to check. Both now
+reach `getStats`.
+
 ## Visual and performance work, September 7
 
 - Preserved and verified the previous agent's query-card sizing/rotation work.
