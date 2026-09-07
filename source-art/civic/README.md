@@ -56,3 +56,5 @@ live in `public/assets/civic/`, with generated metadata in
 The render script uses system Arial Bold for tiny architectural signs when
 available, otherwise Blender’s built-in font. Set `CIVIC_ART_FONT` to use another
 local font. Lettering is baked into image pixels; no font file is distributed.
+
+Business-deal model identities, variants and validation: [DEALS-ART.md](../../DEALS-ART.md).

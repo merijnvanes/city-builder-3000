@@ -337,5 +337,106 @@
     "tiles": 3,
     "label": "Marina",
     "description": "A copper-roofed clubhouse, timber jetties and sculpted sailing yachts in a sheltered basin."
+  },
+  "prison": {
+    "family": "deals",
+    "module": "business_secure",
+    "tiles": 4,
+    "label": "Maximum Security Prison",
+    "description": "Stone perimeter towers, paired cell wings and a controlled gate with a central exercise court."
+  },
+  "casino": {
+    "family": "deals",
+    "module": "business_leisure",
+    "tiles": 3,
+    "label": "Casino",
+    "description": "A stepped Art Deco hotel above a rounded gaming hall, with a gold entrance marquee.",
+    "variants": [
+      {
+        "model": "casino",
+        "label": "Palette 1",
+        "description": "A stepped Art Deco hotel above a rounded gaming hall, with a gold entrance marquee."
+      },
+      {
+        "model": "casino_v1",
+        "label": "Palette 2",
+        "description": "A stepped Art Deco hotel above a rounded gaming hall, with a gold entrance marquee."
+      },
+      {
+        "model": "casino_v2",
+        "label": "Palette 3",
+        "description": "A stepped Art Deco hotel above a rounded gaming hall, with a gold entrance marquee."
+      },
+      {
+        "model": "casino_v3",
+        "label": "Palette 4",
+        "description": "A stepped Art Deco hotel above a rounded gaming hall, with a gold entrance marquee."
+      }
+    ]
+  },
+  "toxicdump": {
+    "family": "deals",
+    "module": "business_waste",
+    "tiles": 3,
+    "label": "Toxic Waste Dump",
+    "description": "Segregated containment bunds, color-coded storage drums and a broad service aisle.",
+    "variants": [
+      {
+        "model": "toxicdump",
+        "label": "Palette 1",
+        "description": "Segregated containment bunds, color-coded storage drums and a broad service aisle."
+      },
+      {
+        "model": "toxicdump_v1",
+        "label": "Palette 2",
+        "description": "Segregated containment bunds, color-coded storage drums and a broad service aisle."
+      },
+      {
+        "model": "toxicdump_v2",
+        "label": "Palette 3",
+        "description": "Segregated containment bunds, color-coded storage drums and a broad service aisle."
+      }
+    ]
+  },
+  "armybase": {
+    "family": "deals",
+    "module": "business_secure",
+    "tiles": 5,
+    "label": "Army Base",
+    "description": "Four pitched-roof barracks, a headquarters, parade square and controlled entrance."
+  },
+  "gigamall": {
+    "family": "deals",
+    "module": "business_leisure",
+    "tiles": 4,
+    "label": "Gigamall",
+    "description": "Anchor stores flank a long glass lantern, with covered entrances and separate rear loading.",
+    "variants": [
+      {
+        "model": "gigamall",
+        "label": "Palette 1",
+        "description": "Anchor stores flank a long glass lantern, with covered entrances and separate rear loading."
+      },
+      {
+        "model": "gigamall_v1",
+        "label": "Palette 2",
+        "description": "Anchor stores flank a long glass lantern, with covered entrances and separate rear loading."
+      },
+      {
+        "model": "gigamall_v2",
+        "label": "Palette 3",
+        "description": "Anchor stores flank a long glass lantern, with covered entrances and separate rear loading."
+      },
+      {
+        "model": "gigamall_v3",
+        "label": "Palette 4",
+        "description": "Anchor stores flank a long glass lantern, with covered entrances and separate rear loading."
+      },
+      {
+        "model": "gigamall_v4",
+        "label": "Palette 5",
+        "description": "Anchor stores flank a long glass lantern, with covered entrances and separate rear loading."
+      }
+    ]
   }
 }

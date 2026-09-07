@@ -51,3 +51,11 @@ test('stadium palettes preserve the original half-seed boundary', () => {
     assert.equal(spriteVariant(JSON.parse(JSON.stringify(tile)), 2), expected);
   }
 });
+
+test('business deal palettes remain deterministic across saves and coordinates', () => {
+  for (const count of [3,4,5]) for (let index=0;index<count;index++) {
+    const tile={x:7,y:11,variant:(index+.5)/count};
+    assert.equal(spriteVariant(tile,count),index);
+    assert.equal(spriteVariant({...JSON.parse(JSON.stringify(tile)),x:40},count),index);
+  }
+});

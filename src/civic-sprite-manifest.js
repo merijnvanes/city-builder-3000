@@ -121,6 +121,124 @@ export const CIVIC_SPRITES = {
     "label": "Airport",
     "description": "A glazed terminal, control tower, hangar and marked runway on a rectangular airfield."
   },
+  "armybase": {
+    "tiles": 5,
+    "scale": 3,
+    "height": 50,
+    "frames": {
+      "day-0": {
+        "file": "armybase-day-0.6ad74069bf.webp",
+        "width": 954,
+        "height": 505,
+        "anchor": [
+          477.0,
+          262.7211
+        ]
+      },
+      "day-1": {
+        "file": "armybase-day-1.cafd9d483e.webp",
+        "width": 954,
+        "height": 522,
+        "anchor": [
+          477.0,
+          279.7211
+        ]
+      },
+      "day-2": {
+        "file": "armybase-day-2.0994ad6c2b.webp",
+        "width": 954,
+        "height": 512,
+        "anchor": [
+          477.0,
+          269.7211
+        ]
+      },
+      "day-3": {
+        "file": "armybase-day-3.460cf8435f.webp",
+        "width": 954,
+        "height": 500,
+        "anchor": [
+          477.0,
+          257.7211
+        ]
+      },
+      "night-0": {
+        "file": "armybase-night-0.f19da4afd4.webp",
+        "width": 954,
+        "height": 505,
+        "anchor": [
+          477.0,
+          262.7211
+        ]
+      },
+      "night-1": {
+        "file": "armybase-night-1.69a769b4d4.webp",
+        "width": 954,
+        "height": 522,
+        "anchor": [
+          477.0,
+          279.7211
+        ]
+      },
+      "night-2": {
+        "file": "armybase-night-2.f48a1854e9.webp",
+        "width": 954,
+        "height": 512,
+        "anchor": [
+          477.0,
+          269.7211
+        ]
+      },
+      "night-3": {
+        "file": "armybase-night-3.8be8842765.webp",
+        "width": 954,
+        "height": 500,
+        "anchor": [
+          477.0,
+          257.7211
+        ]
+      },
+      "unpowered-0": {
+        "file": "armybase-unpowered-0.d572a2369c.webp",
+        "width": 954,
+        "height": 505,
+        "anchor": [
+          477.0,
+          262.7211
+        ]
+      },
+      "unpowered-1": {
+        "file": "armybase-unpowered-1.b73fbeaf5d.webp",
+        "width": 954,
+        "height": 522,
+        "anchor": [
+          477.0,
+          279.7211
+        ]
+      },
+      "unpowered-2": {
+        "file": "armybase-unpowered-2.b13837c0cc.webp",
+        "width": 954,
+        "height": 512,
+        "anchor": [
+          477.0,
+          269.7211
+        ]
+      },
+      "unpowered-3": {
+        "file": "armybase-unpowered-3.1689b1f12f.webp",
+        "width": 954,
+        "height": 500,
+        "anchor": [
+          477.0,
+          257.7211
+        ]
+      }
+    },
+    "family": "deals",
+    "label": "Army Base",
+    "description": "Four pitched-roof barracks, a headquarters, parade square and controlled entrance."
+  },
   "bus": {
     "tiles": 1,
     "scale": 3,
@@ -238,6 +356,470 @@ export const CIVIC_SPRITES = {
     "family": "transport",
     "label": "Bus Stop",
     "description": "A cantilevered glass shelter with sheltered seats, timetable and a clear boarding edge."
+  },
+  "casino": {
+    "tiles": 3,
+    "scale": 3,
+    "height": 76,
+    "frames": {
+      "day-0": {
+        "file": "casino-day-0.a5b52d3e0f.webp",
+        "width": 570,
+        "height": 441,
+        "anchor": [
+          285.0,
+          294.815
+        ]
+      },
+      "day-1": {
+        "file": "casino-day-1.bf4431c8c2.webp",
+        "width": 570,
+        "height": 381,
+        "anchor": [
+          285.0,
+          234.815
+        ]
+      },
+      "day-2": {
+        "file": "casino-day-2.3722169bee.webp",
+        "width": 570,
+        "height": 381,
+        "anchor": [
+          285.0,
+          234.815
+        ]
+      },
+      "day-3": {
+        "file": "casino-day-3.3180fd6397.webp",
+        "width": 570,
+        "height": 441,
+        "anchor": [
+          285.0,
+          294.815
+        ]
+      },
+      "night-0": {
+        "file": "casino-night-0.a202e64fab.webp",
+        "width": 570,
+        "height": 441,
+        "anchor": [
+          285.0,
+          294.815
+        ]
+      },
+      "night-1": {
+        "file": "casino-night-1.413a62aa97.webp",
+        "width": 570,
+        "height": 381,
+        "anchor": [
+          285.0,
+          234.815
+        ]
+      },
+      "night-2": {
+        "file": "casino-night-2.a75dede2bf.webp",
+        "width": 570,
+        "height": 381,
+        "anchor": [
+          285.0,
+          234.815
+        ]
+      },
+      "night-3": {
+        "file": "casino-night-3.b75f4449f9.webp",
+        "width": 570,
+        "height": 441,
+        "anchor": [
+          285.0,
+          294.815
+        ]
+      },
+      "unpowered-0": {
+        "file": "casino-unpowered-0.5fe030a0c3.webp",
+        "width": 570,
+        "height": 441,
+        "anchor": [
+          285.0,
+          294.815
+        ]
+      },
+      "unpowered-1": {
+        "file": "casino-unpowered-1.bbc9d88d15.webp",
+        "width": 570,
+        "height": 381,
+        "anchor": [
+          285.0,
+          234.815
+        ]
+      },
+      "unpowered-2": {
+        "file": "casino-unpowered-2.e323fe4b53.webp",
+        "width": 570,
+        "height": 381,
+        "anchor": [
+          285.0,
+          234.815
+        ]
+      },
+      "unpowered-3": {
+        "file": "casino-unpowered-3.975a55a126.webp",
+        "width": 570,
+        "height": 441,
+        "anchor": [
+          285.0,
+          294.815
+        ]
+      },
+      "day-0-v1": {
+        "file": "casino-day-0-v1.2a0529b859.webp",
+        "width": 570,
+        "height": 441,
+        "anchor": [
+          285.0,
+          294.815
+        ]
+      },
+      "day-1-v1": {
+        "file": "casino-day-1-v1.4dc9d50e5f.webp",
+        "width": 570,
+        "height": 381,
+        "anchor": [
+          285.0,
+          234.815
+        ]
+      },
+      "day-2-v1": {
+        "file": "casino-day-2-v1.6b16d2010f.webp",
+        "width": 570,
+        "height": 381,
+        "anchor": [
+          285.0,
+          234.815
+        ]
+      },
+      "day-3-v1": {
+        "file": "casino-day-3-v1.d0378053e5.webp",
+        "width": 570,
+        "height": 441,
+        "anchor": [
+          285.0,
+          294.815
+        ]
+      },
+      "night-0-v1": {
+        "file": "casino-night-0-v1.e2725c27a8.webp",
+        "width": 570,
+        "height": 441,
+        "anchor": [
+          285.0,
+          294.815
+        ]
+      },
+      "night-1-v1": {
+        "file": "casino-night-1-v1.aeb5f4cea6.webp",
+        "width": 570,
+        "height": 381,
+        "anchor": [
+          285.0,
+          234.815
+        ]
+      },
+      "night-2-v1": {
+        "file": "casino-night-2-v1.975b1c17f1.webp",
+        "width": 570,
+        "height": 381,
+        "anchor": [
+          285.0,
+          234.815
+        ]
+      },
+      "night-3-v1": {
+        "file": "casino-night-3-v1.2bbd5e50da.webp",
+        "width": 570,
+        "height": 441,
+        "anchor": [
+          285.0,
+          294.815
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "casino-unpowered-0-v1.2bafe5957f.webp",
+        "width": 570,
+        "height": 441,
+        "anchor": [
+          285.0,
+          294.815
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "casino-unpowered-1-v1.165fdafd9a.webp",
+        "width": 570,
+        "height": 381,
+        "anchor": [
+          285.0,
+          234.815
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "casino-unpowered-2-v1.0d4364dae8.webp",
+        "width": 570,
+        "height": 381,
+        "anchor": [
+          285.0,
+          234.815
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "casino-unpowered-3-v1.349ece1e18.webp",
+        "width": 570,
+        "height": 441,
+        "anchor": [
+          285.0,
+          294.815
+        ]
+      },
+      "day-0-v2": {
+        "file": "casino-day-0-v2.979c13a5ad.webp",
+        "width": 570,
+        "height": 441,
+        "anchor": [
+          285.0,
+          294.815
+        ]
+      },
+      "day-1-v2": {
+        "file": "casino-day-1-v2.ebc1b1c15e.webp",
+        "width": 570,
+        "height": 381,
+        "anchor": [
+          285.0,
+          234.815
+        ]
+      },
+      "day-2-v2": {
+        "file": "casino-day-2-v2.3210083a7d.webp",
+        "width": 570,
+        "height": 381,
+        "anchor": [
+          285.0,
+          234.815
+        ]
+      },
+      "day-3-v2": {
+        "file": "casino-day-3-v2.4afd7253c0.webp",
+        "width": 570,
+        "height": 441,
+        "anchor": [
+          285.0,
+          294.815
+        ]
+      },
+      "night-0-v2": {
+        "file": "casino-night-0-v2.59cd3f0835.webp",
+        "width": 570,
+        "height": 441,
+        "anchor": [
+          285.0,
+          294.815
+        ]
+      },
+      "night-1-v2": {
+        "file": "casino-night-1-v2.454fdf2cbb.webp",
+        "width": 570,
+        "height": 381,
+        "anchor": [
+          285.0,
+          234.815
+        ]
+      },
+      "night-2-v2": {
+        "file": "casino-night-2-v2.afb2874f89.webp",
+        "width": 570,
+        "height": 381,
+        "anchor": [
+          285.0,
+          234.815
+        ]
+      },
+      "night-3-v2": {
+        "file": "casino-night-3-v2.00b9cbc1e5.webp",
+        "width": 570,
+        "height": 441,
+        "anchor": [
+          285.0,
+          294.815
+        ]
+      },
+      "unpowered-0-v2": {
+        "file": "casino-unpowered-0-v2.780c9704c7.webp",
+        "width": 570,
+        "height": 441,
+        "anchor": [
+          285.0,
+          294.815
+        ]
+      },
+      "unpowered-1-v2": {
+        "file": "casino-unpowered-1-v2.5fbf5c2c61.webp",
+        "width": 570,
+        "height": 381,
+        "anchor": [
+          285.0,
+          234.815
+        ]
+      },
+      "unpowered-2-v2": {
+        "file": "casino-unpowered-2-v2.b660746592.webp",
+        "width": 570,
+        "height": 381,
+        "anchor": [
+          285.0,
+          234.815
+        ]
+      },
+      "unpowered-3-v2": {
+        "file": "casino-unpowered-3-v2.0e323fd251.webp",
+        "width": 570,
+        "height": 441,
+        "anchor": [
+          285.0,
+          294.815
+        ]
+      },
+      "day-0-v3": {
+        "file": "casino-day-0-v3.d8793c645d.webp",
+        "width": 570,
+        "height": 441,
+        "anchor": [
+          285.0,
+          294.815
+        ]
+      },
+      "day-1-v3": {
+        "file": "casino-day-1-v3.79322ea1a8.webp",
+        "width": 570,
+        "height": 381,
+        "anchor": [
+          285.0,
+          234.815
+        ]
+      },
+      "day-2-v3": {
+        "file": "casino-day-2-v3.1438c9abf9.webp",
+        "width": 570,
+        "height": 381,
+        "anchor": [
+          285.0,
+          234.815
+        ]
+      },
+      "day-3-v3": {
+        "file": "casino-day-3-v3.e11a0e22b4.webp",
+        "width": 570,
+        "height": 441,
+        "anchor": [
+          285.0,
+          294.815
+        ]
+      },
+      "night-0-v3": {
+        "file": "casino-night-0-v3.8b4e488d75.webp",
+        "width": 570,
+        "height": 441,
+        "anchor": [
+          285.0,
+          294.815
+        ]
+      },
+      "night-1-v3": {
+        "file": "casino-night-1-v3.6fd5517973.webp",
+        "width": 570,
+        "height": 381,
+        "anchor": [
+          285.0,
+          234.815
+        ]
+      },
+      "night-2-v3": {
+        "file": "casino-night-2-v3.5d42631d4c.webp",
+        "width": 570,
+        "height": 381,
+        "anchor": [
+          285.0,
+          234.815
+        ]
+      },
+      "night-3-v3": {
+        "file": "casino-night-3-v3.0643cd5707.webp",
+        "width": 570,
+        "height": 441,
+        "anchor": [
+          285.0,
+          294.815
+        ]
+      },
+      "unpowered-0-v3": {
+        "file": "casino-unpowered-0-v3.d8d6fadea7.webp",
+        "width": 570,
+        "height": 441,
+        "anchor": [
+          285.0,
+          294.815
+        ]
+      },
+      "unpowered-1-v3": {
+        "file": "casino-unpowered-1-v3.351c1df8bb.webp",
+        "width": 570,
+        "height": 381,
+        "anchor": [
+          285.0,
+          234.815
+        ]
+      },
+      "unpowered-2-v3": {
+        "file": "casino-unpowered-2-v3.4f76c51e9c.webp",
+        "width": 570,
+        "height": 381,
+        "anchor": [
+          285.0,
+          234.815
+        ]
+      },
+      "unpowered-3-v3": {
+        "file": "casino-unpowered-3-v3.40650006fb.webp",
+        "width": 570,
+        "height": 441,
+        "anchor": [
+          285.0,
+          294.815
+        ]
+      }
+    },
+    "family": "deals",
+    "label": "Casino",
+    "description": "A stepped Art Deco hotel above a rounded gaming hall, with a gold entrance marquee.",
+    "variants": [
+      {
+        "model": "casino",
+        "label": "Palette 1",
+        "description": "A stepped Art Deco hotel above a rounded gaming hall, with a gold entrance marquee."
+      },
+      {
+        "model": "casino_v1",
+        "label": "Palette 2",
+        "description": "A stepped Art Deco hotel above a rounded gaming hall, with a gold entrance marquee."
+      },
+      {
+        "model": "casino_v2",
+        "label": "Palette 3",
+        "description": "A stepped Art Deco hotel above a rounded gaming hall, with a gold entrance marquee."
+      },
+      {
+        "model": "casino_v3",
+        "label": "Palette 4",
+        "description": "A stepped Art Deco hotel above a rounded gaming hall, with a gold entrance marquee."
+      }
+    ]
   },
   "cityhall": {
     "tiles": 3,
@@ -1182,6 +1764,583 @@ export const CIVIC_SPRITES = {
     "family": "power",
     "label": "Gas plant",
     "description": "Twin turbine modules, ribbed air intakes, slender exhausts, and a yellow gas manifold."
+  },
+  "gigamall": {
+    "tiles": 4,
+    "scale": 3,
+    "height": 42,
+    "frames": {
+      "day-0": {
+        "file": "gigamall-day-0.0b1f2eceeb.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "day-1": {
+        "file": "gigamall-day-1.2f9e16e43e.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "day-2": {
+        "file": "gigamall-day-2.d34a937a05.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "day-3": {
+        "file": "gigamall-day-3.b3fab34dca.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "night-0": {
+        "file": "gigamall-night-0.d5672c41a6.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "night-1": {
+        "file": "gigamall-night-1.c3597d3424.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "night-2": {
+        "file": "gigamall-night-2.05b2a918da.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "night-3": {
+        "file": "gigamall-night-3.dfcf6616ff.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "unpowered-0": {
+        "file": "gigamall-unpowered-0.d1bfe85d4c.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "unpowered-1": {
+        "file": "gigamall-unpowered-1.3825f137bc.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "unpowered-2": {
+        "file": "gigamall-unpowered-2.c988fc350a.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "unpowered-3": {
+        "file": "gigamall-unpowered-3.80015f3455.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "day-0-v1": {
+        "file": "gigamall-day-0-v1.cc60013407.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "day-1-v1": {
+        "file": "gigamall-day-1-v1.fabc6e1fd9.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "day-2-v1": {
+        "file": "gigamall-day-2-v1.2c98e2b164.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "day-3-v1": {
+        "file": "gigamall-day-3-v1.a8eb30c4e8.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "night-0-v1": {
+        "file": "gigamall-night-0-v1.baf53aa361.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "night-1-v1": {
+        "file": "gigamall-night-1-v1.f87e5d6c55.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "night-2-v1": {
+        "file": "gigamall-night-2-v1.5f2d85bbc9.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "night-3-v1": {
+        "file": "gigamall-night-3-v1.b766bcb42d.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "gigamall-unpowered-0-v1.43ee0b7cef.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "gigamall-unpowered-1-v1.15db19bc5a.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "gigamall-unpowered-2-v1.eb43a03e71.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "gigamall-unpowered-3-v1.acec3899ac.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "day-0-v2": {
+        "file": "gigamall-day-0-v2.1a98cefcf3.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "day-1-v2": {
+        "file": "gigamall-day-1-v2.ed1a1eb89c.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "day-2-v2": {
+        "file": "gigamall-day-2-v2.47e7da72e3.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "day-3-v2": {
+        "file": "gigamall-day-3-v2.e709ceffd0.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "night-0-v2": {
+        "file": "gigamall-night-0-v2.3fb591ef6d.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "night-1-v2": {
+        "file": "gigamall-night-1-v2.6e9052f281.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "night-2-v2": {
+        "file": "gigamall-night-2-v2.49b3ae1362.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "night-3-v2": {
+        "file": "gigamall-night-3-v2.3e314e0f2e.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "unpowered-0-v2": {
+        "file": "gigamall-unpowered-0-v2.e9bcc7e998.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "unpowered-1-v2": {
+        "file": "gigamall-unpowered-1-v2.81fc7ebe48.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "unpowered-2-v2": {
+        "file": "gigamall-unpowered-2-v2.ce79537370.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "unpowered-3-v2": {
+        "file": "gigamall-unpowered-3-v2.ecd02cdd99.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "day-0-v3": {
+        "file": "gigamall-day-0-v3.ad54e2ac50.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "day-1-v3": {
+        "file": "gigamall-day-1-v3.f8e4da1f15.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "day-2-v3": {
+        "file": "gigamall-day-2-v3.307eb70d85.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "day-3-v3": {
+        "file": "gigamall-day-3-v3.2423d8775c.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "night-0-v3": {
+        "file": "gigamall-night-0-v3.d31e59e9ec.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "night-1-v3": {
+        "file": "gigamall-night-1-v3.b132afc072.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "night-2-v3": {
+        "file": "gigamall-night-2-v3.ac994b3deb.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "night-3-v3": {
+        "file": "gigamall-night-3-v3.8ab4ade5a8.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "unpowered-0-v3": {
+        "file": "gigamall-unpowered-0-v3.267bf3ba5f.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "unpowered-1-v3": {
+        "file": "gigamall-unpowered-1-v3.d9c8cbb938.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "unpowered-2-v3": {
+        "file": "gigamall-unpowered-2-v3.3ee8670c21.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "unpowered-3-v3": {
+        "file": "gigamall-unpowered-3-v3.06e7afc57a.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "day-0-v4": {
+        "file": "gigamall-day-0-v4.fba89bca97.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "day-1-v4": {
+        "file": "gigamall-day-1-v4.1402893135.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "day-2-v4": {
+        "file": "gigamall-day-2-v4.d1b4bcfa44.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "day-3-v4": {
+        "file": "gigamall-day-3-v4.9ae7e6de98.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "night-0-v4": {
+        "file": "gigamall-night-0-v4.e2917c1fcd.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "night-1-v4": {
+        "file": "gigamall-night-1-v4.f571421029.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "night-2-v4": {
+        "file": "gigamall-night-2-v4.0cf334ff56.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "night-3-v4": {
+        "file": "gigamall-night-3-v4.03c371162a.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "unpowered-0-v4": {
+        "file": "gigamall-unpowered-0-v4.0a776f5d28.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      },
+      "unpowered-1-v4": {
+        "file": "gigamall-unpowered-1-v4.20d75cc7f9.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "unpowered-2-v4": {
+        "file": "gigamall-unpowered-2-v4.94d85d1264.webp",
+        "width": 762,
+        "height": 389,
+        "anchor": [
+          381.0,
+          194.6216
+        ]
+      },
+      "unpowered-3-v4": {
+        "file": "gigamall-unpowered-3-v4.117f158a70.webp",
+        "width": 762,
+        "height": 464,
+        "anchor": [
+          381.0,
+          269.6218
+        ]
+      }
+    },
+    "family": "deals",
+    "label": "Gigamall",
+    "description": "Anchor stores flank a long glass lantern, with covered entrances and separate rear loading.",
+    "variants": [
+      {
+        "model": "gigamall",
+        "label": "Palette 1",
+        "description": "Anchor stores flank a long glass lantern, with covered entrances and separate rear loading."
+      },
+      {
+        "model": "gigamall_v1",
+        "label": "Palette 2",
+        "description": "Anchor stores flank a long glass lantern, with covered entrances and separate rear loading."
+      },
+      {
+        "model": "gigamall_v2",
+        "label": "Palette 3",
+        "description": "Anchor stores flank a long glass lantern, with covered entrances and separate rear loading."
+      },
+      {
+        "model": "gigamall_v3",
+        "label": "Palette 4",
+        "description": "Anchor stores flank a long glass lantern, with covered entrances and separate rear loading."
+      },
+      {
+        "model": "gigamall_v4",
+        "label": "Palette 5",
+        "description": "Anchor stores flank a long glass lantern, with covered entrances and separate rear loading."
+      }
+    ]
   },
   "hospital": {
     "tiles": 3,
@@ -3186,6 +4345,124 @@ export const CIVIC_SPRITES = {
     "label": "Police station",
     "description": "Limestone ribs, bronze insignia, and a stepped Art Deco entrance."
   },
+  "prison": {
+    "tiles": 4,
+    "scale": 3,
+    "height": 40,
+    "frames": {
+      "day-0": {
+        "file": "prison-day-0.5a28f670b8.webp",
+        "width": 763,
+        "height": 490,
+        "anchor": [
+          381.9999,
+          295.1422
+        ]
+      },
+      "day-1": {
+        "file": "prison-day-1.22c724220a.webp",
+        "width": 763,
+        "height": 490,
+        "anchor": [
+          381.9999,
+          295.1424
+        ]
+      },
+      "day-2": {
+        "file": "prison-day-2.574ac59fc6.webp",
+        "width": 763,
+        "height": 490,
+        "anchor": [
+          382.0001,
+          295.1424
+        ]
+      },
+      "day-3": {
+        "file": "prison-day-3.a28cd314a5.webp",
+        "width": 763,
+        "height": 490,
+        "anchor": [
+          382.0001,
+          295.1422
+        ]
+      },
+      "night-0": {
+        "file": "prison-night-0.0d725779f9.webp",
+        "width": 763,
+        "height": 490,
+        "anchor": [
+          381.9999,
+          295.1422
+        ]
+      },
+      "night-1": {
+        "file": "prison-night-1.953044ee79.webp",
+        "width": 763,
+        "height": 490,
+        "anchor": [
+          381.9999,
+          295.1424
+        ]
+      },
+      "night-2": {
+        "file": "prison-night-2.3170d0f1f5.webp",
+        "width": 763,
+        "height": 490,
+        "anchor": [
+          382.0001,
+          295.1424
+        ]
+      },
+      "night-3": {
+        "file": "prison-night-3.8bbdf1d0c3.webp",
+        "width": 763,
+        "height": 490,
+        "anchor": [
+          382.0001,
+          295.1422
+        ]
+      },
+      "unpowered-0": {
+        "file": "prison-unpowered-0.07032cdd26.webp",
+        "width": 763,
+        "height": 490,
+        "anchor": [
+          381.9999,
+          295.1422
+        ]
+      },
+      "unpowered-1": {
+        "file": "prison-unpowered-1.2e0139fc40.webp",
+        "width": 763,
+        "height": 490,
+        "anchor": [
+          381.9999,
+          295.1424
+        ]
+      },
+      "unpowered-2": {
+        "file": "prison-unpowered-2.e20186c30d.webp",
+        "width": 763,
+        "height": 490,
+        "anchor": [
+          382.0001,
+          295.1424
+        ]
+      },
+      "unpowered-3": {
+        "file": "prison-unpowered-3.171251d6ff.webp",
+        "width": 763,
+        "height": 490,
+        "anchor": [
+          382.0001,
+          295.1422
+        ]
+      }
+    },
+    "family": "deals",
+    "label": "Maximum Security Prison",
+    "description": "Stone perimeter towers, paired cell wings and a controlled gate with a central exercise court."
+  },
   "railstation": {
     "tiles": 2,
     "scale": 3,
@@ -4708,6 +5985,357 @@ export const CIVIC_SPRITES = {
     "family": "transport",
     "label": "Subway Station",
     "description": "An open stair descends beneath a teal metro portal, with handrails and a ticket machine."
+  },
+  "toxicdump": {
+    "tiles": 3,
+    "scale": 3,
+    "height": 30,
+    "frames": {
+      "day-0": {
+        "file": "toxicdump-day-0.60719755aa.webp",
+        "width": 571,
+        "height": 318,
+        "anchor": [
+          286.0,
+          171.4263
+        ]
+      },
+      "day-1": {
+        "file": "toxicdump-day-1.978fe77e6c.webp",
+        "width": 571,
+        "height": 328,
+        "anchor": [
+          286.0,
+          181.4262
+        ]
+      },
+      "day-2": {
+        "file": "toxicdump-day-2.ccc6976b26.webp",
+        "width": 571,
+        "height": 341,
+        "anchor": [
+          286.0,
+          194.4262
+        ]
+      },
+      "day-3": {
+        "file": "toxicdump-day-3.4e3a19a2ba.webp",
+        "width": 571,
+        "height": 318,
+        "anchor": [
+          286.0,
+          171.4263
+        ]
+      },
+      "night-0": {
+        "file": "toxicdump-night-0.d0e0ee1796.webp",
+        "width": 571,
+        "height": 318,
+        "anchor": [
+          286.0,
+          171.4263
+        ]
+      },
+      "night-1": {
+        "file": "toxicdump-night-1.7b2eea2376.webp",
+        "width": 571,
+        "height": 328,
+        "anchor": [
+          286.0,
+          181.4262
+        ]
+      },
+      "night-2": {
+        "file": "toxicdump-night-2.312feadda6.webp",
+        "width": 571,
+        "height": 341,
+        "anchor": [
+          286.0,
+          194.4262
+        ]
+      },
+      "night-3": {
+        "file": "toxicdump-night-3.54412ea15a.webp",
+        "width": 571,
+        "height": 318,
+        "anchor": [
+          286.0,
+          171.4263
+        ]
+      },
+      "unpowered-0": {
+        "file": "toxicdump-unpowered-0.e648f20b39.webp",
+        "width": 571,
+        "height": 318,
+        "anchor": [
+          286.0,
+          171.4263
+        ]
+      },
+      "unpowered-1": {
+        "file": "toxicdump-unpowered-1.60b04d1ea5.webp",
+        "width": 571,
+        "height": 328,
+        "anchor": [
+          286.0,
+          181.4262
+        ]
+      },
+      "unpowered-2": {
+        "file": "toxicdump-unpowered-2.09040a5796.webp",
+        "width": 571,
+        "height": 341,
+        "anchor": [
+          286.0,
+          194.4262
+        ]
+      },
+      "unpowered-3": {
+        "file": "toxicdump-unpowered-3.4020d0174e.webp",
+        "width": 571,
+        "height": 318,
+        "anchor": [
+          286.0,
+          171.4263
+        ]
+      },
+      "day-0-v1": {
+        "file": "toxicdump-day-0-v1.2ed32451dd.webp",
+        "width": 571,
+        "height": 318,
+        "anchor": [
+          286.0,
+          171.4263
+        ]
+      },
+      "day-1-v1": {
+        "file": "toxicdump-day-1-v1.889829fbb8.webp",
+        "width": 571,
+        "height": 328,
+        "anchor": [
+          286.0,
+          181.4262
+        ]
+      },
+      "day-2-v1": {
+        "file": "toxicdump-day-2-v1.91ba97ab46.webp",
+        "width": 571,
+        "height": 341,
+        "anchor": [
+          286.0,
+          194.4262
+        ]
+      },
+      "day-3-v1": {
+        "file": "toxicdump-day-3-v1.22fa877e40.webp",
+        "width": 571,
+        "height": 318,
+        "anchor": [
+          286.0,
+          171.4263
+        ]
+      },
+      "night-0-v1": {
+        "file": "toxicdump-night-0-v1.7656f70276.webp",
+        "width": 571,
+        "height": 318,
+        "anchor": [
+          286.0,
+          171.4263
+        ]
+      },
+      "night-1-v1": {
+        "file": "toxicdump-night-1-v1.736f875aac.webp",
+        "width": 571,
+        "height": 328,
+        "anchor": [
+          286.0,
+          181.4262
+        ]
+      },
+      "night-2-v1": {
+        "file": "toxicdump-night-2-v1.3ec7cbfd1c.webp",
+        "width": 571,
+        "height": 341,
+        "anchor": [
+          286.0,
+          194.4262
+        ]
+      },
+      "night-3-v1": {
+        "file": "toxicdump-night-3-v1.f072d70ea8.webp",
+        "width": 571,
+        "height": 318,
+        "anchor": [
+          286.0,
+          171.4263
+        ]
+      },
+      "unpowered-0-v1": {
+        "file": "toxicdump-unpowered-0-v1.e3e895eace.webp",
+        "width": 571,
+        "height": 318,
+        "anchor": [
+          286.0,
+          171.4263
+        ]
+      },
+      "unpowered-1-v1": {
+        "file": "toxicdump-unpowered-1-v1.6742057375.webp",
+        "width": 571,
+        "height": 328,
+        "anchor": [
+          286.0,
+          181.4262
+        ]
+      },
+      "unpowered-2-v1": {
+        "file": "toxicdump-unpowered-2-v1.f97301b041.webp",
+        "width": 571,
+        "height": 341,
+        "anchor": [
+          286.0,
+          194.4262
+        ]
+      },
+      "unpowered-3-v1": {
+        "file": "toxicdump-unpowered-3-v1.746d49f9dd.webp",
+        "width": 571,
+        "height": 318,
+        "anchor": [
+          286.0,
+          171.4263
+        ]
+      },
+      "day-0-v2": {
+        "file": "toxicdump-day-0-v2.5b0c18909b.webp",
+        "width": 571,
+        "height": 318,
+        "anchor": [
+          286.0,
+          171.4263
+        ]
+      },
+      "day-1-v2": {
+        "file": "toxicdump-day-1-v2.a6591446eb.webp",
+        "width": 571,
+        "height": 328,
+        "anchor": [
+          286.0,
+          181.4262
+        ]
+      },
+      "day-2-v2": {
+        "file": "toxicdump-day-2-v2.15366f26bd.webp",
+        "width": 571,
+        "height": 341,
+        "anchor": [
+          286.0,
+          194.4262
+        ]
+      },
+      "day-3-v2": {
+        "file": "toxicdump-day-3-v2.dcedce9e92.webp",
+        "width": 571,
+        "height": 318,
+        "anchor": [
+          286.0,
+          171.4263
+        ]
+      },
+      "night-0-v2": {
+        "file": "toxicdump-night-0-v2.b0cb61f79b.webp",
+        "width": 571,
+        "height": 318,
+        "anchor": [
+          286.0,
+          171.4263
+        ]
+      },
+      "night-1-v2": {
+        "file": "toxicdump-night-1-v2.73bdad92db.webp",
+        "width": 571,
+        "height": 328,
+        "anchor": [
+          286.0,
+          181.4262
+        ]
+      },
+      "night-2-v2": {
+        "file": "toxicdump-night-2-v2.fb7b8215a5.webp",
+        "width": 571,
+        "height": 341,
+        "anchor": [
+          286.0,
+          194.4262
+        ]
+      },
+      "night-3-v2": {
+        "file": "toxicdump-night-3-v2.0d4ce44a0e.webp",
+        "width": 571,
+        "height": 318,
+        "anchor": [
+          286.0,
+          171.4263
+        ]
+      },
+      "unpowered-0-v2": {
+        "file": "toxicdump-unpowered-0-v2.c80599f5c7.webp",
+        "width": 571,
+        "height": 318,
+        "anchor": [
+          286.0,
+          171.4263
+        ]
+      },
+      "unpowered-1-v2": {
+        "file": "toxicdump-unpowered-1-v2.f1c3897e31.webp",
+        "width": 571,
+        "height": 328,
+        "anchor": [
+          286.0,
+          181.4262
+        ]
+      },
+      "unpowered-2-v2": {
+        "file": "toxicdump-unpowered-2-v2.a2debabb67.webp",
+        "width": 571,
+        "height": 341,
+        "anchor": [
+          286.0,
+          194.4262
+        ]
+      },
+      "unpowered-3-v2": {
+        "file": "toxicdump-unpowered-3-v2.de704a9bbe.webp",
+        "width": 571,
+        "height": 318,
+        "anchor": [
+          286.0,
+          171.4263
+        ]
+      }
+    },
+    "family": "deals",
+    "label": "Toxic Waste Dump",
+    "description": "Segregated containment bunds, color-coded storage drums and a broad service aisle.",
+    "variants": [
+      {
+        "model": "toxicdump",
+        "label": "Palette 1",
+        "description": "Segregated containment bunds, color-coded storage drums and a broad service aisle."
+      },
+      {
+        "model": "toxicdump_v1",
+        "label": "Palette 2",
+        "description": "Segregated containment bunds, color-coded storage drums and a broad service aisle."
+      },
+      {
+        "model": "toxicdump_v2",
+        "label": "Palette 3",
+        "description": "Segregated containment bunds, color-coded storage drums and a broad service aisle."
+      }
+    ]
   },
   "treatment": {
     "tiles": 3,
