@@ -21,7 +21,7 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 | Zone stages | Land value gates how far a zone builds out within its density | **Done.** See below |
 | Waste | Landfills store trash, fill up, decompose and cannot be bulldozed; incinerators age | **Done.** See below |
 | Aura | A per-neighbourhood mood map whose average is the mayoral approval rating | **Done.** See below |
-| Land value | Pylons blight the ground around them | **Done.** See below |
+| Land value | Pylons blight the ground; safety and convenient transport lift it | **Done.** See below |
 | Public safety | Budget sets precinct size and effectiveness; overlaps are additive; jails cap police effectiveness; coverage raises land value | **Done.** See below |
 
 | Fire | Per-building flammability, halved by water and cut by ordinance; relief scaled by preparedness; one crew per station plus the volunteers | **Done.** See below |
@@ -504,6 +504,12 @@ raises land values in a city, which makes Sims happy and proud to be
 citizens."* Land value counted parks, culture, schools and hospitals but had no
 idea whether the streets were safe. Both now lift it, half as strongly as a
 park does.
+
+**So does a bus stop or a station.** *"Land value is influenced by many
+factors, including pollution levels, crime levels and the availability of
+convenient transportation."* Transit coverage was the one item on that list
+land value ignored. A stop with no street beside it still lifts nothing, since
+nobody uses it.
 
 The aura test that measured red tape had to change with this: it compared two
 approval ratings rounded to whole points, and the extra land value pushed both

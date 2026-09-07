@@ -193,3 +193,31 @@ describe("safety is worth something on the ground", () => {
       `${at(c, spot[0], spot[1]).landValue} vs ${before}`);
   });
 });
+
+describe("convenient transport is worth something", () => {
+  // "Land value is influenced by many factors, including pollution levels,
+  // crime levels and the availability of convenient transportation."
+  test("a bus stop lifts the value of the streets it serves", () => {
+    const c = createCity({ seed: 7, layout: "plains", starter: false, hills: 0 });
+    c.money = 5_000_000;
+    for (let x = 24; x <= 36; x++) place(c, x, 30, "road");
+    for (let y = 20; y <= 29; y++) place(c, 30, y, "powerline");
+    refresh(c);
+    const before = at(c, 33, 31).landValue;
+    place(c, 30, 31, "bus");
+    refresh(c);
+    assert.ok(at(c, 33, 31).landValue > before, `${at(c, 33, 31).landValue} vs ${before}`);
+  });
+
+  test("and a stop nobody can reach is worth nothing", () => {
+    // "Bus stops must be placed along the side of roads to be effective."
+    const c = createCity({ seed: 7, layout: "plains", starter: false, hills: 0 });
+    c.money = 5_000_000;
+    for (let y = 20; y <= 29; y++) place(c, 30, y, "powerline");
+    refresh(c);
+    const before = at(c, 33, 31).landValue;
+    place(c, 30, 31, "bus");
+    refresh(c);
+    assert.equal(at(c, 33, 31).landValue, before);
+  });
+});

@@ -224,6 +224,9 @@ export function updateServices(city) {
     // "Good police and fire coverage raises land values in a city, which makes
     // Sims happy and proud to be citizens."
     v += Math.min(t.svc.police, 100) * 0.05 + Math.min(t.svc.fire, 100) * 0.04;
+    // "Land value is influenced by many factors, including pollution levels,
+    // crime levels and the availability of convenient transportation."
+    v += (t.svc.bus + t.svc.rail) * 0.06;
     v += t.trees * 2.5 + valueBump[i] + (t.elev || 0) * 2;
     v -= t.pollution * 0.38 + (t.traffic || 0) * 0.08;
     if (t.powered) v += 5;
