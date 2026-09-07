@@ -13,6 +13,9 @@ export const ROAD_TYPES = new Set(["road", "rail", "highway", "onramp"]);
 // Lots reach the network through these. A highway needs a road or a ramp
 // to serve a lot; on its own it just passes over.
 export const ACCESS_TYPES = new Set(["road", "rail", "onramp"]);
+// Does this tile put a street or a track at ground level? A viaduct tile is a
+// highway on top, but whatever it was built over is still down there.
+export const carriesLocal = (t) => ACCESS_TYPES.has(t.type) || t.under > 0;
 export const OVERLAY_TOOLS = new Set(["powerline", "pipe", "subway"]);
 
 // Zone cost per tile scales with density. Density 1 = low, 2 = medium, 3 = high.

@@ -115,13 +115,41 @@ describe("a longer trip is a worse address", () => {
     assert.equal(commuteAppeal({ reach: -1 }), 0, "out of range is worth nothing");
   });
 
-  test("the near block fills up before the far one", () => {
-    const near = corridor(22), far = corridor(50);
-    years(near, 6); years(far, 6);
-    assert.ok(at(far, 50, 31).reach > at(near, 22, 31).reach,
-      `the far block really is further: ${at(far, 50, 31).reach} vs ${at(near, 22, 31).reach}`);
-    assert.ok(population(near) > population(far) * 1.15,
-      `six years in, the near block should be ahead: ${population(near)} vs ${population(far)}`);
+  // Homes and works in the same places both times, so nothing differs but the
+  // length of the trip between them: one city has a straight street, the other
+  // sends the same commute the long way round.
+  function detour(long) {
+    const c = plains();
+    put(c, 3, 25, "coal");
+    for (let x = 2; x <= 60; x++) { put(c, x, 29, "powerline"); put(c, x, 29, "pipe"); }
+    for (let x = 6; x <= 58; x += 4) {
+      put(c, x, 26, "watertower");
+      for (const y of [27, 28]) { put(c, x, y, "powerline"); put(c, x, y, "pipe"); }
+    }
+    for (let x = 8; x <= 16; x++) put(c, x, 30, "road");
+    for (let x = 28; x <= 36; x++) put(c, x, 30, "road");
+    if (long) {
+      // North, across, and back down: the same two ends, twice as far.
+      for (let y = 24; y <= 30; y++) { put(c, 16, y, "road"); put(c, 28, y, "road"); }
+      for (let x = 16; x <= 28; x++) put(c, x, 24, "road");
+    } else {
+      for (let x = 16; x <= 28; x++) put(c, x, 30, "road");
+    }
+    for (let y = 31; y <= 34; y++) for (let x = 8; x <= 14; x++) put(c, x, y, "industrial", { density: 2 });
+    for (let y = 31; y <= 33; y++) for (let x = 30; x <= 35; x++) put(c, x, y, "residential", { density: 2 });
+    refresh(c);
+    return c;
+  }
+
+  test("the same block grows slower when the trip is longer", () => {
+    const direct = detour(false), roundabout = detour(true);
+    years(direct, 6); years(roundabout, 6);
+    const near = at(direct, 30, 31).reach, far = at(roundabout, 30, 31).reach;
+    assert.ok(far > near * 1.3, `the long way really is longer: ${far} vs ${near}`);
+    // Within range, distance changes the pace rather than the outcome, so the
+    // gap is real but not dramatic: about 14% after six years on this map.
+    assert.ok(population(direct) > population(roundabout) * 1.08,
+      `six years in, the direct route should be ahead: ${population(direct)} vs ${population(roundabout)}`);
   });
 
   test("given long enough, both fill up", () => {

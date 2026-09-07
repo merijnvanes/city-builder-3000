@@ -42,6 +42,8 @@ import { crewsAvailable, fireCrews } from "./fire.js";
 
 export const DEMOLISH_FEE = 5;
 export const BRIDGE_MULTIPLIER = 5;
+// A span over an existing street costs more than laying one on open ground.
+export const VIADUCT_MULTIPLIER = 2;
 
 const fail = (message) => ({ ok: false, noop: false, cost: 0, message, tiles: [] });
 const noop = (message, tiles) => ({ ok: true, noop: true, cost: 0, message, tiles });
@@ -142,6 +144,13 @@ export function evaluate(city, x, y, tool, options = {}) {
   if (tool === "road" || tool === "rail" || tool === "highway") {
     const b = BUILDINGS[tool];
     if (t.type === tool) return noop(`${b.label} already here.`, here);
+    // "Highways may be built over roads, but if you want your Sims to be able
+    // to get from one to the other, the intersection requires an on-ramp." The
+    // street keeps running underneath; the two never meet without a ramp.
+    if (tool === "highway" && (t.type === "road" || t.type === "rail") && !t.under) {
+      const span = t.terrain === "water" ? BRIDGE_MULTIPLIER : 1;
+      return { ok: true, noop: false, cost: Math.round(b.cost * VIADUCT_MULTIPLIER * span), message: `Viaduct over the ${t.type}`, tiles: here, under: t.type === "rail" ? 2 : 1 };
+    }
     if (t.type !== "empty") return fail("Tile is occupied. Bulldoze first.");
     if (t.terrain === "water") return { ok: true, noop: false, cost: b.cost * BRIDGE_MULTIPLIER, message: "Bridge", tiles: here };
     return { ok: true, noop: false, cost: b.cost, message: "", tiles: here };
@@ -239,6 +248,7 @@ export function place(city, x, y, tool, options = {}) {
     bore(city, ev.run, BUILDINGS[tool].bores);
   } else if (tool === "road" || tool === "rail" || tool === "highway" || tool === "onramp") {
     t.type = tool; t.trees = 0; t.density = 0; t.level = 0;
+    if (ev.under) t.under = ev.under;
   } else if (tool === "dispatch") {
     const a = t.lot ? anchorOf(city, t) : t;
     a.fire = 0;
@@ -247,6 +257,10 @@ export function place(city, x, y, tool, options = {}) {
     if (t.lot) {
       const a = anchorOf(city, t);
       clearLot(city, a, { keepZone: ZONED_TYPES.has(a.type) });
+    } else if (t.under) {
+      // Take the viaduct down and leave the street it was built over.
+      t.type = t.under === 2 ? "rail" : "road";
+      t.under = 0;
     } else {
       // Surface first; a subway under an empty tile goes on the next pass.
       if (t.type === "empty" && !t.powerline && !t.pipe && !t.trees) t.subway = false;

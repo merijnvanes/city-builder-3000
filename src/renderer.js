@@ -7,7 +7,7 @@ import { drawArchitecture, heightOf, random } from "./building-art.js";
 import { BUILDINGS, PORT_TYPES } from "./sim/catalog.js";
 import { drawTree } from "./foliage.js";
 import { surfaceColor, drawShoreline } from "./terrain-art.js";
-import { drawStreet, hasStreetLamp, drawStreetLamp, drawVehicle, tunnelPortal, drawTunnelMouth } from "./street-art.js";
+import { drawStreet, drawViaduct, hasStreetLamp, drawStreetLamp, drawVehicle, tunnelPortal, drawTunnelMouth } from "./street-art.js";
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const shade = (hex, k) => {
@@ -296,12 +296,21 @@ export class CityRenderer {
     if (!water && t.type === "empty" && !t.trees) for (let i = 0; i < 3; i++) { const a = random(x, y, i + 1), b = random(y, x, i + 7); this.flat(x + a * 0.85, y + b * 0.85, 0.1, 0.045, 0.05, "#a8ae642b"); }
     if (this.tool !== "inspect" && !water && this.zoom > 0.55) this.flat(x, y, 1, 1, 0.1, null, "#344b2833");
     if (!ROAD.has(t.type)) return;
+    // A viaduct is two surfaces: the street it was built over, then the deck.
+    if (t.under === 1) { drawStreet(this, t, city, { as: "road" }); drawViaduct(this, t, city); return; }
+    if (t.under === 2) { this.railBed(t, city); drawViaduct(this, t, city); return; }
     if (t.type !== "rail") {
       drawStreet(this, t, city);
       const portal = tunnelPortal(t, city);
       if (portal) drawTunnelMouth(this, t, city, portal);
       return;
     }
+    this.railBed(t, city);
+  }
+
+  // Sleepers, ballast and rails on a track tile.
+  railBed(t, city) {
+    const { x, y } = t, water = t.terrain === "water";
     const joins = (a, b) => a === b || (a !== "rail" && b !== "rail" && ROAD.has(a) && ROAD.has(b));
     const adjacent = (dx, dy) => x + dx >= 0 && y + dy >= 0 && x + dx < city.size && y + dy < city.size && joins(city.tiles[(y + dy) * city.size + x + dx]?.type, t.type);
     this.flat(x + 0.015, y + 0.015, 0.97, 0.97, 0.3, "#857f67");

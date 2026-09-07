@@ -51,7 +51,12 @@ export function computeBudget(city) {
   const pct = (d) => (FUNDED_DEPARTMENTS.includes(d) ? (funding[d] ?? 100) / 100 : 1);
 
   for (const t of tiles) {
-    if (ROAD_TYPES.has(t.type) && t.type !== "onramp") { expenses[BUILDINGS[t.type].dept] += BUILDINGS[t.type].upkeep; continue; }
+    if (ROAD_TYPES.has(t.type) && t.type !== "onramp") {
+      expenses[BUILDINGS[t.type].dept] += BUILDINGS[t.type].upkeep;
+      // A viaduct is two routes to keep up: the deck and the street below it.
+      if (t.under) { const b = BUILDINGS[t.under === 2 ? "rail" : "road"]; expenses[b.dept] += b.upkeep; }
+      continue;
+    }
     if (!isAnchor(t)) continue;
     if (ZONE_TYPES.has(t.type)) {
       const cap = capacityOf(t);

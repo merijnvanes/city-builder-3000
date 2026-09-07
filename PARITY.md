@@ -6,7 +6,7 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 
 | Area | Reference behavior | Current gap |
 | --- | --- | --- |
-| Highways | Elevated routes; ramps provide road access | Routing done: streets and highways interchange only at on-ramps. **Open:** they are still drawn flat, and a highway cannot cross an existing road |
+| Highways | Elevated routes; ramps provide road access | **Done.** They interchange only at on-ramps, and one may be built over a street, which keeps running underneath. The deck is drawn raised at crossings; the rest of a highway is still drawn flat |
 | Tunnels | Transport can pass through terrain | **Done.** Road and rail bores through high ground, six tiles minimum |
 | Power | Eight plant types; aging reduces capacity; prolonged overload can destroy plants | **Done.** All eight types with the manual's invention years; output slides after 55% of a plant's life; a year of overdraw destroys one |
 | Water | Freshwater pumps, towers, coastal desalinization; pumps age | **Done.** Sea and fresh water are distinct; three sources with the manual's weaknesses; pumps age and slow in dirty water; pipes reach seven tiles |
@@ -416,6 +416,45 @@ take it upon themselves to assist you in the clean up costs. Be forewarned, a
 Mayor that is well prepared generally receives better treatment."* Losing six
 or more lots to a disaster now draws a relief grant, and a city with funded
 fire and police coverage receives about twice what a neglectful one gets.
+
+## Highways over streets, September 7
+
+The last of the three gaps the previous session left open.
+
+> *"Highways are basically elevated, high capacity roads."*
+> *"When you build a road that crosses an existing road, city engineers will
+> automatically create an intersection for you. Highways may be built over
+> roads, but if you want your Sims to be able to get from one to the other,
+> the intersection requires an on-ramp."*
+
+The interchange half was already right: a street and a highway meet only at a
+ramp. The other half was not: a highway refused to go on an occupied tile at
+all, so it could not cross a street without the mayor bulldozing it first, and
+bulldozing it cut the neighbourhood in two.
+
+A tile now carries `under`: the road or rail line running beneath an elevated
+highway, mirroring `tunnel` for a bore. Laying a highway across a street costs
+twice the open-ground price and leaves the street where it was; bulldozing the
+deck puts the street back. The buried route still gives the lots beside it road
+access, still bills the road or transit budget, and still counts as a border
+connection.
+
+Commuting gained a third layer for it. The graph already had two - the surface
+and the subway tunnels - and the street under a viaduct is a third: a highway
+on the deck steps along the deck, everything else steps along the ground, and
+the two never meet except at a ramp. The layer is only allocated for a city
+that has a viaduct somewhere, and the hot neighbour lookup keeps its original
+form when there is none, so a city without one pays nothing: 32.1ms a month on
+a 128x128 city against 31.3ms before.
+
+Measured on one street crossed by one highway: with the viaduct the
+neighbourhood reaches 1,800 residents and its workers get to the works; with
+the highway laid through the street instead, the neighbourhood never develops
+at all.
+
+The deck is drawn raised on piers, with railings and a shadow on the street it
+crosses. Highways away from a crossing are still drawn flat, which the manual
+would have elevated throughout; that is the piece still outstanding.
 
 ## Transit strikes, and safety on the ground, September 7
 

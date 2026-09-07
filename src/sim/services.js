@@ -1,6 +1,6 @@
 // Road access, service coverage, pollution, crime, land value and garbage.
 import { forRadius, tileAt } from "./grid.js";
-import { BUILDINGS, ZONE_TYPES, PORT_TYPES, ACCESS_TYPES, ROAD_TYPES, FUNDED_DEPARTMENTS } from "./catalog.js";
+import { BUILDINGS, ZONE_TYPES, PORT_TYPES, carriesLocal, ROAD_TYPES, FUNDED_DEPARTMENTS } from "./catalog.js";
 import { ORDINANCES } from "./city.js";
 import { isAnchor, lotTiles, capacityOf } from "./lots.js";
 import { industryTraits } from "./industry.js";
@@ -39,7 +39,7 @@ export function updateServices(city) {
   // ── Road access: within ROAD_REACH of a road or rail tile ────
   for (const t of tiles) { t.roadAccess = false; t.svc = blankServices(); }
   for (const t of tiles) {
-    if (!ACCESS_TYPES.has(t.type)) continue;
+    if (!carriesLocal(t)) continue;
     forRadius(city, t.x, t.y, ROAD_REACH, (n) => { n.roadAccess = true; });
   }
   // A lot has access when any of its tiles has it.

@@ -32,13 +32,15 @@ export function streetConnections(t, city) {
   });
 }
 
-export function drawStreet(r, t, city) {
-  const { x, y } = t, highway = t.type === 'highway', ramp = t.type === 'onramp';
+// `as` overrides the surface drawn, for the street that runs under a viaduct.
+// `lift` raises the whole surface, for the deck that runs over it.
+export function drawStreet(r, t, city, { as = t.type, lift = 0 } = {}) {
+  const { x, y } = t, highway = as === 'highway', ramp = as === 'onramp';
   const joins = streetConnections(t, city), junction = !ramp && joins.filter(Boolean).length >= 3;
   const inset = highway ? 0.055 : ramp ? 0.09 : 0.14, width = 1 - inset * 2;
   const asphalt = highway ? '#424c53' : ramp ? '#4a555b' : '#525f63';
-  const flat = (a, b, w, d, color, z = 0.5) => r.flat(x + a, y + b, w, d, z, color);
-  const line = (a, b, c, d, color, w = 0.7) => r.line(r.project(x + a, y + b, 0.7), r.project(x + c, y + d, 0.7), color, w);
+  const flat = (a, b, w, d, color, z = 0.5) => r.flat(x + a, y + b, w, d, z + lift, color);
+  const line = (a, b, c, d, color, w = 0.7) => r.line(r.project(x + a, y + b, 0.7 + lift), r.project(x + c, y + d, 0.7 + lift), color, w);
   flat(0, 0, 1, 1, highway ? '#8c9792' : ramp ? '#93a09a' : '#a9afa5', 0.3);
   flat(inset, inset, width, width, asphalt);
   // A ramp carries chevrons so it reads as a slip road rather than a street.
@@ -73,18 +75,34 @@ export function drawStreet(r, t, city) {
       else line(inset, dy > 0 ? 1 - inset : inset, 1 - inset, dy > 0 ? 1 - inset : inset, '#d1d1bb');
     }
   }
-  if (t.terrain === 'water') {
-    // Railings follow the bridge axis, including north/south highways.
+  if (t.terrain === 'water' || lift) {
+    // Railings follow the axis of the span, on a bridge or a viaduct deck.
     const alongX = joins[0] || joins[2];
     for (const s of [0.04, 0.96]) {
       const a = alongX ? [0, s] : [s, 0], b = alongX ? [1, s] : [s, 1];
-      r.line(r.project(x + a[0], y + a[1], 4), r.project(x + b[0], y + b[1], 4), '#c5cbbf', 1.3);
+      r.line(r.project(x + a[0], y + a[1], 4 + lift), r.project(x + b[0], y + b[1], 4 + lift), '#c5cbbf', 1.3);
       for (const k of [0.1, 0.5, 0.9]) {
         const px = x + (alongX ? k : s), py = y + (alongX ? s : k);
-        r.line(r.project(px, py, 0.6), r.project(px, py, 4), '#8b9794', 0.75);
+        r.line(r.project(px, py, 0.6 + lift), r.project(px, py, 4 + lift), '#8b9794', 0.75);
       }
     }
   }
+}
+
+// "Highways are basically elevated, high capacity roads... Highways may be
+// built over roads, but if you want your Sims to be able to get from one to
+// the other, the intersection requires an on-ramp." Where a highway crosses a
+// street, the street stays on the ground and the deck rides over it on piers.
+export const VIADUCT_HEIGHT = 9;
+
+export function drawViaduct(r, t, city) {
+  const { x, y } = t;
+  // The deck throws a shadow on the street it crosses.
+  r.flat(x + 0.06, y + 0.06, 0.88, 0.88, 0.92, '#1c242899');
+  for (const [a, b] of [[0.04, 0.04], [0.84, 0.04], [0.04, 0.84], [0.84, 0.84]]) {
+    r.box(x + a, y + b, 0.12, 0.12, VIADUCT_HEIGHT, '#79837f');
+  }
+  drawStreet(r, t, city, { as: 'highway', lift: VIADUCT_HEIGHT });
 }
 
 export function hasStreetLamp(t) {

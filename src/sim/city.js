@@ -57,6 +57,10 @@ export function makeTile(x, y, terrain, trees, variant, elev = 0, salt = 0) {
     fill: 0,
     // A road (1) or rail (2) tunnel bored under this tile.
     tunnel: 0,
+    // A road (1) or rail (2) running under an elevated highway. "Highways may
+    // be built over roads, but if you want your Sims to be able to get from
+    // one to the other, the intersection requires an on-ramp."
+    under: 0,
     // Fallout from a meltdown. "The only time Sims won't return is when an
     // area has been contaminated by radiation from a nuclear explosion."
     radiation: false,
@@ -99,6 +103,8 @@ export function blankCity({ seed = 42, size = DEFAULT_SIZE, layout, name = "New 
     ...defaultPolicies(),
     people: blankPopulation(),
     roadCondition: 100,
+    // How congested the roads have been, which sets how far Sims will drive.
+    trafficLevel: 0,
     // Fire crews sent out this month; see fire.js.
     dispatched: 0,
     siren: blankSiren(),
@@ -159,7 +165,7 @@ export function serialize(city) {
     t.powerline ? 1 : 0, t.pipe ? 1 : 0, t.elev | 0, t.subway ? 1 : 0, t.flooded | 0,
     t.industry ? INDUSTRY_TYPES.indexOf(t.industry) + 1 : 0, t.strain | 0, t.salt ? 1 : 0,
     Math.round((t.fill || 0) * 100) / 100, t.tunnel | 0,
-    t.commerce ? COMMERCE_TYPES.indexOf(t.commerce) + 1 : 0, t.radiation ? 1 : 0,
+    t.commerce ? COMMERCE_TYPES.indexOf(t.commerce) + 1 : 0, t.radiation ? 1 : 0, t.under | 0,
   ]);
   return JSON.stringify({
     version: SAVE_VERSION,
@@ -179,6 +185,7 @@ export function serialize(city) {
     deals: city.deals ?? {},
     people: serializePopulation(city.people),
     roadCondition: city.roadCondition ?? 100,
+    trafficLevel: city.trafficLevel ?? 0,
     dispatched: city.dispatched ?? 0,
     siren: serializeSiren(city.siren ?? blankSiren()),
   });
@@ -228,9 +235,10 @@ export function deserialize(raw) {
   for (let i = 0; i < d.tiles.length; i++) {
     const r = d.tiles[i];
     const x = i % size, y = (i - x) / size;
-    if (!Array.isArray(r) || r.length < 15 || r.length > 25) throw new Error(`Invalid save: tile ${i} malformed.`);
-    const [terrainCode, trees, typeCode, density, lotX, lotY, lotW, lotH, level, variant, abandoned, age, fire, powerline, pipe, elev = 0, subway = 0, flooded = 0, industry = 0, strain = 0, salt = 0, fill = 0, tunnel = 0, commerce = 0, radiation = 0] = r;
+    if (!Array.isArray(r) || r.length < 15 || r.length > 26) throw new Error(`Invalid save: tile ${i} malformed.`);
+    const [terrainCode, trees, typeCode, density, lotX, lotY, lotW, lotH, level, variant, abandoned, age, fire, powerline, pipe, elev = 0, subway = 0, flooded = 0, industry = 0, strain = 0, salt = 0, fill = 0, tunnel = 0, commerce = 0, radiation = 0, under = 0] = r;
     if (![0, 1].includes(radiation)) throw new Error(`Invalid save: tile ${i} bad radiation.`);
+    if (![0, 1, 2].includes(under)) throw new Error(`Invalid save: tile ${i} bad viaduct.`);
     if (!Number.isInteger(commerce) || commerce < 0 || commerce > COMMERCE_TYPES.length) throw new Error(`Invalid save: tile ${i} bad commerce.`);
     if (![0, 1, 2].includes(tunnel)) throw new Error(`Invalid save: tile ${i} bad tunnel.`);
     if (!Number.isFinite(fill) || fill < 0 || fill > MAX_FILL) throw new Error(`Invalid save: tile ${i} bad landfill contents.`);
@@ -254,6 +262,8 @@ export function deserialize(raw) {
     if (!Number.isInteger(age) || age < 0 || !Number.isInteger(fire) || fire < 0 || fire > 6) throw new Error(`Invalid save: tile ${i} bad counters.`);
     const terrain = TERRAIN_NAME[terrainCode];
     if (terrain === "water" && type !== "empty" && !ROAD_TYPES.has(type)) throw new Error(`Invalid save: tile ${i} built on water.`);
+    // Only a highway carries a route beneath it.
+    if (under && type !== "highway") throw new Error(`Invalid save: tile ${i} has a viaduct without a highway.`);
     const t = makeTile(x, y, terrain, trees, variant, elev, salt);
     t.type = type; t.density = density; t.level = level; t.abandoned = !!abandoned; t.age = age; t.fire = fire;
     t.powerline = !!powerline; t.pipe = !!pipe; t.subway = !!subway; t.flooded = flooded;
@@ -263,6 +273,7 @@ export function deserialize(raw) {
     t.tunnel = tunnel;
     t.commerce = commerce ? COMMERCE_TYPES[commerce - 1] : null;
     t.radiation = !!radiation;
+    t.under = under;
     if (lotW > 0) {
       if (!Number.isInteger(lotX) || !Number.isInteger(lotY) || !Number.isInteger(lotH) || lotW > 8 || lotH > 8 ||
           lotX > x || lotY > y || lotX + lotW <= x || lotY + lotH <= y) throw new Error(`Invalid save: tile ${i} bad lot.`);
@@ -298,6 +309,7 @@ export function deserialize(raw) {
     settings: { yearEndBudget: d.settings?.yearEndBudget !== false },
     people: parsePopulation(d.people),
     roadCondition: Number.isFinite(d.roadCondition) && d.roadCondition >= 0 && d.roadCondition <= 100 ? d.roadCondition : 100,
+    trafficLevel: Number.isFinite(d.trafficLevel) && d.trafficLevel >= 0 && d.trafficLevel <= 100 ? d.trafficLevel : 0,
     // Crews already out this month, so a save cannot refill the fire trucks.
     dispatched: Number.isInteger(d.dispatched) && d.dispatched >= 0 && d.dispatched <= 999 ? d.dispatched : 0,
     siren: parseSiren(d.siren),

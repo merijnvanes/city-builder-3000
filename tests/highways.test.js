@@ -99,3 +99,118 @@ describe("a ramp behaves like a street", () => {
     assert.equal(serialize(d), serialize(c));
   });
 });
+
+describe("a highway built over a street", () => {
+  // "Highways may be built over roads, but if you want your Sims to be able to
+  // get from one to the other, the intersection requires an on-ramp."
+  const town = () => createCity({ seed: 12, starter: false, layout: "plains", hills: 0, startYear: 2000 });
+
+  test("the highway goes over and the street stays underneath", () => {
+    const c = town();
+    for (let y = 10; y <= 50; y++) put(c, 30, y, "road");
+    const r = put(c, 30, 30, "highway");
+    assert.equal(r.ok, true);
+    assert.match(r.message, /Viaduct over the road/);
+    const t = at(c, 30, 30);
+    assert.equal(t.type, "highway");
+    assert.equal(t.under, 1);
+  });
+
+  test("it costs more than laying one on open ground", () => {
+    const c = town();
+    for (let y = 10; y <= 50; y++) put(c, 30, y, "road");
+    const bare = evaluate(c, 31, 20, "highway").cost;
+    assert.ok(evaluate(c, 30, 30, "highway").cost > bare);
+  });
+
+  test("a second deck cannot go on the same tile", () => {
+    const c = town();
+    for (let y = 10; y <= 50; y++) put(c, 30, y, "road");
+    put(c, 30, 30, "highway");
+    assert.equal(evaluate(c, 30, 30, "highway").noop, true);
+  });
+
+  test("bulldozing the deck leaves the street it crossed", () => {
+    const c = town();
+    for (let y = 10; y <= 50; y++) put(c, 30, y, "road");
+    put(c, 30, 30, "highway");
+    put(c, 30, 30, "bulldoze");
+    assert.equal(at(c, 30, 30).type, "road");
+    assert.equal(at(c, 30, 30).under, 0);
+  });
+
+  test("the street below still serves the lots beside it", () => {
+    const c = town();
+    for (let y = 10; y <= 50; y++) put(c, 30, y, "road");
+    put(c, 30, 30, "highway");
+    refresh(c);
+    assert.equal(at(c, 31, 30).roadAccess, true);
+    assert.equal(at(c, 29, 30).roadAccess, true);
+  });
+
+  test("rail may be crossed too, and the track stays track", () => {
+    const c = town();
+    for (let y = 10; y <= 50; y++) put(c, 30, y, "rail");
+    assert.equal(put(c, 30, 30, "highway").ok, true);
+    assert.equal(at(c, 30, 30).under, 2);
+    put(c, 30, 30, "bulldoze");
+    assert.equal(at(c, 30, 30).type, "rail");
+  });
+
+  test("it survives a save and a tampered viaduct is rejected", () => {
+    const c = town();
+    for (let y = 10; y <= 50; y++) put(c, 30, y, "road");
+    put(c, 30, 30, "highway");
+    refresh(c);
+    const back = deserialize(serialize(c));
+    assert.equal(at(back, 30, 30).under, 1);
+    assert.equal(serialize(back), serialize(c));
+
+    const bad = JSON.parse(serialize(c));
+    bad.tiles[30 * c.size + 30][25] = 3;
+    assert.throws(() => deserialize(JSON.stringify(bad)), /bad viaduct/);
+
+    // And a viaduct with no highway over it is nonsense.
+    const orphan = JSON.parse(serialize(c));
+    const road = orphan.tiles.findIndex((row, i) => i !== 30 * c.size + 30 && orphan.types[row[2]] === "road");
+    orphan.tiles[road][25] = 1;
+    assert.throws(() => deserialize(JSON.stringify(orphan)), /viaduct without a highway/);
+  });
+
+  // The whole point: a street the highway crosses is not severed.
+  function corridor(cross) {
+    const c = town();
+    for (let y = 10; y <= 50; y++) if (cross || y !== 30) put(c, y === 30 ? 30 : 30, y, "road");
+    for (let x = 10; x <= 50; x++) if (x !== 30) put(c, x, 30, "highway");
+    put(c, 30, 30, "highway");
+    put(c, 24, 12, "coal");
+    for (let x = 28; x <= 29; x++) for (let y = 12; y <= 48; y++) put(c, x, y, "powerline");
+    for (let y = 12; y <= 48; y++) put(c, 29, y, "pipe");
+    for (const y of [20, 40]) { put(c, 28, y, "watertower"); put(c, 28, y, "pipe"); }
+    for (let y = 12; y <= 20; y++) for (let x = 31; x <= 33; x++) put(c, x, y, "residential", { density: 2 });
+    for (let y = 40; y <= 48; y++) for (let x = 31; x <= 33; x++) put(c, x, y, "industrial", { density: 2 });
+    refresh(c);
+    for (let i = 0; i < 12 * 12; i++) tick(c);
+    return getStats(c);
+  }
+
+  test("commuters keep using the street the highway crosses", () => {
+    const through = corridor(true), severed = corridor(false);
+    assert.ok(through.population > 1000, `the viaduct keeps the neighbourhood alive: ${through.population}`);
+    assert.ok(through.employed > 0, `and its workers reach the works: ${through.employed}`);
+    assert.equal(severed.population, 0, "cutting the street with a highway kills it");
+  });
+
+  test("but they still cannot drive up onto the deck without a ramp", () => {
+    const c = town();
+    // A dead-end street that only meets the highway at a viaduct.
+    for (let y = 28; y <= 32; y++) put(c, 30, y, "road");
+    for (let x = 10; x <= 50; x++) put(c, x, 30, "highway");
+    assert.equal(at(c, 30, 30).under, 1);
+    refresh(c);
+    // The street under the deck reaches only its own five tiles; the highway
+    // above goes right across the map and never picks anyone up.
+    const s = getStats(c);
+    assert.equal(s.employed, 0, "nobody is going anywhere on a five-tile street");
+  });
+});

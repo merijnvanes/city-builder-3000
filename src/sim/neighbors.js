@@ -114,8 +114,8 @@ export function detectConnections(city) {
   SIDES.forEach((side, index) => {
     const info = { name: neighborName(city.seed, index), road: 0, rail: 0, power: 0, water: 0, port: 0, roadTiles: [], powerTiles: [], pipeTiles: [] };
     for (const t of edgeTiles(city, side)) {
-      if (t.type === "road" || t.type === "highway") { info.road++; info.roadTiles.push(t); }
-      if (t.type === "rail") info.rail++;
+      if (t.type === "road" || (t.type === "highway" && t.under !== 2)) { info.road++; info.roadTiles.push(t); }
+      if (t.type === "rail" || t.under === 2) info.rail++;
       if (t.powerline) { info.power++; info.powerTiles.push(t); }
       if (t.pipe) { info.water++; info.pipeTiles.push(t); }
     }

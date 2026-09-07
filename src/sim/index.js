@@ -3,7 +3,7 @@ import { TOOLS, TOOL_MAP, BUILDINGS, ZONE_TYPES, PORT_TYPES, ZONED_TYPES, FUNDED
 import { blankCity, serialize, deserialize as parseCity, ORDINANCES, START_YEAR, DEFAULT_SIZE, defaultPolicies } from "./city.js";
 import { place, evaluate, techAvailable } from "./place.js";
 import { refreshCity } from "./refresh.js";
-import { updateTraffic } from "./traffic.js";
+import { updateTraffic, settleTraffic } from "./traffic.js";
 import { computeMetrics, dateOf, yearOf } from "./metrics.js";
 import { computeDemand, updateGrowth, conditionsOk, connected } from "./growth.js";
 import { computeBudget, amortize, takeLoan, repayLoan } from "./economy.js";
@@ -79,6 +79,10 @@ export function tick(city) {
   // Every change to the city happens here, above the refreshes. Anything
   // mutated afterwards would leave a save whose derived state settle() cannot
   // reproduce on load, and the two copies would drift apart.
+  // How far Sims are willing to drive catches up with what the roads were
+  // like last month. It has to move here, above the refreshes, or a reloaded
+  // city would take a step the running one had not.
+  city.trafficLevel = settleTraffic(city.trafficLevel, city._metrics?.traffic ?? city.trafficLevel);
   const growth = updateGrowth(city, city.demand, rng);
   // Last month's crews come back on duty: "one dispatch unit for each fire
   // station you build, plus one for the volunteer group", every month.
