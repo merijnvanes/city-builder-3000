@@ -1065,6 +1065,41 @@ The mayor paid the mass transit budget with no way to find out whether anybody
 was riding, which is the one thing the manual tells them to check. Both now
 reach `getStats`.
 
+### The other five budgets, and the tax curve, September 7
+
+After the mass transit budget turned out to do nothing, the same probe was run
+on every funded department: one identical city, one budget varied, read on the
+timescale that department actually works over. A cohort statistic like schooling
+cannot move in a month and a road surface cannot decay in one either, which is
+why the first sweep showed three of them flat.
+
+| department | read | 100% | 20% |
+| --- | --- | --- | --- |
+| police | crime, 1 month | 21 | 27 |
+| fire | coverage, 1 month | 11 | 0 |
+| health | life expectancy, 10 years | 54.2 | 30 |
+| education | youth EQ, 15 years | 76.9 | 13.6 |
+| road | surface condition, 10 years | 100 | 40 |
+
+All monotonic, and none of them buys anything with the extra 20% above
+adequate. Transit was the only one that was broken.
+
+**Taxes** were checked the same way and are right, including the part that is
+easy to get wrong. Demand falls monotonically with the rate in all three
+sectors, and the revenue curve turns over:
+
+| flat rate | income | population |
+| --- | --- | --- |
+| 7% | 1,947 | 15,950 |
+| 14% | 3,471 | 13,570 |
+| 17% | 3,542 | 11,070 |
+| 20% | 2,054 | 5,150 |
+
+That is *"Raising taxes may either raise or lower city income. It just depends
+on the current conditions in the city"* falling out of the model rather than
+being written into it: 20% earns less than 14% because it empties the city.
+Both are now pinned in `tests/budget-effect.test.js`.
+
 ## Visual and performance work, September 7
 
 - Preserved and verified the previous agent's query-card sizing/rotation work.

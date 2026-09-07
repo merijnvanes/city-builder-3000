@@ -47,6 +47,61 @@ describe("the six city services", () => {
   });
 });
 
+// Every funded department has to change something the player can see, or the
+// budget slider is decoration. The mass transit budget was: every level from
+// 0% to 120% produced byte-identical traffic, and only a strike did anything.
+// This sweeps the other five on the timescale each one actually works over,
+// because a cohort statistic like schooling cannot move in a month and a road
+// surface cannot decay in one either.
+describe("every department budget moves something", () => {
+  const settled = () => { const c = createCity(21, true); for (let i = 0; i < 240; i++) tick(c); return c; };
+  // Same city, same span, one budget the only difference.
+  function compare(dept, years, read) {
+    const saved = serialize(settled());
+    const at = (pct) => {
+      const c = deserialize(saved);
+      setPolicy(c, `funding.${dept}`, pct);
+      for (let i = 0; i < years * 12; i++) tick(c);
+      return read(c, getStats(c));
+    };
+    return { full: at(100), starved: at(20), lavish: at(120) };
+  }
+
+  test("police funding holds crime down", () => {
+    const r = compare("police", 0, (c, s) => s.crime);
+    assert.ok(r.starved > r.full, `crime ${r.starved} starved against ${r.full} funded`);
+  });
+
+  test("fire funding widens coverage", () => {
+    const r = compare("fire", 0, (c, s) => s.fireCover);
+    assert.ok(r.starved < r.full, `coverage ${r.starved} starved against ${r.full} funded`);
+  });
+
+  test("health funding lengthens lives", () => {
+    const r = compare("health", 5, (c, s) => s.lifeExpectancy);
+    assert.ok(r.starved < r.full - 5, `life expectancy ${r.starved} starved against ${r.full} funded`);
+  });
+
+  test("education funding teaches children", () => {
+    const r = compare("education", 8, (c, s) => s.youthEq);
+    assert.ok(r.starved < r.full - 5, `youth EQ ${r.starved} starved against ${r.full} funded`);
+  });
+
+  test("the road budget keeps the surface up", () => {
+    const r = compare("road", 5, (c) => c.roadCondition);
+    assert.ok(r.starved < r.full, `condition ${r.starved} starved against ${r.full} funded`);
+    assert.equal(r.full, 100, "a fully funded road budget should hold the surface");
+  });
+
+  // "An over funded branch will waste money."
+  test("no department does better than adequate on more than adequate", () => {
+    for (const [dept, years, read] of [["police", 0, (c, s) => s.crime], ["fire", 0, (c, s) => s.fireCover], ["road", 5, (c) => c.roadCondition]]) {
+      const r = compare(dept, years, read);
+      assert.equal(r.lavish, r.full, `${dept} bought something with the extra 20%`);
+    }
+  });
+});
+
 describe("over-funding is waste", () => {
   test("paying a department more than it asks buys no extra coverage", () => {
     const full = createCity(21, true);
@@ -141,5 +196,52 @@ describe("roads fall apart without maintenance", () => {
     assert.equal(d.roadCondition, c.roadCondition);
     years(c, 2); years(d, 2);
     assert.equal(serialize(d), serialize(c));
+  });
+});
+
+// "Typically, when you lower tax rates for any sector, demand for that sector
+// will increase. If you raise taxes, demand decreases."
+//
+// And the harder half, which the model gets right: "Raising taxes may either
+// raise or lower city income. It just depends on the current conditions in the
+// city." A rate high enough to empty the city earns less than a moderate one.
+describe("taxes", () => {
+  const settled = () => { const c = createCity(21, true); for (let i = 0; i < 240; i++) tick(c); return c; };
+
+  test("demand falls as the rate rises, in every sector", () => {
+    const saved = serialize(settled());
+    for (const kind of ["residential", "commercial", "industrial"]) {
+      let last = Infinity;
+      for (const rate of [0, 4, 7, 10, 14, 20]) {
+        const c = deserialize(saved);
+        setPolicy(c, `tax.${kind}`, rate);
+        tick(c);
+        const d = getStats(c).demand[kind];
+        assert.ok(d <= last, `${kind} demand rose from ${last} to ${d} when tax went to ${rate}%`);
+        last = d;
+      }
+    }
+  });
+
+  test("a punishing rate earns less than a moderate one", () => {
+    const saved = serialize(settled());
+    const income = (rate) => {
+      const c = deserialize(saved);
+      for (const k of ["residential", "commercial", "industrial"]) setPolicy(c, `tax.${k}`, rate);
+      for (let i = 0; i < 180; i++) tick(c);
+      const s = getStats(c);
+      return { income: s.budget.income.total, pop: s.population };
+    };
+    const moderate = income(14), punishing = income(20);
+    assert.ok(punishing.pop < moderate.pop * 0.6, `20% left ${punishing.pop} of ${moderate.pop} residents`);
+    assert.ok(punishing.income < moderate.income, `20% earned ${punishing.income} against 14%'s ${moderate.income}`);
+  });
+
+  test("the rate is held to the range the budget window allows", () => {
+    const c = createCity(21, true);
+    assert.equal(setPolicy(c, "tax.residential", 21).ok, false);
+    assert.equal(setPolicy(c, "tax.residential", -1).ok, false);
+    assert.equal(setPolicy(c, "tax.residential", 20).ok, true);
+    assert.equal(setPolicy(c, "tax.residential", 0).ok, true);
   });
 });
