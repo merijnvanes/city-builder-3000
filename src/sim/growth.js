@@ -7,6 +7,8 @@
 import { ZONE_TYPES } from "./catalog.js";
 import { isAnchor, findLot, assignLot, clearLot } from "./lots.js";
 import { WORKFORCE_SHARE } from "./traffic.js";
+import { pickIndustry, convertIndustry, industryOf } from "./industry.js";
+import { yearOf } from "./metrics.js";
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
@@ -52,7 +54,11 @@ export function desirability(t) {
   } else if (t.type === "commercial") {
     d = 0.5 + lv / 120 - t.crime / 150 - t.pollution / 320 + Math.min(t.traffic, 50) / 350 + (s.bus + s.rail) / 500;
   } else {
-    d = 0.75 + (100 - lv) / 220 - t.crime / 300 + s.rail / 300;
+    // Smokestacks want cheap land; laboratories want a good address.
+    const clean = industryOf(t) === "hightech";
+    d = clean
+      ? 0.5 + lv / 130 - t.pollution / 200 - t.crime / 220 + (s.education + s.rail) / 500
+      : 0.75 + (100 - lv) / 220 - t.crime / 300 + s.rail / 300;
   }
   return clamp(d, 0.2, 1.6);
 }
@@ -67,7 +73,9 @@ export function conditionsOk(t) {
 
 export function updateGrowth(city, demand, rng) {
   const { tiles } = city;
-  let built = 0, upgraded = 0, declined = 0, abandoned = 0;
+  const year = yearOf(city.month, city.startYear);
+  const eq = city._metrics?.eq ?? 55;
+  let built = 0, upgraded = 0, declined = 0, abandoned = 0, retooled = 0;
 
   // Developed lots first so freshly formed lots are not judged twice.
   for (const t of tiles) {
@@ -76,6 +84,11 @@ export function updateGrowth(city, demand, rng) {
     t.age = (t.age || 0) + 1;
     const ok = conditionsOk(t);
     const des = desirability(t);
+    // A working plant re-tools when the era and the city's schooling move on.
+    if (t.type === "industrial" && !t.abandoned && t.level && rng() < 0.04) {
+      const next = convertIndustry(t, year, eq, rng());
+      if (next !== industryOf(t)) { t.industry = next; retooled++; }
+    }
     if (t.abandoned) {
       if (ok && d > 15 && rng() < 0.2 * des) { t.abandoned = false; t.level = 1; t.age = 0; built++; }
       else if (t.age > 30 && rng() < 0.3) { clearLot(city, t, { keepZone: true }); }
@@ -112,8 +125,9 @@ export function updateGrowth(city, demand, rng) {
     if (rng() >= p) continue;
     const lot = findLot(city, t);
     if (!lot) continue;
-    assignLot(city, lot, 1, rng());
+    const anchor = assignLot(city, lot, 1, rng());
+    if (t.type === "industrial") anchor.industry = pickIndustry(anchor, year, eq, rng());
     built++;
   }
-  return { built, upgraded, declined, abandoned };
+  return { built, upgraded, declined, abandoned, retooled };
 }

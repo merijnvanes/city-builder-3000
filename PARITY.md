@@ -13,6 +13,8 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 | Education | Childhood learning and adult knowledge retention; strikes from sustained underfunding | **Done.** EQ is taught to children aged 5-17, colleges take 18-22, adults decay without libraries or museums, and teachers strike after 18 months below 40% funding |
 | Health | Average city reaches 59 years, a well-run one 90; hospitals need beds and funding; pollution and traffic pull it down | **Done.** Life expectancy is a cohort statistic on the same anchors, with healthcare strikes |
 
+| Industry | Farms, heavy industry, manufacturing and high tech, the last attracted by an educated workforce | **Done.** See below |
+
 Other systems needing controlled comparisons against the original game include growth thresholds, lot stages, service capacity, land value, pollution, budgets, rewards, neighbor contracts and disasters. The manual describes behaviors but does not expose all numerical formulas. Exact balance requires repeatable reference-game experiments, not guessed constants.
 
 ## Demographics, September 7
@@ -34,6 +36,28 @@ Anchors taken straight from the manual (pages 91-93):
 The constants between those anchors are calibrated to reproduce them, not
 recovered from the original game. The mortality curve is fitted by bisection
 so the reported life expectancy is a measured mean, not a label.
+
+## Industrial subtypes, September 7
+
+`src/sim/industry.js` gives every industrial lot one of four kinds:
+agriculture, heavy industry, manufacturing, high tech. Two forces pick it.
+
+- **SimNation's economy** drifts from smoke toward silicon: heavy industry
+  dominates before the war, manufacturing peaks mid-century, high tech is
+  barely a rumour before the 1970s.
+- **The city's own EQ** decides how much of that drift it can capture.
+
+Measured over 140 years from 1900 on the same map and seed:
+
+| | EQ | Pollution | Mix in 2050 |
+| --- | --- | --- | --- |
+| Schools, colleges, libraries, museums, 120% funding | 116 | 11 | farms + high tech |
+| Education funding at zero | 43 | 17 | farms + heavy industry |
+
+That is the manual's promise on page 92 reproduced: *"nasty polluting
+industries turning into cleaner, high-tech industries."* The kind also sets
+jobs per tile and tax yield, so a laboratory is worth more per worker than a
+foundry, and farms employ few.
 
 ## Visual and performance work, September 7
 

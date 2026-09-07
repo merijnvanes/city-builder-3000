@@ -5,6 +5,7 @@ import { BUILDINGS, ZONE_TYPES, ROAD_TYPES, FUNDED_DEPARTMENTS } from "./catalog
 import { tileAt } from "./grid.js";
 import { lotTiles } from "./lots.js";
 import { blankPopulation, serializePopulation, parsePopulation } from "./population.js";
+import { INDUSTRY_TYPES } from "./industry.js";
 
 export const SAVE_VERSION = 4;
 export const DEFAULT_SIZE = 64;
@@ -36,7 +37,7 @@ export const ORDINANCES = {
 export function makeTile(x, y, terrain, trees, variant, elev = 0) {
   return {
     x, y, terrain, trees, elev,
-    type: "empty", density: 0, lot: null, level: 0, variant, abandoned: false, age: 0, fire: 0,
+    type: "empty", density: 0, lot: null, level: 0, variant, abandoned: false, age: 0, fire: 0, industry: null,
     powered: false, watered: false, roadAccess: false, powerline: false, pipe: false, subway: false,
     pollution: 0, crime: 0, traffic: 0, landValue: 40, svc: null,
   };
@@ -99,6 +100,7 @@ export function serialize(city) {
     t.lot ? t.lot.x : -1, t.lot ? t.lot.y : -1, t.lot ? t.lot.w : 0, t.lot ? t.lot.h : 0,
     t.level | 0, Math.round(t.variant * 1000) / 1000, t.abandoned ? 1 : 0, t.age | 0, t.fire | 0,
     t.powerline ? 1 : 0, t.pipe ? 1 : 0, t.elev | 0, t.subway ? 1 : 0, t.flooded | 0,
+    t.industry ? INDUSTRY_TYPES.indexOf(t.industry) + 1 : 0,
   ]);
   return JSON.stringify({
     version: SAVE_VERSION,
@@ -158,8 +160,9 @@ export function deserialize(raw) {
   for (let i = 0; i < d.tiles.length; i++) {
     const r = d.tiles[i];
     const x = i % size, y = (i - x) / size;
-    if (!Array.isArray(r) || r.length < 15 || r.length > 18) throw new Error(`Invalid save: tile ${i} malformed.`);
-    const [terrainCode, trees, typeCode, density, lotX, lotY, lotW, lotH, level, variant, abandoned, age, fire, powerline, pipe, elev = 0, subway = 0, flooded = 0] = r;
+    if (!Array.isArray(r) || r.length < 15 || r.length > 19) throw new Error(`Invalid save: tile ${i} malformed.`);
+    const [terrainCode, trees, typeCode, density, lotX, lotY, lotW, lotH, level, variant, abandoned, age, fire, powerline, pipe, elev = 0, subway = 0, flooded = 0, industry = 0] = r;
+    if (!Number.isInteger(industry) || industry < 0 || industry > INDUSTRY_TYPES.length) throw new Error(`Invalid save: tile ${i} bad industry.`);
     if (!Number.isInteger(elev) || elev < 0 || elev > MAX_ELEVATION) throw new Error(`Invalid save: tile ${i} bad elevation.`);
     if (!Number.isInteger(flooded) || flooded < 0 || flooded > 2) throw new Error(`Invalid save: tile ${i} bad flood duration.`);
     if (![0, 1].includes(subway)) throw new Error(`Invalid save: tile ${i} bad subway flag.`);
@@ -177,6 +180,7 @@ export function deserialize(raw) {
     const t = makeTile(x, y, terrain, trees, variant, elev);
     t.type = type; t.density = density; t.level = level; t.abandoned = !!abandoned; t.age = age; t.fire = fire;
     t.powerline = !!powerline; t.pipe = !!pipe; t.subway = !!subway; t.flooded = flooded;
+    t.industry = industry ? INDUSTRY_TYPES[industry - 1] : null;
     if (lotW > 0) {
       if (!Number.isInteger(lotX) || !Number.isInteger(lotY) || !Number.isInteger(lotH) || lotW > 8 || lotH > 8 ||
           lotX > x || lotY > y || lotX + lotW <= x || lotY + lotH <= y) throw new Error(`Invalid save: tile ${i} bad lot.`);

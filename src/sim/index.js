@@ -4,7 +4,7 @@ import { blankCity, serialize, deserialize as parseCity, ORDINANCES, START_YEAR,
 import { place, evaluate, techAvailable } from "./place.js";
 import { refreshCity } from "./refresh.js";
 import { updateTraffic } from "./traffic.js";
-import { computeMetrics, dateOf } from "./metrics.js";
+import { computeMetrics, dateOf, yearOf } from "./metrics.js";
 import { computeDemand, updateGrowth, conditionsOk } from "./growth.js";
 import { computeBudget, amortize, takeLoan, repayLoan } from "./economy.js";
 import { generateAdvisors, generateNews, ADVISORS } from "./advisors.js";
@@ -19,6 +19,7 @@ import { SPECIAL_TYPES } from "./catalog.js";
 import { DEALS, SIDES, signDeal, cancelDeal, auditDeals, dealAvailable } from "./neighbors.js";
 import { buildingName } from "./names.js";
 import { advanceYear, updateStrikes, readPopulation, blankPopulation, serviceQuality } from "./population.js";
+import { INDUSTRY, industryOf, ensureIndustry } from "./industry.js";
 
 export { TOOLS, TOOL_MAP, BUILDINGS, ZONE_TYPES, ORDINANCES, ADVISORS, DISASTERS, START_YEAR, DEFAULT_SIZE, FUNDED_DEPARTMENTS, SPECIAL_TYPES, PETITIONS, DEALS, SIDES, serialize, place, evaluate, isZone };
 
@@ -29,11 +30,14 @@ export function createCity(seed = 42, starter = true, options = {}) {
   return settle(city);
 }
 
+const dateYear = (city) => yearOf(city.month, city.startYear);
+
 // Recompute everything derived and cache stats on the city.
 function settle(city) {
   ensureEvents(city);
   if (!city.people) city.people = blankPopulation();
   refreshCity(city);
+  ensureIndustry(city, dateYear(city), city._metrics?.eq ?? 55);
   const share = readPopulation(city, city.population || 0).workforceShare;
   city._traffic = updateTraffic(city, share);
   refreshCity(city);
@@ -247,7 +251,11 @@ export function inspectTile(city, x, y) {
     const name = buildingName(a);
     if (!a.lot) description = "Zoned, waiting for development. Needs road access and power" + (t.density >= 2 ? " and water." : ".");
     else if (a.abandoned) description = `Abandoned ${STAGE_NAMES[t.type][Math.max(1, a.level)].toLowerCase()}. Restore services and demand to bring residents back.`;
-    else { title = name || title; description = `${STAGE_NAMES[t.type][a.level]}, ${DENSITY_NAMES[t.density].toLowerCase()} ${t.type} (${a.lot.w}×${a.lot.h} lot, stage ${a.level}/4).`; }
+    else {
+      title = name || title;
+      const stage = t.type === "industrial" ? INDUSTRY[industryOf(a)].label : STAGE_NAMES[t.type][a.level];
+      description = `${stage}, ${DENSITY_NAMES[t.density].toLowerCase()} ${t.type} (${a.lot.w}×${a.lot.h} lot, stage ${a.level}/4).`;
+    }
     const cap = capacityOf(a);
     if (cap) details.push(t.type === "residential" ? `Residents: ${cap.toLocaleString()}` : `Jobs: ${cap.toLocaleString()}${a.filled != null ? ` (${Math.min(cap, Math.round(a.filled)).toLocaleString()} filled)` : ""}`);
     if (t.type === "residential" && a.commute != null && cap) details.push(`Workers with a job: ${Math.round(a.commute * 100)}%`);

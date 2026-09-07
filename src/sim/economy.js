@@ -1,6 +1,7 @@
 // Taxes, department budgets, ordinances and loans.
 import { BUILDINGS, ZONE_TYPES, DEPARTMENTS, FUNDED_DEPARTMENTS } from "./catalog.js";
 import { isAnchor, capacityOf } from "./lots.js";
+import { industryTraits } from "./industry.js";
 import { ORDINANCES } from "./city.js";
 import { DEALS } from "./neighbors.js";
 
@@ -31,7 +32,7 @@ export function computeBudget(city) {
       if (!cap) continue;
       if (t.type === "residential") { population += cap; income.residential += cap * (taxes.residential / 100) * 1.4 * wealth(t); }
       else if (t.type === "commercial") income.commercial += cap * (taxes.commercial / 100) * 1.4 * wealth(t);
-      else income.industrial += cap * (taxes.industrial / 100) * 1.2 * (ordinances.wasteTax ? 1.15 : 1);
+      else income.industrial += cap * (taxes.industrial / 100) * 1.2 * industryTraits(t).value * (ordinances.wasteTax ? 1.15 : 1);
       continue;
     }
     const b = BUILDINGS[t.type];

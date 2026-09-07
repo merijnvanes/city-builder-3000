@@ -2,6 +2,7 @@
 import { forRadius, tileAt } from "./grid.js";
 import { BUILDINGS, ZONE_TYPES, ACCESS_TYPES, FUNDED_DEPARTMENTS } from "./catalog.js";
 import { isAnchor, lotTiles, capacityOf } from "./lots.js";
+import { industryTraits } from "./industry.js";
 
 export const ROAD_REACH = 3;
 export const SERVICE_KINDS = ["police", "fire", "health", "education", "culture", "park", "bus", "rail"];
@@ -58,7 +59,8 @@ export function updateServices(city) {
     const b = BUILDINGS[t.type];
     if (t.type === "industrial" && t.level && !t.abandoned) {
       industrialLots++;
-      addSource(t.x, t.y, 14 + t.density * t.level * 3 * t.lot.w, 7 + t.density);
+      const smoke = industryTraits(t).pollution;
+      addSource(t.x, t.y, (14 + t.density * t.level * 3 * t.lot.w) * smoke, 7 + t.density);
     } else if (b?.pollution) {
       addSource(t.x + (t.lot.w >> 1), t.y + (t.lot.h >> 1), b.pollution * (t.powered || !b.powerUse ? 1 : 0.4), 5 + b.w);
     }
