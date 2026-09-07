@@ -12,15 +12,16 @@ try {
   await page.goto(`${process.env.CIVIC_TEST_URL || 'http://127.0.0.1:4173'}/civic-gallery`);
   await mkdir('artifacts', { recursive: true });
   for (const mode of ['overview', 'rotations', 'night', 'unpowered']) {
-    const count = await page.evaluate(async mode => {
+    const count = await page.evaluate(async ({mode,family}) => {
       const { CityRenderer } = await import('/src/renderer.js');
       const { drawArchitecture, preloadCivicSprites } = await import('/src/building-art.js');
+      const { CIVIC_SPRITES } = await import('/src/civic-sprite-manifest.js');
       const { BUILDINGS } = await import('/src/sim/catalog.js');
       document.body.replaceChildren();
       document.documentElement.style.cssText = 'height:auto;overflow:visible';
       document.body.style.cssText = 'display:grid;grid-template-columns:repeat(4,300px);background:#263c46;margin:0;height:auto;overflow:visible';
       let count = 0;
-      for (const [type, spec] of Object.entries(BUILDINGS).filter(([, s]) => s.group === 'civic')) {
+      for (const [type, spec] of Object.entries(BUILDINGS).filter(([, s]) => family === 'power' ? s.group === 'utilities' && s.powerOut > 0 : s.group === 'civic')) {
         for (const rotation of mode === 'overview' ? [0] : [0, 1, 2, 3]) {
           await preloadCivicSprites({ types: [type], rotation, night: mode === 'night' || mode === 'unpowered', powered: mode !== 'unpowered' });
           const canvas = document.createElement('canvas');
@@ -28,7 +29,7 @@ try {
           canvas.style.cssText = 'width:300px;height:270px';
           document.body.append(canvas);
           const r = Object.assign(Object.create(CityRenderer.prototype), {
-            base: canvas.getContext('2d'), w: 300, h: 270, zoom: spec.w === 4 ? 1.05 : 1.4, size: spec.w,
+            base: canvas.getContext('2d'), w: 300, h: 270, zoom: Math.min(1.4, 270 / (spec.w * 64), 195 / (CIVIC_SPRITES[type].height + spec.w * 16)), size: spec.w,
             panX: 0, panY: 35, rotation, night: mode === 'night' || mode === 'unpowered', platform: 0,
           });
           r.base.scale(2, 2);
@@ -51,10 +52,11 @@ try {
         }
       }
       return count;
-    }, mode);
-    assert.equal(count, mode === 'overview' ? 12 : 48);
-    await page.screenshot({ path: `artifacts/civic-${mode}.png`, fullPage: true });
+    }, {mode, family: process.env.ART_FAMILY || 'civic'});
+    const types = process.env.ART_FAMILY === 'power' ? 8 : 12;
+    assert.equal(count, types * (mode === 'overview' ? 1 : 4));
+    await page.screenshot({ path: `artifacts/${process.env.ART_FAMILY || 'civic'}-${mode}.png`, fullPage: true });
   }
   assert.deepEqual(errors, []);
-  console.log('Rendered all 12 civic buildings: overview and four rotations by day, night, and without power.');
+  console.log(`Rendered ${process.env.ART_FAMILY || 'civic'} collection: overview and four rotations by day, night, and without power.`);
 } finally { await browser.close(); }

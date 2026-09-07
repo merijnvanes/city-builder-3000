@@ -9,7 +9,8 @@ For extending this standard to all other buildings, follow
 entries in group `civic`; rewards such as City Hall and University remain to do.
 
 Each building has four camera angles and three lighting states: daylight,
-powered night, and unpowered night. The 144 sprites total about 2.85 MiB.
+powered night, and unpowered night. The 144 civic sprites total about 2.85 MiB.
+The shared loader also serves the eight [power buildings](POWER-ART.md).
 No 3D library or model data is loaded by the browser.
 
 | Building | Architectural identity |

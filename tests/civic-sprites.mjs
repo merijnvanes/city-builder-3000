@@ -30,6 +30,7 @@ try {
     const draw = r.base.drawImage.bind(r.base);
     r.base.drawImage = (...args) => { blits++; draw(...args); };
     for (let i = 0; i < 200; i++) drawCachedArchitecture(r, { ...tile }, { tiles: [] });
+    const initialBlits = blits;
     const fallbackReleased = architectureCacheStats(r).entries === 0;
     const sharedCanvases = new Set(r.pickables.map(p => p.canvas)).size;
     const hit = r.pickables[0];
@@ -90,7 +91,7 @@ try {
       const py = hit.y + (Math.floor(pixel / hit.canvas.width) + .5) / hit.canvas.height * hit.h;
       if (r.pickObject(px, py).x === tile.x) retinaPicks++;
     }
-    return { activeViewRetained, retinaPicks, portraitRefreshed, coldEntries, fallbackReleased, invalidated, initialBlits: blits - 150, sharedCanvases, solidHit, clearHit, variants: new Set(hashes).size, stats: civicSpriteStats() };
+    return { activeViewRetained, retinaPicks, portraitRefreshed, coldEntries, fallbackReleased, invalidated, initialBlits, sharedCanvases, solidHit, clearHit, variants: new Set(hashes).size, stats: civicSpriteStats() };
   });
   assert.equal(result.activeViewRetained, true, 'active view survives background cache churn');
   assert.equal(result.retinaPicks, 4, 'Retina picking works in all four views');

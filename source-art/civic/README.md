@@ -28,7 +28,8 @@ and the visual checks required before shipping.
 
 ## Source and export
 
-Model sources: `common.py`, `services.py`, `culture.py`, `sanitation.py`.
+Civic model sources: `common.py`, `services.py`, `culture.py`, `sanitation.py`.
+The shared registry and power-family sources are documented in [POWER-ART.md](../../POWER-ART.md).
 `render.py` owns the exact 2:1 ground projection, consistent screen-relative
 lighting, four rotations, and day / powered night / unpowered night states.
 `package.py` exports alpha-cropped WebP with screen anchors and measured heights.
@@ -43,7 +44,7 @@ blender --background --factory-startup --python tools/civic_art/render.py -- \
 python3 tools/civic_art/package.py --types fire
 ```
 
-`--save-blend` writes an editable `.blend` here for inspection. Generated render
+`--save-blend` writes an editable `.blend` into the render output directory for inspection. Generated render
 intermediates live in ignored `artifacts/civic-renders/`. Packaged runtime images
 live in `public/assets/civic/`, with generated metadata in
 `src/civic-sprite-manifest.js`. Building scripts are the source of truth.

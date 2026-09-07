@@ -13,7 +13,9 @@
     "test:visuals": "node tests/architecture.mjs && node tests/architecture-cache.mjs && node tests/disaster-rendering.mjs",
     "test:performance": "node tests/performance.mjs",
     "test:civic": "node --test tests/civic-art.test.js tests/civic-sprite-manifest.test.js && node tests/civic-sprites.mjs && node tests/civic-art.mjs",
-    "art:civic": "blender --background --factory-startup --python tools/civic_art/render.py -- --types all --states day,night,unpowered --rotations 0,1,2,3 --samples 32 && python3 tools/civic_art/package.py"
+    "art:civic": "blender --background --factory-startup --python tools/civic_art/render.py -- --types civic --states day,night,unpowered --rotations 0,1,2,3 --samples 32 && python3 tools/civic_art/package.py --types civic",
+    "art:power": "blender --background --factory-startup --python tools/civic_art/render.py -- --types power --states day,night,unpowered --rotations 0,1,2,3 --samples 32 && python3 tools/civic_art/package.py --types power",
+    "test:power": "node tests/power-sprites.mjs && ART_FAMILY=power node tests/civic-art.mjs"
   },
   "devDependencies": {
     "vite": "^7.0.0",

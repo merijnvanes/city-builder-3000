@@ -1,0 +1,142 @@
+{
+  "police": {
+    "module": "services",
+    "tiles": 3,
+    "family": "civic",
+    "label": "Police station",
+    "description": "Limestone ribs, bronze insignia, and a stepped Art Deco entrance."
+  },
+  "fire": {
+    "module": "services",
+    "tiles": 3,
+    "family": "civic",
+    "label": "Fire station",
+    "description": "A brick firehouse with deep engine portals, slate dormers, and a hose tower."
+  },
+  "hospital": {
+    "module": "services",
+    "tiles": 3,
+    "family": "civic",
+    "label": "Hospital",
+    "description": "Stepped white wards, prominent medical crosses, and a separate red emergency canopy."
+  },
+  "school": {
+    "module": "services",
+    "tiles": 3,
+    "family": "civic",
+    "label": "School",
+    "description": "Warm brick wings, a bell cupola, and a welcoming play-and-learning garden."
+  },
+  "jail": {
+    "module": "services",
+    "tiles": 3,
+    "family": "civic",
+    "label": "County jail",
+    "description": "A robust entrance lodge, secure exercise court, and restrained masonry."
+  },
+  "college": {
+    "module": "culture",
+    "tiles": 4,
+    "family": "civic",
+    "label": "College",
+    "description": "A collegiate quadrangle, copper clock tower, cloisters, and a shaded court."
+  },
+  "library": {
+    "module": "culture",
+    "tiles": 2,
+    "family": "civic",
+    "label": "Library",
+    "description": "A copper-vaulted reading room, timber archive wing, and a small public terrace."
+  },
+  "museum": {
+    "module": "culture",
+    "tiles": 3,
+    "family": "civic",
+    "label": "Museum",
+    "description": "A limestone colonnade, copper rotunda, and a curated sculpture forecourt."
+  },
+  "landfill": {
+    "module": "sanitation",
+    "tiles": 1,
+    "family": "civic",
+    "label": "Landfill",
+    "description": "Managed earth cells and retaining walls that join into a larger working site."
+  },
+  "incinerator": {
+    "module": "sanitation",
+    "tiles": 3,
+    "family": "civic",
+    "label": "Incinerator",
+    "description": "A brick furnace hall, tapering stacks, loading doors, and exposed service ducts."
+  },
+  "recycling": {
+    "module": "sanitation",
+    "tiles": 3,
+    "family": "civic",
+    "label": "Recycling center",
+    "description": "A folded green roof, clerestory glazing, and four clearly separated sorting bays."
+  },
+  "wasteenergy": {
+    "module": "sanitation",
+    "tiles": 3,
+    "family": "civic",
+    "label": "Waste-to-energy plant",
+    "description": "A blue boiler hall, glazed turbine gallery, and insulated district-heating pipes."
+  },
+  "coal": {
+    "module": "power_fossil",
+    "tiles": 4,
+    "family": "power",
+    "label": "Coal plant",
+    "description": "Brick turbine halls, twin masonry stacks, and a coal bunker feeding an elevated conveyor."
+  },
+  "oil": {
+    "module": "power_fossil",
+    "tiles": 4,
+    "family": "power",
+    "label": "Oil plant",
+    "description": "Bunded fuel tanks, an ochre boiler house, and a single striped exhaust stack."
+  },
+  "gas": {
+    "module": "power_fossil",
+    "tiles": 3,
+    "family": "power",
+    "label": "Gas plant",
+    "description": "Twin turbine modules, ribbed air intakes, slender exhausts, and a yellow gas manifold."
+  },
+  "nuclear": {
+    "module": "power_clean",
+    "tiles": 4,
+    "family": "power",
+    "label": "Nuclear plant",
+    "description": "Hollow concrete cooling towers, domed containment, and a separate turbine hall."
+  },
+  "wind": {
+    "module": "power_clean",
+    "tiles": 1,
+    "family": "power",
+    "label": "Wind turbine",
+    "description": "Three sculpted airfoil blades, a tapered white mast, and a compact transformer cabinet."
+  },
+  "solar": {
+    "module": "power_clean",
+    "tiles": 3,
+    "family": "power",
+    "label": "Solar array",
+    "description": "Tilted blue photovoltaic rows on steel supports, with an inverter service lane."
+  },
+  "microwave": {
+    "module": "power_future",
+    "tiles": 4,
+    "family": "power",
+    "label": "Microwave plant",
+    "description": "A concave satellite-power receiver, copper rectenna grids, and conversion equipment."
+  },
+  "fusion": {
+    "module": "power_future",
+    "tiles": 4,
+    "family": "power",
+    "label": "Fusion plant",
+    "description": "An annular reactor enclosure, radial copper housings, and a teal control gallery."
+  }
+}

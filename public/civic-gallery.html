@@ -13,7 +13,8 @@
 <main><p class="note">These are the actual transparent game sprites. No 3D rendering runs in this page or in the game.</p><p id="error" role="alert"></p><div id="collection"></div></main>
 <footer>Original architecture · Four camera angles · Three lighting states · Shared, compressed browser assets</footer>
 <script type="module">
-const descriptions={police:['Police station','Limestone ribs, bronze insignia, and a stepped Art Deco entrance.'],fire:['Fire station','A brick firehouse with deep engine portals, slate dormers, and a hose tower.'],jail:['County jail','A robust entrance lodge, secure exercise court, and restrained masonry.'],hospital:['Hospital','Stepped white wards, prominent medical crosses, and a separate red emergency canopy.'],school:['School','Warm brick wings, a bell cupola, and a welcoming play-and-learning garden.'],college:['College','A collegiate quadrangle, copper clock tower, cloisters, and a shaded court.'],library:['Library','A copper-vaulted reading room, timber archive wing, and a small public terrace.'],museum:['Museum','A limestone colonnade, copper rotunda, and a curated sculpture forecourt.'],landfill:['Landfill','Managed earth cells and retaining walls that join into a larger working site.'],incinerator:['Incinerator','A brick furnace hall, tapering stacks, loading doors, and exposed service ducts.'],recycling:['Recycling center','A folded green roof, clerestory glazing, and four clearly separated sorting bays.'],wasteenergy:['Waste-to-energy plant','A blue boiler hall, glazed turbine gallery, and insulated district-heating pipes.']};
+const descriptions={};
+const family=new URLSearchParams(location.search).get('family')==='power'?'power':'civic';
 let catalog,state='day',rotation=0,detail=false;
 const cards=[];
 function update(){
@@ -32,11 +33,19 @@ function update(){
 }
 try{
   const response=await fetch('./assets/civic/catalog.json');if(!response.ok)throw new Error('Asset catalog could not be loaded.');catalog=await response.json();
+  const familyLink=document.createElement('a');familyLink.href=`?family=${family==='civic'?'power':'civic'}`;familyLink.textContent=family==='civic'?'View power collection →':'View civic collection →';familyLink.style.cssText='color:var(--accent);margin-right:12px';document.querySelector('nav').prepend(familyLink);
+  if(family==='power'){
+    document.title='Power Collection · City Builder 3000';
+    document.querySelector('.eyebrow').textContent='City Builder 3000 · Asset Collection 02';
+    document.querySelector('h1').textContent='The power behind the city.';
+    document.querySelector('header p').textContent='Eight distinct ways to power a city, from brick coal works to a futuristic fusion campus. Original miniature architecture and recognizable generating equipment.';
+  }
+  for(const [type,spec] of Object.entries(catalog))if(spec.family===family)descriptions[type]=[spec.label,spec.description];
   for(const [type,[label,description]] of Object.entries(descriptions)){
     const figure=document.createElement('figure');figure.className='card';
     const stage=document.createElement('div');stage.className='stage';
     const img=document.createElement('img');img.alt=label;img.decoding='async';stage.append(img);
-    const caption=document.createElement('figcaption');caption.innerHTML=`<span class="index">${String(cards.length+1).padStart(2,'0')} / CIVIC</span><h2>${label}</h2><p class="description">${description}</p>`;
+    const caption=document.createElement('figcaption');caption.innerHTML=`<span class="index">${String(cards.length+1).padStart(2,'0')} / ${family.toUpperCase()}</span><h2>${label}</h2><p class="description">${description}</p>`;
     figure.append(stage,caption);document.querySelector('#collection').append(figure);cards.push({type,stage,img});
   }
   document.querySelectorAll('[data-state]').forEach(b=>b.onclick=()=>{state=b.dataset.state;update()});

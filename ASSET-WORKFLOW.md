@@ -31,8 +31,8 @@ monument: houses should feel domestic and industrial plants should reveal proces
 
 This is a migration checklist from `src/sim/catalog.js` on the civic-art branch.
 Reconcile it with the current catalog and rendering dispatch before implementing;
-another agent is developing the simulation on `main`. Nothing below is complete.
-The twelve catalog entries in group `civic` are already done; similarly named
+another agent is developing the simulation on `main`. Power is complete; other rows remain to do.
+The twelve catalog entries in group `civic` are also done; similarly named
 rewards and landmarks are separate assets.
 
 | Family | Remaining assets / coverage |
@@ -40,7 +40,7 @@ rewards and landmarks are separate assets.
 | Residential zones | All three densities, development levels 1–4, supported lot sizes and deterministic architectural variants |
 | Commercial zones | All three densities, levels 1–4, supported lot sizes and variants, including tower families |
 | Industrial zones | All three densities, levels 1–4 and variants; preserve both 3×3 low-density farms and 1×1 workshops |
-| Power | `coal`, `oil`, `gas`, `nuclear`, `wind`, `solar`, `microwave`, `fusion` |
+| Power | Complete: `coal`, `oil`, `gas`, `nuclear`, `wind`, `solar`, `microwave`, `fusion`; see [POWER-ART.md](POWER-ART.md) |
 | Water | `waterpump`, `watertower`, `desalination`, `treatment` |
 | Transport buildings | `bus`, `railstation`, `substation`, `airport` (6×5), `seaport` |
 | Parks | `park`, `largepark`, `zoo` |
@@ -53,8 +53,7 @@ crews are related environment assets, not interchangeable standalone buildings.
 Audit them at the end for visual compatibility and record remaining work explicitly;
 do not silently count these tools as migrated buildings or replace network logic.
 
-Suggested order: generalize the export/runtime contract with one representative
-new building; finish power/water; transport (including rectangular lots); parks,
+Suggested order: finish water; transport (including rectangular lots); parks,
 rewards and landmarks; then zoned neighborhoods as complete families. A residential
 pilot earlier can establish the everyday city palette. This order is a working
 recommendation, not a restriction; finish and validate each chosen slice before
@@ -62,9 +61,9 @@ committing and pushing it.
 
 ## Pipeline extension requirements
 
-The current `tools/civic_art/` pipeline is intentionally limited to twelve types.
-Its registry, packager completeness checks, manifest, loader and gallery all need
-an intentional extension for new families. Share primitives and export machinery;
+The `tools/civic_art/registry.json` registry covers twelve civic and eight power
+assets. The shared export, loader and gallery support these square lots (1×1,
+2×2, 3×3 and 4×4). New families still need explicit coverage and contract checks. Share primitives and export machinery;
 keep authored models in small family modules. Avoid a second divergent renderer
 or a giant switch containing every model. Preserve existing civic exports during
 incremental migration.
@@ -93,7 +92,8 @@ incremental migration.
 One tile is four model units. Model X maps to game X and model Y to negative game
 Y. `render.py` uses an orthographic camera at 30° elevation, azimuth -45° plus
 90° per rotation, matching a 64×32 pixel ground tile at game zoom 1. Current bakes
-use scale 3. Preserve exact projection, measured world-origin screen anchors,
+use scale 3. Power framing is measured across all four camera views; civic
+framing is preserved to keep existing exports stable. Preserve exact projection, measured world-origin screen anchors,
 alpha-crop anchor adjustment and measured heights for culling/shadows. Derive
 framing from bounds for larger/taller new models; do not guess placement offsets
 or assume the existing square render padding fits skyscrapers.
@@ -137,7 +137,7 @@ Do not preview into the complete-bake directory and then package incomplete
 metadata. Never package concurrently with renders writing that same directory.
 Use the full twelve-frame per-type command in the source README for release.
 Incremental packaging needs the existing complete exported catalog, which is
-tracked; full packaging needs a full bake. Update these commands when generalizing
+tracked; full packaging needs a full bake of all registered families. Update these commands when generalizing
 beyond civic assets, and keep the documented workflow executable.
 
 ## Working alongside simulation development
