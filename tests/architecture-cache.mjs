@@ -8,7 +8,7 @@ try {
   await page.goto(process.env.CIVIC_TEST_URL || 'http://127.0.0.1:4173');
   const results = await page.evaluate(async () => {
     const { CityRenderer } = await import('/src/renderer.js');
-    const { drawArchitecture } = await import('/src/building-art.js');
+    const { drawArchitecture, preloadCivicSprites } = await import('/src/building-art.js');
     const { drawCachedArchitecture } = await import('/src/architecture-cache.js');
     const { BUILDINGS } = await import('/src/sim/catalog.js');
     const canvas = document.createElement('canvas'); canvas.width = 800; canvas.height = 800;
@@ -23,6 +23,7 @@ try {
     for (const type of ['residential', 'commercial', 'industrial']) for (const density of [1, 2, 3]) for (const variant of [0.1, 0.45, 0.8]) models.push({ type, density, level: 4, w: density, h: density, variant });
     let checked = 0;
     for (const model of models) for (const night of [false, true]) for (let rotation = 0; rotation < 4; rotation++) {
+      await preloadCivicSprites({ types: [model.type], rotation, night });
       Object.assign(r, { rotation, night });
       const t = { ...model, x: 1, y: 1, elev: 0, powered: true, age: 20, lot: { x: 1, y: 1, w: model.w || 1, h: model.h || 1 } };
       base.clearRect(0, 0, 800, 800); drawArchitecture(r, t);

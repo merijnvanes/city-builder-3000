@@ -26,25 +26,6 @@ export function flag(d, x, y, height, color) {
   d.box(x, y, 0.1, 0.008, 4, color, height - 4);
 }
 
-export function vehicle(d, x, y, color, kind = 'car') {
-  const w = kind === 'bus' ? 0.3 : 0.22, h = kind === 'car' ? 3 : 4.5;
-  d.box(x + 0.015, y + 0.01, w - 0.03, 0.095, 1.2, '#303f49');
-  d.box(x, y, w, 0.115, h, color, 1);
-  d.box(x + 0.025, y + 0.012, 0.065, 0.09, 1.8, CIVIC.glass, h + 1);
-  if (kind === 'bus') {
-    for (const [side, dy] of [['north', -0.002], ['south', 0.116]]) if (d.visible(side)) {
-      for (let i = 0; i < 5; i++) d.box(x + 0.105 + i * 0.035, y + dy, 0.025, 0.002, 1.5, CIVIC.slate, 3);
-    }
-  } else if (kind === 'fire') {
-    for (const dy of [0.025, 0.085]) d.line(x + 0.1, y + dy, h + 1.3, x + w - 0.01, y + dy, h + 1.3, CIVIC.trim, 1);
-    for (let i = 0; i < 4; i++) d.line(x + 0.11 + i * 0.03, y + 0.025, h + 1.3, x + 0.11 + i * 0.03, y + 0.085, h + 1.3, CIVIC.trim, 0.7);
-  }
-  if (kind !== 'bus') {
-    d.box(x + 0.055, y + 0.015, 0.024, 0.035, 0.8, '#ee6554', h + 2.8);
-    d.box(x + 0.055, y + 0.065, 0.024, 0.035, 0.8, '#65c4e4', h + 2.8);
-  }
-}
-
 export function cross(d, x, y, size, z, color) {
   d.flat(x + size / 3, y, size / 3, size, z, color);
   d.flat(x, y + size / 3, size, size / 3, z + 0.01, color);

@@ -14,7 +14,7 @@ try {
   for (const mode of ['overview', 'rotations', 'night', 'unpowered']) {
     const count = await page.evaluate(async mode => {
       const { CityRenderer } = await import('/src/renderer.js');
-      const { drawArchitecture } = await import('/src/building-art.js');
+      const { drawArchitecture, preloadCivicSprites } = await import('/src/building-art.js');
       const { BUILDINGS } = await import('/src/sim/catalog.js');
       document.body.replaceChildren();
       document.documentElement.style.cssText = 'height:auto;overflow:visible';
@@ -22,6 +22,7 @@ try {
       let count = 0;
       for (const [type, spec] of Object.entries(BUILDINGS).filter(([, s]) => s.group === 'civic')) {
         for (const rotation of mode === 'overview' ? [0] : [0, 1, 2, 3]) {
+          await preloadCivicSprites({ types: [type], rotation, night: mode === 'night' || mode === 'unpowered', powered: mode !== 'unpowered' });
           const canvas = document.createElement('canvas');
           canvas.width = 600; canvas.height = 540;
           canvas.style.cssText = 'width:300px;height:270px';

@@ -1,5 +1,5 @@
 """Editable, world-scale architectural modeling primitives. One tile is 4 m."""
-import bpy, math, random
+import bpy, math, random, os
 from mathutils import Vector
 
 M = {}
@@ -117,7 +117,8 @@ FONT=None
 def text(body,x,y,z,size=.25,mat='cream',face='front'):
     global FONT
     if FONT is None:
-        FONT=bpy.data.fonts.load('/System/Library/Fonts/Supplemental/Arial Bold.ttf')
+        path=os.environ.get('CIVIC_ART_FONT','/System/Library/Fonts/Supplemental/Arial Bold.ttf')
+        FONT=bpy.data.fonts.load(path) if os.path.isfile(path) else bpy.data.fonts.get('Bfont')
     data=bpy.data.curves.new('architectural lettering','FONT'); data.body=body; data.align_x='CENTER'; data.align_y='CENTER'; data.size=size; data.extrude=.003;data.font=FONT
     o=bpy.data.objects.new(body,data);bpy.context.collection.objects.link(o);o.location=(x,y,z)
     if face=='front': o.rotation_euler=(math.pi/2,0,0)
@@ -212,12 +213,19 @@ def fence(x,y,w,d,h=1,mat='slate'):
         xx=x+w*i/n;yy=y+d*i/n;beam((xx,yy,.2),(xx,yy,.2+h),.018,mat)
     for z in [.42,.2+h]:beam((*a,z),(*b,z),.025,mat)
 
-def clock(x,y,z,r=.35):
+def clock(x,y,z,r=.35,face='front'):
+    before=set(bpy.context.scene.objects)
     o=cyl(x,y,z,r,.065,'cream',32);o.rotation_euler.x=math.pi/2
     beam((x,y-.05,z+.032),(x,y-.055,z+r*.67),.018,'slate')
     beam((x,y-.05,z+.032),(x+r*.5,y-.055,z+.032),.018,'slate')
     for i in range(12):
         a=i*math.tau/12;beam((x+math.sin(a)*r*.81,y-.06,z+math.cos(a)*r*.81),(x+math.sin(a)*r*.9,y-.06,z+math.cos(a)*r*.9),.008,'gold')
+
+    angle={'front':0,'back':math.pi,'left':-math.pi/2,'right':math.pi/2}[face]
+    if angle:
+        for obj in set(bpy.context.scene.objects)-before:
+            rel=obj.location-Vector((x,y,z));c,s=math.cos(angle),math.sin(angle)
+            obj.location=(x+rel.x*c-rel.y*s,y+rel.x*s+rel.y*c,z+rel.z);obj.rotation_euler.z+=angle
 
 def door(x,y,z=.2,w=.85,h=1.6,mat='blue'):
     box(x-w/2-.1,y-.09,z,w+.2,.12,h+.12,'ivory')

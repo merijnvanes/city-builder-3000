@@ -1,36 +1,59 @@
 # Civic architecture
 
-All twelve entries in the catalog's `civic` group have dedicated procedural
-Canvas artwork. Simulation behavior and construction costs are unchanged.
+The twelve civic buildings use original Blender models baked into transparent
+WebP sprites. Their editable model sources and art direction are documented in
+[source-art/civic/README.md](source-art/civic/README.md).
 
-| Building | Visual identity |
+Each building has four camera angles and three lighting states: daylight,
+powered night, and unpowered night. The 144 sprites total about 2.82 MiB.
+No 3D library or model data is loaded by the browser.
+
+| Building | Architectural identity |
 | --- | --- |
-| Police station | Navy precinct, gold roof shield, radio aerial and patrol cars |
-| Fire station | Vermilion engine bays, ladder trucks and tall hose tower |
-| Jail | Barred cell block, fenced exercise yard and glazed watchtower |
-| Hospital | White and teal stepped ward, medical crosses, red emergency canopy and ambulances |
-| School | Terracotta schoolhouse, clock turret, playground swings and yellow school bus |
-| College | Brick quadrangle, copper roofs, ceremonial gate and tall clock tower |
-| Library | Paired teal roofs, open-book roof sign and reading benches |
-| Museum | Limestone colonnade, glass pyramid, exhibition banners and sculpture forecourt |
-| Landfill | Layered refuse cells and yellow compactor |
-| Incinerator | Brick furnace hall, twin orange-banded stacks and loading hopper |
-| Recycling center | Green sawtooth roof, reuse arrows and four sorting containers |
-| Waste-to-energy plant | Teal turbine hall, lightning emblem, striped stack and transformers |
+| Police station | Art Deco limestone precinct, bronze shield and blue glazed entrance |
+| Fire station | Brick firehouse, deep engine portals, slate dormers and hose tower |
+| Jail | County entrance lodge, barred cell block and secure exercise courtyard |
+| Hospital | Modern ward, glazed circulation drum and sheltered emergency entry |
+| School | Brick schoolhouse, bell cupola, play garden and raised learning beds |
+| College | Collegiate quadrangle, four-sided clock tower, cloisters and courtyard fountain |
+| Library | Copper-vaulted reading room, timber archive wing and reading terrace |
+| Museum | Limestone colonnade, copper rotunda and sculpture forecourt |
+| Landfill | Managed earth cells, refuse materials and retaining walls |
+| Incinerator | Brick furnace hall, tapering stacks, clerestories and service ducts |
+| Recycling center | Folded green roof, glazed clerestories and separate sorting bays |
+| Waste-to-energy plant | Blue boiler hall, turbine gallery and district-heating pipes |
 
-Art lives in `src/civic-services-art.js`, `src/civic-culture-art.js` and
-`src/civic-sanitation-art.js`; small architectural details live in
-`src/civic-details.js`. Ground is drawn first, independent structures use
-camera-sorted parts, and facade markings are limited to visible walls.
-Building heights in `src/building-art.js` cover the new silhouettes.
+Vehicles are deliberately absent. Architecture and campus composition carry
+recognition; context is specific to each building's use.
 
-To inspect all models, run Vite, then:
+## Browser rendering
+
+`src/civic-sprites.js` loads only requested frames, shares one decoded canvas
+between instances, and retains images within a 32 MiB LRU budget. Current views
+are preferred over inactive angles during eviction. A civic lot takes one
+`drawImage` call, including all material details, scenery and baked shadows.
+Temporary procedural fallback canvases are released when production assets load.
+Failed requests keep the fallback available without a request loop.
+
+Measured heights and per-frame pixel anchors preserve projection, terrain
+placement, shadow bounds and alpha-based picking. Inspection portraits refresh
+after asynchronous loads. Asset URLs support deployment under a subdirectory.
+
+## Inspect and validate
+
+Open `/civic-gallery.html` on the running app to compare game scale, close-ups,
+lighting states and all four camera angles. This page uses the actual assets
+shipped with the production build.
+
+With Vite running:
 
 ```sh
-CIVIC_TEST_URL=http://127.0.0.1:4173 node tests/civic-art.mjs
-node --test tests/civic-art.test.js
+CIVIC_TEST_URL=http://127.0.0.1:4175 npm run test:civic
+CIVIC_TEST_URL=http://127.0.0.1:4175 npm run test:visuals
+CIVIC_TEST_URL=http://127.0.0.1:4175 npm run test:performance
 ```
 
-The browser script writes contact sheets to `artifacts/civic-overview.png`,
-`civic-rotations.png`, `civic-night.png` and `civic-unpowered.png`.
-The geometry tests check lot bounds, height bounds and hidden medical emblems.
+The civic suite verifies catalog completeness, compressed size, cold-load
+redraw, release of fallback canvases, shared image reuse, a single blit per
+instance, distinct rotation/lighting states, alpha picking and bounded decoded
+memory. It also exports visual contact sheets in `artifacts/`.

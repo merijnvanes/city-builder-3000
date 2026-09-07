@@ -29,13 +29,14 @@ Model sources: `common.py`, `services.py`, `culture.py`, `sanitation.py`.
 lighting, four rotations, and day / powered night / unpowered night states.
 `package.py` exports alpha-cropped WebP with screen anchors and measured heights.
 
-Example from the repository root, using Blender 5.1 and Python with Pillow:
+Run `npm run art:civic` for a complete initial bake, using Blender 5.1 and
+Python with Pillow. Afterward, rebuild an individual building from the repository root:
 
 ```sh
 blender --background --factory-startup --python tools/civic_art/render.py -- \
   --types fire --states day,night,unpowered --rotations 0,1,2,3 --samples 32 \
   --save-blend
-python3 tools/civic_art/package.py
+python3 tools/civic_art/package.py --types fire
 ```
 
 `--save-blend` writes an editable `.blend` here for inspection. Generated render
@@ -43,5 +44,6 @@ intermediates live in ignored `artifacts/civic-renders/`. Packaged runtime image
 live in `public/assets/civic/`, with generated metadata in
 `src/civic-sprite-manifest.js`. Building scripts are the source of truth.
 
-The render script uses a system Arial Bold font for tiny architectural signs.
-The font is baked into image pixels and is not distributed as a font asset.
+The render script uses system Arial Bold for tiny architectural signs when
+available, otherwise Blender’s built-in font. Set `CIVIC_ART_FONT` to use another
+local font. Lettering is baked into image pixels; no font file is distributed.

@@ -17,8 +17,10 @@ def college():
     building(-6.9,-4.8,.2,3.3,3.3,7.2,'ivory',floors=3,pitched=False)
     for x in [-6.98,-3.87]:
         for y in [-4.88,-1.77]:box(x,y,.2,.27,.27,7.5,'cream')
-    for y in [-4.93,-1.42]:
-        clock(-5.25,y,6.42,.58)
+    clock(-5.25,-4.93,6.42,.58)
+    clock(-5.25,-1.42,6.42,.58,'back')
+    clock(-7.0,-3.15,6.42,.58,'left')
+    clock(-3.48,-3.15,6.42,.58,'right')
     box(-7.07,-4.97,7.6,3.64,3.64,.22,'cream');hip(-7.18,-5.08,7.82,3.86,3.86,1.9,'copper')
     cyl(-5.25,-3.15,9.72,.045,.65,'gold')
     # A formal entrance arch at the opposite end remains lower than the quad.

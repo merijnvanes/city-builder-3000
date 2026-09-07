@@ -1,3 +1,6 @@
+import { drawCivicSprite } from './civic-sprites.js';
+export { preloadCivicSprites, civicSpriteStats } from './civic-sprites.js';
+import { CIVIC_SPRITES } from './civic-sprite-manifest.js';
 import { drawStadium } from "./civic-art.js";
 import { drawPolice, drawFire, drawHospital, drawSchool, drawJail } from "./civic-services-art.js";
 import { drawCollegeCampus, drawLibrary, drawMuseum } from "./civic-culture-art.js";
@@ -18,6 +21,7 @@ const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 export function heightOf(t) {
   const lot = t.lot;
   if (!lot) return 0;
+  if (CIVIC_SPRITES[t.type]) return CIVIC_SPRITES[t.type].height;
   const level = t.level || 1;
   if (t.type === "residential") return t.density === 1 ? 10 + level * 3 : t.density === 2 ? 18 + level * 6 : 30 + level * 18;
   if (t.type === "commercial") return t.density === 1 ? 10 + level * 2 : t.density === 2 ? 20 + level * 7 : 40 + level * 24;
@@ -743,6 +747,7 @@ export function drawZoneMarker(r, t) {
 }
 
 export function drawArchitecture(r, t) {
+  if (drawCivicSprite(r, t)) return;
   const lot = t.lot;
   if (!lot) { drawZoneMarker(r, t); return; }
   const n = t.variant ?? random(t.x, t.y);

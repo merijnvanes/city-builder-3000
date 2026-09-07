@@ -1,3 +1,4 @@
+import { drawCivicSprite } from './civic-sprites.js';
 import { drawArchitecture, heightOf } from './building-art.js';
 
 // Bounded lot artwork, retained across months when a building has not changed.
@@ -22,6 +23,12 @@ export function hitUncachedArchitecture(r, t, sx, sy) {
   return base.getImageData(0, 0, 1, 1).data[3] > 24;
 }
 export function drawCachedArchitecture(r, t, city) {
+  const civic = drawCivicSprite(r, t);
+  if (civic) {
+    const cache = caches.get(r), fallback = cache?.sprites.get(t);
+    if (fallback) { cache.bytes -= fallback.bytes; cache.sprites.delete(t); }
+    recordPick(r, t, civic, civic.canvas); return;
+  }
   const scale = Math.max(0.5, Math.ceil(r.zoom * 2) / 2);
   const key = `${r.rotation}:${scale}:${r.dpr}:${!!r.night}`;
   let cache = caches.get(r);
@@ -77,4 +84,9 @@ export function drawCachedArchitecture(r, t, city) {
   const bounds = { x: snap(p.x + sprite.dx * ratio), y: snap(p.y + sprite.dy * ratio), w: sprite.canvas.width / r.dpr * ratio, h: sprite.canvas.height / r.dpr * ratio };
   r.base.drawImage(sprite.canvas, bounds.x, bounds.y, bounds.w, bounds.h);
   recordPick(r, t, bounds, sprite.canvas);
+}
+
+export function architectureCacheStats(r) {
+  const cache = caches.get(r);
+  return { entries: cache?.sprites.size || 0, bytes: cache?.bytes || 0 };
 }

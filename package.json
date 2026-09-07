@@ -11,7 +11,9 @@
     "test:browser": "node tests/browser.mjs",
     "test:architecture": "node tests/architecture.mjs",
     "test:visuals": "node tests/architecture.mjs && node tests/architecture-cache.mjs && node tests/disaster-rendering.mjs",
-    "test:performance": "node tests/performance.mjs"
+    "test:performance": "node tests/performance.mjs",
+    "test:civic": "node --test tests/civic-art.test.js tests/civic-sprite-manifest.test.js && node tests/civic-sprites.mjs && node tests/civic-art.mjs",
+    "art:civic": "blender --background --factory-startup --python tools/civic_art/render.py -- --types all --states day,night,unpowered --rotations 0,1,2,3 --samples 32 && python3 tools/civic_art/package.py"
   },
   "devDependencies": {
     "vite": "^7.0.0",

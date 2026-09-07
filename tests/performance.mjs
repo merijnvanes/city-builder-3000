@@ -9,6 +9,7 @@ try {
   await page.waitForFunction(() => window.civic);
   const results = await page.evaluate(async () => {
     const { CityRenderer } = await import('/src/renderer.js');
+    const { preloadCivicSprites } = await import('/src/building-art.js');
     const canvas = document.createElement('canvas');
     canvas.style.cssText = 'position:fixed;inset:0;width:1440px;height:1000px;z-index:99999';
     document.body.append(canvas);
@@ -34,6 +35,7 @@ try {
       r.focusOn(built.reduce((s, t) => s + t.x, 0) / built.length, built.reduce((s, t) => s + t.y, 0) / built.length, 0.85);
       if (!Number.isFinite(r.panX + r.panY)) throw new Error("Benchmark camera must be finite");
       for (const night of [false, true]) {
+        await preloadCivicSprites({ night });
         r.night = night; r.paint(city);
         const paint = [], idle = [], intervals = [];
         for (let i = 0; i < 40; i++) {

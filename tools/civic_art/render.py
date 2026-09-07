@@ -19,7 +19,7 @@ except ModuleNotFoundError:pass
 
 def look(o,target):o.rotation_euler=(Vector(target)-o.location).to_track_quat('-Z','Y').to_euler()
 
-for kind in args.types.split(','):
+for kind in (models if args.types == 'all' else args.types.split(',')):
     started=time.time(); bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
     for collection in [bpy.data.meshes,bpy.data.curves,bpy.data.materials,bpy.data.cameras,bpy.data.lights]:
         for block in list(collection):

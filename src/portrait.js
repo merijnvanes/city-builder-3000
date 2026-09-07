@@ -10,7 +10,11 @@ export function createPortrait(canvas) {
   const r = Object.assign(Object.create(CityRenderer.prototype), {
     corners: null, platform: 0, size: 64, panX: 0, panY: 0,
   });
-  let lastKey, bounds;
+  let lastKey, bounds, lastRequest;
+  r.onArtworkReady = () => {
+    lastKey = null;
+    if (lastRequest && canvas.isConnected) portrait.draw(...lastRequest);
+  };
 
   function artwork(tile) {
     const { x, y, w, h } = tile.lot;
@@ -19,12 +23,13 @@ export function createPortrait(canvas) {
     drawArchitecture(r, tile);
   }
 
-  return {
+  const portrait = {
     draw(tile, night = false, rotation = 0) {
       const lot = tile?.lot;
       if (!lot) return false;
+      lastRequest = [tile, night, rotation];
       r.night = night; r.rotation = rotation;
-      const key = JSON.stringify([tile.x, tile.y, lot.w, lot.h, tile.type, tile.density, tile.level, tile.variant, tile.abandoned, tile.age === 0, rotation]);
+      const key = JSON.stringify([tile.x, tile.y, lot.w, lot.h, tile.type, tile.density, tile.level, tile.variant, tile.abandoned, tile.age === 0, rotation, night, tile.powered]);
       if (key !== lastKey) {
         r.base = measuring; r.w = r.h = 1024; r.zoom = 1;
         r.panX = r.panY = 0;
@@ -45,6 +50,7 @@ export function createPortrait(canvas) {
       const rect = canvas.getBoundingClientRect();
       r.w = rect.width || 150; r.h = rect.height || 110;
       const dpr = Math.min(devicePixelRatio || 1, 2);
+      r.dpr = dpr;
       canvas.width = Math.round(r.w * dpr); canvas.height = Math.round(r.h * dpr);
       r.base = canvas.getContext('2d');
       r.base.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -57,4 +63,5 @@ export function createPortrait(canvas) {
       return true;
     },
   };
+  return portrait;
 }

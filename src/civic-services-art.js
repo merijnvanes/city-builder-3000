@@ -1,4 +1,4 @@
-import { CIVIC as C, campus, hall, steps, flag, vehicle, cross, clockFaces } from './civic-details.js';
+import { CIVIC as C, campus, hall, steps, flag, cross, clockFaces } from './civic-details.js';
 
 export function drawPolice(d, t) {
   campus(d, '#91a9a2');
@@ -21,7 +21,6 @@ export function drawPolice(d, t) {
       d.box(0.31, 0.61, 0.38, 0.09, 1.5, '#326ca2', 10);
       steps(d, 0.34, 0.65, 0.32, 2);
     }],
-    ...[0.13, 0.43, 0.73].map(x => [x + 0.11, 0.84, () => vehicle(d, x, 0.79, '#ecf0e9')]),
   ]);
 }
 
@@ -45,7 +44,6 @@ export function drawFire(d, t) {
         d.box(x + 0.02, 0.603, 0.2, 0.025, 1.5, C.trim, 10);
       }
     }]),
-    ...[0.11, 0.67].map(x => [x + 0.11, 0.79, () => vehicle(d, x, 0.74, '#df493b', 'fire')]),
     [0.5, 0.86, () => flag(d, 0.5, 0.86, 15, '#dc503e')],
   ]);
 }
@@ -70,10 +68,6 @@ export function drawHospital(d, t) {
       d.box(0.34, 0.62, 0.32, 0.05, 8, C.glass);
       d.box(0.29, 0.62, 0.42, 0.1, 2, '#dc5b50', 8);
     }],
-    ...[0.14, 0.67].map(x => [x + 0.11, 0.83, () => {
-      vehicle(d, x, 0.78, '#f3f0df', 'ambulance');
-      cross(d, x + 0.12, 0.795, 0.075, 5.6, '#d9504b');
-    }]),
     [0.08, 0.66, () => d.tree(0.08, 0.66, 1)],
     [0.92, 0.66, () => d.tree(0.92, 0.66, 1)],
   ]);
@@ -98,7 +92,6 @@ export function drawSchool(d, t) {
       if (d.visible('south')) d.box(0.45, 0.531, 0.1, 0.004, 7, '#3c737f');
       d.roof(0.38, 0.45, 0.24, 0.1, 9, 3, '#437f8c');
     }],
-    [0.75, 0.78, () => vehicle(d, 0.6, 0.76, '#f5bf43', 'bus')],
     [0.39, 0.82, () => {
       for (const x of [0.28, 0.48]) {
         d.line(x, 0.77, 0.7, x, 0.82, 9, '#ce5f48', 1.5);
