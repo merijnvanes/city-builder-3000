@@ -14,7 +14,7 @@
 <footer>Original architecture · Four camera angles · Three lighting states · Shared, compressed browser assets</footer>
 <script type="module">
 const requestedFamily=new URLSearchParams(location.search).get('family');
-const family=['civic','power','water','parks','transport','rewards','deals','landmarks','residential','commercial'].includes(requestedFamily)?requestedFamily:'civic';
+const family=['civic','power','water','parks','transport','rewards','deals','landmarks','residential','commercial','industrial'].includes(requestedFamily)?requestedFamily:'civic';
 let catalog,state='day',rotation=0,detail=false,density=0,level=0;
 const cards=[];
 function update(){
@@ -36,7 +36,7 @@ function update(){
 }
 try{
   const response=await fetch('./assets/civic/catalog.json');if(!response.ok)throw new Error('Asset catalog could not be loaded.');catalog=await response.json();
-  for(const other of ['civic','power','water','parks','transport','rewards','deals','landmarks','residential','commercial'].filter(value=>value!==family)){
+  for(const other of ['civic','power','water','parks','transport','rewards','deals','landmarks','residential','commercial','industrial'].filter(value=>value!==family)){
     const link=document.createElement('a');link.href=`?family=${other}`;link.textContent=`View ${other} collection →`;link.style.cssText='color:var(--accent);margin-right:12px';document.querySelector('nav').prepend(link);
   }
   if(family==='power'){
@@ -59,6 +59,12 @@ try{
       select.onchange=()=>{if(label==='Density')density=Number(select.value);else level=Number(select.value);update();};
       document.querySelector('nav').append(select);
     }
+  }
+  if(family==='industrial'){
+    document.title='Industrial Architecture · City Builder 3000';
+    document.querySelector('.eyebrow').textContent='CITY BUILDER 3000 · WORKING LANDSCAPES';
+    document.querySelector('h1').textContent='Fields, workshops and works.';
+    document.querySelector('header p').textContent='Planted fields, barnyards, rooflit warehouses and tank-and-stack factories. Every industrial density, growth stage and supported lot size has its own authored architecture.';
   }
   if(family==='commercial'){
     document.title='Commercial Architecture · City Builder 3000';

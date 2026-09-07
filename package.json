@@ -35,7 +35,9 @@
     "art:commercial": "blender --background --factory-startup --python tools/civic_art/render.py -- --types commercial --states day,night,unpowered --rotations 0,1,2,3 --samples 32 && python3 tools/civic_art/package.py --types commercial",
     "test:commercial": "node --test tests/zone-art.test.js tests/commercial-variation.test.js && ART_FAMILY=commercial node tests/power-sprites.mjs && ART_FAMILY=commercial node tests/zone-gallery.mjs && node tests/zone-lifecycle.mjs && ART_FAMILY=commercial node tests/zone-city.mjs",
     "test:art-production": "node tests/art-production.mjs",
-    "test:starter-art": "node tests/starter-art.mjs"
+    "test:starter-art": "node tests/starter-art.mjs",
+    "art:industrial": "blender --background --factory-startup --python tools/civic_art/render.py -- --types industrial --states day,night,unpowered --rotations 0,1,2,3 --samples 32 && python3 tools/civic_art/package.py --types industrial",
+    "test:industrial": "node --test tests/zone-art.test.js tests/industrial-variation.test.js && ART_FAMILY=industrial node tests/power-sprites.mjs && ART_FAMILY=industrial node tests/zone-gallery.mjs && node tests/zone-lifecycle.mjs && ART_FAMILY=industrial node tests/zone-city.mjs"
   },
   "devDependencies": {
     "vite": "^7.0.0",

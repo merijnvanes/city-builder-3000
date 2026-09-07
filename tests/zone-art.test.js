@@ -7,7 +7,7 @@ import { drawLotEffects } from '../src/lot-art-effects.js';
 import { shadeHex, NIGHT_EXPOSURE } from '../src/art-colors.js';
 import { expectedZoneEntries } from './zone-art-contract.mjs';
 
-test('every supported residential lot, density and stage selects its exact authored entry', () => {
+test('every supported zone lot, density and stage selects its exact authored entry', () => {
   for(const entry of expectedZoneEntries()) {
     const tile={type:entry.type,density:entry.density,level:entry.level,lot:{x:2,y:3,w:entry.size,h:entry.size}};
     assert.equal(zoneArtKey(tile),entry.key);

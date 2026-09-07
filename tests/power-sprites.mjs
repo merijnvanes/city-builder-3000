@@ -4,7 +4,7 @@ import { chromium } from '@playwright/test';
 import assert from 'node:assert/strict';
 import { FAMILY_LAYOUT_COUNTS } from './art-families.mjs';
 const family = process.env.ART_FAMILY || 'power';
-assert.ok(['power','water','parks','transport','rewards','deals','landmarks','residential','commercial'].includes(family));
+assert.ok(['power','water','parks','transport','rewards','deals','landmarks','residential','commercial','industrial'].includes(family));
 const expectedFrames = FAMILY_LAYOUT_COUNTS[family] * 12;
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
 try {

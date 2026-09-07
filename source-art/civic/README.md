@@ -64,3 +64,5 @@ Landmark architecture and validation: [LANDMARKS-ART.md](../../LANDMARKS-ART.md)
 Residential state coverage and zone pipeline: [RESIDENTIAL-ART.md](../../RESIDENTIAL-ART.md).
 
 Commercial state coverage and skyline selection: [COMMERCIAL-ART.md](../../COMMERCIAL-ART.md).
+
+Industrial state coverage and seed intervals: [INDUSTRIAL-ART.md](../../INDUSTRIAL-ART.md).

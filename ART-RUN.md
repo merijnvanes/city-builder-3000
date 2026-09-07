@@ -6,9 +6,13 @@ Authorized order, with a completed review, commit and push for every coherent sl
 2. Landmarks — complete: five models and sixty frames; see LANDMARKS-ART.md.
 3. Residential zones — complete: 24 states, 100 layouts, 1,200 frames; see RESIDENTIAL-ART.md.
 4. Commercial zones — complete: 24 states, 136 layouts, 1,632 frames; see COMMERCIAL-ART.md.
-5. Industrial zones — pending: all density/level/lot-size/variant combinations.
+5. Industrial zones — complete: 28 states, 152 layouts, 1,824 frames; see INDUSTRIAL-ART.md.
 
 Worktree: `city-builder-3000-civic-art`, branch `feat/civic-building-art`.
 Baseline: `e3a492b`. Main's RCI lot contract agrees; growable ports remain separate.
 Continue without pausing after a family. Preserve existing exports, seed variation,
 32 MiB shared cache, gameplay rules and original scripted Blender art direction.
+
+All five requested categories are complete. The catalog now contains 126 entries,
+454 layouts and 5,448 frames. Environment compatibility and separate optional
+polish are recorded in ENVIRONMENT-ART-AUDIT.md.

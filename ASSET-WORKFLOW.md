@@ -27,19 +27,19 @@ Repeated neighborhoods need meaningful architectural variants, not just recolors
 Keep a coherent material and lighting language without making everything a civic
 monument: houses should feel domestic and industrial plants should reveal process.
 
-## Remaining inventory
+## Coverage inventory
 
 This is a migration checklist from `src/sim/catalog.js` on the civic-art branch.
 Reconcile it with the current catalog and rendering dispatch before implementing;
-another agent is developing the simulation on `main`. Power, water, parks, fixed-lot transport, rewards, business deals, landmarks, residential and commercial are complete; other rows remain to do.
+another agent is developing the simulation on `main`. All building families listed below are now authored on this branch.
 The twelve catalog entries in group `civic` are also done; similarly named
 rewards and landmarks are separate assets.
 
-| Family | Remaining assets / coverage |
+| Family | Assets / coverage |
 | --- | --- |
 | Residential zones | Complete: all densities, levels 1–4, supported lot sizes and 100 authored layouts; see [RESIDENTIAL-ART.md](RESIDENTIAL-ART.md) |
 | Commercial zones | Complete: all densities, levels 1–4, supported footprints and 136 authored layouts; see [COMMERCIAL-ART.md](COMMERCIAL-ART.md) |
-| Industrial zones | All three densities, levels 1–4 and variants; preserve both 3×3 low-density farms and 1×1 workshops |
+| Industrial zones | Complete: all densities, levels 1–4, supported footprints and 152 authored layouts, including 3×3 farms and 1×1 workshops; see [INDUSTRIAL-ART.md](INDUSTRIAL-ART.md) |
 | Power | Complete: `coal`, `oil`, `gas`, `nuclear`, `wind`, `solar`, `microwave`, `fusion`; see [POWER-ART.md](POWER-ART.md) |
 | Water | Complete: `waterpump`, `watertower`, `desalination`, `treatment`; see [WATER-ART.md](WATER-ART.md) |
 | Transport buildings | Complete on this branch: `bus`, `railstation`, `substation`, `airport` (6×5), `seaport`; see [TRANSPORT-ART.md](TRANSPORT-ART.md) for the growing-port integration boundary |
@@ -50,18 +50,18 @@ rewards and landmarks are separate assets.
 
 Roads, rail, highways, ramps, tunnel portals, networks, trees, terrain and emergency
 crews are related environment assets, not interchangeable standalone buildings.
-Audit them at the end for visual compatibility and record remaining work explicitly;
+The end-of-run compatibility audit and follow-up polish are recorded in
+[ENVIRONMENT-ART-AUDIT.md](ENVIRONMENT-ART-AUDIT.md);
 do not silently count these tools as migrated buildings or replace network logic.
 
-Current authorized order: business deals, landmarks, residential zones, commercial
-zones, then industrial zones. This order is a working
-recommendation, not a restriction; finish and validate each chosen slice before
-committing and pushing it.
+This run followed the authorized order: business deals, landmarks, residential
+zones, commercial zones, then industrial zones. Each slice is validated, reviewed,
+committed and pushed before the next completed category.
 
 ## Pipeline extension requirements
 
 The `tools/civic_art/registry.json` registry covers twelve civic, eight power, four water, three park, five transport, eight reward, five business-deal and five landmark
-fixed assets plus 48 residential/commercial state/footprint entries. The shared export, loader and gallery support legacy square lots (1×1,
+fixed assets plus 76 residential/commercial/industrial state/footprint entries. The shared export, loader and gallery support legacy square lots (1×1,
 2×2, 3×3, 4×4 and 5×5) and explicit rectangular footprint metadata. New families still need explicit coverage and contract checks. Share primitives and export machinery;
 keep authored models in small family modules. Avoid a second divergent renderer
 or a giant switch containing every model. Preserve existing civic exports during

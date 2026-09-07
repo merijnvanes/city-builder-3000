@@ -2325,5 +2325,1157 @@
         "description": "Garden terraces."
       }
     ]
+  },
+  "industrial-d1-l1-s1": {
+    "module": "zone_industrial",
+    "tiles": 1,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 1 \u00b7 stage 1 \u00b7 1\u00d71",
+    "description": "Industrial density 1, growth stage 1, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 1,
+      "level": 1
+    },
+    "variants": [
+      {
+        "model": "industrial-d1-l1-s1",
+        "label": "Terracotta workshop",
+        "description": "Terracotta workshop."
+      },
+      {
+        "model": "industrial-d1-l1-s1_v1",
+        "label": "Blue workshop",
+        "description": "Blue workshop."
+      },
+      {
+        "model": "industrial-d1-l1-s1_v2",
+        "label": "Ochre workshop",
+        "description": "Ochre workshop."
+      },
+      {
+        "model": "industrial-d1-l1-s1_v3",
+        "label": "Teal workshop",
+        "description": "Teal workshop."
+      },
+      {
+        "model": "industrial-d1-l1-s1_v4",
+        "label": "Plum workshop",
+        "description": "Plum workshop."
+      }
+    ]
+  },
+  "industrial-d1-l1-s3": {
+    "module": "zone_industrial",
+    "tiles": 3,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 1 \u00b7 stage 1 \u00b7 3\u00d73",
+    "description": "Industrial density 1, growth stage 1, authored specifically for a 3\u00d73 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 1,
+      "level": 1
+    },
+    "variants": [
+      {
+        "model": "industrial-d1-l1-s3",
+        "label": "Golden grain farm",
+        "description": "Golden grain farm."
+      },
+      {
+        "model": "industrial-d1-l1-s3_v1",
+        "label": "Green row-crop farm",
+        "description": "Green row-crop farm."
+      },
+      {
+        "model": "industrial-d1-l1-s3_v2",
+        "label": "Furrowed farm",
+        "description": "Furrowed farm."
+      },
+      {
+        "model": "industrial-d1-l1-s3_v3",
+        "label": "Orchard farm",
+        "description": "Orchard farm."
+      }
+    ]
+  },
+  "industrial-d1-l2-s1": {
+    "module": "zone_industrial",
+    "tiles": 1,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 1 \u00b7 stage 2 \u00b7 1\u00d71",
+    "description": "Industrial density 1, growth stage 2, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 1,
+      "level": 2
+    },
+    "variants": [
+      {
+        "model": "industrial-d1-l2-s1",
+        "label": "Terracotta workshop",
+        "description": "Terracotta workshop."
+      },
+      {
+        "model": "industrial-d1-l2-s1_v1",
+        "label": "Blue workshop",
+        "description": "Blue workshop."
+      },
+      {
+        "model": "industrial-d1-l2-s1_v2",
+        "label": "Ochre workshop",
+        "description": "Ochre workshop."
+      },
+      {
+        "model": "industrial-d1-l2-s1_v3",
+        "label": "Teal workshop",
+        "description": "Teal workshop."
+      },
+      {
+        "model": "industrial-d1-l2-s1_v4",
+        "label": "Plum workshop",
+        "description": "Plum workshop."
+      }
+    ]
+  },
+  "industrial-d1-l2-s3": {
+    "module": "zone_industrial",
+    "tiles": 3,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 1 \u00b7 stage 2 \u00b7 3\u00d73",
+    "description": "Industrial density 1, growth stage 2, authored specifically for a 3\u00d73 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 1,
+      "level": 2
+    },
+    "variants": [
+      {
+        "model": "industrial-d1-l2-s3",
+        "label": "Golden grain farm",
+        "description": "Golden grain farm."
+      },
+      {
+        "model": "industrial-d1-l2-s3_v1",
+        "label": "Green row-crop farm",
+        "description": "Green row-crop farm."
+      },
+      {
+        "model": "industrial-d1-l2-s3_v2",
+        "label": "Furrowed farm",
+        "description": "Furrowed farm."
+      },
+      {
+        "model": "industrial-d1-l2-s3_v3",
+        "label": "Orchard farm",
+        "description": "Orchard farm."
+      }
+    ]
+  },
+  "industrial-d1-l3-s1": {
+    "module": "zone_industrial",
+    "tiles": 1,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 1 \u00b7 stage 3 \u00b7 1\u00d71",
+    "description": "Industrial density 1, growth stage 3, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 1,
+      "level": 3
+    },
+    "variants": [
+      {
+        "model": "industrial-d1-l3-s1",
+        "label": "Terracotta workshop",
+        "description": "Terracotta workshop."
+      },
+      {
+        "model": "industrial-d1-l3-s1_v1",
+        "label": "Blue workshop",
+        "description": "Blue workshop."
+      },
+      {
+        "model": "industrial-d1-l3-s1_v2",
+        "label": "Ochre workshop",
+        "description": "Ochre workshop."
+      },
+      {
+        "model": "industrial-d1-l3-s1_v3",
+        "label": "Teal workshop",
+        "description": "Teal workshop."
+      },
+      {
+        "model": "industrial-d1-l3-s1_v4",
+        "label": "Plum workshop",
+        "description": "Plum workshop."
+      }
+    ]
+  },
+  "industrial-d1-l3-s3": {
+    "module": "zone_industrial",
+    "tiles": 3,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 1 \u00b7 stage 3 \u00b7 3\u00d73",
+    "description": "Industrial density 1, growth stage 3, authored specifically for a 3\u00d73 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 1,
+      "level": 3
+    },
+    "variants": [
+      {
+        "model": "industrial-d1-l3-s3",
+        "label": "Golden grain farm",
+        "description": "Golden grain farm."
+      },
+      {
+        "model": "industrial-d1-l3-s3_v1",
+        "label": "Green row-crop farm",
+        "description": "Green row-crop farm."
+      },
+      {
+        "model": "industrial-d1-l3-s3_v2",
+        "label": "Furrowed farm",
+        "description": "Furrowed farm."
+      },
+      {
+        "model": "industrial-d1-l3-s3_v3",
+        "label": "Orchard farm",
+        "description": "Orchard farm."
+      }
+    ]
+  },
+  "industrial-d1-l4-s1": {
+    "module": "zone_industrial",
+    "tiles": 1,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 1 \u00b7 stage 4 \u00b7 1\u00d71",
+    "description": "Industrial density 1, growth stage 4, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 1,
+      "level": 4
+    },
+    "variants": [
+      {
+        "model": "industrial-d1-l4-s1",
+        "label": "Terracotta workshop",
+        "description": "Terracotta workshop."
+      },
+      {
+        "model": "industrial-d1-l4-s1_v1",
+        "label": "Blue workshop",
+        "description": "Blue workshop."
+      },
+      {
+        "model": "industrial-d1-l4-s1_v2",
+        "label": "Ochre workshop",
+        "description": "Ochre workshop."
+      },
+      {
+        "model": "industrial-d1-l4-s1_v3",
+        "label": "Teal workshop",
+        "description": "Teal workshop."
+      },
+      {
+        "model": "industrial-d1-l4-s1_v4",
+        "label": "Plum workshop",
+        "description": "Plum workshop."
+      }
+    ]
+  },
+  "industrial-d1-l4-s3": {
+    "module": "zone_industrial",
+    "tiles": 3,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 1 \u00b7 stage 4 \u00b7 3\u00d73",
+    "description": "Industrial density 1, growth stage 4, authored specifically for a 3\u00d73 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 1,
+      "level": 4
+    },
+    "variants": [
+      {
+        "model": "industrial-d1-l4-s3",
+        "label": "Golden grain farm",
+        "description": "Golden grain farm."
+      },
+      {
+        "model": "industrial-d1-l4-s3_v1",
+        "label": "Green row-crop farm",
+        "description": "Green row-crop farm."
+      },
+      {
+        "model": "industrial-d1-l4-s3_v2",
+        "label": "Furrowed farm",
+        "description": "Furrowed farm."
+      },
+      {
+        "model": "industrial-d1-l4-s3_v3",
+        "label": "Orchard farm",
+        "description": "Orchard farm."
+      }
+    ]
+  },
+  "industrial-d2-l1-s1": {
+    "module": "zone_industrial",
+    "tiles": 1,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 2 \u00b7 stage 1 \u00b7 1\u00d71",
+    "description": "Industrial density 2, growth stage 1, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 2,
+      "level": 1
+    },
+    "variants": [
+      {
+        "model": "industrial-d2-l1-s1",
+        "label": "Red-cargo works",
+        "description": "Red-cargo works."
+      },
+      {
+        "model": "industrial-d2-l1-s1_v1",
+        "label": "Blue-cargo works",
+        "description": "Blue-cargo works."
+      },
+      {
+        "model": "industrial-d2-l1-s1_v2",
+        "label": "Blue-cargo warehouse",
+        "description": "Blue-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l1-s1_v3",
+        "label": "Ochre-cargo warehouse",
+        "description": "Ochre-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l1-s1_v4",
+        "label": "Green-cargo warehouse",
+        "description": "Green-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l1-s1_v5",
+        "label": "Green-cargo works",
+        "description": "Green-cargo works."
+      },
+      {
+        "model": "industrial-d2-l1-s1_v6",
+        "label": "Plum-cargo works",
+        "description": "Plum-cargo works."
+      }
+    ]
+  },
+  "industrial-d2-l1-s2": {
+    "module": "zone_industrial",
+    "tiles": 2,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 2 \u00b7 stage 1 \u00b7 2\u00d72",
+    "description": "Industrial density 2, growth stage 1, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 2,
+      "level": 1
+    },
+    "variants": [
+      {
+        "model": "industrial-d2-l1-s2",
+        "label": "Red-cargo works",
+        "description": "Red-cargo works."
+      },
+      {
+        "model": "industrial-d2-l1-s2_v1",
+        "label": "Blue-cargo works",
+        "description": "Blue-cargo works."
+      },
+      {
+        "model": "industrial-d2-l1-s2_v2",
+        "label": "Blue-cargo warehouse",
+        "description": "Blue-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l1-s2_v3",
+        "label": "Ochre-cargo warehouse",
+        "description": "Ochre-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l1-s2_v4",
+        "label": "Green-cargo warehouse",
+        "description": "Green-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l1-s2_v5",
+        "label": "Green-cargo works",
+        "description": "Green-cargo works."
+      },
+      {
+        "model": "industrial-d2-l1-s2_v6",
+        "label": "Plum-cargo works",
+        "description": "Plum-cargo works."
+      }
+    ]
+  },
+  "industrial-d2-l2-s1": {
+    "module": "zone_industrial",
+    "tiles": 1,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 2 \u00b7 stage 2 \u00b7 1\u00d71",
+    "description": "Industrial density 2, growth stage 2, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 2,
+      "level": 2
+    },
+    "variants": [
+      {
+        "model": "industrial-d2-l2-s1",
+        "label": "Red-cargo works",
+        "description": "Red-cargo works."
+      },
+      {
+        "model": "industrial-d2-l2-s1_v1",
+        "label": "Blue-cargo works",
+        "description": "Blue-cargo works."
+      },
+      {
+        "model": "industrial-d2-l2-s1_v2",
+        "label": "Blue-cargo warehouse",
+        "description": "Blue-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l2-s1_v3",
+        "label": "Ochre-cargo warehouse",
+        "description": "Ochre-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l2-s1_v4",
+        "label": "Green-cargo warehouse",
+        "description": "Green-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l2-s1_v5",
+        "label": "Green-cargo works",
+        "description": "Green-cargo works."
+      },
+      {
+        "model": "industrial-d2-l2-s1_v6",
+        "label": "Plum-cargo works",
+        "description": "Plum-cargo works."
+      }
+    ]
+  },
+  "industrial-d2-l2-s2": {
+    "module": "zone_industrial",
+    "tiles": 2,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 2 \u00b7 stage 2 \u00b7 2\u00d72",
+    "description": "Industrial density 2, growth stage 2, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 2,
+      "level": 2
+    },
+    "variants": [
+      {
+        "model": "industrial-d2-l2-s2",
+        "label": "Red-cargo works",
+        "description": "Red-cargo works."
+      },
+      {
+        "model": "industrial-d2-l2-s2_v1",
+        "label": "Blue-cargo works",
+        "description": "Blue-cargo works."
+      },
+      {
+        "model": "industrial-d2-l2-s2_v2",
+        "label": "Blue-cargo warehouse",
+        "description": "Blue-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l2-s2_v3",
+        "label": "Ochre-cargo warehouse",
+        "description": "Ochre-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l2-s2_v4",
+        "label": "Green-cargo warehouse",
+        "description": "Green-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l2-s2_v5",
+        "label": "Green-cargo works",
+        "description": "Green-cargo works."
+      },
+      {
+        "model": "industrial-d2-l2-s2_v6",
+        "label": "Plum-cargo works",
+        "description": "Plum-cargo works."
+      }
+    ]
+  },
+  "industrial-d2-l3-s1": {
+    "module": "zone_industrial",
+    "tiles": 1,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 2 \u00b7 stage 3 \u00b7 1\u00d71",
+    "description": "Industrial density 2, growth stage 3, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 2,
+      "level": 3
+    },
+    "variants": [
+      {
+        "model": "industrial-d2-l3-s1",
+        "label": "Red-cargo works",
+        "description": "Red-cargo works."
+      },
+      {
+        "model": "industrial-d2-l3-s1_v1",
+        "label": "Blue-cargo works",
+        "description": "Blue-cargo works."
+      },
+      {
+        "model": "industrial-d2-l3-s1_v2",
+        "label": "Blue-cargo warehouse",
+        "description": "Blue-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l3-s1_v3",
+        "label": "Ochre-cargo warehouse",
+        "description": "Ochre-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l3-s1_v4",
+        "label": "Green-cargo warehouse",
+        "description": "Green-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l3-s1_v5",
+        "label": "Green-cargo works",
+        "description": "Green-cargo works."
+      },
+      {
+        "model": "industrial-d2-l3-s1_v6",
+        "label": "Plum-cargo works",
+        "description": "Plum-cargo works."
+      }
+    ]
+  },
+  "industrial-d2-l3-s2": {
+    "module": "zone_industrial",
+    "tiles": 2,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 2 \u00b7 stage 3 \u00b7 2\u00d72",
+    "description": "Industrial density 2, growth stage 3, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 2,
+      "level": 3
+    },
+    "variants": [
+      {
+        "model": "industrial-d2-l3-s2",
+        "label": "Red-cargo works",
+        "description": "Red-cargo works."
+      },
+      {
+        "model": "industrial-d2-l3-s2_v1",
+        "label": "Blue-cargo works",
+        "description": "Blue-cargo works."
+      },
+      {
+        "model": "industrial-d2-l3-s2_v2",
+        "label": "Blue-cargo warehouse",
+        "description": "Blue-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l3-s2_v3",
+        "label": "Ochre-cargo warehouse",
+        "description": "Ochre-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l3-s2_v4",
+        "label": "Green-cargo warehouse",
+        "description": "Green-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l3-s2_v5",
+        "label": "Green-cargo works",
+        "description": "Green-cargo works."
+      },
+      {
+        "model": "industrial-d2-l3-s2_v6",
+        "label": "Plum-cargo works",
+        "description": "Plum-cargo works."
+      }
+    ]
+  },
+  "industrial-d2-l4-s1": {
+    "module": "zone_industrial",
+    "tiles": 1,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 2 \u00b7 stage 4 \u00b7 1\u00d71",
+    "description": "Industrial density 2, growth stage 4, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 2,
+      "level": 4
+    },
+    "variants": [
+      {
+        "model": "industrial-d2-l4-s1",
+        "label": "Red-cargo works",
+        "description": "Red-cargo works."
+      },
+      {
+        "model": "industrial-d2-l4-s1_v1",
+        "label": "Blue-cargo works",
+        "description": "Blue-cargo works."
+      },
+      {
+        "model": "industrial-d2-l4-s1_v2",
+        "label": "Blue-cargo warehouse",
+        "description": "Blue-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l4-s1_v3",
+        "label": "Ochre-cargo warehouse",
+        "description": "Ochre-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l4-s1_v4",
+        "label": "Green-cargo warehouse",
+        "description": "Green-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l4-s1_v5",
+        "label": "Green-cargo works",
+        "description": "Green-cargo works."
+      },
+      {
+        "model": "industrial-d2-l4-s1_v6",
+        "label": "Plum-cargo works",
+        "description": "Plum-cargo works."
+      }
+    ]
+  },
+  "industrial-d2-l4-s2": {
+    "module": "zone_industrial",
+    "tiles": 2,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 2 \u00b7 stage 4 \u00b7 2\u00d72",
+    "description": "Industrial density 2, growth stage 4, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 2,
+      "level": 4
+    },
+    "variants": [
+      {
+        "model": "industrial-d2-l4-s2",
+        "label": "Red-cargo works",
+        "description": "Red-cargo works."
+      },
+      {
+        "model": "industrial-d2-l4-s2_v1",
+        "label": "Blue-cargo works",
+        "description": "Blue-cargo works."
+      },
+      {
+        "model": "industrial-d2-l4-s2_v2",
+        "label": "Blue-cargo warehouse",
+        "description": "Blue-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l4-s2_v3",
+        "label": "Ochre-cargo warehouse",
+        "description": "Ochre-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l4-s2_v4",
+        "label": "Green-cargo warehouse",
+        "description": "Green-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l4-s2_v5",
+        "label": "Green-cargo works",
+        "description": "Green-cargo works."
+      },
+      {
+        "model": "industrial-d2-l4-s2_v6",
+        "label": "Plum-cargo works",
+        "description": "Plum-cargo works."
+      }
+    ]
+  },
+  "industrial-d3-l1-s1": {
+    "module": "zone_industrial",
+    "tiles": 1,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 3 \u00b7 stage 1 \u00b7 1\u00d71",
+    "description": "Industrial density 3, growth stage 1, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 3,
+      "level": 1
+    },
+    "variants": [
+      {
+        "model": "industrial-d3-l1-s1",
+        "label": "Red-cargo process plant",
+        "description": "Red-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l1-s1_v1",
+        "label": "Blue-cargo process plant",
+        "description": "Blue-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l1-s1_v2",
+        "label": "Ochre-cargo process plant",
+        "description": "Ochre-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l1-s1_v3",
+        "label": "Green-cargo process plant",
+        "description": "Green-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l1-s1_v4",
+        "label": "Plum-cargo process plant",
+        "description": "Plum-cargo process plant."
+      }
+    ]
+  },
+  "industrial-d3-l1-s2": {
+    "module": "zone_industrial",
+    "tiles": 2,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 3 \u00b7 stage 1 \u00b7 2\u00d72",
+    "description": "Industrial density 3, growth stage 1, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 3,
+      "level": 1
+    },
+    "variants": [
+      {
+        "model": "industrial-d3-l1-s2",
+        "label": "Red-cargo process plant",
+        "description": "Red-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l1-s2_v1",
+        "label": "Blue-cargo process plant",
+        "description": "Blue-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l1-s2_v2",
+        "label": "Ochre-cargo process plant",
+        "description": "Ochre-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l1-s2_v3",
+        "label": "Green-cargo process plant",
+        "description": "Green-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l1-s2_v4",
+        "label": "Plum-cargo process plant",
+        "description": "Plum-cargo process plant."
+      }
+    ]
+  },
+  "industrial-d3-l1-s3": {
+    "module": "zone_industrial",
+    "tiles": 3,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 3 \u00b7 stage 1 \u00b7 3\u00d73",
+    "description": "Industrial density 3, growth stage 1, authored specifically for a 3\u00d73 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 3,
+      "level": 1
+    },
+    "variants": [
+      {
+        "model": "industrial-d3-l1-s3",
+        "label": "Red-cargo process plant",
+        "description": "Red-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l1-s3_v1",
+        "label": "Blue-cargo process plant",
+        "description": "Blue-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l1-s3_v2",
+        "label": "Ochre-cargo process plant",
+        "description": "Ochre-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l1-s3_v3",
+        "label": "Green-cargo process plant",
+        "description": "Green-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l1-s3_v4",
+        "label": "Plum-cargo process plant",
+        "description": "Plum-cargo process plant."
+      }
+    ]
+  },
+  "industrial-d3-l2-s1": {
+    "module": "zone_industrial",
+    "tiles": 1,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 3 \u00b7 stage 2 \u00b7 1\u00d71",
+    "description": "Industrial density 3, growth stage 2, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 3,
+      "level": 2
+    },
+    "variants": [
+      {
+        "model": "industrial-d3-l2-s1",
+        "label": "Red-cargo process plant",
+        "description": "Red-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l2-s1_v1",
+        "label": "Blue-cargo process plant",
+        "description": "Blue-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l2-s1_v2",
+        "label": "Ochre-cargo process plant",
+        "description": "Ochre-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l2-s1_v3",
+        "label": "Green-cargo process plant",
+        "description": "Green-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l2-s1_v4",
+        "label": "Plum-cargo process plant",
+        "description": "Plum-cargo process plant."
+      }
+    ]
+  },
+  "industrial-d3-l2-s2": {
+    "module": "zone_industrial",
+    "tiles": 2,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 3 \u00b7 stage 2 \u00b7 2\u00d72",
+    "description": "Industrial density 3, growth stage 2, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 3,
+      "level": 2
+    },
+    "variants": [
+      {
+        "model": "industrial-d3-l2-s2",
+        "label": "Red-cargo process plant",
+        "description": "Red-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l2-s2_v1",
+        "label": "Blue-cargo process plant",
+        "description": "Blue-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l2-s2_v2",
+        "label": "Ochre-cargo process plant",
+        "description": "Ochre-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l2-s2_v3",
+        "label": "Green-cargo process plant",
+        "description": "Green-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l2-s2_v4",
+        "label": "Plum-cargo process plant",
+        "description": "Plum-cargo process plant."
+      }
+    ]
+  },
+  "industrial-d3-l2-s3": {
+    "module": "zone_industrial",
+    "tiles": 3,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 3 \u00b7 stage 2 \u00b7 3\u00d73",
+    "description": "Industrial density 3, growth stage 2, authored specifically for a 3\u00d73 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 3,
+      "level": 2
+    },
+    "variants": [
+      {
+        "model": "industrial-d3-l2-s3",
+        "label": "Red-cargo process plant",
+        "description": "Red-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l2-s3_v1",
+        "label": "Blue-cargo process plant",
+        "description": "Blue-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l2-s3_v2",
+        "label": "Ochre-cargo process plant",
+        "description": "Ochre-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l2-s3_v3",
+        "label": "Green-cargo process plant",
+        "description": "Green-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l2-s3_v4",
+        "label": "Plum-cargo process plant",
+        "description": "Plum-cargo process plant."
+      }
+    ]
+  },
+  "industrial-d3-l3-s1": {
+    "module": "zone_industrial",
+    "tiles": 1,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 3 \u00b7 stage 3 \u00b7 1\u00d71",
+    "description": "Industrial density 3, growth stage 3, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 3,
+      "level": 3
+    },
+    "variants": [
+      {
+        "model": "industrial-d3-l3-s1",
+        "label": "Red-cargo process plant",
+        "description": "Red-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l3-s1_v1",
+        "label": "Blue-cargo process plant",
+        "description": "Blue-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l3-s1_v2",
+        "label": "Ochre-cargo process plant",
+        "description": "Ochre-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l3-s1_v3",
+        "label": "Green-cargo process plant",
+        "description": "Green-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l3-s1_v4",
+        "label": "Plum-cargo process plant",
+        "description": "Plum-cargo process plant."
+      }
+    ]
+  },
+  "industrial-d3-l3-s2": {
+    "module": "zone_industrial",
+    "tiles": 2,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 3 \u00b7 stage 3 \u00b7 2\u00d72",
+    "description": "Industrial density 3, growth stage 3, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 3,
+      "level": 3
+    },
+    "variants": [
+      {
+        "model": "industrial-d3-l3-s2",
+        "label": "Red-cargo process plant",
+        "description": "Red-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l3-s2_v1",
+        "label": "Blue-cargo process plant",
+        "description": "Blue-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l3-s2_v2",
+        "label": "Ochre-cargo process plant",
+        "description": "Ochre-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l3-s2_v3",
+        "label": "Green-cargo process plant",
+        "description": "Green-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l3-s2_v4",
+        "label": "Plum-cargo process plant",
+        "description": "Plum-cargo process plant."
+      }
+    ]
+  },
+  "industrial-d3-l3-s3": {
+    "module": "zone_industrial",
+    "tiles": 3,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 3 \u00b7 stage 3 \u00b7 3\u00d73",
+    "description": "Industrial density 3, growth stage 3, authored specifically for a 3\u00d73 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 3,
+      "level": 3
+    },
+    "variants": [
+      {
+        "model": "industrial-d3-l3-s3",
+        "label": "Red-cargo process plant",
+        "description": "Red-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l3-s3_v1",
+        "label": "Blue-cargo process plant",
+        "description": "Blue-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l3-s3_v2",
+        "label": "Ochre-cargo process plant",
+        "description": "Ochre-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l3-s3_v3",
+        "label": "Green-cargo process plant",
+        "description": "Green-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l3-s3_v4",
+        "label": "Plum-cargo process plant",
+        "description": "Plum-cargo process plant."
+      }
+    ]
+  },
+  "industrial-d3-l4-s1": {
+    "module": "zone_industrial",
+    "tiles": 1,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 3 \u00b7 stage 4 \u00b7 1\u00d71",
+    "description": "Industrial density 3, growth stage 4, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 3,
+      "level": 4
+    },
+    "variants": [
+      {
+        "model": "industrial-d3-l4-s1",
+        "label": "Red-cargo process plant",
+        "description": "Red-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l4-s1_v1",
+        "label": "Blue-cargo process plant",
+        "description": "Blue-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l4-s1_v2",
+        "label": "Ochre-cargo process plant",
+        "description": "Ochre-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l4-s1_v3",
+        "label": "Green-cargo process plant",
+        "description": "Green-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l4-s1_v4",
+        "label": "Plum-cargo process plant",
+        "description": "Plum-cargo process plant."
+      }
+    ]
+  },
+  "industrial-d3-l4-s2": {
+    "module": "zone_industrial",
+    "tiles": 2,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 3 \u00b7 stage 4 \u00b7 2\u00d72",
+    "description": "Industrial density 3, growth stage 4, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 3,
+      "level": 4
+    },
+    "variants": [
+      {
+        "model": "industrial-d3-l4-s2",
+        "label": "Red-cargo process plant",
+        "description": "Red-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l4-s2_v1",
+        "label": "Blue-cargo process plant",
+        "description": "Blue-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l4-s2_v2",
+        "label": "Ochre-cargo process plant",
+        "description": "Ochre-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l4-s2_v3",
+        "label": "Green-cargo process plant",
+        "description": "Green-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l4-s2_v4",
+        "label": "Plum-cargo process plant",
+        "description": "Plum-cargo process plant."
+      }
+    ]
+  },
+  "industrial-d3-l4-s3": {
+    "module": "zone_industrial",
+    "tiles": 3,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 3 \u00b7 stage 4 \u00b7 3\u00d73",
+    "description": "Industrial density 3, growth stage 4, authored specifically for a 3\u00d73 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 3,
+      "level": 4
+    },
+    "variants": [
+      {
+        "model": "industrial-d3-l4-s3",
+        "label": "Red-cargo process plant",
+        "description": "Red-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l4-s3_v1",
+        "label": "Blue-cargo process plant",
+        "description": "Blue-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l4-s3_v2",
+        "label": "Ochre-cargo process plant",
+        "description": "Ochre-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l4-s3_v3",
+        "label": "Green-cargo process plant",
+        "description": "Green-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l4-s3_v4",
+        "label": "Plum-cargo process plant",
+        "description": "Plum-cargo process plant."
+      }
+    ]
   }
 }

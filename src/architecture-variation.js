@@ -7,6 +7,15 @@ export const random = (x, y, n = 0) => {
 export function spriteVariant(tile, count = 1) {
   if (count <= 1) return 0;
   const seed = tile.variant ?? random(tile.x, tile.y);
+  if (tile.type === 'industrial') {
+    // Legacy palette lookups wrap at the save format's inclusive terminal seed.
+    if (seed === 1) return 0;
+    if (tile.density === 2 && count === 7) {
+      // Union of warehouse thirds and cargo-color fifths, not seven equal bins.
+      const value = Math.max(0, Math.min(1 - Number.EPSILON, Number.isFinite(seed) ? seed : 0));
+      return [.2, 1/3, .4, .6, 2/3, .8, 1].findIndex(limit => value < limit);
+    }
+  }
   if (tile.type === 'commercial') {
     if (seed === 1 && tile.density === 1 && count === 5) return 2;
     if (seed === 1 && tile.density === 2 && count === 7) return 4;
