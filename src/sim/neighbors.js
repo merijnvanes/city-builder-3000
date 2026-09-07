@@ -34,26 +34,55 @@ const NAMES = ["Ashford", "Brightwater", "Cedar Falls", "Dunmore", "Eastbrook", 
 export const DEALS = {
   power: {
     buy:  { cap: 6000, rate: 0.06, minimum: 40, label: "Buy power as needed", needs: "power" },
-    sell: { cap: 2000, rate: 0.075, minimum: 0, label: "Sell 2,000 units of surplus power", needs: "power" },
+    sell: { cap: 2000, rate: 0.075, minimum: 0, label: "Sell surplus power", needs: "power" },
   },
   water: {
     buy:  { cap: 4000, rate: 0.055, minimum: 25, label: "Buy water as needed", needs: "water" },
-    sell: { cap: 1500, rate: 0.06, minimum: 0, label: "Sell 1,500 units of water", needs: "water" },
+    sell: { cap: 1500, rate: 0.06, minimum: 0, label: "Sell surplus water", needs: "water" },
   },
   garbage: {
-    buy:  { cap: 600, rate: 0.37, minimum: 0, label: "Accept 600 tons of their garbage", needs: "road" },
+    buy:  { cap: 600, rate: 0.37, minimum: 0, label: "Dispose of a neighbour's garbage", needs: "road" },
     sell: { cap: 4000, rate: 0.32, minimum: 45, label: "Export excess garbage", needs: "road" },
   },
 };
+
+// "Deals are updated periodically to reflect both your city's and the
+// neighboring city's needs", so the terms a neighbour offers are not the list
+// price. `roll` is 0..1 from the city's own random stream.
+export const RATE_SPREAD = 0.3;   // the price swings this far either way
+export const CAP_SPREAD = 0.25;   // and so does how much they will handle
+
+export function offerTerms(resource, kind, roll = 0.5) {
+  const base = DEALS[resource]?.[kind];
+  if (!base) return null;
+  const swing = (r, spread) => 1 + (r * 2 - 1) * spread;
+  const rate = Math.round(base.rate * swing(roll, RATE_SPREAD) * 1000) / 1000;
+  const cap = Math.round(base.cap * swing(1 - roll, CAP_SPREAD) / 10) * 10;
+  return { rate, cap, minimum: Math.round((base.minimum || 0) * rate / base.rate) };
+}
+
+// The terms a signed contract actually runs on. A deal keeps the price it was
+// signed at; only a save from before terms were stored falls back to the list.
+export function dealTerms(city, resource) {
+  const deal = city?.deals?.[resource];
+  if (!deal) return null;
+  const base = DEALS[resource]?.[deal.kind];
+  if (!base) return null;
+  return {
+    ...base,
+    rate: Number.isFinite(deal.rate) ? deal.rate : base.rate,
+    cap: Number.isFinite(deal.cap) ? deal.cap : base.cap,
+    minimum: Number.isFinite(deal.minimum) ? deal.minimum : base.minimum,
+  };
+}
 
 // "There is a large penalty for cancelling the deal", whether the mayor walks
 // away or the city simply stops being able to deliver. Twelve months of the
 // standing charge, or of the contracted amount for a sale.
 export const CANCEL_MONTHS = 12;
-export function cancelPenalty(resource, kind) {
-  const d = DEALS[resource]?.[kind];
-  if (!d) return 0;
-  return Math.round((d.minimum || d.cap * d.rate) * CANCEL_MONTHS);
+export function cancelPenalty(terms) {
+  if (!terms) return 0;
+  return Math.round((terms.minimum || terms.cap * terms.rate) * CANCEL_MONTHS);
 }
 
 export function neighborName(seed, index) {
@@ -114,25 +143,35 @@ export function dealAvailable(connections, resource, side) {
   return c[needs] > 0;
 }
 
-export function signDeal(city, resource, side, kind) {
+// How an offer reads to the mayor.
+export function describeTerms(resource, kind, terms) {
+  const unit = resource === "garbage" ? "ton" : "unit";
+  return kind === "buy" && terms.minimum
+    ? `at $${terms.rate.toFixed(2)} a ${unit} for up to ${terms.cap.toLocaleString()}, minimum $${terms.minimum}/month`
+    : `${terms.cap.toLocaleString()} ${unit}s at $${terms.rate.toFixed(2)}, about $${Math.round(terms.cap * terms.rate).toLocaleString()}/month`;
+}
+
+// Sign the terms a neighbour offered. The manual has the neighbour do the
+// approaching - "Mayors from neighboring cities may approach you from time to
+// time with offers" - so the offer, and its price, comes from events.js.
+export function signDeal(city, resource, side, kind, terms) {
   if (!DEALS[resource] || !DEALS[resource][kind] || !SIDES.includes(side)) return { ok: false, message: "Unknown deal." };
   const connections = detectConnections(city);
   if (!dealAvailable(connections, resource, side)) {
     const needs = DEALS[resource][kind].needs;
-    return { ok: false, message: `Connect a ${needs === "power" ? "power line" : needs === "water" ? "pipe" : "road, rail line or seaport"} to the ${side} edge first.` };
+    return { ok: false, message: `The connection to the ${side} was cut: run a ${needs === "power" ? "power line" : needs === "water" ? "pipe" : "road, rail line or seaport"} to that edge again.` };
   }
-  ensureDeals(city)[resource] = { side, kind, since: city.month };
+  if (city.deals?.[resource]) return { ok: false, message: `The city already has a ${resource} contract.` };
+  const t = terms || offerTerms(resource, kind);
+  ensureDeals(city)[resource] = { side, kind, since: city.month, rate: t.rate, cap: t.cap, minimum: t.minimum };
   const d = DEALS[resource][kind];
-  const terms = kind === "buy" && d.minimum
-    ? `at $${d.rate.toFixed(2)} a unit, minimum $${d.minimum}/month`
-    : `for about $${Math.round(d.cap * d.rate).toLocaleString()}/month`;
-  return { ok: true, message: `${d.label} ${kind === "buy" ? "from" : "to"} ${connections[side].name} ${terms}. Breaking it costs $${cancelPenalty(resource, kind).toLocaleString()}.` };
+  return { ok: true, message: `${d.label} ${kind === "buy" ? "from" : "to"} ${connections[side].name} ${describeTerms(resource, kind, t)}. Breaking it costs $${cancelPenalty(t).toLocaleString()}.` };
 }
 
 export function cancelDeal(city, resource) {
   const deal = city.deals?.[resource];
   if (!deal) return { ok: false, message: "No such deal." };
-  const penalty = cancelPenalty(resource, deal.kind);
+  const penalty = cancelPenalty(dealTerms(city, resource));
   if (penalty > city.money) return { ok: false, message: `Breaking the ${resource} contract costs $${penalty.toLocaleString()}, which the city cannot pay.` };
   delete city.deals[resource];
   city.money -= penalty;
@@ -149,7 +188,7 @@ export function auditDeals(city, connections, utilities) {
     const cut = !dealAvailable(connections, resource, deal.side);
     const undelivered = !cut && deal.kind === "sell" && resource !== "garbage" && utilities?.[resource]?.deal?.met === false;
     if (!cut && !undelivered) continue;
-    const penalty = cancelPenalty(resource, deal.kind);
+    const penalty = cancelPenalty(dealTerms(city, resource));
     delete city.deals[resource];
     city.money -= penalty;
     const who = connections[deal.side]?.name || "The neighbour";

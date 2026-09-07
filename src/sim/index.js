@@ -16,7 +16,7 @@ import { anchorOf, capacityOf, drawOf } from "./lots.js";
 import { WATER_RADIUS } from "./utilities.js";
 import { updateEvents, respondPetition, openPetition, specialAvailable, ensureEvents, PETITIONS } from "./events.js";
 import { SPECIAL_TYPES } from "./catalog.js";
-import { DEALS, SIDES, signDeal, cancelDeal, auditDeals, dealAvailable, cancelPenalty } from "./neighbors.js";
+import { DEALS, SIDES, cancelDeal, auditDeals, dealAvailable, cancelPenalty, dealTerms } from "./neighbors.js";
 import { buildingName } from "./names.js";
 import { advanceYear, updateStrikes, readPopulation, blankPopulation, serviceQuality } from "./population.js";
 import { INDUSTRY, industryOf, ensureIndustry } from "./industry.js";
@@ -205,7 +205,10 @@ export function getStats(city) {
     available: Object.fromEntries(SPECIAL_TYPES.map((type) => [type, specialAvailable(city, type) && techAvailable(city, type)])),
     tech: Object.fromEntries(Object.keys(BUILDINGS).map((type) => [type, techAvailable(city, type)])),
     startYear: city.startYear,
-    petition: (() => { const p = openPetition(city); return p ? { ...p, ...PETITIONS[p.id] } : null; })(),
+    // The template first, so a petition that writes its own title, body or
+    // button labels - a neighbour's offer does, because every offer carries
+    // its own terms - overrides it rather than being overridden by it.
+    petition: (() => { const p = openPetition(city); return p ? { ...PETITIONS[p.id], ...p } : null; })(),
     neighbors: SIDES.map((side) => {
       const c = city._connections?.[side] || {};
       return { side, name: c.name, road: c.road || 0, rail: c.rail || 0, power: c.power || 0, water: c.water || 0,
@@ -214,7 +217,7 @@ export function getStats(city) {
     // What each deal is actually costing or earning this month, so the
     // neighbours panel can show the metered figure rather than a list price.
     deals: Object.fromEntries(Object.entries(city.deals || {}).map(([r, d]) => {
-      const terms = DEALS[r][d.kind];
+      const terms = dealTerms(city, r);
       const traded = r === "garbage"
         ? (d.kind === "sell" ? city._svc?.exported || 0 : terms.cap)
         : city._util?.[r]?.deal?.amount ?? 0;
@@ -222,7 +225,7 @@ export function getStats(city) {
         ...d, ...terms,
         traded: Math.round(traded),
         monthly: Math.max(terms.minimum || 0, Math.round(traded * terms.rate)),
-        penalty: cancelPenalty(r, d.kind),
+        penalty: cancelPenalty(terms),
         met: r === "garbage" ? true : city._util?.[r]?.deal?.met !== false,
       }];
     })),
@@ -271,8 +274,6 @@ export function setPolicy(city, key, value) {
       result = sound(city);
     } else if (key === "petition") {
       result = respondPetition(city, value?.id, !!value?.accept);
-    } else if (key === "deal") {
-      result = signDeal(city, value?.resource, value?.side, value?.kind);
     } else if (key === "cancelDeal") {
       result = cancelDeal(city, value);
     } else if (key === "name") {

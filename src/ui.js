@@ -769,7 +769,7 @@ export function mountUI(actions) {
   neighborSection.appendChild(el("div", "modal-section-title", "Neighbor Deals"));
   const neighborHint = el("p");
   neighborHint.style.cssText = "font-size:.6rem;color:var(--text-dim);line-height:1.5;margin:0 0 6px";
-  neighborHint.textContent = "Run a road, rail, power line or pipe to the map edge to connect with a neighbor. Connections bring trade and jobs; power lines and pipes allow deals.";
+  neighborHint.textContent = "Run a road, rail, power line or pipe to the map edge to connect with a neighbor. Connections bring trade and jobs. Once one is up, a neighboring mayor will call on you with terms whenever your city has a surplus or a shortfall — deals are signed in the Petition window, not here.";
   neighborSection.appendChild(neighborHint);
   const neighborList = el("div");
   neighborSection.appendChild(neighborList);
@@ -799,8 +799,9 @@ export function mountUI(actions) {
           continue;
         }
         if (!n.deals?.[r] || active) continue;
-        acts.appendChild(btn("btn btn-sm", `Buy ${r}`, `Buy ${r} from ${n.name}`, () => actions.setPolicy?.("deal", { resource: r, side: n.side, kind: "buy" })));
-        acts.appendChild(btn("btn btn-sm", `Sell ${r}`, `Sell ${r} to ${n.name}`, () => actions.setPolicy?.("deal", { resource: r, side: n.side, kind: "sell" })));
+        // The mayor does not go shopping: a neighbour with a use for the
+        // city's surplus, or a shortfall to cover, comes to the door.
+        acts.appendChild(el("span", "neighbor-open", `${r}: open to a deal`));
       }
       if (acts.children.length) row.appendChild(acts);
       neighborList.appendChild(row);
@@ -1153,7 +1154,7 @@ export function mountUI(actions) {
     "Police, fire, health and education coverage depends on distance and department funding in the Budget. Garbage needs landfills, an incinerator or a recycling center. Parks, trees and water raise land value; industry, pollution, crime and traffic lower it.",
     "Airports and seaports are zones too. Draw at least 3x5 for an airport (from 1930) or 2x6 for a seaport, give the block power, water and a road, and the Sims build the terminal once the city's commerce and industry need outside trade. A seaport only works on a shoreline, and pays best on a seacoast.",
     "Roads, rails, power lines and pipes that reach the map edge connect you to a neighbor: trade lifts demand, roads bring outside jobs, and lines or pipes let you buy or sell power and water. A seaport counts as a connection to every neighbor.",
-    "Population milestones unlock rewards such as the Mayor's House and City Hall. Petitioners offer money-making deals with strings attached. Every January the budget review pauses the game.",
+    "Population milestones unlock rewards such as the Mayor's House and City Hall. Petitioners bring money-making business deals with strings attached, and neighboring mayors bring power, water and garbage contracts on terms that change from offer to offer. Turn one down and the petitioner may never come back. Every January the budget review pauses the game.",
   ]);
   helpSection("Navigation", [
     ["WASD / ↑↓←→", "Pan the map"],

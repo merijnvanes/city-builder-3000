@@ -4,7 +4,7 @@ import { isAnchor, capacityOf } from "./lots.js";
 import { industryTraits } from "./industry.js";
 import { commerceTraits } from "./commerce.js";
 import { ORDINANCES } from "./city.js";
-import { DEALS } from "./neighbors.js";
+import { dealTerms } from "./neighbors.js";
 import { portUpkeep } from "./ports.js";
 
 export const LOAN_AMOUNT = 10000;
@@ -60,7 +60,7 @@ export function computeBudget(city) {
   // a minimum fee "if you didn't need any during the month". Selling pays the
   // contracted amount, and only when the network could deliver it.
   for (const [resource, deal] of Object.entries(city.deals || {})) {
-    const d = DEALS[resource]?.[deal.kind];
+    const d = dealTerms(city, resource);
     if (!d) continue;
     const traded = resource === "garbage"
       ? (deal.kind === "sell" ? city._svc?.exported || 0 : d.cap)

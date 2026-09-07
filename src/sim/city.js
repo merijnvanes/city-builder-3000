@@ -1,5 +1,5 @@
 import { effectState, parseEffects } from "./effects-state.js";
-// City state: tile schema, creation, save format (version 5).
+// City state: tile schema, creation, save format (version 6).
 import { generateTerrain, LAYOUTS, MAX_ELEVATION } from "./terrain.js";
 import { BUILDINGS, ZONE_TYPES, PORT_TYPES, ZONED_TYPES, ROAD_TYPES, FUNDED_DEPARTMENTS } from "./catalog.js";
 import { tileAt } from "./grid.js";
@@ -9,11 +9,12 @@ import { INDUSTRY_TYPES } from "./industry.js";
 import { COMMERCE_TYPES } from "./commerce.js";
 import { blankSiren, parseSiren, serializeSiren } from "./siren.js";
 import { OVERLOAD_MONTHS } from "./power.js";
+import { DEALS, SIDES, RATE_SPREAD, CAP_SPREAD } from "./neighbors.js";
 
 // Nothing holds more trash than the largest landfill tile.
 const MAX_FILL = Math.max(...Object.values(BUILDINGS).map((b) => b.hold || 0));
 
-export const SAVE_VERSION = 5;
+export const SAVE_VERSION = 6;
 export const DEFAULT_SIZE = 64;
 export const MAX_SIZE = 128;
 export const START_MONEY = 50000;
@@ -105,6 +106,31 @@ export function blankCity({ seed = 42, size = DEFAULT_SIZE, layout, name = "New 
   };
 }
 
+// One canonical shape for a petition, used on the way out and on the way in.
+// A petition may carry a neighbour's offer, which is money, so this copies
+// only the fields the game writes and holds the terms to what an offer can be.
+// Both directions go through it, so a save reproduces byte for byte however
+// the runtime happened to build the object.
+function petitionRecord(p) {
+  const out = { id: p.id, status: p.status, since: p.since };
+  for (const k of ["expires", "decidedAt", "buildBy"]) if (Number.isInteger(p[k])) out[k] = p[k];
+  if (p.never === true) out.never = true;
+  if (typeof p.topic === "string" && p.topic.length <= 40) out.topic = p.topic;
+  for (const k of ["title", "body", "accept", "decline"]) if (typeof p[k] === "string" && p[k].length <= 400) out[k] = p[k];
+  const d = p.deal;
+  if (d && DEALS[d.resource]?.[d.kind] && SIDES.includes(d.side)) {
+    const base = DEALS[d.resource][d.kind];
+    const within = (x, lo, hi) => (Number.isFinite(x) && x >= lo && x <= hi ? x : null);
+    out.deal = {
+      resource: d.resource, side: d.side, kind: d.kind,
+      rate: within(d.rate, base.rate * (1 - RATE_SPREAD), base.rate * (1 + RATE_SPREAD)) ?? base.rate,
+      cap: within(d.cap, base.cap * (1 - CAP_SPREAD), base.cap * (1 + CAP_SPREAD)) ?? base.cap,
+      minimum: within(d.minimum, 0, (base.minimum || 0) * (1 + RATE_SPREAD)) ?? base.minimum,
+    };
+  }
+  return out;
+}
+
 // ── save / load ───────────────────────────────────────────────
 const TERRAIN_CODE = { grass: 0, water: 1, sand: 2, rock: 3 };
 const TERRAIN_NAME = ["grass", "water", "sand", "rock"];
@@ -139,7 +165,7 @@ export function serialize(city) {
     disasters: city.disasters !== false,
     effects: effectState(city.effects),
     unlocked: city.unlocked ?? {},
-    petitions: city.petitions ?? [],
+    petitions: (city.petitions ?? []).map(petitionRecord),
     settings: city.settings ?? { yearEndBudget: true },
     deals: city.deals ?? {},
     people: serializePopulation(city.people),
@@ -252,12 +278,25 @@ export function deserialize(raw) {
     disasters: d.disasters !== false,
     effects: parseEffects(d.effects, size),
     unlocked: Object.fromEntries(Object.entries(d.unlocked || {}).filter(([k, v]) => BUILDINGS[k] && Number.isInteger(v))),
-    petitions: Array.isArray(d.petitions) ? d.petitions.filter((p) => p && typeof p.id === "string" && typeof p.status === "string" && Number.isInteger(p.since)).slice(0, 50).map((p) => ({ ...p })) : [],
+    petitions: Array.isArray(d.petitions) ? d.petitions.filter((p) => p && typeof p.id === "string" && typeof p.status === "string" && Number.isInteger(p.since)).slice(0, 50).map(petitionRecord) : [],
     settings: { yearEndBudget: d.settings?.yearEndBudget !== false },
     people: parsePopulation(d.people),
     roadCondition: Number.isFinite(d.roadCondition) && d.roadCondition >= 0 && d.roadCondition <= 100 ? d.roadCondition : 100,
     siren: parseSiren(d.siren),
-    deals: Object.fromEntries(Object.entries(d.deals || {}).filter(([k, v]) => ["power", "water", "garbage"].includes(k) && v && ["north", "east", "south", "west"].includes(v.side) && ["buy", "sell"].includes(v.kind)).map(([k, v]) => [k, { side: v.side, kind: v.kind, since: Number.isInteger(v.since) ? v.since : 0 }])),
+    // A contract keeps the price it was signed at, so the terms travel with
+    // it. They are money, so a save cannot be trusted to set them freely.
+    deals: Object.fromEntries(Object.entries(d.deals || {})
+      .filter(([k, v]) => ["power", "water", "garbage"].includes(k) && v && ["north", "east", "south", "west"].includes(v.side) && ["buy", "sell"].includes(v.kind))
+      .map(([k, v]) => {
+        const base = DEALS[k][v.kind];
+        const within = (x, lo, hi) => (Number.isFinite(x) && x >= lo && x <= hi ? x : null);
+        return [k, {
+          side: v.side, kind: v.kind, since: Number.isInteger(v.since) ? v.since : 0,
+          rate: within(v.rate, base.rate * (1 - RATE_SPREAD), base.rate * (1 + RATE_SPREAD)) ?? base.rate,
+          cap: within(v.cap, base.cap * (1 - CAP_SPREAD), base.cap * (1 + CAP_SPREAD)) ?? base.cap,
+          minimum: within(v.minimum, 0, (base.minimum || 0) * (1 + RATE_SPREAD)) ?? base.minimum,
+        }];
+      })),
   };
   if (d.scenario && typeof d.scenario === "object") city.scenario = d.scenario;
   // Every lot must be consistent: all its tiles reference the same anchor and share a type.

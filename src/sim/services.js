@@ -9,7 +9,7 @@ import { sitingFactor } from "./siting.js";
 import { PORTS, portTiles } from "./ports.js";
 import { readPopulation, NATIONAL_EQ, BASE_LIFE_EXPECTANCY } from "./population.js";
 import { ageFactor } from "./wear.js";
-import { DEALS } from "./neighbors.js";
+import { dealTerms } from "./neighbors.js";
 
 export const ROAD_REACH = 3;
 // Share of residents who pass through the courts in a year and need a cell.
@@ -177,7 +177,8 @@ export function updateServices(city) {
   let garbageProduced = population * 0.03 + jobs * 0.015;
   if (ord.recycling) garbageProduced *= 0.75;
   const garbageDeal = city.deals?.garbage;
-  if (garbageDeal?.kind === "buy") garbageProduced += DEALS.garbage.buy.cap;
+  const garbageCap = dealTerms(city, "garbage")?.cap ?? 0;
+  if (garbageDeal?.kind === "buy") garbageProduced += garbageCap;
 
   // Recycling first, then the incinerators, then the tips. "A contracted
   // neighbour will take all your excess garbage, meaning any garbage that
@@ -186,10 +187,10 @@ export function updateServices(city) {
   let left = Math.max(0, garbageProduced - recycleRate - burnRate);
   const buried = Math.min(left, landfillSpace);
   left -= buried;
-  const exported = garbageDeal?.kind === "sell" ? Math.min(left, DEALS.garbage.sell.cap) : 0;
+  const exported = garbageDeal?.kind === "sell" ? Math.min(left, garbageCap) : 0;
   const uncollected = left - exported;
   const garbage = garbageProduced > 0 ? Math.round(100 * uncollected / garbageProduced) : 0;
-  const garbageCapacity = recycleRate + burnRate + landfillSpace + (garbageDeal?.kind === "sell" ? DEALS.garbage.sell.cap : 0);
+  const garbageCapacity = recycleRate + burnRate + landfillSpace + (garbageDeal?.kind === "sell" ? garbageCap : 0);
   if (garbage > 0) for (const t of tiles) if (ZONE_TYPES.has(t.type)) t.pollution = Math.min(100, t.pollution + Math.round(garbage * 0.06));
 
   // ── Land value (before crime, so the result depends only on the

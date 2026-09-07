@@ -10,7 +10,7 @@
 import { components, forSquare, forRadius, tileAt } from "./grid.js";
 import { BUILDINGS, ZONED_TYPES, ROAD_TYPES } from "./catalog.js";
 import { isAnchor, anchorOf, drawOf, lotTiles } from "./lots.js";
-import { DEALS } from "./neighbors.js";
+import { dealTerms } from "./neighbors.js";
 import { plantOutput, OVERLOAD_RATIO } from "./power.js";
 import { pumpOutput, waterPollutionOf } from "./water.js";
 import { industryTraits } from "./industry.js";
@@ -37,7 +37,7 @@ function applyDeal(city, resource, netIds, supply, consumers, tilesKey) {
   if (!edge) return null;
   const net = netIds[edge.y * city.size + edge.x];
   if (net < 0) return null;
-  const d = DEALS[resource][deal.kind];
+  const d = dealTerms(city, resource);
   if (deal.kind === "buy") {
     // Work out that network's shortfall, and buy exactly that much.
     let demand = 0;

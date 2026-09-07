@@ -27,6 +27,7 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 | Siting | Stops need roads, stations need track | **Done.** See below |
 | Ports | Airports and seaports are zones the Sims develop, with a minimum footprint | **Done.** See below |
 | Neighbour deals | Purchases meter the deficit with a minimum fee; sales are an obligation; cancelling costs a large penalty | **Done.** See below |
+| Petitioners | Neighbours bring deals to the Meet window on terms that change; a rejected petitioner may never return | **Done.** See below |
 
 Other systems needing controlled comparisons against the original game include growth thresholds, land value, rewards, petitions and disaster severity. The manual describes behaviors but does not expose all numerical formulas. Exact balance requires repeatable reference-game experiments, not guessed constants.
 
@@ -412,6 +413,55 @@ take it upon themselves to assist you in the clean up costs. Be forewarned, a
 Mayor that is well prepared generally receives better treatment."* Losing six
 or more lots to a disaster now draws a relief grant, and a city with funded
 fire and police coverage receives about twice what a neglectful one gets.
+
+## Petitioners bring the deals, September 7
+
+Two rules, both about who does the approaching.
+
+**Neighbour deals are offered, not shopped for.** The manual says so four
+times, in four different chapters:
+
+> *"When these connections are in place and the conditions are right (you have
+> excess or insufficient resources or disposal means) the Mayor of the city
+> your connection runs to will approach you via the Petitioners Meet window
+> with terms for an import or export deal."*
+
+> *"Mayors from neighboring cities may approach you from time to time with
+> offers to sell power or water to you, or offers to pay you to supply them."*
+
+> *"If you are generating excess power or water and you have the appropriate
+> utilities connection in place, you may be approached by a neighbor looking
+> to purchase these resources."*
+
+> *"Look for Money-Making Neighbor Deals! If you have excess water, power, or
+> garbage disposal capacity, check in the Petitioner window for neighbors who
+> will pay you to supply these commodities."*
+
+The game had a shop: four sides times three resources times buy or sell, all
+available at any time from the Neighbours panel at a fixed list price. Now a
+neighbouring mayor turns up as a petition when the connection is up **and** the
+condition is right: short of power or water, or carrying more surplus than the
+contract would take, or with uncollected garbage, or with disposal capacity
+going spare. The Neighbours panel keeps the standing contracts and the cancel
+button, and marks the rest *open to a deal*.
+
+**The terms change from offer to offer.** *"Deals are updated periodically to
+reflect both your city's and the neighboring city's needs."* The price swings
+30% either way of the list rate and the cap 25%, so the same neighbour is worth
+$150 a month on one call and $90 on the next. A signed contract then keeps the
+price it was signed at: the terms live on the contract, not in the table, and
+the billing, the metering, the garbage throughput and the cancellation penalty
+all read them from there.
+
+**A rejected petitioner sometimes leaves for good.** *"If you reject the offer,
+the Petitioner leaves; sometimes they never come back."* One decline in three
+is permanent, rolled once at the moment of refusal so reopening the window
+cannot reroll it, and carried in the save. The rest stay away ten years, as
+before.
+
+Save version 6: contracts and petitions both carry more than they used to, and
+both are validated on load - a save cannot invent a rate outside what an offer
+could have been.
 
 ## Port zones, September 7
 
