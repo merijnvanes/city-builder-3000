@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { createCity, tick, getStats, place, evaluate, serialize, deserialize, setPolicy, disaster, refresh, inspectTile, TOOLS, BUILDINGS } from "../src/sim/index.js";
 import { generateTerrain } from "../src/sim/terrain.js";
 import { findLot, assignLot, capacityOf, isAnchor, anchorOf } from "../src/sim/lots.js";
-import { computeDemand } from "../src/sim/growth.js";
+import { computeDemand, valueForStage } from "../src/sim/growth.js";
 import { computeMetrics } from "../src/sim/metrics.js";
 import { pumpOutput, hasSource } from "../src/sim/water.js";
 import { MAX_LOANS, LOAN_YEARS, LOAN_MAX, LOAN_STEP } from "../src/sim/economy.js";
@@ -508,5 +508,59 @@ describe("auto budget", () => {
     tick(c);
     assert.equal(c.settings.yearEndBudget, true);
     assert.ok(c.news.some((n) => /budget review is back on/.test(n)));
+  });
+});
+
+// "Density sets the maximum density for a zone. Land value of the zone must be
+// very high in order for full density to be reached... Rising land values allow
+// zones to develop to higher densities, represented by taller, more exclusive
+// buildings."
+//
+// Very high, and the top of the ladder is the tallest artwork in the game, so
+// it matters that a determined mayor can actually get there. A starter town run
+// sixty years with schools, hospitals, parks and every good ordinance still puts
+// nothing at stage 4 in its high-density blocks, which reads like a dead tier
+// until the address is built for deliberately: concentrated civic investment and
+// no crime takes one lot to 62 against a threshold of 52.
+describe("the top of the growth ladder is reachable", () => {
+  const stageFor = (type, density, level) => valueForStage({ type, density }, level);
+
+  test("a lot given everything clears what full density asks", () => {
+    const c = createCity({ seed: 12, starter: false, layout: "plains", hills: 0 });
+    c.money = 500_000_000;
+    c.unlocked = Object.fromEntries(["operahouse", "cathedral", "university"].map((k) => [k, true]));
+    const CX = 32, CY = 32;
+    const at = (x, y, t, o) => place(c, x, y, t, { ...o, deferRefresh: true });
+    at(CX, CY, "residential", { density: 3 });
+    at(CX, CY - 1, "road");
+    // The line stops short of the doorstep: a pylon on it is worth -9.
+    for (let x = CX - 6; x <= CX + 6; x++) { at(x, CY - 5, "powerline"); at(x, CY - 5, "pipe"); }
+    at(CX - 7, CY - 5, "watertower"); at(CX - 7, CY - 5, "powerline"); at(CX - 8, CY - 5, "coal");
+    for (const [x, y, t] of [[CX - 4, CY + 2, "police"], [CX + 2, CY + 2, "fire"], [CX - 4, CY - 4, "hospital"],
+                             [CX + 2, CY - 4, "school"], [CX + 6, CY + 2, "library"], [CX + 6, CY - 4, "museum"],
+                             [CX - 8, CY + 2, "operahouse"], [CX - 8, CY - 1, "cathedral"]]) at(x, y, t);
+    for (let y = CY - 12; y <= CY + 12; y++) for (let x = CX - 12; x <= CX + 12; x++) {
+      const t = c.tiles[y * c.size + x];
+      if (t && t.type === "empty" && !t.lot && t.terrain !== "water") { at(x, y, "largepark"); at(x, y, "park"); }
+    }
+    refresh(c);
+    const lot = c.tiles[CY * c.size + CX];
+    const needed = stageFor("residential", 3, 4);
+    assert.ok(lot.landValue > needed,
+      `the best address a mayor can build reached ${lot.landValue}, and full density asks ${needed}`);
+  });
+
+  // A ladder with rungs in the wrong order would let a tower go up on cheaper
+  // ground than the block beside it.
+  test("each rung asks more than the one below it", () => {
+    for (const type of ["residential", "commercial"]) {
+      for (const density of [1, 2, 3]) {
+        assert.ok(stageFor(type, density, 3) > stageFor(type, density, 2), `${type} d${density} stage 3`);
+        assert.ok(stageFor(type, density, 4) > stageFor(type, density, 3), `${type} d${density} stage 4`);
+      }
+      // And a taller band asks more than a shorter one at the same stage.
+      assert.ok(stageFor(type, 3, 4) > stageFor(type, 2, 4), `${type} density 3 stage 4`);
+      assert.ok(stageFor(type, 2, 4) > stageFor(type, 1, 4), `${type} density 2 stage 4`);
+    }
   });
 });

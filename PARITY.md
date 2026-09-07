@@ -1140,6 +1140,39 @@ are both inside what the model can produce. Riverton renewal wants its 60% in
 five years from $12,000 and a $25,000 loan, which is hard, but that is what a
 scenario is for.
 
+### The top of the growth ladder, September 7
+
+> *"Density sets the maximum density for a zone. Land value of the zone must be
+> very high in order for full density to be reached... Rising land values allow
+> zones to develop to higher densities, represented by taller, more exclusive
+> buildings."*
+
+This looked like a dead tier. A starter town run sixty years with every school,
+hospital, park and good ordinance, at zero tax, put **nothing** at stage 4 in
+its high-density blocks: density-3 residential peaked at land value 45 against
+a threshold of 52, and commercial at 34 against 38.
+
+It is not dead. A single lot built for deliberately — 139 parks, police, fire,
+hospital, school, library, museum, opera house and cathedral inside their
+radii, and the power line stopped two tiles short so no pylon sits on the
+doorstep — reaches **62**, before the ten points that power and water add. The
+threshold is meant to be hard and it is: *very high*, as the manual says.
+
+The term breakdown of the best lot in the failed attempt says where the earlier
+rigs went wrong: park coverage 24 out of a possible 160, and zero culture,
+health, police and fire, because the civic buildings sat outside their own
+radii. Crime at 48 took another 9.6 points off. Nothing was wrong with the model.
+
+Worth recording because it was nearly a mistake: on the strength of that first
+measurement the stage thresholds were about to be lowered. That is the fourth
+time in this session a bad rig pointed at a constant that turned out to be
+right — after the citywide crime mean, the citywide business-deal effects, and
+the "shared lots" filter that dropped the tiles hit hardest. **Check the
+instrument before changing the model.**
+
+`tests/sim.test.js` now pins both halves: that a determined mayor can clear full
+density, and that every rung of the ladder asks more than the one below it.
+
 ## Visual and performance work, September 7
 
 - Preserved and verified the previous agent's query-card sizing/rotation work.
