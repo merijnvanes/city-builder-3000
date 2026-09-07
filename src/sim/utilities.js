@@ -9,7 +9,7 @@
 // WATER_RADIUS (square) of one of its pipes, with the same budget rule.
 import { components, forSquare, forRadius, tileAt } from "./grid.js";
 import { BUILDINGS, ZONE_TYPES, ROAD_TYPES } from "./catalog.js";
-import { isAnchor, anchorOf, drawOf } from "./lots.js";
+import { isAnchor, anchorOf, drawOf, lotTiles } from "./lots.js";
 import { DEALS } from "./neighbors.js";
 import { plantOutput, OVERLOAD_RATIO } from "./power.js";
 import { pumpOutput, waterPollutionOf } from "./water.js";
@@ -90,6 +90,36 @@ function powerComponents(city) {
   return { ids, count };
 }
 
+// Hops from the nearest power plant, across the conducting grid. A brownout
+// works outward from the plants, so this decides who keeps the lights on.
+function distanceFromPlants(city, netIds) {
+  const { size, tiles } = city;
+  const dist = new Int32Array(tiles.length).fill(-1);
+  const queue = new Int32Array(tiles.length);
+  let head = 0, tail = 0;
+  for (const t of tiles) {
+    if (!isAnchor(t) || !BUILDINGS[t.type]?.powerOut) continue;
+    for (const cell of lotTiles(city, t.lot)) {
+      const i = cell.y * size + cell.x;
+      if (dist[i] === -1) { dist[i] = 0; queue[tail++] = i; }
+    }
+  }
+  const step = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+  while (head < tail) {
+    const i = queue[head++];
+    const x = i % size, y = (i - x) / size;
+    for (const [dx, dy] of step) {
+      const nx = x + dx, ny = y + dy;
+      if (nx < 0 || ny < 0 || nx >= size || ny >= size) continue;
+      const ni = ny * size + nx;
+      if (dist[ni] !== -1 || netIds[ni] < 0) continue;
+      dist[ni] = dist[i] + 1;
+      queue[tail++] = ni;
+    }
+  }
+  return dist;
+}
+
 function allocate(city, netIds, count, supply, consumers) {
   const budget = Float64Array.from(supply);
   const demand = new Float64Array(count);
@@ -126,6 +156,13 @@ export function updateUtilities(city) {
     if (draw > 0) powerConsumers.push({ anchor: t, net, draw });
   }
   if (city.ordinances?.energyConservation) for (const c of powerConsumers) c.draw *= 0.85;
+  // "Power will radiate as far as possible from the power station and then
+  // will just stop, leaving structures farthest from the plant without
+  // power." So when a grid is short, it is the outskirts that go dark, not an
+  // arbitrary scatter of buildings.
+  const hops = distanceFromPlants(city, power.ids);
+  for (const c of powerConsumers) c.reach = hops[c.anchor.y * size + c.anchor.x];
+  powerConsumers.sort((a, b) => (a.reach < 0 ? 1e9 : a.reach) - (b.reach < 0 ? 1e9 : b.reach));
   const powerDeal = applyDeal(city, "power", power.ids, powerSupply, powerConsumers, "powerTiles");
   const p = allocate(city, power.ids, power.count, powerSupply, powerConsumers);
   for (const t of tiles) {

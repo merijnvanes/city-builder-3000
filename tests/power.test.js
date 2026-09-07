@@ -1,7 +1,7 @@
 // Power plants: invention years, ageing, hilltop wind and overload failure.
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
-import { createCity, tick, getStats, place, serialize, deserialize, evaluate } from "../src/sim.js";
+import { createCity, tick, getStats, place, refresh, serialize, deserialize, evaluate } from "../src/sim.js";
 import { BUILDINGS, TECH_YEAR } from "../src/sim/catalog.js";
 import { plantOutput, OVERLOAD_MONTHS, isPlant } from "../src/sim/power.js";
 import { ageFactor, lifespanOf, WORN } from "../src/sim/wear.js";
@@ -138,6 +138,39 @@ describe("overload", () => {
     const bad = JSON.parse(serialize(c));
     bad.tiles[4 * c.size + 4][19] = OVERLOAD_MONTHS + 5;
     assert.throws(() => deserialize(JSON.stringify(bad)), /bad plant strain/);
+  });
+});
+
+describe("blackouts spread from the edges", () => {
+  // "Power will radiate as far as possible from the power station and then
+  // will just stop, leaving structures farthest from the plant without power."
+  test("a short grid keeps the near streets lit and drops the far ones", () => {
+    const c = createCity(21, true);
+    const plant = c.tiles.find((t) => t.lot?.x === t.x && t.lot?.y === t.y && isPlant(t));
+    c.money = 500_000;
+    place(c, plant.x, plant.y, "bulldoze");
+    place(c, plant.x, plant.y, "solar");
+    refresh(c);
+
+    const reach = (t) => Math.abs(t.x - plant.x) + Math.abs(t.y - plant.y);
+    const zoned = c.tiles.filter((t) => t.lot && t.type === "residential");
+    const lit = zoned.filter((t) => t.powered), dark = zoned.filter((t) => !t.powered);
+    assert.ok(lit.length > 0 && dark.length > 0, "this should be a brownout, not a blackout");
+    const mean = (a) => a.reduce((s, t) => s + reach(t), 0) / a.length;
+    assert.ok(mean(dark) > mean(lit) + 5, `dark ${Math.round(mean(dark))} vs lit ${Math.round(mean(lit))}`);
+  });
+
+  test("the nearest lot to the plant is never the one that goes dark", () => {
+    const c = createCity(21, true);
+    const plant = c.tiles.find((t) => t.lot?.x === t.x && t.lot?.y === t.y && isPlant(t));
+    c.money = 500_000;
+    place(c, plant.x, plant.y, "bulldoze");
+    place(c, plant.x, plant.y, "solar");
+    refresh(c);
+    const zoned = c.tiles.filter((t) => t.lot && t.type === "residential" && t.level);
+    const reach = (t) => Math.abs(t.x - plant.x) + Math.abs(t.y - plant.y);
+    zoned.sort((a, b) => reach(a) - reach(b));
+    assert.equal(zoned[0].powered, true, "the closest lot should still have power");
   });
 });
 

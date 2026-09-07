@@ -347,6 +347,23 @@ invisible.
 None of these refuse the placement. The game lets the mistake happen and then
 quietly does nothing with the building, and the query card says why.
 
+## Blackouts spread from the edges, September 7
+
+*"Most blackouts occur when a power station can't generate enough power to
+meet the demands of the area it serves. Power will radiate as far as possible
+from the power station and then will just stop, leaving structures farthest
+from the plant without power."*
+
+A short grid used to serve buildings in tile order, so a brownout blacked out
+a scattered, arbitrary set and told the player nothing. Consumers are now
+served outward from the nearest plant, measured in hops across the conducting
+grid, so the outskirts go dark first. Measured on one starter town with its
+plant swapped for a small one: the lots still lit average 33 tiles from the
+plant, the dark ones 52.
+
+That makes a brownout legible. The dark ring shows where the next plant
+belongs.
+
 ## Visual and performance work, September 7
 
 - Preserved and verified the previous agent's query-card sizing/rotation work.
