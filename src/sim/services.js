@@ -25,7 +25,10 @@ export function updateServices(city) {
   const { tiles, size } = city;
   const funding = city.funding || {};
   const ord = city.ordinances || {};
-  const pct = (dept) => (FUNDED_DEPARTMENTS.includes(dept) ? (funding[dept] ?? 100) / 100 : 1);
+  // "An over funded branch will waste money. Underfunding causes a loss of
+  // effectiveness of the branch." So the budget buys nothing above what the
+  // department asks for; the surplus is spent and lost.
+  const pct = (dept) => (FUNDED_DEPARTMENTS.includes(dept) ? Math.min(1, (funding[dept] ?? 100) / 100) : 1);
 
   // ── Road access: within ROAD_REACH of a road or rail tile ────
   for (const t of tiles) { t.roadAccess = false; t.svc = blankServices(); }
@@ -67,7 +70,7 @@ export function updateServices(city) {
     const b = BUILDINGS[t.type];
     if (!b?.service) continue;
     const s = b.service;
-    const budget = Math.min(1.25, pct(b.dept));
+    const budget = pct(b.dept);
     const powered = b.powerUse && !t.powered ? 0.35 : 1;
     let strength = (s.strength ?? 100) * budget * powered;
     if (s.kind === "police") strength *= jailFactor;

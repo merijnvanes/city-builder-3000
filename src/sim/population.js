@@ -152,7 +152,8 @@ export function serviceQuality(city, pop) {
     adultReach += Math.min(100, (t.svc?.education || 0) * 0.6 + (t.svc?.culture || 0));
   }
 
-  const staffing = (dept, strike) => (strike ? STRIKE_QUALITY : clamp((funding[dept] ?? 100) / 100, 0, 1.2));
+  // Money beyond what a department asks for is waste, not extra teachers.
+  const staffing = (dept, strike) => (strike ? STRIKE_QUALITY : clamp((funding[dept] ?? 100) / 100, 0, 1));
   const eduStaff = staffing("education", pop.strikes.education > 0);
   const healthStaff = staffing("health", pop.strikes.health > 0);
 

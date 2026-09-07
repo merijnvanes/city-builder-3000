@@ -8,6 +8,7 @@
 import { forRadius, NEIGHBORS4 } from "./grid.js";
 import { ZONE_TYPES, BUILDINGS } from "./catalog.js";
 import { isAnchor, capacityOf, lotTiles } from "./lots.js";
+import { roadCapacity } from "./roads.js";
 
 export const MAX_TRIP = 40;
 // Fallback share for callers without a demographic pyramid. The live value
@@ -171,10 +172,13 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
 
   const ord = city.ordinances || {};
   const carScale = (ord.carpool ? 0.9 : 1) * (ord.alternateDriving ? 0.75 : 1);
+  // Potholes cost capacity: the same commuters make a worse jam on a road the
+  // transport budget has stopped maintaining.
+  const surface = roadCapacity(city);
   const trafficOf = (i, load) => {
     const t = tiles[i];
-    if (kind[i] === ROAD) { let v = load[i] / TRAFFIC_PER_POINT * carScale; if (t.svc?.bus) v *= 0.75; return v; }
-    if (kind[i] === HIGHWAY) return load[i] / HIGHWAY_PER_POINT * carScale;
+    if (kind[i] === ROAD) { let v = load[i] / (TRAFFIC_PER_POINT * surface) * carScale; if (t.svc?.bus) v *= 0.75; return v; }
+    if (kind[i] === HIGHWAY) return load[i] / (HIGHWAY_PER_POINT * surface) * carScale;
     if (kind[i] === RAIL) return load[i] / RAIL_PER_POINT;
     return 0;
   };

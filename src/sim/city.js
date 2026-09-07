@@ -85,6 +85,7 @@ export function blankCity({ seed = 42, size = DEFAULT_SIZE, layout, name = "New 
     month: 0,
     ...defaultPolicies(),
     people: blankPopulation(),
+    roadCondition: 100,
     population: 0, happiness: 50,
     demand: { residential: 0, commercial: 0, industrial: 0 },
     history: [], news: [],
@@ -132,6 +133,7 @@ export function serialize(city) {
     settings: city.settings ?? { yearEndBudget: true },
     deals: city.deals ?? {},
     people: serializePopulation(city.people),
+    roadCondition: city.roadCondition ?? 100,
   });
 }
 
@@ -232,6 +234,7 @@ export function deserialize(raw) {
     petitions: Array.isArray(d.petitions) ? d.petitions.filter((p) => p && typeof p.id === "string" && typeof p.status === "string" && Number.isInteger(p.since)).slice(0, 50).map((p) => ({ ...p })) : [],
     settings: { yearEndBudget: d.settings?.yearEndBudget !== false },
     people: parsePopulation(d.people),
+    roadCondition: Number.isFinite(d.roadCondition) && d.roadCondition >= 0 && d.roadCondition <= 100 ? d.roadCondition : 100,
     deals: Object.fromEntries(Object.entries(d.deals || {}).filter(([k, v]) => ["power", "water", "garbage"].includes(k) && v && ["north", "east", "south", "west"].includes(v.side) && ["buy", "sell"].includes(v.kind)).map(([k, v]) => [k, { side: v.side, kind: v.kind, since: Number.isInteger(v.since) ? v.since : 0 }])),
   };
   if (d.scenario && typeof d.scenario === "object") city.scenario = d.scenario;

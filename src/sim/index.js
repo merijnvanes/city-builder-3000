@@ -23,6 +23,7 @@ import { INDUSTRY, industryOf, ensureIndustry } from "./industry.js";
 import { agePlants, plantOutput, OVERLOAD_MONTHS } from "./power.js";
 import { agePumps, pumpOutput, hasSource, SOURCE_REACH } from "./water.js";
 import { fillLandfills, landfillLoad, landfillNews } from "./waste.js";
+import { advanceRoads, roadCapacity } from "./roads.js";
 import { ageFactor } from "./wear.js";
 
 export { TOOLS, TOOL_MAP, BUILDINGS, ZONE_TYPES, ORDINANCES, ADVISORS, DISASTERS, START_YEAR, DEFAULT_SIZE, FUNDED_DEPARTMENTS, SPECIAL_TYPES, PETITIONS, DEALS, SIDES, serialize, place, evaluate, isZone };
@@ -85,6 +86,8 @@ export function tick(city) {
   const tipsBefore = landfillLoad(city);
   fillLandfills(city, city._svc?.buried || 0);
   monthNews.push(...landfillNews(city, tipsBefore, landfillLoad(city)));
+  // Roads wear out unless the transport budget keeps them up.
+  monthNews.push(...advanceRoads(city));
   advanceEffects(city);
 
   refreshCity(city);
@@ -330,6 +333,13 @@ export function inspectTile(city, x, y) {
       details.push(`City landfills: ${Math.round(100 * landfillLoad(city))}% full (${(m.landfillSpace || 0).toLocaleString()} tons of space left)`);
       if (!t.roadAccess) details.push("No road: this landfill is decommissioned and slowly decomposing.");
     }
+    // Streets and highways share one surface, kept up by the transport budget.
+    if (b.path && t.type !== "rail" && t.type !== "subway") {
+      const surface = Math.round(city.roadCondition ?? 100);
+      const state = surface >= 90 ? "well maintained" : surface >= 70 ? "wearing" : surface >= 45 ? "potholed" : "breaking up";
+      details.push(`Surface: ${surface}% — ${state}`);
+    }
+    if (t.type === "road" && t.terrain === "water") description = "Bridge.";
   } else {
     description = t.trees ? `${["", "Scattered trees", "Woodland", "Dense forest"][t.trees]} on ${t.terrain}.` : `Undeveloped ${t.terrain}.`;
   }

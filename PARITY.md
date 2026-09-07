@@ -15,6 +15,7 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 
 | Industry | Farms, heavy industry, manufacturing and high tech, the last attracted by an educated workforce | **Done.** See below |
 
+| Budget | Over-funding wastes money; the road budget keeps roads from falling apart | **Done.** See below |
 | Zone stages | Land value gates how far a zone builds out within its density | **Done.** See below |
 | Waste | Landfills store trash, fill up, decompose and cannot be bulldozed; incinerators age | **Done.** See below |
 | Aura | A per-neighbourhood mood map whose average is the mayoral approval rating | **Done.** See below |
@@ -188,6 +189,29 @@ Incinerators and recycling centres now lose capacity with age on the shared
 wear curve, and two more pieces from the manual arrived: the **waste-to-energy
 plant** (2000), which burns refuse and returns power, with original artwork,
 and the **Trash Presort** ordinance, which raises recycling throughput 40%.
+
+## What the budget buys, September 7
+
+Two lines from the manual's budget page that the game ignored.
+
+*"An over funded branch will waste money. Underfunding causes a loss of
+effectiveness of the branch."* Funding above 100% bought up to 25% extra
+coverage and teaching. It now buys nothing: the surplus is spent and lost,
+exactly as the manual describes, while underfunding still costs effect.
+
+*"Road Budget - Pays for road and highway maintenance, and keeps roads from
+falling apart."* Roads never wore out. The network now carries a condition
+that drifts toward what the transport budget sustains: 100% at full funding,
+down to a floor of 25 with none. A worn surface carries fewer cars before it
+jams, so skimping shows up as congestion a year or two later rather than at
+once. Measured on one starter town, five years at 20% funding took the
+condition to 40 and average traffic from 16 to 29; restoring the budget
+brought both back over four years. Two warnings on the way down and one
+all-clear on the way up, and querying any street reports its surface.
+
+A regression test now checks that every building carrying a number the player
+has to manage still reports it when queried. Two such lines had been lost to
+an earlier edit without anything noticing.
 
 ## Visual and performance work, September 7
 
