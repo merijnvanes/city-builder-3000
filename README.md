@@ -112,3 +112,8 @@ Tool shortcuts are shown in the tooltips of the tool dock.
 - `src/main.js` — game loop, saves, wiring
 
 City Builder 3000 is an original work. No copyrighted assets are used.
+
+Ground shadows (trees, lots, aircraft and UFOs) and streetlight glow are clipped to the map's
+terrain boundary in every camera orientation. Raised artwork can overhang it.
+Run `node tests/ground-effects.mjs` against the dev server on port 4173 to check
+this distinction in a real Canvas renderer.

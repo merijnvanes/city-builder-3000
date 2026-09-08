@@ -1,3 +1,4 @@
+import { withGroundClip } from './ground-effects.js';
 import { civicSpriteSpec } from './civic-sprites.js';
 import { drawMapBackdrop, drawBoat, drawOutageMarkers, drawAirplane } from "./scene-art.js";
 // Isometric Canvas 2D renderer. Static ground and buildings are painted into
@@ -122,12 +123,23 @@ export class CityRenderer {
         c[vy * w + vx] = count ? (sum / count) * ELEV_PX : 0;
       }
     }
+    const boundary = [];
+    for (let i = 0; i <= n; i++) boundary.push(c[i], c[n * w + i], c[i * w], c[i * w + n]);
+    const boundaryKey = boundary.join(',');
+    if (boundaryKey !== this.terrainBoundaryKey) this.terrainBoundaryRevision = (this.terrainBoundaryRevision || 0) + 1;
+    this.terrainBoundaryKey = boundaryKey;
     this.corners = c;
     this.tiles = city.tiles;
   }
   project(x, y, z = 0) {
     const p = this.orient(x, y);
     return { x: this.cx + this.panX + (p.x - p.y) * TILE_W * this.zoom, y: this.cy + this.panY + (p.x + p.y - (this.size || 64)) * TILE_H * this.zoom - (z + this.groundZ(x, y)) * this.zoom };
+  }
+  projectGround(x, y) {
+    const platform = this.platform;
+    this.platform = null;
+    try { return this.project(x, y); }
+    finally { this.platform = platform; }
   }
   pickFlat(sx, sy) {
     const dx = (sx - this.cx - this.panX) / (TILE_W * this.zoom);
@@ -468,7 +480,8 @@ export class CityRenderer {
       if (t.lot?.x === t.x && t.lot?.y === t.y && visible(t.x, t.y)) this.platformFor(t);
       this.platform = null;
     }
-    // Shadows for every lot.
+    // Shadows for every lot share one clip.
+    withGroundClip(this, () => {
     for (const t of this.sorted) {
       if (!t.lot || t.lot.x !== t.x || t.lot.y !== t.y) continue;
       if (!visible(t.x, t.y)) continue;
@@ -493,12 +506,14 @@ export class CityRenderer {
       this.platform = null;
     }
 
+    });
+
     if (this.night) {
       ctx.fillStyle = '#10284288'; ctx.fillRect(0, 0, this.w, this.h);
     }
-    if (this.night && this.zoom > 0.5) for (const t of this.sorted) {
-      if (hasStreetLamp(t) && visible(t.x, t.y)) drawStreetLamp(this, t, true);
-    }
+    if (this.night && this.zoom > 0.5) withGroundClip(this, () => {
+      for (const t of this.sorted) if (hasStreetLamp(t) && visible(t.x, t.y)) drawStreetLamp(this, t, true);
+    });
 
     if (this.overlay !== "none") {
       ctx.fillStyle = "#1a222a55";
@@ -639,7 +654,7 @@ export class CityRenderer {
         const p = this.project(x, y, this.flightAltitude + Math.sin(a * 2) * 8);
         const next = this.project(x - Math.sin(a) * 0.09, y + Math.cos(a) * 0.06, this.flightAltitude + Math.sin(a * 2) * 8);
         const shadow = this.project(x, y);
-        ctx.fillStyle = "#20333d22"; ctx.beginPath(); ctx.ellipse(shadow.x, shadow.y, 7 * this.zoom, 2.5 * this.zoom, 0, 0, Math.PI * 2); ctx.fill();
+        withGroundClip(this, () => { ctx.fillStyle = "#20333d22"; ctx.beginPath(); ctx.ellipse(shadow.x, shadow.y, 7 * this.zoom, 2.5 * this.zoom, 0, 0, Math.PI * 2); ctx.fill(); }, ctx);
         aircraft.push({ p, heading: Math.atan2(next.y - p.y, next.x - p.x) });
       }
     }
@@ -707,7 +722,7 @@ export class CityRenderer {
           ctx.fillStyle = `rgba(170,255,200,${0.22 + 0.1 * Math.sin(time * 0.03)})`;
           ctx.beginPath(); ctx.moveTo(p.x - 5 * z, p.y); ctx.lineTo(p.x + 5 * z, p.y); ctx.lineTo(g.x + 18 * z, g.y + 4 * z); ctx.lineTo(g.x - 18 * z, g.y + 4 * z); ctx.closePath(); ctx.fill();
         }
-        ctx.fillStyle = "#00000022"; ctx.beginPath(); ctx.ellipse(g.x, g.y + 2 * z, 18 * z, 6 * z, 0, 0, Math.PI * 2); ctx.fill();
+        withGroundClip(this, () => { ctx.fillStyle = "#00000022"; ctx.beginPath(); ctx.ellipse(g.x, g.y + 2 * z, 18 * z, 6 * z, 0, 0, Math.PI * 2); ctx.fill(); }, ctx);
         ctx.fillStyle = "#59616d"; ctx.beginPath(); ctx.ellipse(p.x, p.y + 2 * z, 28 * z, 8 * z, 0, 0, Math.PI * 2); ctx.fill();
         ctx.fillStyle = "#7d8794"; ctx.beginPath(); ctx.ellipse(p.x, p.y, 28 * z, 8 * z, 0, Math.PI, 0); ctx.fill();
         ctx.fillStyle = "#b7cad9"; ctx.beginPath(); ctx.ellipse(p.x, p.y - 5 * z, 11 * z, 7.5 * z, 0, Math.PI, 0); ctx.fill();

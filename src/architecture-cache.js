@@ -35,7 +35,8 @@ export function drawCachedArchitecture(r, t, city) {
   if (!cache || cache.key !== key || cache.tiles !== city.tiles) {
     cache = { key, tiles: city.tiles, bytes: 0, sprites: new Map() }; caches.set(r, cache);
   }
-  const state = [t.type, t.density, t.level, t.variant, t.abandoned, t.age === 0, t.elev, t.powered, t.x, t.y, t.lot.w, t.lot.h].join(':');
+  const edgeLot = t.x === 0 || t.y === 0 || t.x + t.lot.w === r.size || t.y + t.lot.h === r.size;
+  const state = [t.type, t.density, t.level, t.variant, t.abandoned, t.age === 0, t.elev, t.powered, t.x, t.y, t.lot.w, t.lot.h, edgeLot ? r.terrainBoundaryRevision : 0].join(':');
   const epoch = r.paintEpoch || 0;
   let sprite = cache.sprites.get(t);
   if (sprite && sprite.state !== state) {
@@ -74,6 +75,10 @@ export function drawCachedArchitecture(r, t, city) {
     const base = canvas.getContext('2d'); base.scale(r.dpr, r.dpr);
     const proxy = Object.assign(Object.create(r), { base, atlasOwner: r, zoom: scale });
     proxy.project = (a, b, z = 0) => { const p = relative(a, b, z); return { x: p.x - left, y: p.y - top }; };
+    proxy.projectGround = (a, b) => {
+      const p = r.projectGround(a, b);
+      return { x: (p.x - anchor.x) * ratio - left, y: (p.y - anchor.y) * ratio - top };
+    };
     drawArchitecture(proxy, t);
     sprite = { canvas, dx: left, dy: top, bytes, state };
     cache.bytes += bytes; cache.sprites.set(t, sprite);

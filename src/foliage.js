@@ -1,9 +1,10 @@
 // Small, deterministic tree silhouettes shared by lots and natural forests.
 // Screen-space crowns stay legible at city scale as the map rotates.
 import { random } from './building-art.js';
+import { withGroundClip } from './ground-effects.js';
 
 function paintTree(r, x, y, variant = 0) {
-  const z = r.zoom, ctx = r.base;
+  const z = r.zoom;
   const seed = random(x, y, variant);
   const species = ((variant % 3) + 3) % 3;
   const height = 13 + seed * 9;
@@ -13,11 +14,6 @@ function paintTree(r, x, y, variant = 0) {
     ? ['#203e32', '#2a4d3b', '#385b42', '#486849', '#55744e']
     : ['#304d2b', '#416432', '#587d3b', '#71934b', '#8aa75a'];
 
-  // Contact shadow and a longer soft cast shadow underneath the trunk.
-  ctx.fillStyle = '#24352328';
-  ctx.beginPath(); ctx.ellipse(foot.x - 4 * z, foot.y + 2 * z, 9 * z, 3.4 * z, -0.12, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#24352336';
-  ctx.beginPath(); ctx.ellipse(foot.x, foot.y, 2.3 * z, 1.1 * z, 0, 0, Math.PI * 2); ctx.fill();
   r.line(foot, r.project(x, y, height + 1), '#655239', 1.6);
   if (z >= 0.85) r.line({ x: foot.x + 0.45 * z, y: foot.y - z }, { x: foot.x + 0.45 * z, y: crown.y + 3 * z }, '#9b8054', 0.45);
 
@@ -62,10 +58,24 @@ function paintTree(r, x, y, variant = 0) {
   }
 }
 
+function drawTreeShadow(r, x, y) {
+  const z = r.zoom, ctx = r.base, foot = r.project(x, y);
+  const paint = () => {
+    // Contact shadow and a longer soft cast shadow underneath the trunk.
+    ctx.fillStyle = '#24352328';
+    ctx.beginPath(); ctx.ellipse(foot.x - 4 * z, foot.y + 2 * z, 9 * z, 3.4 * z, -0.12, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#24352336';
+    ctx.beginPath(); ctx.ellipse(foot.x, foot.y, 2.3 * z, 1.1 * z, 0, 0, Math.PI * 2); ctx.fill();
+  };
+  if (x >= 1 && y >= 1 && x <= r.size - 1 && y <= r.size - 1) paint();
+  else withGroundClip(r, paint);
+}
+
 // A small atlas of deterministic crowns keeps forests cheap while panning.
 // Cache belongs to the renderer and is discarded on scale/lighting changes.
 const atlases = new WeakMap();
 export function drawTree(r, x, y, variant = 0) {
+  drawTreeShadow(r, x, y);
   if (typeof document === 'undefined') return paintTree(r, x, y, variant);
   const dpr = Math.max(2, r.dpr || 1), scale = 2;
   const key = `${scale}:${dpr}:${!!r.night}`;
