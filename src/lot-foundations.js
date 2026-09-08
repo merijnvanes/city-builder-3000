@@ -54,9 +54,10 @@ export function drawLotFoundation(r,t,cell=null) {
   const old=r.platform,polygons=[];
   try {
     r.platform=0;
-    // Keep the complete skirt at terraced corners. The pad and nearer
-    // terrain cover its inner faces; culling opens the far corner again.
-    for(const {a,b,top,shade} of foundationEdges(r,t,cell)) {
+    // Keep the complete skirt, but paint rear faces first. At a lowered
+    // corner their projections overlap the visible wall below the pad.
+    const edges=foundationEdges(r,t,cell).sort((a,b)=>Number(a.facing)-Number(b.facing));
+    for(const {a,b,top,shade} of edges) {
       const points=[r.project(a[0],a[1],top),r.project(b[0],b[1],top),r.project(...b),r.project(...a)];
       r.poly(points,shade);polygons.push(points);
     }

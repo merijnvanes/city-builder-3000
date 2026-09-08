@@ -69,6 +69,14 @@ only buried terrain and checks that every rendered ground pixel stays unchanged
 in all four views. It also changes the exterior terrain and checks that pixels
 inside the exposed retaining faces remain unchanged.
 
+The skirt draws rear faces before visible faces. At a lowered corner, the two
+faces overlap on screen below the pad; drawing a rear face last puts its shade
+across the visible wall. An isolated browser test checks the wall's exact color
+at all four lowered corners in every rotation, without terrain or cast shadows.
+The city-renderer test also checks exact wall colors after the terrain and tool
+grid pass, using a 3x3 lot and eight side or diagonal neighbor layouts in every
+rotation. Cast shadows are disabled for that color check.
+
 Foundations also participate in solid occlusion. Before a building is drawn,
 its pad and walls clear earlier solids from the transparent object layer,
 revealing the shaded ground cache underneath. The foundation and its building
