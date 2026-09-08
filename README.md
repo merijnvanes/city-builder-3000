@@ -215,6 +215,14 @@ steep sites require leveling, and zoning develops only level footprints.
 Checks: `pnpm test:foundations` (against the running development server), including
 terraced corner support and tree overlap at all four rotations.
 
+### Construction sites
+
+Zoned buildings use a separate construction site during their existing first
+month: exposed floor slabs and columns, materials, and a braced crane. The
+finished sprite appears when that construction state ends. Abandoned sites
+do not show cranes. Check `pnpm test:construction-art` against the development
+server.
+
 ### Sunlight and shadows
 
 The sun stays fixed in the world when the view rotates. Buildings and trees

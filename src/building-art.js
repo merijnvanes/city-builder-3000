@@ -1,6 +1,7 @@
 import { NIGHT_EXPOSURE, shadeHex } from './art-colors.js';
 export { NIGHT_EXPOSURE, shadeHex } from './art-colors.js';
 import { drawLotEffects } from './lot-art-effects.js';
+import {drawConstructionSite,isUnderConstruction} from './construction-art.js';
 import { drawCivicSprite, civicSpriteSpec } from './civic-sprites.js';
 export { preloadCivicSprites, civicSpriteStats, civicSpriteSpec, civicSpriteKey } from './civic-sprites.js';
 import { drawStadium } from "./civic-art.js";
@@ -741,6 +742,7 @@ export function drawArchitecture(r, t) {
   if (drawCivicSprite(r, t)) return;
   const lot = t.lot;
   if (!lot) { drawZoneMarker(r, t); return; }
+  if(isUnderConstruction(t)){drawConstructionSite(r,t,heightOf(t));return;}
   const n = t.variant ?? random(t.x, t.y);
   const level = Math.max(1, t.level || 1);
   const d = scoped(r, lot, !!t.abandoned, t.powered !== false);
@@ -749,5 +751,5 @@ export function drawArchitecture(r, t) {
   else if (t.type === "industrial") industrial(d, t, n, level, r);
   else if (RECIPES[t.type]) RECIPES[t.type](d, t, n, r);
   else { d.box(0.15, 0.15, 0.7, 0.7, 12, "#b0aa96"); }
-  drawLotEffects(r, t, heightOf(t));
+  drawLotEffects(r,t);
 }

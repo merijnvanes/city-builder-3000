@@ -4,6 +4,7 @@ import { zoneArtKey } from '../src/zone-art-key.js';
 import { civicSpriteSpec, civicSpriteKey } from '../src/civic-sprites.js';
 import { spriteVariant } from '../src/architecture-variation.js';
 import { drawLotEffects } from '../src/lot-art-effects.js';
+import {drawConstructionSite,isUnderConstruction} from '../src/construction-art.js';
 import { shadeHex, NIGHT_EXPOSURE } from '../src/art-colors.js';
 import { expectedZoneEntries } from './zone-art-contract.mjs';
 
@@ -29,16 +30,19 @@ test('residential architectural seed boundaries survive save/load and coordinate
   }
 });
 
-test('shared lot effects preserve night/abandonment colors and return crane pick bounds', () => {
+test('construction and abandonment preserve night colors and construction pick bounds', () => {
   const flat=[],lines=[],boxes=[];
-  const r={night:true,project:(x,y,z=0)=>({x:x*20,y:y*10-z}),flat:(...a)=>flat.push(a),line:(...a)=>lines.push(a),box:(...a)=>boxes.push(a)};
+  const r={night:true,orient:(x,y)=>({x,y}),project:(x,y,z=0)=>({x:x*20,y:y*10-z}),flat:(...a)=>flat.push(a),line:(...a)=>lines.push(a),box:(...a)=>boxes.push(a)};
   const tile={x:1,y:2,type:'residential',age:0,lot:{x:1,y:2,w:2,h:2}};
-  const bounds=drawLotEffects(r,tile,50);
-  assert.ok(bounds.top < -30);
-  assert.ok(lines.length>3);assert.equal(boxes.length,1);
-  assert.equal(lines[0][2],shadeHex('#d9c24a',NIGHT_EXPOSURE));
-  lines.length=0;
-  assert.equal(drawLotEffects(r,{...tile,abandoned:true},50),null);
+  assert.ok(isUnderConstruction(tile));
+  assert.equal(isUnderConstruction({...tile,age:1}),false);
+  assert.equal(isUnderConstruction({...tile,abandoned:true}),false);
+  const bounds=drawConstructionSite(r,tile,50);
+  assert.ok(bounds.y < -30);assert.equal(bounds.canvas,null);
+  assert.ok(lines.length>3);assert.ok(boxes.length>4);
+  assert.ok(lines.some(line=>line[2]===shadeHex('#d6b64b',NIGHT_EXPOSURE)));
+  lines.length=0;flat.length=0;
+  assert.equal(drawLotEffects(r,{...tile,abandoned:true}),null);
   assert.equal(flat.length,4);assert.equal(lines.length,0);
   assert.equal(flat[0][5],shadeHex('#6b6a4c',.55*NIGHT_EXPOSURE));
 });

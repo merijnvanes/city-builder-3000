@@ -1,6 +1,7 @@
 import { spriteVariant, spriteFrameKey } from './architecture-variation.js';
 import { zoneArtKey } from './zone-art-key.js';
 import { drawLotEffects } from './lot-art-effects.js';
+import {drawConstructionSite,isUnderConstruction} from './construction-art.js';
 import { CIVIC_SPRITES } from './civic-sprite-manifest.js';
 
 // Authored models are baked offline. One decoded image is shared by every lot
@@ -253,6 +254,7 @@ export function civicSpriteSpec(t) {
 export function drawCivicSprite(r, t) {
   const spec = civicSpriteSpec(t);
   if (!spec || !r.base?.drawImage) return null;
+  if(isUnderConstruction(t))return drawConstructionSite(r,t,spec.height);
   const state = r.night ? t.powered === false || (spec.zone && t.abandoned) ? 'unpowered' : 'night' : 'day';
   const entry = requestFrame(civicSpriteKey(t), state, r.rotation || 0, r.atlasOwner || r, spriteVariant(t, spec.variants?.length || 1));
   if (!entry?.canvas) return null;
@@ -266,13 +268,6 @@ export function drawCivicSprite(r, t) {
   if (t.abandoned) { r.base.globalAlpha *= 0.7; r.base.filter = 'saturate(0.35)'; }
   r.base.drawImage(canvas, bounds.x, bounds.y, bounds.w, bounds.h);
   r.base.restore();
-  const effects = spec.zone && drawLotEffects(r, t, spec.height);
-  if (effects) {
-    const right=Math.max(bounds.x+bounds.w,effects.right),bottom=Math.max(bounds.y+bounds.h,effects.bottom);
-    bounds.x=Math.min(bounds.x,effects.left);bounds.y=Math.min(bounds.y,effects.top);
-    bounds.w=right-bounds.x;bounds.h=bottom-bounds.y;
-    // Temporary crane/scaffold pixels use the existing exact click-pixel path.
-    bounds.canvas=null;
-  }
+  if(spec.zone)drawLotEffects(r,t);
   return bounds;
 }
