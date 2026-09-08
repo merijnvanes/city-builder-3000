@@ -84,14 +84,37 @@ function trimFrames(current) {
   }
 }
 
+// The largest share of the export any current viewer draws. A frame nobody is
+// looking at yet is an explicit inspection preload, which keeps full pixels.
+function decodeQuality(entry) {
+  let quality = null;
+  for (const [ref] of entry.owners) {
+    const owner = ref.deref();
+    if (!owner) { entry.owners.delete(ref); continue; }
+    quality = Math.max(quality ?? 0, requestedQuality(owner, entry.scale));
+  }
+  for (const owner of entry.waiters) quality = Math.max(quality ?? 0, requestedQuality(owner, entry.scale));
+  return quality ?? 1;
+}
+
 function loadFrame(key, entry) {
   entry.loading = true;
   entry.ready = new Promise(resolve => {
     const image = new Image();
     image.onload = () => {
+      // Decode at the size the map actually draws, not the size it was baked
+      // at. Models bake at scale 3, roughly five times the pixels a default
+      // zoom shows, so holding one rotation at full resolution nearly fills
+      // the budget and a quarter turn evicts and reloads the whole city. The
+      // upgrade path in requestFrame still restores pixels on a closer look.
+      const quality = decodeQuality(entry);
+      const width = Math.max(1, Math.ceil(entry.frame.width * quality));
+      const height = Math.max(1, Math.ceil(entry.frame.height * quality));
       const canvas = document.createElement('canvas');
-      canvas.width = entry.frame.width; canvas.height = entry.frame.height;
-      canvas.getContext('2d', { willReadFrequently: true }).drawImage(image, 0, 0);
+      canvas.width = width; canvas.height = height;
+      const context = canvas.getContext('2d', { willReadFrequently: true });
+      context.imageSmoothingQuality = 'high';
+      context.drawImage(image, 0, 0, width, height);
       // An upgrade can be evicted while its image is loading. Its late result
       // must not add untracked bytes or resurrect an off-screen cache entry.
       const retained = entries.get(key) === entry;

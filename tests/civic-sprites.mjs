@@ -83,7 +83,12 @@ try {
     }
     pinned.pickables = []; pinned.dirty = false;
     drawCachedArchitecture(pinned, tile, city);
-    const activeViewRetained = pinned.pickables[0].canvas === pinnedCanvas;
+    // Frames decode at the resolution their viewers draw, so a second viewer
+    // at a closer zoom legitimately upgrades a shared frame; replaceCanvas
+    // swaps the buffer and migrates the picking records. What churn must never
+    // do is leave the active view without artwork, or with a coarser buffer.
+    const activeCanvas = pinned.pickables[0].canvas;
+    const activeViewRetained = !!activeCanvas && activeCanvas.width >= pinnedCanvas.width;
     // Exercise alpha picking at Retina snapping and non-integer zoom in every view.
     let retinaPicks = 0;
     for (let rotation = 0; rotation < 4; rotation++) {

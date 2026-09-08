@@ -30,7 +30,11 @@ try {
   tile.age=10;tile.abandoned=true;r.night=true;const abandonStart=loaded.length;await warm(tile);const abandoned=paint(tile);
   const unpowered=civicSpriteSpec(tile).frames['unpowered-0-v1'];
   if(loaded.slice(abandonStart).some(url=>!url.endsWith(unpowered.file)))throw new Error('Abandoned night artwork requested powered windows');
-  if(abandoned.canvas.width!==unpowered.width)throw new Error('Abandoned art did not use the unpowered frame');
+  // Frames decode at the resolution this viewer draws, so the canvas is a
+  // fraction of the export. Which frame was chosen is already proven by the
+  // requested file above; this checks the unpowered export is what decoded.
+  const drawn=Math.ceil(unpowered.width*Math.min(1,(r.zoom*(r.dpr||1))/civicSpriteSpec(tile).scale));
+  if(abandoned.canvas.width!==drawn)throw new Error('Abandoned art did not use the unpowered frame');
   // Stress a mixed city with every authored zone layout and all fixed types.
   r.zoom=.5;r.dpr=2;r.night=false;r.paintEpoch+=3;r.pickables=[];
   const fixtures=[];
