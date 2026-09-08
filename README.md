@@ -28,6 +28,37 @@ With Chrome installed, run `pnpm dev --port 4173` in one terminal and `pnpm test
 
 Gameplay fidelity and remaining verified gaps are tracked in [PARITY.md](PARITY.md).
 
+## Playing with an agent
+
+The running page exposes `window.civic.agent`, a command surface built for
+software rather than for a mouse. An agent drives the same city you are
+looking at, so you keep playing and watch it work.
+
+```js
+civic.agent.help()                              // every command, tool and policy
+civic.agent.state()                             // money, demand, budget, advisors
+civic.agent.overview()                          // the whole map as a character grid
+civic.agent.region(20, 20, 30, 20)              // one window in full detail
+civic.agent.objects({ problem: true })          // what is built and what is wrong
+civic.agent.find("coal", { near: { x: 30, y: 40 } })
+civic.agent.build("road", 22, 50, 22, 60)       // same drag the mouse makes
+civic.agent.run(12)                             // advance a year
+```
+
+Reach it from any browser automation with a single evaluate call, for example
+Playwright's `page.evaluate(() => civic.agent.state())`. There are no
+screenshots and no coordinate clicking.
+
+Every command that changes the city announces itself: a notice on screen, a
+line in the news ticker, and the camera moves to the work when it is off
+screen. `civic.agent.log()` replays what the agent did.
+
+The map accessors are level of detail on purpose. `overview()` and `field()`
+fold the map into a fixed grid, so they cost the same on a 64×64 map and a
+256×256 one. `region()` is bounded by the window you ask for. `objects()`
+scales with what is built, not with map area, and reports a 3×3 lot as one
+entry. Nothing ever returns the whole tile array.
+
 ## The game
 
 - **Maps** of 64×64, 96×96 or 128×128 tiles with rivers, coasts, lakes, beaches and forests. Start on empty land or with an established town, with $10K–$50K.
@@ -69,6 +100,7 @@ Tool shortcuts are shown in the tooltips of the tool dock.
 - `src/renderer.js`, `src/building-art.js` — isometric renderer and procedural architecture
 - `src/street-art.js`, `src/foliage.js`, `src/architecture-cache.js` — street details and bounded artwork caches
 - `src/ui.js`, `src/style.css` — the interface
+- `src/agent-api.js` — the `civic.agent` command surface, an adapter over the same paths the mouse drives
 - `src/main.js` — game loop, saves, wiring
 
 City Builder 3000 is an original work. No copyrighted assets are used.

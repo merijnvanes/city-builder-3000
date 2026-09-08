@@ -7,6 +7,7 @@ import { planConstruction, applyConstruction, createUndoManager } from "./constr
 import { attachInput } from "./input.js";
 import { CityAudio } from "./audio.js";
 import { SCENARIOS, startScenario, updateScenario } from "./scenarios.js";
+import { createAgentAPI } from "./agent-api.js";
 
 const SAVE_KEY = "city-builder-3000-save-v3";
 const MONTH_MS = 2500;
@@ -76,8 +77,11 @@ function restore() {
 
 function undoLast() {
   input?.cancel();
-  if (undo.undo(city)) { renderer.dirty = true; refresh(); ui.notify("Construction undone."); }
-  else ui.notify("Nothing to undo since the last simulation step.");
+  if (!undo.undo(city)) { ui.notify("Nothing to undo since the last simulation step."); return false; }
+  renderer.dirty = true;
+  refresh();
+  ui.notify("Construction undone.");
+  return true;
 }
 
 function setDensity(n) {
@@ -122,8 +126,44 @@ function loadFrom(raw, message) {
   } catch (err) { ui.notify(`That save could not be loaded: ${err.message}`); }
 }
 
+// Commit a construction plan. The mouse and the agent API both land here, so
+// pricing, undo, tips and the notice line behave the same either way.
+function commit(plan) {
+  const before = structuredClone(city);
+  const result = applyConstruction(city, plan);
+  if (result.ok) {
+    undo.record(before);
+    renderer.dirty = true;
+    refresh();
+    advanceTips();
+    audio.effect("build");
+    ui.notify(`${result.changed} tile${result.changed === 1 ? "" : "s"} · $${Math.round(result.cost).toLocaleString()}`);
+  } else {
+    audio.effect("error");
+    ui.notify(result.message || "Nothing to build here.");
+  }
+  return result;
+}
+
+// One simulated month. The clock in frame() and the agent's run() share it so
+// neither can drift from the other.
+function stepMonth() {
+  undo.clear();
+  const result = sim.tick(city);
+  const stats = refresh();
+  const goal = updateScenario(city, stats);
+  if (result.disaster) { ui.notify(result.disaster); audio.effect(/fire|riot/i.test(result.disaster) ? "siren" : "disaster"); }
+  if (goal) { ui.notify(goal); audio.effect("cash"); }
+  // Autosave every January.
+  if (city.month % 12 === 0) { try { localStorage.setItem(slotKey(0), sim.serialize(city)); } catch { /* storage full or blocked */ } }
+  return [result.disaster, goal].filter(Boolean);
+}
+
 const actions = {
   selectTool: choose, setSpeed, setDensity, undo: undoLast,
+  getSpeed: () => speed,
+  build: (tool, start, end, options) => commit(planConstruction(city, start, end, tool, options)),
+  stepMonths: (n) => { const events = []; for (let i = 0; i < n; i++) events.push(...stepMonth()); lastTick = performance.now(); return events; },
   setTax: (n) => { for (const key of ["residential", "commercial", "industrial"]) sim.setPolicy(city, `tax.${key}`, Number(n)); refresh(); },
   setPolicy: policy,
   renameCity: (name) => policy("name", name),
@@ -199,21 +239,7 @@ input = attachInput(canvas, renderer, {
   onChoose: choose, onSpeed: setSpeed, onUndo: undoLast, onHome: actions.home, onRotate: actions.rotate,
   onPreview: (plan) => ui.setBuildPreview?.(plan || { count: 0, cost: 0, valid: true, message: "" }),
   onInspect: (tile) => { selection = { x: tile.x, y: tile.y }; refreshSelection(); },
-  onCommit: (plan) => {
-    const before = structuredClone(city);
-    const result = applyConstruction(city, plan);
-    if (result.ok) {
-      undo.record(before);
-      renderer.dirty = true;
-      refresh();
-      advanceTips();
-      audio.effect("build");
-      ui.notify(`${result.changed} tile${result.changed === 1 ? "" : "s"} · $${Math.round(result.cost).toLocaleString()}`);
-    } else {
-      audio.effect("error");
-      ui.notify(result.message || "Nothing to build here.");
-    }
-  },
+  onCommit: commit,
 }, planConstruction);
 const minimap = createMinimap(renderer);
 refresh(); choose("inspect"); setDensity(1); setSpeed(0);
@@ -225,20 +251,17 @@ function frame(now) {
   const delta = Math.min(100, now - previousTime);
   previousTime = now;
   if (speed) animationTime += delta * speed;
-  if (speed && !document.hidden && now - lastTick > MONTH_MS / speed) {
-    undo.clear();
-    const result = sim.tick(city);
-    lastTick = now;
-    const stats = refresh();
-    const goal = updateScenario(city, stats);
-    if (result.disaster) { ui.notify(result.disaster); audio.effect(/fire|riot/i.test(result.disaster) ? "siren" : "disaster"); }
-    if (goal) { ui.notify(goal); audio.effect("cash"); }
-    // Autosave every January.
-    if (city.month % 12 === 0) { try { localStorage.setItem(slotKey(0), sim.serialize(city)); } catch { /* storage full or blocked */ } }
-  }
+  if (speed && !document.hidden && now - lastTick > MONTH_MS / speed) { stepMonth(); lastTick = now; }
   if (!document.hidden) { input.update(delta); renderer.render(city, animationTime); minimap.update(city); }
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
 
-window.civic = { get city() { return city; }, get renderer() { return renderer; }, getStats: () => sim.getStats(city), sim };
+window.civic = {
+  get city() { return city; },
+  get renderer() { return renderer; },
+  getStats: () => sim.getStats(city),
+  sim,
+  // Machine-facing command surface. Start with civic.agent.help().
+  agent: createAgentAPI({ getCity: () => city, actions, renderer, ui, undo }),
+};
