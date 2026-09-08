@@ -1,3 +1,4 @@
+import {terrainVertexHeight, drawLotFoundation} from './lot-foundations.js';
 import {TILE_W,TILE_H,ELEV_PX} from './render-scale.js';
 import {pickTransportSurface} from './surface-picking.js';
 import { drawBridgeFrame, bridgePlatform } from './bridge-art.js';
@@ -125,14 +126,7 @@ export class CityRenderer {
     const c = new Float32Array(w * w);
     for (let vy = 0; vy <= n; vy++) {
       for (let vx = 0; vx <= n; vx++) {
-        let sum = 0, count = 0;
-        for (const [dx, dy] of [[-1, -1], [0, -1], [-1, 0], [0, 0]]) {
-          const tx = vx + dx, ty = vy + dy;
-          if (tx < 0 || ty < 0 || tx >= n || ty >= n) continue;
-          const tile=city.tiles[ty*n+tx];
-          sum += tile.terrain==='water'?waterSurface(tile):(tile.elev || 0); count++;
-        }
-        c[vy * w + vx] = count ? (sum / count) * ELEV_PX : 0;
+        c[vy * w + vx] = terrainVertexHeight(city,vx,vy);
       }
     }
     const boundary = [];
@@ -438,29 +432,6 @@ export class CityRenderer {
     this.dirty = true;
   }
 
-  // Flat platform for a lot with retaining walls where the ground falls away.
-  platformFor(t) {
-    const { x, y, w, h } = t.lot;
-    const top = t.elev * ELEV_PX;
-    this.platform = null;
-    const corners = [[x, y], [x + w, y], [x + w, y + h], [x, y + h]];
-    const ground = corners.map(([cx, cy]) => this.groundZ(cx, cy));
-    this.platform = top;
-    const flatPts = corners.map(([cx, cy]) => this.project(cx, cy, 0));
-    this.platform = null;
-    // Walls on the two front edges, only where the ground is lower.
-    const front = [["south", 3, 2], ["east", 2, 1], ["north", 0, 1], ["west", 3, 0]];
-    const visible = [["south", "east"], ["east", "north"], ["north", "west"], ["west", "south"]][this.rotation || 0];
-    for (const [name, a, b] of front) {
-      if (!visible.includes(name)) continue;
-      if (ground[a] >= top - 0.5 && ground[b] >= top - 0.5) continue;
-      const pa = this.project(corners[a][0], corners[a][1], 0), pb = this.project(corners[b][0], corners[b][1], 0);
-      this.poly([flatPts[a], flatPts[b], pb, pa], name === "south" || name === "west" ? "#6f6a58" : "#8a836c");
-    }
-    this.platform = top;
-    this.poly(flatPts, t.terrain === "sand" ? "#b7b487" : t.terrain === "rock" ? "#615a53" : "#7c914b");
-  }
-
   // ── Static layer ──────────────────────────────────────────────
   paint(city) {
     this.paintEpoch = (this.paintEpoch || 0) + 1;
@@ -490,12 +461,11 @@ export class CityRenderer {
     }
     const visible = (x, y) => { const p = this.project(x, y); return p.x > -260 * this.zoom && p.x < this.w + 260 * this.zoom && p.y > -80 * this.zoom && p.y < this.h + 420 * this.zoom; };
 
-    for (const t of this.sorted) if (visible(t.x + 0.5, t.y + 0.5)) this.terrain(t, city);
-
-    // All platforms precede cast shadows, so adjacent lots cannot erase them.
-    for (const t of this.sorted) {
-      if (t.lot?.x === t.x && t.lot?.y === t.y && visible(t.x, t.y)) this.platformFor(t);
-      this.platform = null;
+    // Grade and retain each site tile in terrain paint order. A distant
+    // foundation cannot overwrite a road or hillside in front of it.
+    for (const t of this.sorted) if (visible(t.x + 0.5, t.y + 0.5)) {
+      this.terrain(t, city);
+      if(t.lot)drawLotFoundation(this,city.tiles[t.lot.y*city.size+t.lot.x],t);
     }
     // Shadows for every lot share one clip.
     withGroundClip(this, () => {
