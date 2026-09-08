@@ -6,8 +6,17 @@ import { CIVIC_SPRITES } from './civic-sprite-manifest.js';
 // Authored models are baked offline. One decoded image is shared by every lot
 // of its type; there is no 3D engine, model parsing or per-lot rasterization.
 const MAX_DECODED_BYTES = 32 * 1024 * 1024;
+// A turn of the camera swaps every sprite for a different file, so the angles
+// you are not looking at are kept ready at a fraction of the on-screen
+// resolution. That is enough to draw the instant you turn, and requestFrame's
+// upgrade path sharpens whichever angle you land on. Speculative art must never
+// crowd out art on screen, so it is only fetched while well under the budget
+// and, having no viewer, is always the first thing trimFrames releases.
+const PREFETCH_QUALITY = 0.6;
+const PREFETCH_HEADROOM = 0.6;
+const MAX_PREFETCH_QUEUE = 512;
 const entries = new Map();
-let bytes = 0, clock = 0;
+let bytes = 0, clock = 0, loads = 0, speculativeLoads = 0;
 
 function markActive(entry, owner) {
   if (!owner) return;
@@ -84,21 +93,28 @@ function trimFrames(current) {
   }
 }
 
-// The largest share of the export any current viewer draws. A frame nobody is
-// looking at yet is an explicit inspection preload, which keeps full pixels.
+// What to decode into. A frame someone is looking at gets the resolution they
+// draw it at. A frame held for an angle they might turn to gets a fraction of
+// that, enough to bridge the turn. A frame with no viewer at all is an explicit
+// inspection preload and keeps its full pixels.
 function decodeQuality(entry) {
-  let quality = null;
+  const active = activeQuality(entry);
+  if (active !== null) return active;
+  let requested = null;
   for (const [ref] of entry.owners) {
     const owner = ref.deref();
     if (!owner) { entry.owners.delete(ref); continue; }
-    quality = Math.max(quality ?? 0, requestedQuality(owner, entry.scale));
+    requested = Math.max(requested ?? 0, requestedQuality(owner, entry.scale));
   }
-  for (const owner of entry.waiters) quality = Math.max(quality ?? 0, requestedQuality(owner, entry.scale));
-  return quality ?? 1;
+  for (const owner of entry.waiters) requested = Math.max(requested ?? 0, requestedQuality(owner, entry.scale));
+  return requested === null ? 1 : requested * PREFETCH_QUALITY;
 }
 
 function loadFrame(key, entry) {
   entry.loading = true;
+  // A fetch for a frame someone is drawing counts against loads, whether it is
+  // the first one or a sharper replacement; anything else is warming ahead.
+  if (activeQuality(entry) !== null) loads++; else speculativeLoads++;
   entry.ready = new Promise(resolve => {
     const image = new Image();
     image.onload = () => {
@@ -142,7 +158,47 @@ function loadFrame(key, entry) {
   });
 }
 
-function requestFrame(type, state, rotation, owner, variant = 0) {
+// Angles the camera could turn to next, fetched while the browser is idle.
+const queuedFiles = new Set();
+const queue = [];
+let draining = false;
+
+const whenIdle = (fn) => (typeof requestIdleCallback === 'function' ? requestIdleCallback(fn, { timeout: 400 }) : setTimeout(fn, 50));
+
+// Speculative work stops well short of the cap. Past it, a big city simply
+// keeps today's behaviour of loading an angle the first time it is shown,
+// rather than thrashing frames that are on screen.
+const hasHeadroom = () => bytes < MAX_DECODED_BYTES * PREFETCH_HEADROOM;
+
+function drainPrefetch() {
+  draining = false;
+  for (let i = 0; i < 8 && queue.length && hasHeadroom(); i++) {
+    const job = queue.shift();
+    queuedFiles.delete(job.file);
+    const owner = job.owner.deref();
+    // Skip anything already resident, and anything whose renderer has gone.
+    if (owner && !entries.has(job.file)) requestFrame(job.type, job.state, job.rotation, owner, job.variant, true);
+  }
+  if (!queue.length || !hasHeadroom()) { queue.length = 0; queuedFiles.clear(); return; }
+  draining = true;
+  whenIdle(drainPrefetch);
+}
+
+function schedulePrefetch(type, state, rotation, owner, variant) {
+  const spec = CIVIC_SPRITES[type];
+  if (!owner?.warmRotations || !spec || !hasHeadroom() || queue.length >= MAX_PREFETCH_QUEUE) return;
+  const ref = new WeakRef(owner);
+  for (let angle = 0; angle < 4; angle++) {
+    if (angle === rotation) continue;
+    const frame = spec.frames[spriteFrameKey(state, angle, variant)];
+    if (!frame || entries.has(frame.file) || queuedFiles.has(frame.file)) continue;
+    queuedFiles.add(frame.file);
+    queue.push({ type, state, rotation: angle, variant, owner: ref, file: frame.file });
+  }
+  if (queue.length && !draining) { draining = true; whenIdle(drainPrefetch); }
+}
+
+function requestFrame(type, state, rotation, owner, variant = 0, speculative = false) {
   const spec = CIVIC_SPRITES[type];
   const frame = spec?.frames[spriteFrameKey(state, rotation, variant)];
   if (!frame || typeof Image === 'undefined') return null;
@@ -151,7 +207,8 @@ function requestFrame(type, state, rotation, owner, variant = 0) {
   if (entry) {
     entry.used = ++clock;
     markActive(entry, owner);
-    if (owner && !entry.failed && (!entry.canvas || entry.loading)) entry.waiters.add(owner);
+    // Speculative art never makes the renderer wait on it or repaint for it.
+    if (owner && !speculative && !entry.failed && (!entry.canvas || entry.loading)) entry.waiters.add(owner);
     const quality = requestedQuality(owner, spec.scale);
     if (entry.canvas && !entry.loading && !entry.failed && (entry.canvas.width < Math.ceil(frame.width * quality) || entry.canvas.height < Math.ceil(frame.height * quality))) {
       if (owner) entry.waiters.add(owner);
@@ -159,10 +216,12 @@ function requestFrame(type, state, rotation, owner, variant = 0) {
     }
     return entry;
   }
-  entry = { frame, scale: spec.scale, canvas: null, used: ++clock, waiters: new Set(owner ? [owner] : []), bytes: 0, owners: new Map(), rotation, night: state !== 'day' };
+  entry = { frame, scale: spec.scale, canvas: null, used: ++clock, waiters: new Set(owner && !speculative ? [owner] : []), bytes: 0, owners: new Map(), rotation, night: state !== 'day' };
   markActive(entry, owner);
   entries.set(key, entry);
   loadFrame(key, entry);
+  // Warm the other angles of anything actually drawn, never of a guess.
+  if (!speculative) schedulePrefetch(type, state, rotation, owner, variant);
   return entry;
 }
 
@@ -176,7 +235,10 @@ export async function preloadCivicSprites({ rotation = 0, night = false, powered
 }
 
 export function civicSpriteStats() {
-  return { entries: entries.size, decodedBytes: bytes, maxDecodedBytes: MAX_DECODED_BYTES };
+  // loads counts frames fetched because something drew them; speculativeLoads
+  // counts angles warmed ahead of a turn. Keeping them apart lets a test assert
+  // on drawing without depending on when the idle queue happens to drain.
+  return { entries: entries.size, decodedBytes: bytes, maxDecodedBytes: MAX_DECODED_BYTES, loads, speculativeLoads, prefetchQueued: queue.length };
 }
 
 export function civicSpriteKey(t) { return zoneArtKey(t) || t.type; }

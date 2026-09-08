@@ -39,6 +39,11 @@ export class CityRenderer {
     this.hover = null; this.preview = null; this.tool = "inspect"; this.overlay = "none"; this.night = false;
     this.dirty = true; this.lastRevision = -1; this.w = 0; this.h = 0; this.sorted = [];
     this.minZoom = 0.3; this.maxZoom = 2.8;
+    // A city view can be turned, and each angle is a different set of sprites.
+    // Say so, and the sprite cache warms the other three while the browser is
+    // idle. Portraits and offscreen probes build renderers without this
+    // constructor and stay lean, because they never rotate.
+    this.warmRotations = true;
     this.corners = null; this.platform = null; this.tiles = null;
     this.resizeObserver = new ResizeObserver(() => this.resize());
     this.resizeObserver.observe(canvas);

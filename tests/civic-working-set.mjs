@@ -73,7 +73,7 @@ async function setup(page, portraitHistory = false, zoom = .8) {
     const y = hit.y + (Math.floor(pixel / hit.canvas.width) + .5) / hit.canvas.height * hit.h;
     if (r.pickObject(x, y).x !== target.x) throw new Error('Reduced alpha mask lost picking alignment');
     window.artTest = { r, tiles, target, hit, preloadCivicSprites, civicSpriteStats, civicSpriteSpec, drawCachedArchitecture, CIVIC_SPRITES, get requests() { return requests; } };
-    return { types: tiles.length, reduced, requests, peak };
+    return { types: tiles.length, reduced, requests, peak, loads: civicSpriteStats().loads };
   }, { portraitHistory, zoom });
 }
 
@@ -81,9 +81,12 @@ try {
   let page = await browser.newPage();
   const initial = await setup(page);
   assert.equal(initial.types, 50);
-  assert.equal(initial.requests, 50, 'one load per gameplay type');
+  // Count frames fetched because something drew them. Total image requests also
+  // include angles warmed ahead of a turn, which land whenever the browser is
+  // idle and so cannot be asserted on exactly.
+  assert.equal(initial.loads, 50, 'one load per gameplay type');
   const upgrade = await page.evaluate(async () => {
-    const s = artTest, old = s.hit.canvas, before = s.requests;
+    const s = artTest, old = s.hit.canvas, before = s.civicSpriteStats().loads;
     s.r.zoom = 2.4; s.r.paintEpoch++; s.r.pickables = [];
     s.drawCachedArchitecture(s.r, s.target, { tiles: [] });
     const pendingHit = s.r.pickables[0];
@@ -92,7 +95,7 @@ try {
     if (pendingHit.canvas === old) throw new Error('Upgrade left a retired canvas in picking records');
     s.r.pickables = []; s.drawCachedArchitecture(s.r, s.target, { tiles: [] });
     if (s.r.pickables[0].canvas.width !== s.CIVIC_SPRITES[s.target.type].frames['day-0'].width) throw new Error('Close-up did not regain full resolution');
-    return { requests: s.requests - before, stats: s.civicSpriteStats() };
+    return { requests: s.civicSpriteStats().loads - before, stats: s.civicSpriteStats() };
   });
   assert.equal(upgrade.requests, 1);
   assert.ok(upgrade.stats.decodedBytes <= upgrade.stats.maxDecodedBytes);
@@ -102,7 +105,7 @@ try {
   const failed = await setup(page);
   await page.evaluate(file => { window.artworkFault = { file, kind: 'error' }; }, failed.reduced[0].file);
   const failure = await page.evaluate(async () => {
-    const s = artTest, old = s.hit.canvas, before = s.requests;
+    const s = artTest, old = s.hit.canvas, before = s.civicSpriteStats().loads;
     s.r.zoom = 2.4; s.r.paintEpoch++; s.r.pickables = [];
     s.drawCachedArchitecture(s.r, s.target, { tiles: [] });
     await s.preloadCivicSprites({ types: [s.target.type], variant: 0, owner: s.r });
@@ -110,7 +113,7 @@ try {
       s.r.pickables = []; s.drawCachedArchitecture(s.r, s.target, { tiles: [] });
       if (s.r.pickables[0].canvas !== old) throw new Error('Failed upgrade discarded usable artwork');
     }
-    return s.requests - before;
+    return s.civicSpriteStats().loads - before;
   });
   assert.equal(failure, 1, 'failed upgrades do not retry on every paint');
   await page.close();

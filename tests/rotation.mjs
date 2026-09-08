@@ -27,7 +27,7 @@ try {
     const canvas = document.createElement('canvas'); canvas.width = 2400; canvas.height = 2000;
     const r = Object.assign(Object.create(CityRenderer.prototype), {
       base: canvas.getContext('2d'), w: 1200, h: 1000, size: 64, zoom: .85, dpr: 1.6,
-      rotation: 0, night: false, panX: 0, panY: 0, platform: 0, paintEpoch: 1, pickables: [],
+      rotation: 0, night: false, panX: 0, panY: 0, platform: 0, paintEpoch: 1, pickables: [], warmRotations: true,
     });
     r.pick = () => ({ miss: true });
 
@@ -38,35 +38,46 @@ try {
 
     const phases = [];
     let peak = 0;
-    for (const [label, rotation] of [['first 0', 0], ['repaint 0', 0], ['first 1', 1], ['first 2', 2], ['first 3', 3], ['back 1', 1], ['back 0', 0]]) {
+
+    // What the player sees on a turn: how much of the city has artwork on the
+    // very first paint at the new angle, before anything has a chance to load.
+    // A cold angle draws nothing and the city visibly pops.
+    const turn = (label, rotation) => {
       r.rotation = rotation;
-      const before = requests;
-      paint(); await settle(); paint(); await settle();
+      r.paintEpoch++; r.pickables = [];
+      for (const t of lots) drawCachedArchitecture(r, t, { tiles: [] });
       const stats = civicSpriteStats();
       peak = Math.max(peak, stats.decodedBytes);
-      phases.push({ label, loads: requests - before, decodedBytes: stats.decodedBytes });
-    }
-    return { lots: lots.length, phases, peak, budget: civicSpriteStats().maxDecodedBytes };
+      phases.push({ label, rotation, drawn: r.pickables.filter(hit => hit.canvas).length });
+    };
+
+    r.rotation = 0; paint(); await settle(); paint(); await settle();
+    const cold = r.pickables.filter(hit => hit.canvas).length;
+    // Let the idle queue warm the other angles, the way it would while a player
+    // looks around before turning. Background tabs throttle timers, so wait on
+    // the queue draining rather than on a fixed delay.
+    for (let i = 0; i < 80 && (civicSpriteStats().prefetchQueued || i < 2); i++) await settle();
+
+    for (const [label, rotation] of [['turn to 1', 1], ['turn to 2', 2], ['turn to 3', 3], ['back to 0', 0]]) turn(label, rotation);
+    return { lots: lots.length, cold, phases, peak, budget: civicSpriteStats().maxDecodedBytes, stats: civicSpriteStats() };
   });
 
-  const at = label => result.phases.find(p => p.label === label);
   assert.ok(result.lots > 100, 'the starter town should place a substantial sprite working set');
-  assert.ok(at('first 0').loads > 0, 'the first paint loads the visible artwork');
-  assert.equal(at('repaint 0').loads, 0, 'a repaint at the same angle reloads nothing');
+  assert.equal(result.cold, result.lots, 'the starting angle should be fully drawn once loaded');
 
-  // The point of the whole exercise: a visited angle is already resident.
-  assert.equal(at('back 1').loads, 0, 'returning to a visited angle reloads nothing');
-  assert.equal(at('back 0').loads, 0, 'returning to the first angle reloads nothing');
+  // The whole point: every turn draws immediately. There are only four angles,
+  // so all of them are warmed while the camera sits still. A turn that has to
+  // fetch first is a turn the player watches the city reappear.
+  for (const phase of result.phases) {
+    assert.equal(phase.drawn, result.lots, `${phase.label}: only ${phase.drawn} of ${result.lots} lots had artwork on the first paint`);
+  }
 
-  // All four angles have to coexist for that to be possible.
   assert.ok(result.peak <= result.budget, `peak ${result.peak} exceeds budget ${result.budget}`);
-  const perAngle = at('first 0').decodedBytes;
-  assert.ok(perAngle * 4 <= result.budget, `one angle costs ${perAngle}; four must fit ${result.budget}`);
+  assert.ok(result.stats.speculativeLoads > 0, 'other angles should be warmed ahead of the turn');
 
   await page.close();
-  console.log(`rotation: ${result.lots} sprite lots, ${(perAngle / 1048576).toFixed(1)} MB per angle, ` +
-    `${(result.peak / 1048576).toFixed(1)} MB peak of ${(result.budget / 1048576).toFixed(0)} MB, ` +
-    `${result.phases.filter(p => p.label.startsWith('back')).every(p => !p.loads) ? 'no' : 'some'} reloads on return`);
+  console.log(`rotation: ${result.lots} sprite lots, ${result.stats.loads} drawn + ${result.stats.speculativeLoads} warmed, ` +
+    `${(result.peak / 1048576).toFixed(1)} MB peak of ${(result.budget / 1048576).toFixed(0)} MB, every turn fully drawn`);
 } finally {
   await browser.close();
 }
