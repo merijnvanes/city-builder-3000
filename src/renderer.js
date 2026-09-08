@@ -1,4 +1,6 @@
-import { drawBridgeFrame } from './bridge-art.js';
+import {TILE_W,TILE_H,ELEV_PX} from './render-scale.js';
+import {pickTransportSurface} from './surface-picking.js';
+import { drawBridgeFrame, bridgePlatform } from './bridge-art.js';
 import { surfaceStep } from './sim/structures.js';
 import { waterSurface } from './sim/surface-water.js';
 import { EDGE_DIRECTIONS } from './sim/neighbor-links.js';
@@ -29,8 +31,6 @@ const ZONE_TINT = {
   airport: { fill: "#9aa2b077", edge: "#dfe4ec" },
   seaport: { fill: "#4fa8b077", edge: "#c4ecef" },
 };
-const TILE_W = 32, TILE_H = 16;
-const ELEV_PX = 8; // screen pixels per terrain level at zoom 1
 
 export const OVERLAYS = ["none", "power", "water", "landvalue", "pollution", "crime", "traffic", "police", "fire", "health", "education", "garbage"];
 
@@ -103,7 +103,7 @@ export class CityRenderer {
   // interpolated between corner heights; while a lot is being drawn the
   // whole lot sits on a flat platform at its tile's level.
   groundZ(x, y) {
-    if (this.platform != null) return this.platform;
+    if (this.platform != null) return typeof this.platform==='function'?this.platform(x,y):this.platform;
     const tx=Math.max(0,Math.min(this.size-1,Math.floor(x))),ty=Math.max(0,Math.min(this.size-1,Math.floor(y)));
     const tile=this.tiles?.[ty*this.size+tx];
     if(x>=0 && y>=0 && x<=this.size && y<=this.size && tile?.terrain==='water')return waterSurface(tile)*ELEV_PX;
@@ -146,7 +146,7 @@ export class CityRenderer {
     this.corners = c;
     this.cornerRevision = city.revision;
     this.tiles = city.tiles;
-    this.bridgeDeckLevels=[...new Set((city.transportStructures || []).filter(s=>s.kind==='bridge').map(s=>s.elevation*ELEV_PX+4))].sort((a,b)=>b-a);
+    this.hasBridges=(city.transportStructures || []).some(s=>s?.kind==='bridge');
   }
   project(x, y, z = 0) {
     const p = this.orient(x, y);
@@ -169,11 +169,8 @@ export class CityRenderer {
   pick(sx, sy) {
     let p = this.pickFlat(sx, sy);
     if (!this.corners) return p;
-    if(this.overlay!=='water' && !['pipe','subway','substation'].includes(this.tool))for(const height of this.bridgeDeckLevels || []) {
-      const q=this.pickFlat(sx,sy+height*this.zoom);
-      if(q.x<0 || q.y<0 || q.x>=this.size || q.y>=this.size)continue;
-      const s=this.tiles?.[q.y*this.size+q.x]?.structure;
-      if(s?.kind==='bridge' && s.elevation*ELEV_PX+4===height)return q;
+    if(this.hasBridges && this.overlay!=='water' && !['pipe','subway','substation'].includes(this.tool)) {
+      const hit=pickTransportSurface(this,sx,sy);if(hit)return hit;
     }
     for (let i = 0; i < 3; i++) {
       const z = this.groundZ(p.x + 0.5, p.y + 0.5) * this.zoom;
@@ -344,7 +341,7 @@ export class CityRenderer {
     if (this.tool !== "inspect" && !water && this.zoom > 0.55) this.flat(x, y, 1, 1, 0.1, null, "#344b2833");
     if (!ROAD.has(t.type)) return;
     if(t.structure?.kind==='bridge') {
-      const ground=this.platform;this.platform=t.structure.elevation*ELEV_PX+4;
+      const ground=this.platform;this.platform=bridgePlatform(this,t);
       if(t.type==='rail')this.railBed(t,city);else drawStreet(this,t,city);
       drawBridgeFrame(this,t);this.platform=ground;return;
     }
@@ -640,10 +637,10 @@ export class CityRenderer {
         const east = t.x + 1 < city.size && carriesRoute(city.tiles[i + 1], hw ? "highway" : "road") && surfaceStep(t,city.tiles[i+1]), south = carriesRoute(city.tiles[i + city.size], hw ? "highway" : "road") && surfaceStep(t,city.tiles[i+city.size]);
         if (!east && !south) continue;
         const vertical = south && (!east || i % 2 === 0), f = (time * (hw ? 0.0003 : 0.00016) + random(t.x, t.y)) % 1, back = i % 3 === 0;
+        this.platform=bridgePlatform(this,t);
         const a = back ? 1 - f : f, p = this.project(t.x + (vertical ? (back ? 0.68 : 0.32) : a), t.y + (vertical ? a : back ? 0.68 : 0.32), 2.1);
-        if (p.x < -20 || p.x > this.w + 20 || p.y < -20 || p.y > this.h + 20) continue;
+        if (p.x < -20 || p.x > this.w + 20 || p.y < -20 || p.y > this.h + 20) {this.platform=null;continue;}
         const bus = i % 17 === 0;
-        this.platform=t.structure?.kind==='bridge'?t.structure.elevation*ELEV_PX+4:null;
         drawVehicle(this, t.x + (vertical ? (back ? 0.68 : 0.32) : a), t.y + (vertical ? a : back ? 0.68 : 0.32), vertical, back, bus ? "#4f9db1" : ["#e9dfbc", "#c5684e", "#739bab", "#e6e4d7", "#dfb45b"][i % 5], bus);
         this.platform=null;
       }
@@ -654,9 +651,9 @@ export class CityRenderer {
       const t = city.tiles[i];
       if (!carriesRoute(t, "rail") || !t.traffic || random(t.x, t.y, 5) > 0.12) continue;
       const f = (time * 0.0002 + random(t.x, t.y, 6)) % 1;
+      this.platform=bridgePlatform(this,t);
       const p = this.project(t.x + .5, t.y + .5, 3);
-      if (p.x < -20 || p.x > this.w + 20 || p.y < -20 || p.y > this.h + 20) continue;
-      this.platform=t.structure?.kind==='bridge'?t.structure.elevation*ELEV_PX+4:null;
+      if (p.x < -20 || p.x > this.w + 20 || p.y < -20 || p.y > this.h + 20) {this.platform=null;continue;}
       drawTrain(this, t, city, f);
       this.platform=null;
     }

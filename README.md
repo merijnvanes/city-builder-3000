@@ -164,7 +164,8 @@ Road, rail and highway drags across water now quote a complete straight bridge
 between dry banks at the same elevation. Cross one continuous stretch of water
 per drag; use separate drags for separate streams or islands. A span may cover
 at most 16 water tiles; clear the site first. Beam spans (1–4 tiles), trusses (5–10) and suspension
-spans (11–16) have different artwork. Cost is the route's tile price multiplied
+spans (11–16) have different artwork. Dry approach tiles slope between the level
+span and the adjoining road or track. Cost is the route's tile price multiplied
 by `length + 2 + 2 × length²`, including both approaches. Bridges cannot cross
 other bridges or tunnels, turn, or accept side connections.
 

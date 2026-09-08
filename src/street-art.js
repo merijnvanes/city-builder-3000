@@ -1,3 +1,4 @@
+import { bridgePlatform } from './bridge-art.js';
 import { surfaceStep, isPortal } from './sim/structures.js';
 import { outwardConnection } from './sim/neighbor-links.js';
 import { carriesRoute } from './sim/catalog.js';
@@ -114,18 +115,22 @@ export function hasStreetLamp(t) {
   return t.type === 'road' && t.terrain !== 'water' && (t.x + t.y) % 4 === 0;
 }
 export function drawStreetLamp(r, t, glow = false) {
-  const x = t.x + 0.075, y = t.y + 0.075;
-  const foot = r.project(x, y, 0.6), top = r.project(x, y, 13), head = r.project(x + 0.1, y, 13);
-  if (glow) {
-    const p = r.project(x + 0.35, y + 0.25), ctx = r.base;
-    const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 24 * r.zoom);
-    g.addColorStop(0, '#ffdb9359'); g.addColorStop(1, '#ffdb9300');
-    ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(p.x, p.y, 24 * r.zoom, 12 * r.zoom, 0, 0, Math.PI * 2); ctx.fill();
-    return;
-  }
-  r.line(foot, top, '#46575b', 1);
-  r.line(top, head, '#697879', 1.3);
-  r.line(head, { x: head.x + 2 * r.zoom, y: head.y }, r.night ? '#ffe3a0' : '#cdd6c9', 1.5);
+  const platform=r.platform;
+  if(t.structure?.kind==='bridge')r.platform=bridgePlatform(r,t);
+  try {
+    const x = t.x + 0.075, y = t.y + 0.075;
+    const foot = r.project(x, y, 0.6), top = r.project(x, y, 13), head = r.project(x + 0.1, y, 13);
+    if (glow) {
+      const p = r.project(x + 0.35, y + 0.25), ctx = r.base;
+      const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 24 * r.zoom);
+      g.addColorStop(0, '#ffdb9359'); g.addColorStop(1, '#ffdb9300');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(p.x, p.y, 24 * r.zoom, 12 * r.zoom, 0, 0, Math.PI * 2); ctx.fill();
+      return;
+    }
+    r.line(foot, top, '#46575b', 1);
+    r.line(top, head, '#697879', 1.3);
+    r.line(head, { x: head.x + 2 * r.zoom, y: head.y }, r.night ? '#ffe3a0' : '#cdd6c9', 1.5);
+  } finally {r.platform=platform;}
 }
 
 export function drawVehicle(r, x, y, vertical, back, color, bus = false) {
