@@ -62,6 +62,13 @@ baked self-shading supplies fine detail; dynamic shadows supply relationships
 between separate objects. New asset types automatically participate through
 the existing lot footprint and measured height contract.
 
+The foundation pad and skirt replace the terrain surface inside each lot.
+Buried slope tiles and their grid lines must not be painted: later tiles can
+otherwise cut through the far retaining wall. A browser regression changes
+only buried terrain and checks that every rendered ground pixel stays unchanged
+in all four views. It also changes the exterior terrain and checks that pixels
+inside the exposed retaining faces remain unchanged.
+
 Foundations also participate in solid occlusion. Before a building is drawn,
 its pad and walls clear earlier solids from the transparent object layer,
 revealing the shaded ground cache underneath. The foundation and its building

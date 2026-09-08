@@ -476,8 +476,10 @@ export class CityRenderer {
     // Grade and retain each site tile in terrain paint order. A distant
     // foundation cannot overwrite a road or hillside in front of it.
     for (const t of this.sorted) if (visible(t.x + 0.5, t.y + 0.5)) {
-      this.terrain(t, city);
+      // The pad and skirt replace the buried terrain. Drawing that mesh
+      // lets later slope tiles and their grid lines cut through far walls.
       if(t.lot)drawLotFoundation(this,city.tiles[t.lot.y*city.size+t.lot.x],t);
+      else this.terrain(t, city);
       drawTerrainShadows(this,t,city);
     }
     if (this.night) {
