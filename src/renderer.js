@@ -7,7 +7,8 @@ import {shadowPoint,faceLight} from './sunlight.js';
 import {terrainVertexHeight, drawLotFoundation,occludeLotFoundation,hitFoundation} from './lot-foundations.js';
 import {TILE_W,TILE_H,ELEV_PX} from './render-scale.js';
 import {pickMapSurface} from './surface-picking.js';
-import { drawBridgeFrame, bridgePlatform } from './bridge-art.js';
+import { bridgePlatform } from './bridge-art.js';
+import {drawBridgeSolid,buildBridgeTrafficMask,beginBridgeTraffic,compositeBridgeTraffic} from './bridge-scene.js';
 import { surfaceStep } from './sim/structures.js';
 import { waterSurface } from './sim/surface-water.js';
 import {waterGeometry,waterHeightAt,isWaterPoint,waterPath} from './water-geometry.js';
@@ -148,7 +149,7 @@ export class CityRenderer {
     this.corners = c;
     this.cornerRevision = city.revision;
     this.tiles = city.tiles;
-    this.hasBridges=(city.transportStructures || []).some(s=>s?.kind==='bridge');
+    this.hasBridges=city.tiles.some(t=>t.structure?.kind==='bridge');
     this.hasWater=city.tiles.some(t=>t.terrain==='water');
   }
   project(x, y, z = 0) {
@@ -199,7 +200,7 @@ export class CityRenderer {
         const py=source.y+Math.min(source.h-1,Math.floor((sy-hit.y)/hit.h*source.h));
         opaque = hit.canvas.getContext("2d").getImageData(px, py, 1, 1).data[3] > 24;
       } else opaque = hitUncachedArchitecture(this, hit.t, sx, sy);
-      if (opaque) return { x: hit.t.x, y: hit.t.y };
+      if (opaque) return hit.ground?this.pick(sx,sy):{ x: hit.t.x, y: hit.t.y };
     }
     return this.pick(sx, sy);
   }
@@ -364,11 +365,7 @@ export class CityRenderer {
       } else this.flat(x,y,1,1,0.1,null,'#344b2833');
     }
     if (!ROAD.has(t.type)) return;
-    if(t.structure?.kind==='bridge') {
-      const ground=this.platform;this.platform=bridgePlatform(this,t);
-      if(t.type==='rail')this.railBed(t,city);else drawStreet(this,t,city);
-      drawBridgeFrame(this,t);this.platform=ground;return;
-    }
+    if(t.structure?.kind==='bridge')return;
     // A viaduct is two surfaces: the street it was built over, then the deck.
     if (t.under === 1) { drawStreet(this, t, city, { as: "road" }); drawViaduct(this, t, city); return; }
     if (t.under === 2) {
@@ -437,7 +434,7 @@ export class CityRenderer {
 
   heatColor(t) {
     const o = this.overlay;
-    if (t.terrain === "water" && o !== "pollution") return null;
+    if (t.terrain === "water" && t.structure?.kind!=='bridge' && o !== "pollution") return null;
     if (o === "power") return t.powered ? "#dbe64488" : (t.lot || t.type !== "empty") ? "#db5b40aa" : null;
     if (o === "water") return t.watered ? "#469bdbaa" : (t.lot || t.type !== "empty") ? "#bd7045aa" : null;
     if (o === "landvalue") return "hsla(" + (t.landValue * 1.2) + ",65%,48%,.6)";
@@ -499,7 +496,7 @@ export class CityRenderer {
       // lets later slope tiles and their grid lines cut through far walls.
       if(t.lot)drawLotFoundation(this,city.tiles[t.lot.y*city.size+t.lot.x],t);
       else this.terrain(t, city);
-      drawTerrainShadows(this,t,city);
+      if(t.structure?.kind!=='bridge')drawTerrainShadows(this,t,city);
     }
     if (this.night) {
       ctx.fillStyle = '#10284288'; ctx.fillRect(0, 0, this.w, this.h);
@@ -525,11 +522,13 @@ export class CityRenderer {
     if (showPipes) ctx.globalAlpha = 0.3;
 
     this.paintingSolids = true;
+    this.bridgeSpriteIndex=0;
     // Use footprint separation where wide lots overlap neighboring solids.
     if (this.itemTiles !== city.tiles || this.itemRevision !== city.revision || this.itemRotation !== this.rotation) {
       const items = [];
     for (const t of city.tiles) {
-      if (t.lot) {
+      if(t.structure?.kind==='bridge')items.push({k:this.depthKey(t.x,t.y),t,kind:'bridge'});
+      else if (t.lot) {
         if (t.lot.x === t.x && t.lot.y === t.y) items.push({ k: this.depthKey(t.x, t.y, t.lot.w, t.lot.h), t, kind: "lot" });
       } else if (t.type !== "empty" && !ROAD.has(t.type)) {
         items.push({ k: this.depthKey(t.x, t.y), t, kind: "zone" });
@@ -549,7 +548,8 @@ export class CityRenderer {
     for (const it of items) {
       const t = it.t;
       if (!visible(t.x + (t.lot?.w || 1) / 2, t.y + (t.lot?.h || 1) / 2)) continue;
-      if (it.kind === "lot") { occludeLotFoundation(this,t);this.platform = t.elev * ELEV_PX; drawShadedArchitecture(this, t, city); this.platform = null; }
+      if(it.kind==='bridge')drawBridgeSolid(this,t,city);
+      else if (it.kind === "lot") { occludeLotFoundation(this,t);this.platform = t.elev * ELEV_PX; drawShadedArchitecture(this, t, city); this.platform = null; }
       else if (it.kind === "zone") drawArchitecture(this, t);
       else if (it.kind === "trees") {
         drawShadedArchitecture(this,t,city,()=>{for(const [x,y,variant] of naturalTrees(t))if(!isWaterPoint(this,x,y))this.tree(x,y,variant);});
@@ -558,6 +558,7 @@ export class CityRenderer {
       else this.powerline(t, city);
     }
     this.paintingSolids = false;
+    buildBridgeTrafficMask(this);
     ctx.globalAlpha = 1;
     this.lastRevision = city.revision;
     this.dirty = false;
@@ -605,6 +606,7 @@ export class CityRenderer {
     ctx.globalAlpha = 1;
 
     // Cars: more on busy roads, faster on highways.
+    const bridgeTraffic=beginBridgeTraffic(this);
     if (this.overlay !== "water" && this.tool !== "pipe") {
       for (let i = 0; i < city.tiles.length; i++) {
         const t = city.tiles[i];
@@ -617,7 +619,9 @@ export class CityRenderer {
         const a = back ? 1 - f : f, p = this.project(t.x + (vertical ? (back ? 0.68 : 0.32) : a), t.y + (vertical ? a : back ? 0.68 : 0.32), 2.1);
         if (p.x < -20 || p.x > this.w + 20 || p.y < -20 || p.y > this.h + 20) {this.platform=null;continue;}
         const bus = i % 17 === 0;
+        if(t.structure?.kind==='bridge')this.ctx=bridgeTraffic;
         drawVehicle(this, t.x + (vertical ? (back ? 0.68 : 0.32) : a), t.y + (vertical ? a : back ? 0.68 : 0.32), vertical, back, bus ? "#4f9db1" : ["#e9dfbc", "#c5684e", "#739bab", "#e6e4d7", "#dfb45b"][i % 5], bus);
+        this.ctx=ctx;
         this.platform=null;
       }
     }
@@ -630,7 +634,8 @@ export class CityRenderer {
       this.platform=bridgePlatform(this,t);
       const p = this.project(t.x + .5, t.y + .5, 3);
       if (p.x < -20 || p.x > this.w + 20 || p.y < -20 || p.y > this.h + 20) {this.platform=null;continue;}
-      drawTrain(this, t, city, f);
+      if(t.structure?.kind==='bridge')this.ctx=bridgeTraffic;
+      drawTrain(this, t, city, f);this.ctx=ctx;
       this.platform=null;
     }
     // Surface traffic remains below buildings; cruising aircraft are above them.
@@ -656,6 +661,7 @@ export class CityRenderer {
     }
 
     ctx.drawImage(this.cache, 0, 0, this.w, this.h);
+    compositeBridgeTraffic(this);
     for (const plane of aircraft) drawAirplane(this, plane.p, plane.heading, time);
 
     // Neighbour names along the map edges.

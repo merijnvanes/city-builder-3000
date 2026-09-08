@@ -188,6 +188,11 @@ span and the adjoining road or track. Cost is the route's tile price multiplied
 by `length + 2 + 2 × length²`, including both approaches. Bridges cannot cross
 other bridges or tunnels, turn, or accept side connections.
 
+Bridge decks and frames share the scene order used by buildings and trees.
+Foreground terrain clips their silhouettes. A cached visibility mask lets
+traffic move above the deck while nearer buildings and trusses cover it.
+`pnpm test:bridges` checks overlap pixels, picking and traffic in all four views.
+
 The Road Tunnel and Rail Tunnel tools find level portals across at least six
 tiles of higher ground. There is no tunnel length cap beyond the map itself.
 Tunnel cost is the tool's bore price times length, plus the route's tile price

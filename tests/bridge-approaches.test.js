@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {CityRenderer} from '../src/renderer.js';
 import {bridgePlatform,bridgeSurfaceHeight} from '../src/bridge-art.js';
+import {drawStreet} from '../src/street-art.js';
 for(const axis of ['x','y'])for(const reverse of [false,true])test(`bridge approach seams and picking on ${axis}, reverse=${reverse}`,()=>{
  const from={x:5,y:5},to={...from,[axis]:14};
  const s={kind:'bridge',route:'road',from:reverse?to:from,to:reverse?from:to,elevation:3,length:8};
@@ -28,7 +29,7 @@ for(const axis of ['x','y'])for(const reverse of [false,true])test(`bridge appro
   }
  }
 });
-test('terrain drawing uses the sloped bridge approach and restores its platform',()=>{
+test('bridge asphalt uses the sloped approach separately from the ground layer',()=>{
  const s={kind:'bridge',route:'road',from:{x:2,y:3},to:{x:7,y:3},elevation:1,length:4};
  const tiles=Array.from({length:100},(_,i)=>({x:i%10,y:Math.floor(i/10),type:'empty',terrain:'grass',elev:1,trees:0}));
  for(let x=1;x<=8;x++){tiles[30+x].type='road';if(x>=2 && x<=7)tiles[30+x].structure=s;}
@@ -36,7 +37,9 @@ test('terrain drawing uses the sloped bridge approach and restores its platform'
  const r=Object.assign(Object.create(CityRenderer.prototype),{size:10,w:1200,h:850,zoom:1,panX:0,panY:0,platform:null,tool:'inspect',rotation:0});r.buildCorners(city);
  const polygons=[];r.poly=(points,color)=>polygons.push({points,color});r.line=()=>{};
  r.terrain(tiles[32],city);assert.equal(r.platform,null);
+ assert.ok(!polygons.some(p=>p.color==='#525f63'),'terrain defers elevated asphalt to the solid scene');
  const expected=r.project(2,3.14,.5);
+ r.platform=bridgePlatform(r,tiles[32]);drawStreet(r,tiles[32],city);r.platform=null;
  assert.ok(polygons.filter(p=>p.color==='#525f63').some(p=>p.points.some(q=>Math.abs(q.x-expected.x)<1e-8 && Math.abs(q.y-expected.y)<1e-8)),'actual asphalt reaches the land-road edge');
 });
 test('foreground terrain wins over an approach hidden behind it',()=>{

@@ -13,7 +13,7 @@
     "test:coastlines": "node --test tests/water-geometry.test.js tests/surface-water.test.js && node tests/coastlines.mjs && node tests/surface-water.mjs",
     "test:shadows": "node --test tests/sunlight.test.js tests/shadow-atlas.test.js && node tests/building-shadows.mjs && node tests/ground-effects.mjs",
     "test:foundations": "node --test tests/lot-foundations.test.js tests/scene-order.test.js && node tests/lot-foundations.mjs && node tests/scene-depth.mjs && node tests/foundation-surface.mjs && node tests/foundation-wall-order.mjs && node tests/foundation-wall-scene.mjs",
-    "test:bridges": "node --test tests/bridge-approaches.test.js tests/bridge-art.test.js tests/structures.test.js && node tests/bridge-approaches.mjs",
+    "test:bridges": "node --test tests/bridge-approaches.test.js tests/bridge-art.test.js tests/structures.test.js && node tests/bridge-approaches.mjs && node tests/bridge-depth.mjs",
     "test:powerlines": "node --test tests/powerline-occupancy.test.js && node tests/powerline-occupancy.mjs",
     "test:architecture": "node tests/architecture.mjs",
     "test:visuals": "node tests/architecture.mjs && node tests/architecture-cache.mjs && node tests/disaster-rendering.mjs",
