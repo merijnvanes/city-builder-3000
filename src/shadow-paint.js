@@ -6,6 +6,7 @@ import {drawCachedArchitecture} from './architecture-cache.js';
 import {lotBody} from './shadow-scene.js';
 import {bridgePlatform} from './bridge-art.js';
 import {waterSurface} from './sim/surface-water.js';
+import {waterGeometry,waterPath} from './water-geometry.js';
 import {ELEV_PX,VIADUCT_HEIGHT} from './render-scale.js';
 
 function path(r,ctx,polygon) {
@@ -22,6 +23,27 @@ function shadows(r,ctx,polygons) {
 export function drawTerrainShadows(r,t,city) {
  if(r.night || !r.shadowScene)return;
  const scene=r.shadowScene;
+ const coast=!t.lot && waterGeometry(r,t);
+ if(coast && bridgePlatform(r,t)===null) {
+  scene.waterPolygons ??= new Map();
+  let shadow=scene.waterPolygons.get(t);
+  const geometry=coast;
+  if(!shadow) {
+   const casters=scene.candidates(t.x,t.y);
+   shadow={wet:geometry.wet.flatMap(p=>intersections(p,casters)),dry:geometry.dry.flatMap(p=>intersections(p,casters))};
+   scene.waterPolygons.set(t,shadow);
+  }
+  if(!shadow.wet.length && !shadow.dry.length)return;
+  const old=r.platform,ctx=r.base;r.platform=0;ctx.save();
+  try {
+   ctx.fillStyle=`rgba(21,35,45,${SHADOW_ALPHA})`;
+   ctx.save();waterPath(r,ctx,geometry.wet);ctx.clip();
+   for(const polygon of geometry.dry) {waterPath(r,ctx,[polygon]);ctx.rect(0,0,r.w,r.h);ctx.clip('evenodd');}
+   waterPath(r,ctx,shadow.wet);ctx.fill();ctx.restore();
+   waterPath(r,ctx,shadow.dry);ctx.fill();
+  } finally {ctx.restore();r.platform=old;}
+  return;
+ }
  scene.terrainPolygons ??= Array.from({length:4},()=>new Map());
  const cache=scene.terrainPolygons[t.lot?(r.rotation || 0):0];
  let polygons=cache.get(t);

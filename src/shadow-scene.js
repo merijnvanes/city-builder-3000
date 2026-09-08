@@ -4,6 +4,7 @@ import {ELEV_PX,VIADUCT_HEIGHT} from './render-scale.js';
 import {shadowPlanes,shadowPoint} from './sunlight.js';
 import {naturalTrees,treeHeight} from './tree-layout.js';
 import {MIN_ELEVATION} from './sim/terrain.js';
+import {isWaterPoint,waterGeometry,waterHeightAt} from './water-geometry.js';
 
 // Deliberately coarse shadow geometry: a solid body rather than every window,
 // gutter and leaf. All artwork providers share the same receiver contract.
@@ -29,9 +30,10 @@ export function shadowScene(r,city) {
  for(const t of city.tiles) {
   if(t.lot?.x===t.x && t.lot?.y===t.y) {const body=lotBody(t);bodies.set(t,body);add(body,t);}
   else if(t.type==='empty' && !t.lot && t.trees) {
-   let top=-Infinity;
+   let top=-Infinity;const coast=waterGeometry(r,t);
    for(const [x,y,v] of naturalTrees(t)) {
-    const height=treeHeight(x,y,v),radius=v===1?.09:.15,z=r.meshZ(x,y);
+    if(isWaterPoint(r,x,y))continue;
+    const height=treeHeight(x,y,v),radius=v===1?.09:.15,z=coast?waterHeightAt(coast,x,y):r.meshZ(x,y);
     add({x:x-radius,y:y-radius,w:radius*2,d:radius*2,z:z+height*.35,h:height*.65},t);
     top=Math.max(top,z+height);
    }

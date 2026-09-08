@@ -1,5 +1,5 @@
 import {bridgePlatform} from './bridge-art.js';
-import {waterSurface} from './sim/surface-water.js';
+import {waterGeometry} from './water-geometry.js';
 import {MIN_ELEVATION,MAX_ELEVATION} from './sim/terrain.js';
 import {TILE_W,TILE_H,ELEV_PX,BRIDGE_LIFT} from './render-scale.js';
 
@@ -20,7 +20,20 @@ function surfaceHit(r,t,sx,sy,platform) {
   }
   return inside;
 }
-export function pickTransportSurface(r,sx,sy) {
+function waterHit(r,geometry,sx,sy) {
+ const old=r.platform;r.platform=0;
+ try {
+  return [...geometry.wet,...geometry.dry].some(polygon=>{
+   const points=polygon.map(p=>r.project(...p));let inside=false;
+   for(let i=0,j=points.length-1;i<points.length;j=i++) {
+    const a=points[i],b=points[j];
+    if((a.y>sy)!==(b.y>sy) && sx<(b.x-a.x)*(sy-a.y)/(b.y-a.y)+a.x)inside=!inside;
+   }
+   return inside;
+  });
+ } finally {r.platform=old;}
+}
+export function pickMapSurface(r,sx,sy,bridges=true) {
   const flat=r.pickFlat(sx,sy);
   let best=null,depth=-Infinity;
   for(let y=Math.max(0,flat.y-RADIUS);y<=Math.min(r.size-1,flat.y+RADIUS);y++) {
@@ -30,8 +43,9 @@ export function pickTransportSurface(r,sx,sy) {
       if(Math.abs(sx-centerX)>TILE_W*r.zoom)continue;
       const key=p.x+p.y;
       if(key<depth)continue;
-      const deck=bridgePlatform(r,t),ground=t.terrain==='water'?waterSurface(t)*ELEV_PX:null;
-      if(deck!==null && surfaceHit(r,t,sx,sy,deck) || surfaceHit(r,t,sx,sy,ground)) {
+      const deck=bridges?bridgePlatform(r,t):null;
+      const coast=waterGeometry(r,t);
+      if(deck!==null && surfaceHit(r,t,sx,sy,deck) || (coast?waterHit(r,coast,sx,sy):surfaceHit(r,t,sx,sy,null))) {
         best={x,y};depth=key;
       }
     }

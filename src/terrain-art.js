@@ -1,4 +1,6 @@
 import { waterSurface } from './sim/surface-water.js';
+import {waterGeometry,waterPath,clipAtLevel} from './water-geometry.js';
+import {shadeHex} from './art-colors.js';
 // Broad, continuous color variation keeps natural terrain from reading as a
 // checkerboard. The simulation grid remains visible when a tool is selected.
 import { noise } from './sim/terrain.js';
@@ -24,36 +26,30 @@ export function surfaceColor(tile, city) {
   return mix([113, 138, 73], [139, 157, 88], broad * 0.6 + variation * 0.4);
 }
 
-export function drawShoreline(r, tile, city) {
-  const { x, y } = tile;
-  // A small waterline follows only genuine land boundaries, never map edges.
-  for (const [dx, dy] of [[0, -1], [1, 0], [0, 1], [-1, 0]]) {
-    const neighbor = at(city, x + dx, y + dy);
-    if (!neighbor || neighbor.terrain === 'water' && waterSurface(neighbor)>=waterSurface(tile)-1e-7) continue;
-    const alongX = dy !== 0;
-    const ax = x + (dx === 1 ? 1 : 0), ay = y + (dy === 1 ? 1 : 0);
-    const bx = ax + (alongX ? 1 : 0), by = ay + (alongX ? 0 : 1);
-    const waterHeight=waterSurface(tile)*8;
-    const atHeight=(a,b,height)=>r.project(a,b,height-waterHeight);
-    const lip=[r.project(ax,ay),r.project(bx,by)];
-    if(neighbor.terrain==='water') {
-      const bed=Math.max(tile.elev*8,waterSurface(neighbor)*8),low=waterSurface(neighbor)*8;
-      r.poly([lip[0],lip[1],atHeight(bx,by,bed),atHeight(ax,ay,bed)],'#527e83');
-      if(bed>low)r.poly([atHeight(ax,ay,bed),atHeight(bx,by,bed),atHeight(bx,by,low),atHeight(ax,ay,low)],'#89836a');
-      continue;
+export function drawWaterTerrain(r,tile,city,dryColor=null) {
+  const old=r.platform;r.platform=0;
+  try {
+    const geometry=waterGeometry(r,tile),ctx=r.base;
+    // Distinct stored pools retain their own level. Close only a true drop
+    // between pools; natural land boundaries come from the contour below.
+    if(tile.terrain==='water')for(const [i,dx,dy] of [[0,0,-1],[1,1,0],[2,0,1],[3,-1,0]]) {
+      const neighbor=at(city,tile.x+dx,tile.y+dy);
+      if(neighbor?.terrain!=='water' || waterSurface(neighbor)>=waterSurface(tile)-1e-7)continue;
+      const stride=geometry.corners.length/4;
+      for(let j=i*stride;j<(i+1)*stride;j++) {
+        const a=geometry.corners[j],b=geometry.corners[(j+1)%geometry.corners.length];
+        const edge=clipAtLevel([a,b],geometry.level);
+        if(edge.length<2)continue;
+        const low=waterSurface(neighbor)*8,first=edge[0],last=edge.at(-1);
+        r.poly([[...first.slice(0,2),geometry.level],[...last.slice(0,2),geometry.level],
+          [...last.slice(0,2),Math.max(low,last[2])],[...first.slice(0,2),Math.max(low,first[2])]].map(p=>r.project(...p)),'#527e83');
+      }
     }
-    // Join the flat surface to the actual land mesh with a bank face; never
-    // flatten the neighboring hill merely to align its water-side vertex.
-    if(r.meshZ)r.poly([lip[0],lip[1],atHeight(bx,by,r.meshZ(bx,by)),atHeight(ax,ay,r.meshZ(ax,ay))],'#969673');
-    // A shallow shelf fades into the channel instead of a bright tile border.
-    const edge = r.project((ax + bx) / 2, (ay + by) / 2, 0.08);
-    const inner = r.project((ax + bx) / 2 - dx * 0.24, (ay + by) / 2 - dy * 0.24, 0.08);
-    const shelf = r.base.createLinearGradient(edge.x, edge.y, inner.x, inner.y);
-    shelf.addColorStop(0, '#bad5bf70'); shelf.addColorStop(1, '#75b2b000');
-    r.poly([r.project(ax, ay, 0.08), r.project(bx, by, 0.08), r.project(bx - dx * 0.24, by - dy * 0.24, 0.08), r.project(ax - dx * 0.24, ay - dy * 0.24, 0.08)], shelf);
-    r.line(r.project(ax, ay, 0.1), r.project(bx, by, 0.1), '#d1dbc577', 0.65);
-    if (r.zoom > 0.65) {
-      r.line(r.project(ax - dx * 0.08, ay - dy * 0.08, 0.1), r.project(bx - dx * 0.08, by - dy * 0.08, 0.1), '#9fc8bd55', 0.6);
-    }
-  }
+    const waterColor=tile.terrain==='water'?(r.surfaceColors?.[tile.y*city.size+tile.x] || surfaceColor(tile,city)):surfaceColor({...tile,terrain:'water'},city);
+    waterPath(r,ctx,geometry.wet);ctx.fillStyle=waterColor;ctx.fill();
+    waterPath(r,ctx,geometry.shelf);ctx.fillStyle='#b8d1be30';ctx.fill();
+    const sand=surfaceColor({...tile,terrain:'sand'},city);
+    waterPath(r,ctx,geometry.dry);ctx.fillStyle=dryColor || shadeHex(sand,r.slopeShade?.(tile.x,tile.y) || 1);ctx.fill();
+    for(const [a,b] of geometry.shore)r.line(r.project(...a),r.project(...b),'#d1dbc566',.65);
+  } finally {r.platform=old;}
 }

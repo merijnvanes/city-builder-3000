@@ -6,10 +6,11 @@ import {naturalTrees} from './tree-layout.js';
 import {shadowPoint,faceLight} from './sunlight.js';
 import {terrainVertexHeight, drawLotFoundation,occludeLotFoundation,hitFoundation} from './lot-foundations.js';
 import {TILE_W,TILE_H,ELEV_PX} from './render-scale.js';
-import {pickTransportSurface} from './surface-picking.js';
+import {pickMapSurface} from './surface-picking.js';
 import { drawBridgeFrame, bridgePlatform } from './bridge-art.js';
 import { surfaceStep } from './sim/structures.js';
 import { waterSurface } from './sim/surface-water.js';
+import {waterGeometry,waterHeightAt,isWaterPoint,waterPath} from './water-geometry.js';
 import { EDGE_DIRECTIONS } from './sim/neighbor-links.js';
 import { drawRail, drawTrain } from './rail-art.js';
 import { withGroundClip } from './ground-effects.js';
@@ -21,7 +22,7 @@ import { hitUncachedArchitecture } from "./architecture-cache.js";
 import { drawArchitecture, heightOf, random } from "./building-art.js";
 import { BUILDINGS, PORT_TYPES, carriesRoute } from "./sim/catalog.js";
 import { drawTree } from "./foliage.js";
-import { surfaceColor, drawShoreline } from "./terrain-art.js";
+import { surfaceColor, drawWaterTerrain } from "./terrain-art.js";
 import { drawStreet, drawViaduct, hasStreetLamp, drawStreetLamp, drawVehicle, tunnelPortal, drawTunnelMouth } from "./street-art.js";
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -112,7 +113,9 @@ export class CityRenderer {
     if (this.platform != null) return typeof this.platform==='function'?this.platform(x,y):this.platform;
     const tx=Math.max(0,Math.min(this.size-1,Math.floor(x))),ty=Math.max(0,Math.min(this.size-1,Math.floor(y)));
     const tile=this.tiles?.[ty*this.size+tx];
-    if(x>=0 && y>=0 && x<=this.size && y<=this.size && tile?.terrain==='water')return waterSurface(tile)*ELEV_PX;
+    if(x>=0 && y>=0 && x<=this.size && y<=this.size && tile) {
+      const geometry=waterGeometry(this,tile);if(geometry)return waterHeightAt(geometry,x,y);
+    }
     return this.meshZ(x,y);
   }
   meshZ(x,y) {
@@ -146,6 +149,7 @@ export class CityRenderer {
     this.cornerRevision = city.revision;
     this.tiles = city.tiles;
     this.hasBridges=(city.transportStructures || []).some(s=>s?.kind==='bridge');
+    this.hasWater=city.tiles.some(t=>t.terrain==='water');
   }
   project(x, y, z = 0) {
     const p = this.orient(x, y);
@@ -168,8 +172,9 @@ export class CityRenderer {
   pick(sx, sy) {
     let p = this.pickFlat(sx, sy);
     if (!this.corners) return p;
-    if(this.hasBridges && this.overlay!=='water' && !['pipe','subway','substation'].includes(this.tool)) {
-      const hit=pickTransportSurface(this,sx,sy);if(hit)return hit;
+    const bridges=this.hasBridges && this.overlay!=='water' && !['pipe','subway','substation'].includes(this.tool);
+    if(this.hasWater || bridges) {
+      const hit=pickMapSurface(this,sx,sy,bridges);if(hit)return hit;
     }
     for (let i = 0; i < 3; i++) {
       const z = this.groundZ(p.x + 0.5, p.y + 0.5) * this.zoom;
@@ -236,6 +241,15 @@ export class CityRenderer {
   }
   flat(x, y, w, d, z, color, stroke, ctx = this.base) {
     this.poly([this.project(x, y, z), this.project(x + w, y, z), this.project(x + w, y + d, z), this.project(x, y + d, z)], color, stroke, ctx);
+  }
+  highlightTile(x,y,z,fill,stroke,ctx) {
+    const t=this.tiles?.[y*this.size+x],geometry=t && waterGeometry(this,t);
+    if(!geometry || this.platform!=null)return this.flat(x,y,1,1,z,fill,stroke,ctx);
+    const old=this.platform;this.platform=0;
+    try {
+      if(fill) {waterPath(this,ctx,[...geometry.wet,...geometry.dry].map(p=>p.map(([x,y,h])=>[x,y,h+z])));ctx.fillStyle=fill;ctx.fill();}
+      this.poly(geometry.boundary.map(([x,y,h])=>this.project(x,y,h+z)),null,stroke,ctx);
+    } finally {this.platform=old;}
   }
   faces(x, y, w, d, h, z = 0) {
     const p = (a, b, c) => this.project(a, b, c);
@@ -328,22 +342,27 @@ export class CityRenderer {
   }
   terrain(t, city) {
     const platform=this.platform;
-    this.platform=t.terrain==='water'?waterSurface(t)*ELEV_PX:null;
+    this.platform=null;
     try { this.paintTerrain(t,city); }
     finally { this.platform=platform; }
   }
   paintTerrain(t, city) {
     const { x, y } = t, water = t.terrain === "water";
+    const coast=waterGeometry(this,t);
     let color = this.surfaceColors?.[y * city.size + x] || surfaceColor(t, city);
     if (!water) {
       const k = this.slopeShade(x, y);
       if (k !== 1) color = shade(color, k);
       else if (t.elev >= 5) color = shade(color, 1 + (t.elev - 4) * 0.03);
     }
-    this.flat(x, y, 1, 1, 0, color);
-    if (water) drawShoreline(this, t, city);
-    if (!water && t.type === "empty" && !t.trees) for (let i = 0; i < 3; i++) { const a = random(x, y, i + 1), b = random(y, x, i + 7); this.flat(x + a * 0.85, y + b * 0.85, 0.1, 0.045, 0.05, "#a8ae642b"); }
-    if (this.tool !== "inspect" && !water && this.zoom > 0.55) this.flat(x, y, 1, 1, 0.1, null, "#344b2833");
+    if(coast)drawWaterTerrain(this,t,city,water?null:color);
+    else this.flat(x,y,1,1,0,color);
+    if (!coast && !water && t.type === "empty" && !t.trees) for (let i = 0; i < 3; i++) { const a = random(x, y, i + 1), b = random(y, x, i + 7); this.flat(x + a * 0.85, y + b * 0.85, 0.1, 0.045, 0.05, "#a8ae642b"); }
+    if (this.tool !== "inspect" && !water && this.zoom > 0.55) {
+      if(coast) {
+        const old=this.platform;this.platform=0;this.poly(coast.boundary.map(([x,y,z])=>this.project(x,y,z+.1)),null,'#344b2833');this.platform=old;
+      } else this.flat(x,y,1,1,0.1,null,'#344b2833');
+    }
     if (!ROAD.has(t.type)) return;
     if(t.structure?.kind==='bridge') {
       const ground=this.platform;this.platform=bridgePlatform(this,t);
@@ -533,7 +552,7 @@ export class CityRenderer {
       if (it.kind === "lot") { occludeLotFoundation(this,t);this.platform = t.elev * ELEV_PX; drawShadedArchitecture(this, t, city); this.platform = null; }
       else if (it.kind === "zone") drawArchitecture(this, t);
       else if (it.kind === "trees") {
-        drawShadedArchitecture(this,t,city,()=>{for(const [x,y,variant] of naturalTrees(t))this.tree(x,y,variant);});
+        drawShadedArchitecture(this,t,city,()=>{for(const [x,y,variant] of naturalTrees(t))if(!isWaterPoint(this,x,y))this.tree(x,y,variant);});
         recordTreePicks(this,t);
       } else if (it.kind === "lamp") { if (this.zoom > 0.5) drawStreetLamp(this, t); }
       else this.powerline(t, city);
@@ -575,10 +594,13 @@ export class CityRenderer {
     for (let i = 0; i < city.tiles.length; i += 7) {
       const t = city.tiles[i];
       if (t.terrain !== "water" || ROAD.has(t.type)) continue;
+      if(!isWaterPoint(this,t.x+.3,t.y+.5))continue;
       const p = this.project(t.x + 0.3, t.y + 0.5);
       if (p.x < -20 || p.x > this.w + 20 || p.y < -20 || p.y > this.h + 20) continue;
       ctx.globalAlpha = 0.12 + 0.1 * Math.sin(time * 0.0008 + i);
-      this.line(p, { x: p.x + 9 * this.zoom, y: p.y - 1 * this.zoom }, "#bed5c5", 0.8, ctx);
+      const old=this.platform;this.platform=0;ctx.save();
+      waterPath(this,ctx,waterGeometry(this,t).wet);ctx.clip();this.platform=old;
+      this.line(p, { x: p.x + 9 * this.zoom, y: p.y - 1 * this.zoom }, "#bed5c5", 0.8, ctx);ctx.restore();
     }
     ctx.globalAlpha = 1;
 
@@ -778,7 +800,7 @@ export class CityRenderer {
         if (t.x < 0 || t.y < 0 || t.x >= city.size || t.y >= city.size) continue;
         const good = t.valid && !t.noop;
         const edge = t.noop ? "#e8e6c0" : good ? (zone ? (lot > 1 ? zone.fill : zone.edge) : "#ecf29a") : "#ffc4a7";
-        this.flat(t.x, t.y, 1, 1, 1, t.noop ? "#d9d9a944" : good ? (zone ? zone.fill : "#aad74977") : "#db513c99", edge, ctx);
+        this.highlightTile(t.x,t.y,1,t.noop ? "#d9d9a944" : good ? (zone ? zone.fill : "#aad74977") : "#db513c99",edge,ctx);
       }
       if (lot > 1) {
         const good = preview.filter((t) => t.valid && !t.noop);
@@ -798,7 +820,7 @@ export class CityRenderer {
         this.platform = city.tiles[tile.lot.y * city.size + tile.lot.x].elev * ELEV_PX;
         this.flat(tile.lot.x, tile.lot.y, tile.lot.w, tile.lot.h, 1, null, "#fff0bd", ctx);
         this.platform = null;
-      } else this.flat(x, y, 1, 1, 1, this.tool === "bulldoze" ? "#d65e4166" : "#e9e6ae33", "#efecc0", ctx);
+      } else this.highlightTile(x,y,1,this.tool==='bulldoze'?'#d65e4166':'#e9e6ae33','#efecc0',ctx);
     }
   }
 }

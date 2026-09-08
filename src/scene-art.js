@@ -1,5 +1,6 @@
 // Cached presentation around the map. The skirt follows actual terrain
 // heights; it adds depth at the city boundary without changing tile geometry.
+import {groundEdgePoints,isWaterPoint,waterGeometry,waterPath} from './water-geometry.js';
 export function drawMapBackdrop(r, city) {
   const ctx = r.base;
   const sky = ctx.createLinearGradient(0, 0, 0, r.h);
@@ -15,16 +16,18 @@ export function drawMapBackdrop(r, city) {
     const [[ax, ay], [bx, by]] = edges[edge];
     const dx = (bx - ax) / n, dy = (by - ay) / n;
     for (let i = 0; i < n; i++) {
-      const x = ax + dx * i, y = ay + dy * i, ex = x + dx, ey = y + dy;
-      const a = r.project(x, y), b = r.project(ex, ey);
-      if (Math.max(a.x, b.x) < -40 || Math.min(a.x, b.x) > r.w + 40 || Math.min(a.y, b.y) > r.h + 40) continue;
-      const c = r.project(ex, ey, -r.groundZ(ex, ey) - 20), d = r.project(x, y, -r.groundZ(x, y) - 20);
-      const tx = Math.max(0, Math.min(n - 1, Math.floor((x + ex) / 2))), ty = Math.max(0, Math.min(n - 1, Math.floor((y + ey) / 2)));
-      const water = city.tiles[ty * n + tx].terrain === 'water';
-      const face = ctx.createLinearGradient(0, Math.min(a.y, b.y), 0, Math.max(c.y, d.y));
-      face.addColorStop(0, water ? '#416e7d' : r.night ? '#425652' : '#8c9a83');
-      face.addColorStop(1, water ? '#315362' : r.night ? '#283c3c' : '#617b70');
-      r.poly([a, b, c, d], face);
+      const sx=ax+dx*i,sy=ay+dy*i,points=groundEdgePoints(r,sx,sy,sx+dx,sy+dy);
+      for(let j=1;j<points.length;j++) {
+        const [x,y]=points[j-1],[ex,ey]=points[j];
+        const a = r.project(x, y), b = r.project(ex, ey);
+        if (Math.max(a.x, b.x) < -40 || Math.min(a.x, b.x) > r.w + 40 || Math.min(a.y, b.y) > r.h + 40) continue;
+        const c = r.project(ex, ey, -r.groundZ(ex, ey) - 20), d = r.project(x, y, -r.groundZ(x, y) - 20);
+        const water=isWaterPoint(r,Math.max(0,Math.min(n-1e-6,(x+ex)/2)),Math.max(0,Math.min(n-1e-6,(y+ey)/2)));
+        const face = ctx.createLinearGradient(0, Math.min(a.y, b.y), 0, Math.max(c.y, d.y));
+        face.addColorStop(0, water ? '#416e7d' : r.night ? '#425652' : '#8c9a83');
+        face.addColorStop(1, water ? '#315362' : r.night ? '#283c3c' : '#617b70');
+        r.poly([a, b, c, d], face);
+      }
     }
   }
 }
@@ -33,14 +36,25 @@ export function drawMapBackdrop(r, city) {
 export function drawBoat(r, x, y, heading, time, seed = 0) {
   const ctx = r.ctx, z = r.zoom;
   const c = Math.cos(heading), s = Math.sin(heading);
-  const p = (forward, side, height = 0) => r.project(x + forward * c - side * s, y + forward * s + side * c, height);
+  const world=(forward,side)=>[x+forward*c-side*s,y+forward*s+side*c];
+  const hull = [[0.24, 0], [0.1, 0.1], [-0.21, 0.09], [-0.24, 0], [-0.21, -0.09], [0.1, -0.1]],level=r.groundZ(x,y);
+  if(![[0,0],...hull].every(([a,b])=>{const [xx,yy]=world(a,b);return isWaterPoint(r,xx,yy) && Math.abs(r.groundZ(xx,yy)-level)<1e-7;}))return;
+  const p=(forward,side,height=0)=>{const [xx,yy]=world(forward,side);return r.project(xx,yy,height+level-r.groundZ(xx,yy));};
   const center = p(0, 0);
   if (center.x < -30 || center.x > r.w + 30 || center.y < -30 || center.y > r.h + 30) return;
-  const hull = [[0.24, 0], [0.1, 0.1], [-0.21, 0.09], [-0.24, 0], [-0.21, -0.09], [0.1, -0.1]];
   // The wake is drawn first, below the hull.
   const wake = 0.08 + 0.025 * Math.sin(time * 0.004 + seed);
-  r.line(p(-0.2, -0.07), p(-0.7, -wake - 0.06), '#c6ded16b', 1.1, ctx);
-  r.line(p(-0.2, 0.07), p(-0.7, wake + 0.06), '#c6ded16b', 1.1, ctx);
+  ctx.save();const old=r.platform;
+  try {
+    const wet=[];
+    for(let yy=Math.max(0,Math.floor(y-.8));yy<=Math.min(r.size-1,Math.floor(y+.8));yy++)for(let xx=Math.max(0,Math.floor(x-.8));xx<=Math.min(r.size-1,Math.floor(x+.8));xx++) {
+      const geometry=waterGeometry(r,r.tiles[yy*r.size+xx]);
+      if(geometry)wet.push(...geometry.wet.filter(p=>Math.abs(p[0][2]-level)<1e-7));
+    }
+    r.platform=0;waterPath(r,ctx,wet);ctx.clip();r.platform=old;
+    r.line(p(-0.2,-0.07),p(-0.7,-wake-.06),'#c6ded16b',1.1,ctx);
+    r.line(p(-0.2,0.07),p(-0.7,wake+.06),'#c6ded16b',1.1,ctx);
+  } finally {r.platform=old;ctx.restore();}
   r.poly(hull.map(([a, b]) => p(a, b, 1)), '#425f6d', null, ctx);
   r.poly(hull.map(([a, b]) => p(a * 0.92, b * 0.87, 3)), r.night ? '#a7b6b2' : '#e6e6d5', null, ctx);
   r.poly([p(-0.07, -0.05, 3), p(0.09, -0.05, 3), p(0.09, -0.05, 6), p(-0.07, -0.05, 6)], '#789da8', null, ctx);

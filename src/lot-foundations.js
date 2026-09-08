@@ -1,7 +1,7 @@
 import {faceLight} from './sunlight.js';
 import {shadeHex} from './art-colors.js';
 import {ELEV_PX} from './render-scale.js';
-import {waterSurface} from './sim/surface-water.js';
+import {waterSurface,bedElevation} from './sim/surface-water.js';
 
 // A developed site owns its grade. Roads and open ground meet its perimeter
 // instead of averaging a dip underneath the slab. At terraced lots, the lower
@@ -13,7 +13,7 @@ function vertexHeight(city,x,y,gradedOnly) {
     const tx=x+dx,ty=y+dy;
     if(tx<0 || ty<0 || tx>=city.size || ty>=city.size)continue;
     const t=city.tiles[ty*city.size+tx];
-    sum+=(t.terrain==='water'?waterSurface(t):(t.elev || 0))*ELEV_PX;count++;
+    sum+=(t.terrain==='water'?bedElevation(t):(t.elev || 0))*ELEV_PX;count++;
     if(t.lot) {
       const anchor=city.tiles[t.lot.y*city.size+t.lot.x];
       if(Number.isFinite(anchor?.elev))pad=Math.min(pad,anchor.elev*ELEV_PX);

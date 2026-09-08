@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {settleSurfaceWater,waterVolume} from '../src/sim/surface-water.js';
 import {createCity,place,evaluate,serialize,deserialize} from '../src/sim/index.js';
 import {CityRenderer} from '../src/renderer.js';
+import {waterGeometry} from '../src/water-geometry.js';
 const at=(c,x,y)=>c.tiles[y*c.size+x],total=c=>c.tiles.reduce((sum,t)=>sum+waterVolume(t),0);
 const town=()=>{const c=createCity({size:16,starter:false,layout:'plains',hills:0,seed:12});for(const t of c.tiles){t.elev=0;t.terrain='grass';t.waterLevel=null;t.trees=0;}return c;};
 const pond=(c,x,y,w,h,bed=-1,level=-.25)=>{for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++)Object.assign(at(c,xx,yy),{terrain:'water',elev:bed,waterLevel:level});};
@@ -40,7 +41,13 @@ test('water surfaces are planar at all rotations beside high terrain',()=>{
  for(let rotation=0;rotation<4;rotation++) {
   const c=town();pond(c,5,5,1,1,1,1.75);at(c,6,5).elev=8;
   const r=Object.assign(Object.create(CityRenderer.prototype),{size:16,w:600,h:400,zoom:1.5,rotation,panX:0,panY:0});r.buildCorners(c);
-  r.paintTerrain=t=>{for(const [x,y]of[[t.x,t.y],[t.x+1,t.y],[t.x+1,t.y+1],[t.x,t.y+1]]){const p=r.project(x,y),o=r.orient(x,y);assert.ok(Math.abs((r.cy+(o.x+o.y-r.size)*16*r.zoom-p.y)/r.zoom-1.75*8)<1e-6);}};
+  r.paintTerrain=t=>{
+   const geometry=waterGeometry(r,t);assert.ok(geometry.dry.length>0);
+   for(const polygon of geometry.wet) {
+    const x=polygon.reduce((s,p)=>s+p[0],0)/polygon.length,y=polygon.reduce((s,p)=>s+p[1],0)/polygon.length;
+    const p=r.project(x,y),o=r.orient(x,y);assert.ok(Math.abs((r.cy+(o.x+o.y-r.size)*16*r.zoom-p.y)/r.zoom-1.75*8)<1e-6);
+   }
+  };
   r.terrain(at(c,5,5),c);assert.equal(r.platform,undefined);
  }
 });
@@ -75,7 +82,7 @@ test('invalid basin grids fail explicitly instead of indexing out of bounds',()=
 test('flat water does not pull neighboring high terrain vertices down to its level',()=>{
  const c=town();for(const t of c.tiles)t.elev=8;pond(c,5,5,1,1,1,1.75);
  const r=Object.assign(Object.create(CityRenderer.prototype),{size:16});r.buildCorners(c);
- assert.equal(r.meshZ(6,5),51.5);assert.equal(r.groundZ(5.5,5.5),14);
+ assert.equal(r.meshZ(6,5),50);assert.equal(r.groundZ(5.5,5.5),14);
 });
 test('outer boundary water projection uses its surface, not the submerged bed',()=>{
  const c=town();pond(c,15,15,1,1,-3,-.25);

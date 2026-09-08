@@ -8,7 +8,6 @@ try {
  const results=await page.evaluate(async()=>{
   const {assignLot}=await import('/src/sim/lots.js');
   const {foundationEdges}=await import('/src/lot-foundations.js');
-  const {shadowScene}=await import('/src/shadow-scene.js');
   const results=[];
   for(const [lx,ly] of [[12,12],[17,12],[17,17],[12,17],[17,14],[14,17],[12,14],[14,12]]) {
    civic.agent.newCity({size:32,starter:false,layout:'plains',hills:0,seed:12});
@@ -21,7 +20,10 @@ try {
    c.revision++;r.buildCorners(c);r.tool='road';
    // Disable cast shadows so the final ground cache can be compared to
    // each wall's material color. Terrain, grid and tile order remain real.
-   shadowScene(r,c).bins.clear();
+   // Use the renderer's scene even when Vite gives its imported module a
+   // hot-reload URL that differs from a direct test import.
+   r.paint(c);r.shadowScene.bins.clear();
+   r.shadowScene.terrainPolygons=undefined;r.shadowScene.buildingPolygons=undefined;r.shadowScene.waterPolygons=undefined;
    for(let rotation=0;rotation<4;rotation++) {
     r.rotation=rotation;r.focusOn(15.5,15,2.2);r.dirty=true;r.render(c,1000);
     const actual=r.ground.getContext('2d').getImageData(0,0,1000,800).data;

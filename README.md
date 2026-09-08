@@ -160,6 +160,25 @@ terrain construction, with no waves, momentum, rain, evaporation or off-map
 water exchange. Existing water rows migrate to separate bed/surface heights.
 Run `node tests/surface-water.mjs` for browser surface/picking checks.
 
+Coastlines follow the intersection of a terrain mesh and each pool's horizontal
+water level. A tile can show both exposed ground and water, with diagonal
+contours instead of square bank walls. The mesh uses shared bed vertices and
+the gentler diagonal. Pits retain a low bed center, and shared channel edges
+retain bed samples so narrow waterways stay connected beneath raised banks.
+Dry banks keep their interpolated terrain.
+Only components connected to a neighboring pool receive its water level.
+This follows the contour-interpolation approach described in
+[Marching Squares](https://prideout.net/marching-squares/), using triangles to
+give each saddle a defined surface.
+
+This is a visual hybrid over the existing simulation grid. Water-classified
+tiles remain water for roads, bridges and building rules, including exposed
+corners. Land-classified bank tiles can show a submerged toe and retain their
+existing grading and placement rules. The water solver and save format are
+unchanged. Picking, shadows, ripples, natural trees and the map-edge skirt use
+the same surface geometry. `pnpm test:coastlines` checks corner cases, separate
+pools, mesh seams, and wet/dry pixels and picking in all four rotations.
+
 Road, rail and highway drags across water now quote a complete straight bridge
 between dry banks at the same elevation. Cross one continuous stretch of water
 per drag; use separate drags for separate streams or islands. A span may cover

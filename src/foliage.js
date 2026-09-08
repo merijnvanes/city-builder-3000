@@ -1,5 +1,6 @@
 import {shadowPoint,SUN} from './sunlight.js';
 import {treeHeight,naturalTrees} from './tree-layout.js';
+import {isWaterPoint} from './water-geometry.js';
 // Small, deterministic tree silhouettes shared by lots and natural forests.
 // Screen-space crowns stay legible at city scale as the map rotates.
 import { random } from './building-art.js';
@@ -101,6 +102,7 @@ export function drawTree(r, x, y, variant = 0) {
 export function recordTreePicks(r,t) {
   if(!r.pickables)return;
   for(const [x,y,variant] of naturalTrees(t)) {
+    if(isWaterPoint(r,x,y))continue;
     const sprite=treeSprite(r,x,y,variant);
     if(sprite)r.pickables.push({t,...sprite});
   }

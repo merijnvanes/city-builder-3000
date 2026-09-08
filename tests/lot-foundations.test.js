@@ -53,7 +53,7 @@ test('coastal foundations meet the waterline and removal restores the original t
  r.buildCorners(city);assert.equal(r.meshZ(6,4),6);
  assert.ok(foundationEdges(r,t).some(e=>e.a[2]===6 && e.top===24));
  for(const cell of city.tiles)cell.lot=null;
- r.buildCorners(city);assert.equal(lotVertexHeight(city,6,4),null);assert.equal(r.meshZ(6,4),15);
+ r.buildCorners(city);assert.equal(lotVertexHeight(city,6,4),null);assert.equal(r.meshZ(6,4),12); // Average ground beds, not the water surface.
 });
 
 test('per-tile foundation pass covers each outer wall once without internal walls',()=>{
