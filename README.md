@@ -159,3 +159,28 @@ The solver uses a simplified depression hierarchy inspired by
 terrain construction, with no waves, momentum, rain, evaporation or off-map
 water exchange. Existing water rows migrate to separate bed/surface heights.
 Run `node tests/surface-water.mjs` for browser surface/picking checks.
+
+Road, rail and highway drags across water now quote a complete straight bridge
+between dry banks at the same elevation. Cross one continuous stretch of water
+per drag; use separate drags for separate streams or islands. A span may cover
+at most 16 water tiles; clear the site first. Beam spans (1–4 tiles), trusses (5–10) and suspension
+spans (11–16) have different artwork. Cost is the route's tile price multiplied
+by `length + 2 + 2 × length²`, including both approaches. Bridges cannot cross
+other bridges or tunnels, turn, or accept side connections.
+
+The Road Tunnel and Rail Tunnel tools find level portals across at least six
+tiles of higher ground. There is no tunnel length cap beyond the map itself.
+Tunnel cost is the tool's bore price times length, plus the route's tile price
+times length squared. Bores cannot cross other bores or subways; surface roads
+may run over sufficiently high ground without joining the tunnel. Traffic enters
+only through the portals. These straight, level structures and their quotes are
+inspired by [OpenTTD's construction rules](https://wiki.openttd.org/en/Manual/Bridges).
+
+Accept the construction dialog to build a bridge or tunnel; Cancel or Escape
+leaves the whole selection and treasury untouched. Quotes are checked again on
+acceptance. Bulldozing a bridge tile or a tunnel entrance removes the complete
+structure; roads and buildings above a tunnel remain. Save/load and undo preserve
+these structures. Old straight bores acquire portal connections when loaded.
+The agent `build()` API returns `requiresConfirmation` and `quote`; repeat the
+same call with `{confirmStructures: true, maxCost: quote}` as the sixth argument
+to accept. `query()` includes the structure's route and both entrances.

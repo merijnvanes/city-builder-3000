@@ -1,3 +1,5 @@
+import { drawBridgeFrame } from './bridge-art.js';
+import { surfaceStep } from './sim/structures.js';
 import { waterSurface } from './sim/surface-water.js';
 import { EDGE_DIRECTIONS } from './sim/neighbor-links.js';
 import { drawRail, drawTrain } from './rail-art.js';
@@ -144,6 +146,7 @@ export class CityRenderer {
     this.corners = c;
     this.cornerRevision = city.revision;
     this.tiles = city.tiles;
+    this.bridgeDeckLevels=[...new Set((city.transportStructures || []).filter(s=>s.kind==='bridge').map(s=>s.elevation*ELEV_PX+4))].sort((a,b)=>b-a);
   }
   project(x, y, z = 0) {
     const p = this.orient(x, y);
@@ -166,6 +169,12 @@ export class CityRenderer {
   pick(sx, sy) {
     let p = this.pickFlat(sx, sy);
     if (!this.corners) return p;
+    if(this.overlay!=='water' && !['pipe','subway','substation'].includes(this.tool))for(const height of this.bridgeDeckLevels || []) {
+      const q=this.pickFlat(sx,sy+height*this.zoom);
+      if(q.x<0 || q.y<0 || q.x>=this.size || q.y>=this.size)continue;
+      const s=this.tiles?.[q.y*this.size+q.x]?.structure;
+      if(s?.kind==='bridge' && s.elevation*ELEV_PX+4===height)return q;
+    }
     for (let i = 0; i < 3; i++) {
       const z = this.groundZ(p.x + 0.5, p.y + 0.5) * this.zoom;
       const q = this.pickFlat(sx, sy + z);
@@ -334,6 +343,11 @@ export class CityRenderer {
     if (!water && t.type === "empty" && !t.trees) for (let i = 0; i < 3; i++) { const a = random(x, y, i + 1), b = random(y, x, i + 7); this.flat(x + a * 0.85, y + b * 0.85, 0.1, 0.045, 0.05, "#a8ae642b"); }
     if (this.tool !== "inspect" && !water && this.zoom > 0.55) this.flat(x, y, 1, 1, 0.1, null, "#344b2833");
     if (!ROAD.has(t.type)) return;
+    if(t.structure?.kind==='bridge') {
+      const ground=this.platform;this.platform=t.structure.elevation*ELEV_PX+4;
+      if(t.type==='rail')this.railBed(t,city);else drawStreet(this,t,city);
+      drawBridgeFrame(this,t);this.platform=ground;return;
+    }
     // A viaduct is two surfaces: the street it was built over, then the deck.
     if (t.under === 1) { drawStreet(this, t, city, { as: "road" }); drawViaduct(this, t, city); return; }
     if (t.under === 2) {
@@ -348,6 +362,7 @@ export class CityRenderer {
       return;
     }
     this.railBed(t, city);
+    const portal=tunnelPortal(t,city);if(portal)drawTunnelMouth(this,t,city,portal);
   }
 
   // Sleepers, ballast and rails on a track tile.
@@ -622,13 +637,15 @@ export class CityRenderer {
         const t = city.tiles[i];
         const hw = t.type === "highway";
         if ((t.type !== "road" && !hw) || random(t.x, t.y, 9) > (hw ? 0.3 : 0.18) + (t.traffic || 0) * 0.008) continue;
-        const east = t.x + 1 < city.size && carriesRoute(city.tiles[i + 1], hw ? "highway" : "road"), south = carriesRoute(city.tiles[i + city.size], hw ? "highway" : "road");
+        const east = t.x + 1 < city.size && carriesRoute(city.tiles[i + 1], hw ? "highway" : "road") && surfaceStep(t,city.tiles[i+1]), south = carriesRoute(city.tiles[i + city.size], hw ? "highway" : "road") && surfaceStep(t,city.tiles[i+city.size]);
         if (!east && !south) continue;
         const vertical = south && (!east || i % 2 === 0), f = (time * (hw ? 0.0003 : 0.00016) + random(t.x, t.y)) % 1, back = i % 3 === 0;
         const a = back ? 1 - f : f, p = this.project(t.x + (vertical ? (back ? 0.68 : 0.32) : a), t.y + (vertical ? a : back ? 0.68 : 0.32), 2.1);
         if (p.x < -20 || p.x > this.w + 20 || p.y < -20 || p.y > this.h + 20) continue;
         const bus = i % 17 === 0;
+        this.platform=t.structure?.kind==='bridge'?t.structure.elevation*ELEV_PX+4:null;
         drawVehicle(this, t.x + (vertical ? (back ? 0.68 : 0.32) : a), t.y + (vertical ? a : back ? 0.68 : 0.32), vertical, back, bus ? "#4f9db1" : ["#e9dfbc", "#c5684e", "#739bab", "#e6e4d7", "#dfb45b"][i % 5], bus);
+        this.platform=null;
       }
     }
 
@@ -639,7 +656,9 @@ export class CityRenderer {
       const f = (time * 0.0002 + random(t.x, t.y, 6)) % 1;
       const p = this.project(t.x + .5, t.y + .5, 3);
       if (p.x < -20 || p.x > this.w + 20 || p.y < -20 || p.y > this.h + 20) continue;
+      this.platform=t.structure?.kind==='bridge'?t.structure.elevation*ELEV_PX+4:null;
       drawTrain(this, t, city, f);
+      this.platform=null;
     }
     // Surface traffic remains below buildings; cruising aircraft are above them.
     const aircraft = [];

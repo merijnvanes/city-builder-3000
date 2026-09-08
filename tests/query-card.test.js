@@ -59,7 +59,7 @@ describe("query cards report what the player has to manage", () => {
     const c = createCity({ seed: 5, starter: false, layout: "river" });
     c.money = 100000;
     const water = c.tiles.find((t) => t.terrain === "water" && t.x > 4 && t.y > 4);
-    assert.equal(place(c, water.x, water.y, "road").ok, true);
+    water.type="road"; // Legacy bridge remains identifiable.
     assert.equal(inspectTile(c, water.x, water.y).description, "Bridge.");
   });
 

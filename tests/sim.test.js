@@ -172,16 +172,16 @@ describe("placement", () => {
     assert.equal(at(c, 6, 6).type, "empty");
     assert.equal(place(c, 6, 6, "bulldoze").ok, false);
   });
-  test("roads and rail bridge water at a premium, pipes and subways do not", () => {
+  test("single tiles cannot build unconfirmed bridges", () => {
     const c = blank();
     const w = c.tiles.find((t) => t.terrain === "water");
-    assert.equal(evaluate(c, w.x, w.y, "road").cost, BUILDINGS.road.cost * 5);
-    assert.equal(evaluate(c, w.x, w.y, "rail").cost, BUILDINGS.rail.cost * 5);
+    assert.equal(evaluate(c, w.x, w.y, "road").ok, false);
+    assert.equal(evaluate(c, w.x, w.y, "rail").ok, false);
     assert.equal(evaluate(c, w.x, w.y, "pipe").ok, false);
     assert.equal(evaluate(c, w.x, w.y, "subway").ok, false);
     assert.equal(evaluate(c, w.x, w.y, "powerline").ok, false);
-    assert.equal(place(c, w.x, w.y, "rail").ok, true);
-    assert.equal(evaluate(c, w.x, w.y, "powerline").ok, true);
+    assert.equal(place(c, w.x, w.y, "rail").ok, false);
+    assert.equal(evaluate(c, w.x, w.y, "powerline").ok, false);
   });
   test("insufficient funds leaves the city untouched", () => {
     const c = blank();
@@ -407,13 +407,12 @@ describe("saves", () => {
     for (let i = 0; i < 6; i++) { tick(c); tick(d); }
     assert.equal(serialize(d), serialize(c));
   });
-  test("road, rail and highway bridges survive saving with power lines", () => {
+  test("legacy water routes survive saving", () => {
     const c = blank();
     const water = c.tiles.filter(t => t.terrain === "water").slice(0, 3);
     for (const [i, type] of ["road", "rail", "highway"].entries()) {
       const t = water[i];
-      assert.equal(place(c, t.x, t.y, type).ok, true);
-      assert.equal(place(c, t.x, t.y, "powerline").ok, true);
+      t.type=type; t.powerline=true; // A legacy save predating engineered spans.
     }
     const loaded = deserialize(serialize(c));
     for (const t of water) {

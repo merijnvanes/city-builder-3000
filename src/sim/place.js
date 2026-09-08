@@ -1,3 +1,4 @@
+import { isPortal, removeStructure, structureTiles, structureCost } from './structures.js';
 import { surfaceWaterPlan, applySurfaceWater, waterVolume, waterSurface, INITIAL_DEPTH } from './surface-water.js';
 // Construction rules: evaluate() prices a single action without mutating;
 // place() applies it. Multi-tile buildings are placed by their top-left
@@ -17,7 +18,7 @@ function terraformPlan(city, start, target) {
     const [t, elev] = queue.shift();
     const key = t.y * city.size + t.x;
     if (changes.has(key) && changes.get(key).elev === elev) continue;
-    if (t.type !== "empty" || t.lot || t.powerline || t.pipe) return { error: t === start ? "Clear the tile before changing the terrain." : "A building or road is in the way." };
+    if (t.type !== "empty" || t.lot || t.powerline || t.pipe || t.tunnel || t.structure) return { error: t === start ? "Clear the tile before changing the terrain." : "A building or road is in the way." };
     changes.set(key, { tile: t, elev });
     for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
       const n = tileAt(city, t.x + dx, t.y + dy);
@@ -42,7 +43,6 @@ import { crewsAvailable, fireCrews, unitsAvailable, policeUnits } from "./fire.j
 import { riotAt, RIOT_REACH } from "./disasters.js";
 
 export const DEMOLISH_FEE = 5;
-export const BRIDGE_MULTIPLIER = 5;
 // A span over an existing street costs more than laying one on open ground.
 export const VIADUCT_MULTIPLIER = 2;
 
@@ -57,6 +57,12 @@ export function evaluate(city, x, y, tool, options = {}) {
   const here = [{ x, y }];
 
   if (tool === "inspect") return noop("", here);
+  if(t.structure && (t.structure.kind==='bridge' || isPortal(t))) {
+    if(tool==='bulldoze')return {ok:true,noop:false,cost:DEMOLISH_FEE*(t.structure.length+2),message:`Remove entire ${t.structure.kind}`,tiles:structureTiles(city,t.structure).map(n=>({x:n.x,y:n.y})),removeStructure:t.structure};
+    if(tool===t.structure.route)return noop('Route already here.',here);
+    return fail('Remove the entire bridge or tunnel before changing its entrance or deck.');
+  }
+  if(t.tunnel && ['raise','lower','level','makewater','makeland','subway'].includes(tool))return fail('Remove the tunnel before changing the ground above it.');
 
   // Zoning, RCI and ports alike: "you zone for airports and wait for Sims to
   // develop them." A port has one density, and a minimum size instead.
@@ -127,10 +133,10 @@ export function evaluate(city, x, y, tool, options = {}) {
     if (t.terrain === "water") return fail("A tunnel has to start on dry land.");
     const run = findBore(city, x, y, bores);
     if (!run) return fail(`No high ground to bore through. A tunnel needs at least ${MIN_BORE} tiles of higher ground and level ground on the far side.`);
-    const cost = BUILDINGS[tool].cost * run.length;
+    const cost = structureCost("tunnel",bores,run.length);
     const tiles = [{ x: run.entrance.x, y: run.entrance.y }, { x: run.exit.x, y: run.exit.y },
       ...run.buried.map((n) => ({ x: n.x, y: n.y }))];
-    return { ok: true, noop: false, cost, message: `Bore a ${run.length}-tile ${bores} tunnel`, tiles, run };
+    return { ok: true, noop: false, cost, message: `Bore a ${run.length}-tile ${bores} tunnel`, tiles, run, requiresConfirmation: true };
   }
 
   // An on-ramp is the only place cars move between a street and a highway.
@@ -169,7 +175,7 @@ export function evaluate(city, x, y, tool, options = {}) {
       return { ok: true, noop: false, cost: Math.round(b.cost * VIADUCT_MULTIPLIER), message: `Viaduct over the ${t.type}`, tiles: here, under: t.type === "rail" ? 2 : 1 };
     }
     if (t.type !== "empty") return fail("Tile is occupied. Bulldoze first.");
-    if (t.terrain === "water") return { ok: true, noop: false, cost: b.cost * BRIDGE_MULTIPLIER, message: "Bridge", tiles: here };
+    if (t.terrain === "water") return fail("Drag straight from dry land to dry land to build a bridge.");
     return { ok: true, noop: false, cost: b.cost, message: "", tiles: here };
   }
 
@@ -247,6 +253,7 @@ export function evaluate(city, x, y, tool, options = {}) {
       if (n.type === tool && n.lot && n.lot.x === x && n.lot.y === y) return noop("Already here.", [{ x, y }]);
       if (n.type !== "empty") return fail("Site is blocked. Bulldoze first.");
       if (Math.abs(n.elev - base) > 1) return fail("Site is too steep. Level the terrain first.");
+      if (n.elev !== base && n.tunnel) return fail("Cannot level the ground over a tunnel.");
       if (n.elev !== base) levelled++;
       tiles.push({ x: xx, y: yy });
     }
@@ -261,10 +268,13 @@ export function place(city, x, y, tool, options = {}) {
   if (ev.noop) return { ok: true, noop: true, message: ev.message, cost: 0, changed: 0 };
   if (city.money < ev.cost) return { ok: false, message: `Not enough funds. Need $${ev.cost.toLocaleString()}, have $${Math.floor(city.money).toLocaleString()}.`, cost: 0, changed: 0 };
 
+  if(ev.requiresConfirmation && (options.confirmStructures!==true || !Number.isFinite(options.maxCost) || ev.cost>options.maxCost))return {ok:false,requiresConfirmation:true,quote:ev.cost,message:ev.message,changed:0,cost:0};
   const t = city.tiles[y * city.size + x];
   const density = options.density ?? 1;
 
-  if (ZONED_TYPES.has(tool)) {
+  if(ev.removeStructure) {
+    removeStructure(city,ev.removeStructure);
+  } else if (ZONED_TYPES.has(tool)) {
     t.type = tool; t.density = PORT_TYPES.has(tool) ? 1 : density; t.level = 0; t.lot = null; t.trees = 0; t.abandoned = false; t.age = 0;
   } else if (OVERLAY_TOOLS.has(tool)) {
     t[tool] = true;

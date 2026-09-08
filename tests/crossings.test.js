@@ -65,7 +65,7 @@ test('a station touching a highway crossing does not substitute for an on-ramp',
 });
 test('bridge crossings are refused in both construction orders',()=>{
   for(const [a,b] of [['road','highway'],['highway','road'],['rail','highway'],['highway','rail'],['road','rail'],['rail','road']]) {
-    const c=town(); at(c,20,20).terrain='water'; put(c,20,20,a);
+    const c=town(); at(c,20,20).terrain='water'; at(c,20,20).type=a; // Legacy water route.
     assert.equal(evaluate(c,20,20,b).ok,false);
   }
 });

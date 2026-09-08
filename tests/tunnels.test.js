@@ -11,7 +11,7 @@ import { findBore, MIN_BORE, TUNNEL_KIND } from "../src/sim/tunnels.js";
 import { BUILDINGS } from "../src/sim/catalog.js";
 
 const at = (c, x, y) => c.tiles[y * c.size + x];
-const put = (c, x, y, tool, o) => { c.money = 5_000_000; return place(c, x, y, tool, o); };
+const put = (c, x, y, tool, o) => { c.money = 5_000_000; return place(c, x, y, tool, {confirmStructures:true,maxCost:5_000_000,...o}); };
 
 // A flat map with a ridge of the given width raised across it at x = from..to.
 function ridge(width, height = 4) {
@@ -45,11 +45,11 @@ describe("the engineers' rule", () => {
     assert.equal(findBore(c, 19, 30, "road"), null);
   });
 
-  test("the engineers quote a price per tile of bore", () => {
+  test("the engineers quote an increasing cost per tile of bore", () => {
     const c = ridge(10);
     const quote = evaluate(c, 19, 30, "tunnel");
     assert.equal(quote.ok, true);
-    assert.equal(quote.cost, BUILDINGS.tunnel.cost * 10);
+    assert.equal(quote.cost, BUILDINGS.tunnel.cost * 10 + BUILDINGS.road.cost * 100);
     assert.match(quote.message, /Bore a 10-tile road tunnel/);
   });
 });

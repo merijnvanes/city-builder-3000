@@ -1,3 +1,4 @@
+import { surfaceStep, isPortal, providesAccess } from './structures.js';
 // Commuting. Each residential lot sends its workers along the transport
 // network to the nearest open jobs (cheapest path, up to MAX_TRIP tiles of
 // street). Roads carry cars; highways and rail move people twice as fast;
@@ -54,7 +55,7 @@ const RAIL_PER_POINT = 20;   // trains carry more per tile
 const HIGHWAY_PER_POINT = 18;
 
 // Travel cost per tile: highways, rail and subways are twice as fast as streets.
-const ROAD = 1, RAIL = 2, STATION = 3, HIGHWAY = 4, SUBSTATION = 5, TUNNEL = 6, RAMP = 7, BORE = 8;
+const ROAD = 1, RAIL = 2, STATION = 3, HIGHWAY = 4, SUBSTATION = 5, TUNNEL = 6, RAMP = 7;
 
 // Cost of entering a tile of each kind, indexed by the constants above.
 // Highways, rail and tunnels move people at twice the speed of a street.
@@ -63,8 +64,6 @@ STEP_COST[0] = 0;
 STEP_COST[ROAD] = 2; STEP_COST[RAIL] = 1; STEP_COST[STATION] = 2;
 STEP_COST[HIGHWAY] = 1; STEP_COST[SUBSTATION] = 2; STEP_COST[TUNNEL] = 1;
 STEP_COST[RAMP] = 2;
-// A bore runs flat under the hill, so it never pays the climbing penalty.
-STEP_COST[BORE] = 2;
 // "If the mass transit budget is low, things will start deteriorating and Sims
 // will be less likely to use the system. If the budget is far below adequate,
 // transit workers will go out on strike."
@@ -94,7 +93,7 @@ function entryOf(city, anchor, kind, ground) {
   let best = -1, bestD = 99;
   for (const t of lotTiles(city, anchor.lot)) {
     forRadius(city, t.x, t.y, OFF_ROAD, (n, d) => {
-      if (d >= bestD) return;
+      if (d >= bestD || !providesAccess(n)) return;
       const node = ground(n.y * city.size + n.x);
       if (kind[node] === ROAD || kind[node] === RAMP) { bestD = d; best = node; }
     });
@@ -130,7 +129,7 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
     else if (t.type === "highway") kind[i] = HIGHWAY;
     else if (t.type === "substation") kind[i] = besideWhatItNeeds(city, t) && !strike ? SUBSTATION : ROAD;
     else if (t.type === "onramp") kind[i] = RAMP;
-    else if (t.tunnel) kind[i] = BORE;
+
     if (!strike && (t.subway || t.type === "substation")) kind[N + i] = TUNNEL;
     if (crossings && t.under) kind[UNDER + i] = t.under === 2 ? RAIL : ROAD;
   }
@@ -198,7 +197,13 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
 
   // Movement rules on the surface: streets join highways; rail only through
   // stations; subway stations join the street to the tunnel beneath them.
+  const engineered=!!city.transportStructures?.length;
   const canStep = (from, to) => {
+    if(engineered) {
+      const aTile=tiles[from%N],bTile=tiles[to%N];
+      if(!surfaceStep(aTile,bTile))return false;
+      if(aTile.structure?.kind==='tunnel' && isPortal(aTile) && bTile.structure===aTile.structure || bTile.structure?.kind==='tunnel' && isPortal(bTile) && aTile.structure===bTile.structure)return false;
+    }
     const a = kind[from], b = kind[to];
     if (a === STATION || b === STATION || a === SUBSTATION || b === SUBSTATION) return b !== 0 && a !== HIGHWAY && b !== HIGHWAY;
     if (a === RAIL || b === RAIL) return a === b;
@@ -206,9 +211,6 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
     // to get from one to the other, the intersection requires an on-ramp."
     // A ramp is the only tile both a street and a highway will step onto.
     if (a === RAMP || b === RAMP) return true;
-    // A bore is a road or rail line under the hill. It joins the portals at
-    // its ends and the rest of its own run; nothing enters it from above.
-    if (a === BORE || b === BORE) return true;
     if ((a === HIGHWAY) !== (b === HIGHWAY)) return false;
     return true; // road <-> road, highway <-> highway
   };
@@ -262,7 +264,18 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
     return out;
   };
 
-  const neighborsOf = crossings ? crossingNeighbors : plainNeighbors;
+  const surfaceNeighbors = crossings ? crossingNeighbors : plainNeighbors;
+  const portals=new Map();
+  for(const s of city.transportStructures || [])if(s.kind==='tunnel') {
+    const a=s.from.y*size+s.from.x,b=s.to.y*size+s.to.x;
+    portals.set(a,b);portals.set(b,a);
+  }
+  const neighborsOf = portals.size ? n=>{const out=surfaceNeighbors(n);if(portals.has(n))out.push(portals.get(n));return out;} : surfaceNeighbors;
+  const heights=Float64Array.from(tiles,t=>t.structure?.kind==='bridge'?t.structure.elevation:t.elev || 0);
+  const travelCost=(a,b)=> {
+    if(portals.get(a)===b)return stepCost[kind[b]]*(Math.abs(tiles[a].x-tiles[b].x)+Math.abs(tiles[a].y-tiles[b].y));
+    return stepCost[kind[b]]+(onGround(a) && onGround(b)?Math.abs(heights[a%N]-heights[b%N]):0);
+  };
 
   // Cheapest cost from any of `sources` to every node, capped at maxCost.
   // Used for "is there anything within a reasonable commute of here", which
@@ -277,9 +290,7 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
         const i = bucket[q];
         if (cost[i] !== d) continue;
         for (const ni of neighborsOf(i)) {
-          const climb = onGround(i) && onGround(ni) && kind[i] !== BORE && kind[ni] !== BORE
-            ? Math.abs((tiles[ni < N ? ni : ni - UNDER].elev || 0) - (tiles[i < N ? i : i - UNDER].elev || 0)) : 0;
-          const nd = d + stepCost[kind[ni]] + climb;
+          const nd = d + travelCost(i,ni);
           if (nd > maxCost) continue;
           if (cost[ni] === -1 || nd < cost[ni]) { cost[ni] = nd; buckets[nd].push(ni); }
         }
@@ -320,9 +331,7 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
             if (settled[ni]) continue;
             // Climbing a hill costs a step per level. A tunnel avoids it,
             // which is the whole reason to bore one.
-            const climb = onGround(i) && onGround(ni) && kind[i] !== BORE && kind[ni] !== BORE
-              ? Math.abs((tiles[ni < N ? ni : ni - UNDER].elev || 0) - (tiles[i < N ? i : i - UNDER].elev || 0)) : 0;
-            const nd = d + stepCost[kind[ni]] + climb + (jam && jam[ni] ? 1 : 0);
+            const nd = d + travelCost(i,ni) + (jam && jam[ni] ? 1 : 0);
             if (nd > maxCost) continue;
             if (dist[ni] === -1 || nd < dist[ni]) {
               if (dist[ni] === -1) touched.push(ni);
@@ -345,7 +354,7 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
   const surface = roadCapacity(city);
   const trafficOf = (i, load) => {
     const t = tiles[i < N ? i : i - UNDER];
-    if (kind[i] === ROAD || kind[i] === RAMP || kind[i] === BORE) { let v = load[i] / (TRAFFIC_PER_POINT * surface) * carScale; if (t.svc?.bus) v *= 1 - 0.25 * Math.min(1, t.svc.bus / BUS_FULL); return v; }
+    if (kind[i] === ROAD || kind[i] === RAMP) { let v = load[i] / (TRAFFIC_PER_POINT * surface) * carScale; if (t.svc?.bus) v *= 1 - 0.25 * Math.min(1, t.svc.bus / BUS_FULL); return v; }
     if (kind[i] === HIGHWAY) return load[i] / (HIGHWAY_PER_POINT * surface) * carScale;
     if (kind[i] === RAIL) return load[i] / RAIL_PER_POINT;
     return 0;
@@ -424,7 +433,7 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
     const cost = reachFrom(sources, maxCost);
     for (const base of crossings ? [0, UNDER] : [0]) {
       for (let i = base; i < base + N; i++) {
-        if (cost[i] < 0 || (kind[i] !== ROAD && kind[i] !== RAMP)) continue;
+        if (!providesAccess(tiles[i-base]) || cost[i] < 0 || (kind[i] !== ROAD && kind[i] !== RAMP)) continue;
         const tile = i - base, x = tile % size, y = (tile - x) / size;
         forRadius(city, x, y, OFF_ROAD, (n) => {
           const j = n.y * size + n.x;

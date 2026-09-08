@@ -1,3 +1,4 @@
+import { bridgeQuote, installStructure } from './sim/structures.js';
 import { connectionOffers, EDGE_DIRECTIONS } from './sim/neighbor-links.js';
 // construction.js — plan, apply and undo player construction. Pure JS.
 //
@@ -66,6 +67,19 @@ export function planConstruction(city, start, end, tool, options = {}) {
     {...inMap[0],dx:inMap[0].x-inMap[1].x,dy:inMap[0].y-inMap[1].y},
     {...inMap.at(-1),dx:inMap.at(-1).x-inMap.at(-2).x,dy:inMap.at(-1).y-inMap.at(-2).y},
   ];
+  const bridge=['road','rail','highway'].includes(tool)?bridgeQuote(city,coords,tool):null;
+  if(bridge?.error)return {...invalid(tool,density,bridge.error),tiles:coords.map(p=>({...p,valid:false,message:bridge.error}))};
+  if(bridge) {
+    const covered=new Set(bridge.tiles.map(t=>`${t.x},${t.y}`));
+    const actions=[];let cost=bridge.cost;
+    for(const c of coords) {
+      if(covered.has(`${c.x},${c.y}`))continue;
+      const ev=evaluate(city,c.x,c.y,tool,{density});
+      if(!ev.ok)return {...invalid(tool,density,ev.message),tiles:coords.map(p=>({...p,valid:false}))};
+      if(!ev.noop){actions.push(c);cost+=ev.cost;}
+    }
+    return {tool,density,start,end,endpoints,bridge:bridge.existing?null:bridge.structure,bridgeCost:bridge.cost,actions,tiles:coords.map(p=>({...p,valid:true,noop:bridge.existing && covered.has(`${p.x},${p.y}`)})),cost,count:bridge.existing?actions.length:coords.length,valid:!bridge.existing || actions.length>0,affordable:cost<=city.money,requiresConfirmation:!bridge.existing,message:bridge.existing?'':`${bridge.structure.length}-tile ${tool} bridge`};
+  }
   const seen = new Set();
   const tiles = [], actions = [], effects = new Map();
   let cost = 0;
@@ -112,13 +126,17 @@ export function planConstruction(city, start, end, tool, options = {}) {
     const blocked = tiles.filter((t) => !t.valid).length;
     if (blocked) message = `${blocked} tile${blocked === 1 ? "" : "s"} blocked`;
   }
-  return { tiles, actions, cost, count, valid, affordable, message, tool, density, elev, endpoints };
+  const requiresConfirmation=!!BUILDINGS[tool]?.bores && valid;
+  const tunnel=requiresConfirmation ? evaluate(city,actions[0].x,actions[0].y,tool).run : null;
+  return { tiles, actions, cost, count, valid, affordable, message, tool, density, elev, endpoints, start, end, requiresConfirmation,
+    tunnel: tunnel ? {from:{x:tunnel.entrance.x,y:tunnel.entrance.y},to:{x:tunnel.exit.x,y:tunnel.exit.y},elevation:tunnel.entrance.elev} : null };
 }
 
 export function planConnectionOffers(city,plan) {
-  if(!["road","rail","highway"].includes(plan.tool)) return [];
-  const endpoints=plan.endpoints || plan.tiles || [];
-  return connectionOffers(city,endpoints).filter(link=>link.route===plan.tool && endpoints.some(p=>{
+  const route=BUILDINGS[plan.tool]?.bores || plan.tool;
+  if(!["road","rail","highway"].includes(route)) return [];
+  const endpoints=plan.tunnel ? [plan.tunnel.from,plan.tunnel.to] : plan.endpoints || plan.tiles || [];
+  return connectionOffers(city,endpoints).filter(link=>link.route===route && endpoints.some(p=>{
     const [dx,dy]=EDGE_DIRECTIONS[link.side];
     return p.x===link.x && p.y===link.y && (p.dx===undefined || p.dx===dx && p.dy===dy);
   }));
@@ -130,13 +148,33 @@ function restore(city, snapshot) {
   }
 }
 
-export function applyConstruction(city, plan) {
+export function applyConstruction(city, plan, options = {}) {
   if (!city || !plan || typeof plan !== "object" || typeof plan.tool !== "string" || !Array.isArray(plan.actions ?? plan.tiles))
     return { ok: false, message: "Malformed plan", changed: 0, cost: 0 };
   if (!Object.hasOwn(TOOL_MAP, plan.tool)) return { ok: false, message: `Unknown tool: ${plan.tool}`, changed: 0, cost: 0 };
   if (![1, 2, 3].includes(plan.density)) return { ok: false, message: "Invalid plan density", changed: 0, cost: 0 };
   const source = plan.actions ?? plan.tiles;
   if (source.length > MAX_TILES) return { ok: false, message: "Plan too large", changed: 0, cost: 0 };
+
+  if(plan.requiresConfirmation || plan.bridge || BUILDINGS[plan.tool]?.bores) {
+    const live=planConstruction(city,plan.start,plan.end,plan.tool,{density:plan.density});
+    if(!live.valid)return {ok:false,message:live.message,changed:0,cost:0};
+    if(options.confirmStructures!==true || !Number.isFinite(options.maxCost) || live.cost>options.maxCost || JSON.stringify(live.bridge || live.tunnel)!==JSON.stringify(plan.bridge || plan.tunnel))
+      return {ok:false,requiresConfirmation:true,quote:live.cost,message:`${live.message || 'Engineered construction'} · $${live.cost.toLocaleString()}. Confirm construction.`,changed:0,cost:0};
+    if(live.cost>city.money)return {ok:false,message:'Insufficient funds for this structure.',changed:0,cost:0};
+    if(live.bridge) {
+      const snapshot=structuredClone(city);
+      try {
+        for(const a of live.actions){const r=place(city,a.x,a.y,live.tool,{deferRefresh:true});if(!r.ok)throw new Error(r.message);}
+        // Recheck the span after approach work, then build it as one unit.
+        const again=planConstruction(city,live.start,live.end,live.tool,{density:live.density});
+        if(!again.bridge || JSON.stringify(again.bridge)!==JSON.stringify(live.bridge))throw new Error('Bridge site changed.');
+        installStructure(city,live.bridge);city.money-=live.bridgeCost;refresh(city);city.revision++;
+        return {ok:true,changed:live.count,cost:snapshot.money-city.money,connectionOffers:planConnectionOffers(city,live)};
+      }catch(err){restore(city,snapshot);return {ok:false,message:err.message,changed:0,cost:0};}
+    }
+    plan=live;
+  }
 
   // Re-evaluate against the live city; never trust a stale plan.
   const seen = new Set();
@@ -168,7 +206,7 @@ export function applyConstruction(city, plan) {
         if (!again.ok || again.noop) continue;
         if (cost + 0 > city.money) break;
       }
-      const r = place(city, a.x, a.y, plan.tool, { density: plan.density, elev: plan.elev, deferRefresh: true });
+      const r = place(city, a.x, a.y, plan.tool, { density: plan.density, elev: plan.elev, deferRefresh: true, confirmStructures:options.confirmStructures,maxCost:options.maxCost });
       if (!r.ok) throw new Error(r.message);
       if (!r.noop) { changed += r.changed || 1; for (const t of a.tiles) cleared.add(`${t.x},${t.y}`); }
     }

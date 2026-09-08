@@ -1,3 +1,4 @@
+import { restoreStructures } from './structures.js';
 import { bedElevation, waterSurface, waterVolume, MIN_WATER_DEPTH, WATER_EPSILON } from './surface-water.js';
 import { parseConnections } from './neighbor-links.js';
 import { effectState, parseEffects } from "./effects-state.js";
@@ -102,6 +103,7 @@ export function blankCity({ seed = 42, size = DEFAULT_SIZE, layout, name = "New 
     size, seed, layout: gen.layout, name, startYear,
     tiles,
     transportConnections: [],
+    transportStructures: [],
     money: START_MONEY, debt: 0, loans: [],
     month: 0,
     ...defaultPolicies(),
@@ -176,6 +178,7 @@ export function serialize(city) {
     size: city.size, seed: city.seed, layout: city.layout, name: city.name, startYear: city.startYear ?? START_YEAR,
     types, tiles,
     transportConnections: city.transportConnections ?? [],
+    transportStructures: city.transportStructures ?? [],
     money: city.money, debt: city.debt, loans: city.loans.map(loanRecord), month: city.month,
     taxes: city.taxes, funding: city.funding, ordinances: city.ordinances,
     population: city.population, happiness: city.happiness, demand: city.demand,
@@ -354,6 +357,7 @@ export function deserialize(raw) {
     }
     if (t !== anchor) { t.level = 0; t.abandoned = false; }
   }
+  restoreStructures(city,d.transportStructures);
   city.transportConnections = parseConnections(city, d.transportConnections);
   return city;
 }

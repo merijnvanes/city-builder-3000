@@ -1,3 +1,4 @@
+import { surfaceStep, providesAccess } from './structures.js';
 // Whether a building is standing somewhere it can actually work.
 //
 // The manual is specific about several: "Bus stops must be placed along the
@@ -26,7 +27,7 @@ export function besideWhatItNeeds(city, t) {
     for (const [dx, dy] of NEIGHBOURS) {
       const n = tileAt(city, cell.x + dx, cell.y + dy);
       if (!n) continue;
-      if (needs === "subway" ? n.subway : carriesRoute(n, needs)) return true;
+      if (needs === "subway" ? n.subway : carriesRoute(n, needs) && providesAccess(n) && surfaceStep(cell,n)) return true;
     }
   }
   return false;

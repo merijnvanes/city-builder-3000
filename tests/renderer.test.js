@@ -99,3 +99,12 @@ test('changing map size clears old elevation geometry before centering', () => {
   const point = r.project(90.5, 90.5);
   assert.equal(point.x, r.cx); assert.equal(point.y, r.cy);
 });
+test('elevated bridge decks remain pickable over deep water in every rotation',()=>{
+ const r=camera();r.size=16;r.zoom=1.5;
+ const bridge={kind:'bridge',route:'road',from:{x:4,y:8},to:{x:11,y:8},elevation:8,length:6};
+ const city={size:16,revision:1,transportStructures:[bridge],tiles:Array.from({length:256},(_,i)=>({x:i%16,y:Math.floor(i/16),terrain:'grass',elev:8}))};
+ for(let x=4;x<=11;x++)Object.assign(city.tiles[8*16+x],{structure:bridge,type:'road',...(x>4 && x<11?{terrain:'water',waterLevel:.75,elev:0}:{})});
+ for(const t of city.tiles)if(t.x>4 && t.x<11)Object.assign(t,{terrain:'water',waterLevel:.75,elev:0});
+ r.buildCorners(city);
+ for(let rotation=0;rotation<4;rotation++){r.rotation=rotation;r.platform=68;const p=r.project(7.5,8.5);r.platform=null;assert.deepEqual(r.pick(p.x,p.y),{x:7,y:8});}
+});

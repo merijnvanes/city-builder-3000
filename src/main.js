@@ -130,9 +130,9 @@ function loadFrom(raw, message) {
 
 // Commit a construction plan. The mouse and the agent API both land here, so
 // pricing, undo, tips and the notice line behave the same either way.
-function commit(plan) {
+function commit(plan, options) {
   const before = structuredClone(city);
-  const result = applyConstruction(city, plan);
+  const result = applyConstruction(city, plan, options);
   if (result.ok) {
     undo.record(before);
     renderer.dirty = true;
@@ -164,6 +164,13 @@ function offerConnections(offers, owner=city) {
     cancel:()=>offerConnections(rest,owner)});
 }
 function commitFromPointer(plan) {
+  if(plan.requiresConfirmation && plan.valid) {
+    const owner=city;
+    return constructionDialog({title:plan.bridge?'Build bridge?':'Bore tunnel?',
+      message:`${plan.bridge ? `${plan.bridge.length}-tile ${plan.tool} bridge` : `${plan.tiles.length-2}-tile tunnel`}. Total construction cost: $${plan.cost.toLocaleString()}.`,
+      acceptLabel:`Build · $${plan.cost.toLocaleString()}`,
+      accept:()=>{if(owner!==city)return;const result=commit(plan,{confirmStructures:true,maxCost:plan.cost});if(result.ok)offerConnections(result.connectionOffers || []);}});
+  }
   if(!plan.count) {
     const offers=planConnectionOffers(city,plan);
     if(offers.length) return offerConnections(offers);
@@ -189,7 +196,7 @@ function stepMonth() {
 const actions = {
   selectTool: choose, setSpeed, setDensity, undo: undoLast, connectNeighbor,
   getSpeed: () => speed,
-  build: (tool, start, end, options) => commit(planConstruction(city, start, end, tool, options)),
+  build: (tool, start, end, options) => commit(planConstruction(city, start, end, tool, options), options),
   stepMonths: (n) => { const events = []; for (let i = 0; i < n; i++) events.push(...stepMonth()); lastTick = performance.now(); return events; },
   setTax: (n) => { for (const key of ["residential", "commercial", "industrial"]) sim.setPolicy(city, `tax.${key}`, Number(n)); refresh(); },
   setPolicy: policy,

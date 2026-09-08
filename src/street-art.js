@@ -1,3 +1,4 @@
+import { surfaceStep, isPortal } from './sim/structures.js';
 import { outwardConnection } from './sim/neighbor-links.js';
 import { carriesRoute } from './sim/catalog.js';
 // Connected street surfaces and small, camera-aware street furniture.
@@ -6,11 +7,10 @@ const DIRECTIONS = [[1, 0], [0, 1], [-1, 0], [0, -1]];
 // A portal is a route tile with a bore running out of one side. Draw the
 // mouth of the tunnel into the hillside so the line does not simply stop.
 export function tunnelPortal(t, city) {
-  for (const [dx, dy] of DIRECTIONS) {
-    const x = t.x + dx, y = t.y + dy;
-    if (x < 0 || y < 0 || x >= city.size || y >= city.size) continue;
-    const n = city.tiles[y * city.size + x];
-    if (n.tunnel) return { dx, dy, rail: n.tunnel === 2 };
+  const s=t.structure;
+  if(s?.kind==='tunnel' && isPortal(t,s)) {
+    const other=t.x===s.from.x && t.y===s.from.y?s.to:s.from;
+    return {dx:Math.sign(other.x-t.x),dy:Math.sign(other.y-t.y),rail:s.route==='rail'};
   }
   return null;
 }
@@ -31,6 +31,8 @@ export function streetConnections(t, city, as = t.type) {
     const x = t.x + dx, y = t.y + dy;
     if (x < 0 || y < 0 || x >= city.size || y >= city.size) return outwardConnection(city,t,dx,dy,as);
     const n = city.tiles[y * city.size + x];
+    if(!surfaceStep(t,n))return false;
+    if(tunnelPortal(t,city)?.dx===dx && tunnelPortal(t,city)?.dy===dy)return true;
     return carriesRoute(n, as) || n.type === 'onramp' || as === 'onramp' && (carriesRoute(n, 'road') || carriesRoute(n, 'highway'));
   });
 }

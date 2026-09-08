@@ -11,12 +11,12 @@
 // A bore runs dead straight and dead level from one portal to the other. The
 // ground above it is untouched, and nothing can join the line in between: the
 // only ways in are the two portals.
+import { installStructure } from "./structures.js";
 import { tileAt } from "./grid.js";
 
-// "six tiles minimum" of ground to pass under, and a limit on how far the
-// engineers are willing to dig.
+// "six tiles minimum" of ground to pass under.
 export const MIN_BORE = 6;
-export const MAX_BORE = 24;
+// No artificial maximum: the opposite portal must fit on the map.
 
 export const TUNNEL_KIND = { road: 1, rail: 2 };
 export const TUNNEL_TYPE = [null, "road", "rail"];
@@ -26,7 +26,7 @@ const DIRECTIONS = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 // Can a portal stand here? It has to be open ground or already a matching
 // route, and on dry land.
 function portalOk(t, type) {
-  if (!t || t.terrain === "water" || t.tunnel) return false;
+  if (!t || t.terrain === "water" || t.tunnel || t.structure || t.subway) return false;
   return t.type === "empty" || t.type === type;
 }
 
@@ -38,9 +38,9 @@ export function findBore(city, x, y, type) {
   let best = null;
   for (const [dx, dy] of DIRECTIONS) {
     const buried = [];
-    for (let step = 1; step <= MAX_BORE + 1; step++) {
+    for (let step = 1; step < city.size; step++) {
       const t = tileAt(city, x + dx * step, y + dy * step);
-      if (!t || t.terrain === "water" || t.tunnel) break;
+      if (!t || t.terrain === "water" || t.tunnel || t.structure || t.subway) break;
       // Ground the bore passes under has to actually be higher than the
       // portals, or there is nothing to tunnel through.
       if (t.elev > start.elev) { buried.push(t); continue; }
@@ -58,12 +58,6 @@ export function findBore(city, x, y, type) {
 // Cut the bore in. The portals become ordinary route tiles; the ground
 // between them keeps whatever is on the surface and carries the line beneath.
 export function bore(city, run, type) {
-  for (const portal of [run.entrance, run.exit]) {
-    portal.type = type;
-    portal.trees = 0;
-    portal.density = 0;
-    portal.level = 0;
-  }
-  for (const t of run.buried) t.tunnel = TUNNEL_KIND[type];
+  installStructure(city, {kind:'tunnel',route:type,from:{x:run.entrance.x,y:run.entrance.y},to:{x:run.exit.x,y:run.exit.y},elevation:run.entrance.elev,length:run.length});
   city.revision++;
 }

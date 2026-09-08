@@ -472,6 +472,7 @@ export function inspectTile(city, x, y) {
   if (t.crime) details.push(`Crime: ${t.crime}/100`);
   for (const link of city.transportConnections || []) if (link.x === x && link.y === y) details.push(`County connection: ${link.route} to ${link.side}`);
   if (t.terrain === "water") details.push(`Waterline: ${(t.waterLevel ?? t.elev).toFixed(2)} · bed: ${t.elev}`);
+  if(t.structure)details.push(`${t.structure.length}-tile ${t.structure.route} ${t.structure.kind} · entrances (${t.structure.from.x}, ${t.structure.from.y}) and (${t.structure.to.x}, ${t.structure.to.y}) · ${t.structure.kind==='bridge'?'demolish any deck tile or entrance':'demolish at an entrance'} to remove the whole structure`);
   if (t.under) details.push(t.type === "road" ? "Road–rail level crossing" : `Highway viaduct over ${t.under === 2 ? "rail" : "road"}`);
   if (t.traffic) details.push(`Traffic: ${t.traffic}/100`);
   if (t.type !== "empty" && t.type !== "road" && t.type !== "rail") {

@@ -1,3 +1,5 @@
+import { surfaceStep } from './sim/structures.js';
+import { tunnelPortal } from './street-art.js';
 import { outwardConnection } from './sim/neighbor-links.js';
 import { carriesRoute } from './sim/catalog.js';
 
@@ -6,7 +8,8 @@ export function railConnections(t, city) {
   return DIRECTIONS.map(([dx,dy]) => {
     const x=t.x+dx, y=t.y+dy;
     if(x<0 || y<0 || x>=city.size || y>=city.size) return outwardConnection(city,t,dx,dy,'rail');
-    return carriesRoute(city.tiles[y*city.size+x], 'rail');
+    const n=city.tiles[y*city.size+x],portal=tunnelPortal(t,city);
+    return surfaceStep(t,n) && (portal?.dx===dx && portal?.dy===dy || carriesRoute(n, 'rail'));
   });
 }
 

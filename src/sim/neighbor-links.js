@@ -1,3 +1,4 @@
+import { allowsDirection } from './structures.js';
 import { carriesRoute } from './catalog.js';
 
 export const CONNECTION_FEES = { road:500, rail:750, highway:1000 };
@@ -11,7 +12,7 @@ function onEdge(size,x,y,side) {
 }
 export function validLink(city,link) {
   return !!link && Number.isSafeInteger(link.x) && Number.isSafeInteger(link.y) && link.x>=0 && link.y>=0 && link.x<city.size && link.y<city.size &&
-    Object.hasOwn(CONNECTION_FEES,link.route) && onEdge(city.size,link.x,link.y,link.side) && carriesRoute(city.tiles[link.y*city.size+link.x],link.route);
+    Object.hasOwn(CONNECTION_FEES,link.route) && onEdge(city.size,link.x,link.y,link.side) && carriesRoute(city.tiles[link.y*city.size+link.x],link.route) && allowsDirection(city.tiles[link.y*city.size+link.x],...EDGE_DIRECTIONS[link.side]);
 }
 export function linked(city,x,y,side,route) {
   return (city.transportConnections || []).some(link=>link.x===x && link.y===y && link.side===side && link.route===route && validLink(city,link));

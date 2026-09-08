@@ -1,3 +1,4 @@
+import { providesAccess } from './structures.js';
 // Road access, service coverage, pollution, crime, land value and garbage.
 import { forRadius, tileAt } from "./grid.js";
 import { BUILDINGS, ZONE_TYPES, PORT_TYPES, carriesLocal, ROAD_TYPES, FUNDED_DEPARTMENTS } from "./catalog.js";
@@ -39,7 +40,7 @@ export function updateServices(city) {
   // ── Road access: within ROAD_REACH of a road or rail tile ────
   for (const t of tiles) { t.roadAccess = false; t.svc = blankServices(); }
   for (const t of tiles) {
-    if (!carriesLocal(t)) continue;
+    if (!carriesLocal(t) || !providesAccess(t)) continue;
     forRadius(city, t.x, t.y, ROAD_REACH, (n) => { n.roadAccess = true; });
   }
   // A lot has access when any of its tiles has it.
