@@ -261,8 +261,8 @@ export function drawCivicSprite(r, t) {
   const { frame, canvas } = entry;
   const center = r.project(t.lot.x + t.lot.w / 2, t.lot.y + t.lot.h / 2);
   const scale = r.zoom / spec.scale;
-  const snap = value => Math.round(value * (r.dpr || 1)) / (r.dpr || 1);
-  const bounds = { x: snap(center.x - frame.anchor[0] * scale), y: snap(center.y - frame.anchor[1] * scale), w: frame.width * scale, h: frame.height * scale, canvas };
+  // Keep the same fractional camera transform as roads and terrain.
+  const bounds = { x: center.x - frame.anchor[0] * scale, y: center.y - frame.anchor[1] * scale, w: frame.width * scale, h: frame.height * scale, canvas };
   r.base.save();
   r.base.imageSmoothingQuality = 'high';
   if (t.abandoned) { r.base.globalAlpha *= 0.7; r.base.filter = 'saturate(0.35)'; }

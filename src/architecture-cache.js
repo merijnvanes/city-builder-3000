@@ -85,8 +85,7 @@ export function drawCachedArchitecture(r, t, city) {
   }
   sprite.lastSeen = epoch;
   const p = r.project(t.x, t.y), ratio = r.zoom / scale;
-  const snap = value => Math.round(value * r.dpr) / r.dpr;
-  const bounds = { x: snap(p.x + sprite.dx * ratio), y: snap(p.y + sprite.dy * ratio), w: sprite.canvas.width / r.dpr * ratio, h: sprite.canvas.height / r.dpr * ratio };
+  const bounds = { x: p.x + sprite.dx * ratio, y: p.y + sprite.dy * ratio, w: sprite.canvas.width / r.dpr * ratio, h: sprite.canvas.height / r.dpr * ratio };
   r.base.drawImage(sprite.canvas, bounds.x, bounds.y, bounds.w, bounds.h);
   recordPick(r, t, bounds, sprite.canvas);
 }

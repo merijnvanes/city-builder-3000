@@ -89,7 +89,7 @@ try {
     // do is leave the active view without artwork, or with a coarser buffer.
     const activeCanvas = pinned.pickables[0].canvas;
     const activeViewRetained = !!activeCanvas && activeCanvas.width >= pinnedCanvas.width;
-    // Exercise alpha picking at Retina snapping and non-integer zoom in every view.
+    // Exercise alpha picking at Retina resolution and fractional zoom in every view.
     let retinaPicks = 0;
     for (let rotation = 0; rotation < 4; rotation++) {
       await preloadCivicSprites({ types: ['fire'], rotation });

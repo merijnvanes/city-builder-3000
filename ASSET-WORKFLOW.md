@@ -93,7 +93,8 @@ incremental migration.
   pressure, surplus active-image resolution can be reduced to the current display
   need; closer views restore full exports asynchronously. See [REWARDS-ART.md](REWARDS-ART.md).
 - Keep async redraw and portrait refresh, fallback cleanup, failed-load fallback,
-  alpha picking, device-pixel snapping and subdirectory-safe asset URLs. Expand the
+  alpha picking, fractional camera alignment and subdirectory-safe asset URLs. Round
+  offscreen buffer bounds only; keep artwork positions continuous during zoom. Expand the
   loader/manifest tests alongside the new contract, not by weakening civic checks.
 - The key and fill lights stay fixed in world space while the camera rotates.
   `src/sunlight-config.json` is shared by the exporter and runtime shadow volumes.
