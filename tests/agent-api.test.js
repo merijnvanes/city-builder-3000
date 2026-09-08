@@ -15,6 +15,7 @@ function harness({ starter = true, seed = 5 } = {}) {
   const undo = createUndoManager(20);
   let speed = 0;
   const actions = {
+    connectNeighbor: link => sim.connectNeighbor(city,link),
     getSpeed: () => speed,
     setSpeed: (n) => { speed = n; },
     setPolicy: (k, v) => sim.setPolicy(city, k, v),

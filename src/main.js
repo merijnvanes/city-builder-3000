@@ -1,9 +1,11 @@
+import { constructionDialog } from './construction-dialog.js';
+import { quoteConnection } from './sim/neighbor-links.js';
 import "./style.css";
 import * as sim from "./sim.js";
 import { mountUI } from "./ui.js";
 import { CityRenderer } from "./renderer.js";
 import { createMinimap } from "./minimap.js";
-import { planConstruction, applyConstruction, createUndoManager } from "./construction.js";
+import { planConstruction, applyConstruction, createUndoManager, planConnectionOffers } from "./construction.js";
 import { attachInput } from "./input.js";
 import { CityAudio } from "./audio.js";
 import { SCENARIOS, startScenario, updateScenario } from "./scenarios.js";
@@ -145,6 +147,31 @@ function commit(plan) {
   return result;
 }
 
+function connectNeighbor(link) {
+  const before=structuredClone(city),result=sim.connectNeighbor(city,link);
+  if(result.ok && !result.noop) { undo.record(before);renderer.dirty=true;refresh(); }
+  ui.notify(result.message);
+  return result;
+}
+function offerConnections(offers, owner=city) {
+  if(owner!==city || !offers.length) return;
+  const [link,...rest]=offers,quote=quoteConnection(city,link);
+  if(!quote.ok || quote.noop) return offerConnections(rest,owner);
+  constructionDialog({title:'Connect to neighboring county?',
+    message:`Connect the ${link.route} at (${link.x}, ${link.y}) to ${city._connections[link.side].name} on the ${link.side} border for $${quote.cost.toLocaleString()}?`,
+    acceptLabel:`Connect · $${quote.cost.toLocaleString()}`,cancelLabel:'Keep dead end',
+    accept:()=>{if(owner===city) connectNeighbor(link);offerConnections(rest,owner);},
+    cancel:()=>offerConnections(rest,owner)});
+}
+function commitFromPointer(plan) {
+  if(!plan.count) {
+    const offers=planConnectionOffers(city,plan);
+    if(offers.length) return offerConnections(offers);
+  }
+  const result=commit(plan);
+  if(result.ok) offerConnections(result.connectionOffers || []);
+}
+
 // One simulated month. The clock in frame() and the agent's run() share it so
 // neither can drift from the other.
 function stepMonth() {
@@ -160,7 +187,7 @@ function stepMonth() {
 }
 
 const actions = {
-  selectTool: choose, setSpeed, setDensity, undo: undoLast,
+  selectTool: choose, setSpeed, setDensity, undo: undoLast, connectNeighbor,
   getSpeed: () => speed,
   build: (tool, start, end, options) => commit(planConstruction(city, start, end, tool, options)),
   stepMonths: (n) => { const events = []; for (let i = 0; i < n; i++) events.push(...stepMonth()); lastTick = performance.now(); return events; },
@@ -239,7 +266,7 @@ input = attachInput(canvas, renderer, {
   onChoose: choose, onSpeed: setSpeed, onUndo: undoLast, onHome: actions.home, onRotate: actions.rotate,
   onPreview: (plan) => ui.setBuildPreview?.(plan || { count: 0, cost: 0, valid: true, message: "" }),
   onInspect: (tile) => { selection = { x: tile.x, y: tile.y }; refreshSelection(); },
-  onCommit: commit,
+  onCommit: commitFromPointer,
 }, planConstruction);
 const minimap = createMinimap(renderer);
 refresh(); choose("inspect"); setDensity(1); setSpeed(0);

@@ -1,3 +1,4 @@
+import { connectionOffers, quoteConnection } from './sim/neighbor-links.js';
 // agent-api.js — a machine-facing command surface for the running game.
 //
 // Every command adapts something the mouse and keyboard already drive.
@@ -232,6 +233,7 @@ export function createAgentAPI({ getCity, actions, renderer, ui, undo }) {
         notes: [
           "build(tool, x1, y1, x2, y2) drags from the first corner to the second, exactly like the mouse.",
           "Rectangle tools fill the box. Path tools draw a Manhattan L. Everything else places one footprint centred on x2,y2.",
+          "Border builds return connectionOffers. connections() lists offers; connectNeighbor(x,y,side,route) explicitly pays to establish one.",
           "region() is bounded; overview() and field() cost the same on any map size.",
           "Read objects() for exact building identity; the region grid only shows the group.",
         ],
@@ -418,7 +420,7 @@ export function createAgentAPI({ getCity, actions, renderer, ui, undo }) {
           x: t.x, y: t.y, type: t.type, terrain: t.terrain, elev: t.elev, trees: t.trees, salt: t.salt,
           density: t.density, level: t.level, abandoned: t.abandoned, lot: t.lot, fire: t.fire,
           powered: t.powered, watered: t.watered, roadAccess: t.roadAccess,
-          powerline: t.powerline, pipe: t.pipe, subway: t.subway, tunnel: t.tunnel, under: t.under,
+          powerline: t.powerline, pipe: t.pipe, subway: t.subway, tunnel: t.tunnel, under: t.under, countyConnections: (city.transportConnections || []).filter(link=>link.x===t.x && link.y===t.y),
           pollution: round1(t.pollution), crime: round1(t.crime), traffic: round1(t.traffic),
           landValue: round1(t.landValue), aura: round1(t.aura ?? 0), reach: t.reach,
           svc: t.svc, industry: t.industry, commerce: t.commerce,
@@ -503,11 +505,18 @@ export function createAgentAPI({ getCity, actions, renderer, ui, undo }) {
       const result = actions.build(tool, a, b, { density });
       if (result.ok) {
         announce({ text: `${tool}${density > 1 ? ` (density ${density})` : ""} ${a.x},${a.y} to ${b.x},${b.y} — ${result.changed} tiles, $${Math.round(result.cost).toLocaleString()}`, tool, from: a, to: b, changed: result.changed, cost: result.cost }, b);
-        return { ok: true, changed: result.changed, cost: Math.round(result.cost), money: Math.round(getCity().money) };
+        return { ok: true, changed: result.changed, cost: Math.round(result.cost), connectionOffers: result.connectionOffers || [], money: Math.round(getCity().money) };
       }
       return { ok: false, error: result.message, money: Math.round(getCity().money) };
     },
 
+    connections() { return {established:getCity().transportConnections || [],offers:connectionOffers(getCity(),getCity().tiles)}; },
+    connectNeighbor(x,y,side,route) {
+      const link={x:int(x),y:int(y),side,route};
+      const quote=quoteConnection(getCity(),link);
+      if(!quote.ok || quote.noop) return quote;
+      return actions.connectNeighbor(link);
+    },
     bulldoze(x1, y1, x2 = x1, y2 = y1) { return api.build("bulldoze", x1, y1, x2, y2); },
 
     // Any of tax.*, fund.*, ordinance.*, name or loan. See help().policies.

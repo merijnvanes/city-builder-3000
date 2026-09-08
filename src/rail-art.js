@@ -1,10 +1,12 @@
+import { outwardConnection } from './sim/neighbor-links.js';
 import { carriesRoute } from './sim/catalog.js';
 
 const DIRECTIONS = [[1,0],[0,1],[-1,0],[0,-1]];
 export function railConnections(t, city) {
   return DIRECTIONS.map(([dx,dy]) => {
     const x=t.x+dx, y=t.y+dy;
-    return x>=0 && y>=0 && x<city.size && y<city.size && carriesRoute(city.tiles[y*city.size+x], 'rail');
+    if(x<0 || y<0 || x>=city.size || y>=city.size) return outwardConnection(city,t,dx,dy,'rail');
+    return carriesRoute(city.tiles[y*city.size+x], 'rail');
   });
 }
 

@@ -1,3 +1,4 @@
+import { connectionOffers, EDGE_DIRECTIONS } from './sim/neighbor-links.js';
 // construction.js — plan, apply and undo player construction. Pure JS.
 //
 // planConstruction prices a drag (rectangle, path or single footprint)
@@ -60,6 +61,11 @@ export function planConstruction(city, start, end, tool, options = {}) {
   if (tool === "inspect") return { ...invalid(tool, density, ""), valid: true, affordable: true };
 
   const coords = coordsFor(sx, sy, ex, ey, tool);
+  const inMap=coords.filter(c=>c.x>=0 && c.y>=0 && c.x<city.size && c.y<city.size);
+  const endpoints=inMap.length<=1 ? inMap : [
+    {...inMap[0],dx:inMap[0].x-inMap[1].x,dy:inMap[0].y-inMap[1].y},
+    {...inMap.at(-1),dx:inMap.at(-1).x-inMap.at(-2).x,dy:inMap.at(-1).y-inMap.at(-2).y},
+  ];
   const seen = new Set();
   const tiles = [], actions = [];
   let cost = 0;
@@ -101,7 +107,16 @@ export function planConstruction(city, start, end, tool, options = {}) {
     const blocked = tiles.filter((t) => !t.valid).length;
     if (blocked) message = `${blocked} tile${blocked === 1 ? "" : "s"} blocked`;
   }
-  return { tiles, actions, cost, count, valid, affordable, message, tool, density, elev };
+  return { tiles, actions, cost, count, valid, affordable, message, tool, density, elev, endpoints };
+}
+
+export function planConnectionOffers(city,plan) {
+  if(!["road","rail","highway"].includes(plan.tool)) return [];
+  const endpoints=plan.endpoints || plan.tiles || [];
+  return connectionOffers(city,endpoints).filter(link=>link.route===plan.tool && endpoints.some(p=>{
+    const [dx,dy]=EDGE_DIRECTIONS[link.side];
+    return p.x===link.x && p.y===link.y && (p.dx===undefined || p.dx===dx && p.dy===dy);
+  }));
 }
 
 function restore(city, snapshot) {
@@ -157,7 +172,7 @@ export function applyConstruction(city, plan) {
     restore(city, snapshot);
     return { ok: false, message: `Construction failed: ${err.message}`, changed: 0, cost: 0 };
   }
-  return { ok: true, message: "", changed, cost: Math.round((snapshot.money - city.money) * 100) / 100 };
+  return { ok: true, message: "", changed, connectionOffers: planConnectionOffers(city,plan), cost: Math.round((snapshot.money - city.money) * 100) / 100 };
 }
 
 export function createUndoManager(limit = 20) {

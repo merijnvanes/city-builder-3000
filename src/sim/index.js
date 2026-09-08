@@ -1,3 +1,4 @@
+import { establishConnection, connectionOffers } from './neighbor-links.js';
 // Public simulation API. No browser deps.
 import { TOOLS, TOOL_MAP, BUILDINGS, ZONE_TYPES, PORT_TYPES, ZONED_TYPES, FUNDED_DEPARTMENTS, isZone } from "./catalog.js";
 import { blankCity, serialize, deserialize as parseCity, ORDINANCES, START_YEAR, DEFAULT_SIZE, defaultPolicies } from "./city.js";
@@ -33,10 +34,19 @@ import { PORTS, portJobs, portUpkeep, portNote, portReady, portObstacle } from "
 
 export { TOOLS, TOOL_MAP, BUILDINGS, ZONE_TYPES, PORT_TYPES, ZONED_TYPES, ORDINANCES, ADVISORS, DISASTERS, START_YEAR, DEFAULT_SIZE, FUNDED_DEPARTMENTS, SPECIAL_TYPES, PETITIONS, DEALS, SIDES, serialize, place, evaluate, isZone };
 
+export function connectNeighbor(city, link) {
+  const result = establishConnection(city, link);
+  if (result.ok && !result.noop) refresh(city);
+  return result;
+}
+
 export function createCity(seed = 42, starter = true, options = {}) {
   if (seed && typeof seed === "object") { options = seed; seed = options.seed ?? 42; starter = options.starter ?? true; }
   const city = blankCity({ seed, size: options.size ?? DEFAULT_SIZE, layout: options.layout, name: options.name, startYear: options.startYear, hills: options.hills });
-  if (starter) buildStarterTown(city);
+  if (starter) {
+    buildStarterTown(city);
+    city.transportConnections = connectionOffers(city, city.tiles).map(({cost, ...link}) => link);
+  }
   settle(city);
   // The founders' town is handed over with people already living in it, so its
   // age pyramid has to be scaled to them before its first birthday. A city
@@ -460,6 +470,7 @@ export function inspectTile(city, x, y) {
   details.push(`Land value: ${t.landValue}/100`);
   if (t.pollution) details.push(`Pollution: ${t.pollution}/100`);
   if (t.crime) details.push(`Crime: ${t.crime}/100`);
+  for (const link of city.transportConnections || []) if (link.x === x && link.y === y) details.push(`County connection: ${link.route} to ${link.side}`);
   if (t.under) details.push(t.type === "road" ? "Road–rail level crossing" : `Highway viaduct over ${t.under === 2 ? "rail" : "road"}`);
   if (t.traffic) details.push(`Traffic: ${t.traffic}/100`);
   if (t.type !== "empty" && t.type !== "road" && t.type !== "rail") {

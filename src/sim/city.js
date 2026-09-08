@@ -1,3 +1,4 @@
+import { parseConnections } from './neighbor-links.js';
 import { effectState, parseEffects } from "./effects-state.js";
 // City state: tile schema, creation, save format (version 6).
 import { generateTerrain, LAYOUTS, MAX_ELEVATION } from "./terrain.js";
@@ -98,6 +99,7 @@ export function blankCity({ seed = 42, size = DEFAULT_SIZE, layout, name = "New 
     version: SAVE_VERSION,
     size, seed, layout: gen.layout, name, startYear,
     tiles,
+    transportConnections: [],
     money: START_MONEY, debt: 0, loans: [],
     month: 0,
     ...defaultPolicies(),
@@ -171,6 +173,7 @@ export function serialize(city) {
     version: SAVE_VERSION,
     size: city.size, seed: city.seed, layout: city.layout, name: city.name, startYear: city.startYear ?? START_YEAR,
     types, tiles,
+    transportConnections: city.transportConnections ?? [],
     money: city.money, debt: city.debt, loans: city.loans.map(loanRecord), month: city.month,
     taxes: city.taxes, funding: city.funding, ordinances: city.ordinances,
     population: city.population, happiness: city.happiness, demand: city.demand,
@@ -344,6 +347,7 @@ export function deserialize(raw) {
     }
     if (t !== anchor) { t.level = 0; t.abandoned = false; }
   }
+  city.transportConnections = parseConnections(city, d.transportConnections);
   return city;
 }
 

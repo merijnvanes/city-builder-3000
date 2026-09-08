@@ -129,3 +129,17 @@ saves, route continuity, network separation and underground utilities.
 Rail bends draw continuous curves with aligned sleepers and train movement.
 Dead ends, T junctions and four-way junctions use only their connected arms;
 road crossings and highway underpasses participate in the same rail geometry.
+
+County transport links are explicit purchases: $500 for a road, $750 for rail,
+$1,000 for a highway, per endpoint and county. After drawing to the border,
+accept the connection offer or keep a dead end. Click an existing endpoint with
+its transport tool to reconsider. Purchased links get an outward arrow/sign,
+open neighbor trade and road jobs, survive saves, and disappear when their route
+is removed. Other purchased links to that county remain active. Existing links
+in older saves and the starter town are retained. Utility connections retain
+their existing edge behavior.
+
+The agent API returns `connectionOffers` from border builds. Call
+`connections()` to list established links and offers, then explicitly purchase
+one with `connectNeighbor(x, y, side, route)`. Construction and connection
+purchases have separate undo steps. Browser regression: `node tests/neighbor-links.mjs`.

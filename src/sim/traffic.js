@@ -179,15 +179,14 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
   // Jobs in neighbouring cities at connected road exits.
   let externalJobs = 0;
   const outside = { filled: 0 };
+  const externalNodes=[];
   for (const side of Object.values(city._connections || {})) {
-    for (const t of side.roadTiles || []) {
-      const i = t.y * size + t.x;
-      const job = addJobs(i, outside, EXTERNAL_JOBS_PER_ROAD);
-      if (crossings && kind[UNDER + i] === ROAD) {
-        if (!jobsAt.has(UNDER + i)) jobsAt.set(UNDER + i, []);
-        jobsAt.get(UNDER + i).push(job);
-      }
-      externalJobs += EXTERNAL_JOBS_PER_ROAD;
+    for (const link of side.roadLinks || []) {
+      const i=link.y*size+link.x;
+      const entry=link.route==="road" && crossings && kind[UNDER+i]===ROAD ? UNDER+i : i;
+      addJobs(entry,outside,EXTERNAL_JOBS_PER_ROAD);
+      externalNodes.push(entry);
+      externalJobs+=EXTERNAL_JOBS_PER_ROAD;
     }
   }
 
@@ -418,9 +417,7 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
   const homeAt = [...new Set(homes.map((h) => h.entry))];
   // "Inter-city connections help your Commercial sector as well, by opening up
   // the borders so new customers can visit and shop."
-  for (const side of Object.values(city._connections || {})) {
-    for (const t of side.roadTiles || []) homeAt.push(t.y * size + t.x);
-  }
+  homeAt.push(...externalNodes);
   const spread = (sources) => {
     const out = new Int32Array(N).fill(-1);
     if (!sources.length) return out;

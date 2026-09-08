@@ -1,8 +1,9 @@
+import { connectionOffers } from '../src/sim/neighbor-links.js';
 // Neighbour connections, deals, external jobs and passenger rail. Port zones
 // have their own file: tests/ports.test.js.
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
-import { createCity, tick, getStats, place, setPolicy, serialize, deserialize, refresh, disaster } from "../src/sim/index.js";
+import { createCity, tick, getStats, place, setPolicy, serialize, deserialize, refresh, disaster, connectNeighbor } from "../src/sim/index.js";
 import { detectConnections, dealAvailable, signDeal, offerTerms, DEALS, cancelPenalty } from "../src/sim/neighbors.js";
 import { findLot, assignLot } from "../src/sim/lots.js";
 import { computeDemand } from "../src/sim/growth.js";
@@ -10,7 +11,12 @@ import { computeMetrics } from "../src/sim/metrics.js";
 
 const plains = () => createCity({ seed: 7, layout: "plains", starter: false, hills: 0 });
 const at = (c, x, y) => c.tiles[y * c.size + x];
-const put = (c, x, y, tool, o) => place(c, x, y, tool, { ...o, deferRefresh: true });
+// District fixtures explicitly purchase any transport endpoint they build.
+const put = (c, x, y, tool, o) => {
+  const result=place(c,x,y,tool,{...o,deferRefresh:true});
+  if(result.ok && ['road','rail','highway'].includes(tool)) for(const link of connectionOffers(c,[{x,y}])) connectNeighbor(c,link);
+  return result;
+};
 // Contracts now arrive as offers from a neighbouring mayor; these tests are
 // about how one is billed once it is signed, so they sign at list terms.
 const sign = (c, resource, side, kind) => {
@@ -275,7 +281,7 @@ describe("transport buildings", () => {
     const c = plains();
     c.money = 5_000_000;
     assert.equal(dealAvailable(detectConnections(c), "garbage", "north"), false);
-    for (let x = 0; x <= 10; x++) place(c, x, 20, "rail");
+    for (let x = 0; x <= 10; x++) put(c, x, 20, "rail");
     assert.equal(dealAvailable(detectConnections(c), "garbage", "west"), true, "rail counts too");
     assert.equal(dealAvailable(detectConnections(c), "garbage", "north"), false, "but only on its own side");
   });

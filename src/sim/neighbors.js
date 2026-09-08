@@ -1,7 +1,8 @@
+import { linked } from './neighbor-links.js';
 // Neighbouring cities beyond the four map edges.
 //
-// A road, rail line, power line or pipe that reaches the map edge connects
-// to the neighbour on that side. Connections open trade (demand and jobs)
+// Roads and rails connect only through purchased county endpoints; power
+// lines and pipes connect when they reach the edge. Connections open trade (demand and jobs)
 // and neighbour deals: buying or selling power and water, and exporting or
 // importing garbage. Deals end when their connection is cut.
 import { ROAD_TYPES } from "./catalog.js";
@@ -112,10 +113,13 @@ export function detectConnections(city) {
   const result = {};
   const ports = standingPorts(city);
   SIDES.forEach((side, index) => {
-    const info = { name: neighborName(city.seed, index), road: 0, rail: 0, power: 0, water: 0, port: 0, roadTiles: [], powerTiles: [], pipeTiles: [] };
+    const info = { name: neighborName(city.seed, index), road: 0, rail: 0, power: 0, water: 0, port: 0, roadTiles: [], roadLinks: [], powerTiles: [], pipeTiles: [] };
     for (const t of edgeTiles(city, side)) {
-      if (t.type === "road" || t.type === "highway") { info.road++; info.roadTiles.push(t); }
-      if (t.type === "rail" || t.under === 2) info.rail++;
+      for (const route of ["road","highway"]) if (linked(city,t.x,t.y,side,route)) {
+        info.road++; info.roadLinks.push({x:t.x,y:t.y,route});
+        if(!info.roadTiles.includes(t)) info.roadTiles.push(t);
+      }
+      if (linked(city,t.x,t.y,side,"rail")) info.rail++;
       if (t.powerline) { info.power++; info.powerTiles.push(t); }
       if (t.pipe) { info.water++; info.pipeTiles.push(t); }
     }

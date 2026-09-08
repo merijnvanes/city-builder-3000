@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createCity, place, evaluate, serialize, deserialize, refresh } from '../src/sim/index.js';
+import { createCity, place, evaluate, serialize, deserialize, refresh, connectNeighbor } from '../src/sim/index.js';
 import { assignLot } from '../src/sim/lots.js';
 import { updateTraffic } from '../src/sim/traffic.js';
 import { besideWhatItNeeds } from '../src/sim/siting.js';
@@ -78,7 +78,7 @@ test('border highway crossings keep highway access to external jobs',()=>{
     const c=town();
     for(let x=0;x<=20;x++) put(c,x,20,'highway');
     put(c,20,21,'road'); put(c,20,20,'onramp'); lot(c,20,22,'residential');
-    put(c,0,20,lower); refresh(c);
+    put(c,0,20,lower); connectNeighbor(c,{x:0,y:20,side:'west',route:'highway'}); refresh(c);
     assert.ok(c._connections.west.road>0); assert.ok(at(c,20,22).commute>0);
   }
 });

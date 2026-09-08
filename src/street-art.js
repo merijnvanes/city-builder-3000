@@ -1,3 +1,4 @@
+import { outwardConnection } from './sim/neighbor-links.js';
 import { carriesRoute } from './sim/catalog.js';
 // Connected street surfaces and small, camera-aware street furniture.
 const DIRECTIONS = [[1, 0], [0, 1], [-1, 0], [0, -1]];
@@ -28,7 +29,7 @@ export function drawTunnelMouth(r, t, city, portal) {
 export function streetConnections(t, city, as = t.type) {
   return DIRECTIONS.map(([dx, dy]) => {
     const x = t.x + dx, y = t.y + dy;
-    if (x < 0 || y < 0 || x >= city.size || y >= city.size) return false;
+    if (x < 0 || y < 0 || x >= city.size || y >= city.size) return outwardConnection(city,t,dx,dy,as);
     const n = city.tiles[y * city.size + x];
     return carriesRoute(n, as) || n.type === 'onramp' || as === 'onramp' && (carriesRoute(n, 'road') || carriesRoute(n, 'highway'));
   });

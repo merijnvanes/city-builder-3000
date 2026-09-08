@@ -1,3 +1,4 @@
+import { EDGE_DIRECTIONS } from './sim/neighbor-links.js';
 import { drawRail, drawTrain } from './rail-art.js';
 import { withGroundClip } from './ground-effects.js';
 import { civicSpriteSpec } from './civic-sprites.js';
@@ -662,6 +663,19 @@ export class CityRenderer {
         ctx.lineWidth = 3; ctx.strokeStyle = "#101820cc"; ctx.strokeText(label, p.x, p.y);
         ctx.fillStyle = links ? "#e8f0d8" : "#b8c4b0"; ctx.fillText(label, p.x, p.y);
       }
+    }
+
+    // Purchased endpoints have a sign and an outward arrow on the route.
+    for (const link of city.transportConnections || []) {
+      const [dx,dy]=EDGE_DIRECTIONS[link.side],x=link.x+.5+dx*.35,y=link.y+.5+dy*.35;
+      const p=this.project(x,y,10),foot=this.project(x,y,0);
+      this.line(foot,p,'#dae2bf',1,ctx);
+      ctx.fillStyle='#245a43';ctx.fillRect(p.x-8*this.zoom,p.y-5*this.zoom,16*this.zoom,10*this.zoom);
+      const direction=this.project(x+dx*.2,y+dy*.2,10);
+      const length=Math.hypot(direction.x-p.x,direction.y-p.y),ux=(direction.x-p.x)/length,uy=(direction.y-p.y)/length;
+      const a={x:p.x-ux*5*this.zoom,y:p.y-uy*5*this.zoom},b={x:p.x+ux*5*this.zoom,y:p.y+uy*5*this.zoom};
+      this.line(a,b,'#f3dfa2',1.5,ctx);
+      for(const side of [-1,1]) this.line(b,{x:b.x-ux*4*this.zoom-uy*side*3*this.zoom,y:b.y-uy*4*this.zoom+ux*side*3*this.zoom},'#f3dfa2',1.2,ctx);
     }
 
     // Fires and smoke.
