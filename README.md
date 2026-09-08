@@ -237,7 +237,9 @@ terraced corner support and tree overlap at all four rotations.
 ### Construction sites
 
 Zoned buildings use a separate construction site during their existing first
-month: exposed floor slabs and columns, materials, and a braced crane. The
+month: exposed floor slabs and columns, materials, and a braced crane. Each
+site uses one of four orientations, fixed by its saved location and variant.
+The crane side and heading stay consistent when the camera rotates. The
 finished sprite appears when that construction state ends. Abandoned sites
 do not show cranes. Check `pnpm test:construction-art` against the development
 server.

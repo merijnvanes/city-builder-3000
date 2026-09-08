@@ -22,10 +22,12 @@ try {
   paint(tile);await warm(tile);const original=paint(tile).canvas;
   tile.level=4;paint(tile);await warm(tile);const grown=paint(tile).canvas;
   if(original===grown)throw new Error('Growth reused the previous stage');
-  tile.age=0;const construction=paint(tile);
+  const cranePoints=[],line=r.line;
+  r.line=function(a,b,color,...rest){if(color==='#d6b64b')cranePoints.push(a,b);return line.call(this,a,b,color,...rest);};
+  tile.age=0;const construction=paint(tile);r.line=line;
   if(construction.canvas)throw new Error('Construction must use exact pixel picking for overlay bounds');
-  const h=civicSpriteSpec(tile).height+10;
-  const tip=r.project(tile.x+.85,tile.y+.15,h);
+  const tip=cranePoints.sort((a,b)=>a.y-b.y)[0];
+  if(!tip)throw new Error('Construction crane was not drawn');
   if(r.pickObject(tip.x,tip.y).x!==tile.x)throw new Error('Construction crane cannot be picked');
   tile.age=10;tile.abandoned=true;r.night=true;const abandonStart=loaded.length;await warm(tile);const abandoned=paint(tile);
   const unpowered=civicSpriteSpec(tile).frames['unpowered-0-v1'];
