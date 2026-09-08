@@ -158,7 +158,7 @@ function offerConnections(offers, owner=city) {
   const [link,...rest]=offers,quote=quoteConnection(city,link);
   if(!quote.ok || quote.noop) return offerConnections(rest,owner);
   constructionDialog({title:'Connect to neighboring county?',
-    message:`Connect the ${link.route} at (${link.x}, ${link.y}) to ${city._connections[link.side].name} on the ${link.side} border for $${quote.cost.toLocaleString()}?`,
+    message:`Connect to ${city._connections[link.side].name} for $${quote.cost.toLocaleString()}?`,
     acceptLabel:`Connect · $${quote.cost.toLocaleString()}`,cancelLabel:'Keep dead end',
     accept:()=>{if(owner===city) connectNeighbor(link);offerConnections(rest,owner);},
     cancel:()=>offerConnections(rest,owner)});
