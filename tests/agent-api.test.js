@@ -392,3 +392,9 @@ function createAt(size) {
     renderer: null, ui: { notify: () => {} }, undo: createUndoManager(1),
   });
 }
+test('pond site searches return nearest buildable quotes without exhausting every equal-price site',()=>{
+ const h=harness({starter:false}),c=h.getCity();
+ const result=h.agent.find('makewater',{near:{x:20,y:20},limit:3});
+ assert.equal(result.spots.length,3);assert.equal(result.exhaustive,false);
+ for(const spot of result.spots)assert.equal(sim.evaluate(c,spot.x,spot.y,'makewater').ok,true);
+});

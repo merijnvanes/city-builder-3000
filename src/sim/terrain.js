@@ -32,6 +32,7 @@ export function fbm(x, y, seed, scale = 12) {
 
 export const LAYOUTS = ["river", "coast", "lakes", "delta", "plains"];
 export const MAX_ELEVATION = 8;
+export const MIN_ELEVATION = -8;
 
 // Relax a per-tile height field so neighbours never differ by more than one
 // level, lowering peaks toward their neighbours. Water stays at zero.

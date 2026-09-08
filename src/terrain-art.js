@@ -1,3 +1,4 @@
+import { waterSurface } from './sim/surface-water.js';
 // Broad, continuous color variation keeps natural terrain from reading as a
 // checkerboard. The simulation grid remains visible when a tool is selected.
 import { noise } from './sim/terrain.js';
@@ -28,10 +29,22 @@ export function drawShoreline(r, tile, city) {
   // A small waterline follows only genuine land boundaries, never map edges.
   for (const [dx, dy] of [[0, -1], [1, 0], [0, 1], [-1, 0]]) {
     const neighbor = at(city, x + dx, y + dy);
-    if (!neighbor || neighbor.terrain === 'water') continue;
+    if (!neighbor || neighbor.terrain === 'water' && waterSurface(neighbor)>=waterSurface(tile)-1e-7) continue;
     const alongX = dy !== 0;
     const ax = x + (dx === 1 ? 1 : 0), ay = y + (dy === 1 ? 1 : 0);
     const bx = ax + (alongX ? 1 : 0), by = ay + (alongX ? 0 : 1);
+    const waterHeight=waterSurface(tile)*8;
+    const atHeight=(a,b,height)=>r.project(a,b,height-waterHeight);
+    const lip=[r.project(ax,ay),r.project(bx,by)];
+    if(neighbor.terrain==='water') {
+      const bed=Math.max(tile.elev*8,waterSurface(neighbor)*8),low=waterSurface(neighbor)*8;
+      r.poly([lip[0],lip[1],atHeight(bx,by,bed),atHeight(ax,ay,bed)],'#527e83');
+      if(bed>low)r.poly([atHeight(ax,ay,bed),atHeight(bx,by,bed),atHeight(bx,by,low),atHeight(ax,ay,low)],'#89836a');
+      continue;
+    }
+    // Join the flat surface to the actual land mesh with a bank face; never
+    // flatten the neighboring hill merely to align its water-side vertex.
+    if(r.meshZ)r.poly([lip[0],lip[1],atHeight(bx,by,r.meshZ(bx,by)),atHeight(ax,ay,r.meshZ(ax,ay))],'#969673');
     // A shallow shelf fades into the channel instead of a bright tile border.
     const edge = r.project((ax + bx) / 2, (ay + by) / 2, 0.08);
     const inner = r.project((ax + bx) / 2 - dx * 0.24, (ay + by) / 2 - dy * 0.24, 0.08);

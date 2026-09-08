@@ -417,7 +417,7 @@ export function createAgentAPI({ getCity, actions, renderer, ui, undo }) {
       return {
         ...info,
         tile: {
-          x: t.x, y: t.y, type: t.type, terrain: t.terrain, elev: t.elev, trees: t.trees, salt: t.salt,
+          x: t.x, y: t.y, type: t.type, terrain: t.terrain, elev: t.elev, waterLevel: t.waterLevel, trees: t.trees, salt: t.salt,
           density: t.density, level: t.level, abandoned: t.abandoned, lot: t.lot, fire: t.fire,
           powered: t.powered, watered: t.watered, roadAccess: t.roadAccess,
           powerline: t.powerline, pipe: t.pipe, subway: t.subway, tunnel: t.tunnel, under: t.under, countyConnections: (city.transportConnections || []).filter(link=>link.x===t.x && link.y===t.y),
@@ -438,14 +438,21 @@ export function createAgentAPI({ getCity, actions, renderer, ui, undo }) {
       const limit = clamp(int(opts.limit ?? 10) || 10, 1, 100);
       const near = opts.near && Number.isFinite(opts.near.x) ? opts.near : null;
       const hits = [];
-      for (let y = box.y; y < box.y + box.h; y++)
-        for (let x = box.x; x < box.x + box.w; x++) {
-          const ev = evaluate(city, x, y, tool, { density });
-          if (!ev.ok || ev.noop) continue;
-          hits.push({ x, y, cost: ev.cost, d: near ? Math.abs(x - near.x) + Math.abs(y - near.y) : 0 });
-        }
+      const candidates=[];
+      for(let y=box.y;y<box.y+box.h;y++)for(let x=box.x;x<box.x+box.w;x++)candidates.push({x,y});
+      if(['makewater','makeland'].includes(tool) && near)candidates.sort((a,b)=>(Math.abs(a.x-near.x)+Math.abs(a.y-near.y))-(Math.abs(b.x-near.x)+Math.abs(b.y-near.y)));
+      let searched=0;
+      for(const {x,y} of candidates) {
+        searched++;
+        const ev = evaluate(city, x, y, tool, { density });
+        if (!ev.ok || ev.noop) continue;
+        hits.push({ x, y, cost: ev.cost, d: near ? Math.abs(x - near.x) + Math.abs(y - near.y) : 0 });
+        // Water tools return the nearest requested valid sites without
+        // running basin simulations for every other tile on the map.
+        if(['makewater','makeland'].includes(tool) && hits.length>=limit)break;
+      }
       hits.sort((a, b) => a.d - b.d || a.cost - b.cost);
-      return { tool, density, found: hits.length, spots: hits.slice(0, limit).map(({ x, y, cost }) => ({ x, y, cost })) };
+      return { tool, density, found: hits.length, exhaustive: searched===candidates.length, spots: hits.slice(0, limit).map(({ x, y, cost }) => ({ x, y, cost })) };
     },
 
     // What is wrong right now, worst first. Advisor lines come from the sim,

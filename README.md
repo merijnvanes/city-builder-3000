@@ -143,3 +143,19 @@ The agent API returns `connectionOffers` from border builds. Call
 `connections()` to list established links and offers, then explicitly purchase
 one with `connectNeighbor(x, y, side, route)`. Construction and connection
 purchases have separate undo steps. Browser regression: `node tests/neighbor-links.mjs`.
+
+Surface water uses a finite-volume hydrostatic model on a closed map. Terrain
+height is the bed; `waterLevel` is a separate horizontal surface. Pools fill,
+spill across terrain saddles, and merge or split as earthworks change their
+basins. Raising/lowering land conserves water; Create Water excavates and adds
+water, while Make Land pumps out and reclaims the selected tile. Terrain can be
+lowered to -8. Earthworks that would flood occupied land are refused before
+money or terrain changes. Saltwater mixing marks the receiving pool as saline. Water shallower than 0.1
+terrain levels remains a stored surface film without converting land or
+removing trees. Construction previews include changes to neighboring pools.
+
+The solver uses a simplified depression hierarchy inspired by
+[Fill–Spill–Merge](https://doi.org/10.5194/esurf-9-105-2021). It settles after
+terrain construction, with no waves, momentum, rain, evaporation or off-map
+water exchange. Existing water rows migrate to separate bed/surface heights.
+Run `node tests/surface-water.mjs` for browser surface/picking checks.

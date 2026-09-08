@@ -65,7 +65,8 @@ describe("elevation", () => {
     assert.equal(at(c, 30, 30).elev, 1);
     assert.equal(place(c, 31, 30, "level", { elev: 0 }).ok, true);
     assert.equal(at(c, 31, 30).elev, 0);
-    assert.equal(place(c, 31, 30, "lower").noop, true, "cannot go below zero");
+    assert.equal(place(c, 31, 30, "lower").ok, true, "pits can extend below sea level");
+    assert.equal(at(c, 31, 30).elev, -1);
     put(c, 40, 40, "road");
     assert.equal(place(c, 40, 40, "raise").ok, false, "built tiles stay put");
     assert.equal(place(c, 41, 40, "raise").ok, true);

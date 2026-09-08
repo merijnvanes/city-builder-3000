@@ -1,7 +1,8 @@
+import { bedElevation, waterSurface, waterVolume, MIN_WATER_DEPTH, WATER_EPSILON } from './surface-water.js';
 import { parseConnections } from './neighbor-links.js';
 import { effectState, parseEffects } from "./effects-state.js";
 // City state: tile schema, creation, save format (version 6).
-import { generateTerrain, LAYOUTS, MAX_ELEVATION } from "./terrain.js";
+import { generateTerrain, LAYOUTS, MAX_ELEVATION, MIN_ELEVATION } from "./terrain.js";
 import { BUILDINGS, ZONE_TYPES, PORT_TYPES, ZONED_TYPES, ROAD_TYPES, FUNDED_DEPARTMENTS } from "./catalog.js";
 import { tileAt } from "./grid.js";
 import { lotTiles } from "./lots.js";
@@ -50,7 +51,8 @@ export const ORDINANCES = {
 
 export function makeTile(x, y, terrain, trees, variant, elev = 0, salt = 0) {
   return {
-    x, y, terrain, trees, elev,
+    x, y, terrain, trees, elev: terrain === "water" ? elev - 1 : elev,
+    waterLevel: terrain === "water" ? elev - .25 : null,
     // Sea water. Fresh pumps cannot draw from it; a desalinization plant can.
     salt: terrain === "water" ? !!salt : false,
     type: "empty", density: 0, lot: null, level: 0, variant, abandoned: false, age: 0, fire: 0, industry: null, commerce: null, strain: 0,
@@ -164,10 +166,10 @@ export function serialize(city) {
     TERRAIN_CODE[t.terrain], t.trees | 0, code(t.type), t.density | 0,
     t.lot ? t.lot.x : -1, t.lot ? t.lot.y : -1, t.lot ? t.lot.w : 0, t.lot ? t.lot.h : 0,
     t.level | 0, Math.round(t.variant * 1000) / 1000, t.abandoned ? 1 : 0, t.age | 0, t.fire | 0,
-    t.powerline ? 1 : 0, t.pipe ? 1 : 0, t.elev | 0, t.subway ? 1 : 0, t.flooded | 0,
+    t.powerline ? 1 : 0, t.pipe ? 1 : 0, bedElevation(t), t.subway ? 1 : 0, t.flooded | 0,
     t.industry ? INDUSTRY_TYPES.indexOf(t.industry) + 1 : 0, t.strain | 0, t.salt ? 1 : 0,
     Math.round((t.fill || 0) * 100) / 100, t.tunnel | 0,
-    t.commerce ? COMMERCE_TYPES.indexOf(t.commerce) + 1 : 0, t.radiation ? 1 : 0, t.under | 0,
+    t.commerce ? COMMERCE_TYPES.indexOf(t.commerce) + 1 : 0, t.radiation ? 1 : 0, t.under | 0, waterVolume(t)>0 ? waterSurface(t) : null,
   ]);
   return JSON.stringify({
     version: SAVE_VERSION,
@@ -239,8 +241,8 @@ export function deserialize(raw) {
   for (let i = 0; i < d.tiles.length; i++) {
     const r = d.tiles[i];
     const x = i % size, y = (i - x) / size;
-    if (!Array.isArray(r) || r.length < 15 || r.length > 26) throw new Error(`Invalid save: tile ${i} malformed.`);
-    const [terrainCode, trees, typeCode, density, lotX, lotY, lotW, lotH, level, variant, abandoned, age, fire, powerline, pipe, elev = 0, subway = 0, flooded = 0, industry = 0, strain = 0, salt = 0, fill = 0, tunnel = 0, commerce = 0, radiation = 0, under = 0] = r;
+    if (!Array.isArray(r) || r.length < 15 || r.length > 27) throw new Error(`Invalid save: tile ${i} malformed.`);
+    const [terrainCode, trees, typeCode, density, lotX, lotY, lotW, lotH, level, variant, abandoned, age, fire, powerline, pipe, elev = 0, subway = 0, flooded = 0, industry = 0, strain = 0, salt = 0, fill = 0, tunnel = 0, commerce = 0, radiation = 0, under = 0, waterLevel = undefined] = r;
     if (![0, 1].includes(radiation)) throw new Error(`Invalid save: tile ${i} bad radiation.`);
     if (![0, 1, 2].includes(under)) throw new Error(`Invalid save: tile ${i} bad viaduct.`);
     if (!Number.isInteger(commerce) || commerce < 0 || commerce > COMMERCE_TYPES.length) throw new Error(`Invalid save: tile ${i} bad commerce.`);
@@ -249,7 +251,7 @@ export function deserialize(raw) {
     if (![0, 1].includes(salt)) throw new Error(`Invalid save: tile ${i} bad water type.`);
     if (!Number.isInteger(industry) || industry < 0 || industry > INDUSTRY_TYPES.length) throw new Error(`Invalid save: tile ${i} bad industry.`);
     if (!Number.isInteger(strain) || strain < 0 || strain > OVERLOAD_MONTHS) throw new Error(`Invalid save: tile ${i} bad plant strain.`);
-    if (!Number.isInteger(elev) || elev < 0 || elev > MAX_ELEVATION) throw new Error(`Invalid save: tile ${i} bad elevation.`);
+    if (!Number.isInteger(elev) || elev < MIN_ELEVATION || elev > MAX_ELEVATION) throw new Error(`Invalid save: tile ${i} bad elevation.`);
     if (!Number.isInteger(flooded) || flooded < 0 || flooded > 2) throw new Error(`Invalid save: tile ${i} bad flood duration.`);
     if (![0, 1].includes(subway)) throw new Error(`Invalid save: tile ${i} bad subway flag.`);
     if (!TERRAIN_NAME[terrainCode]) throw new Error(`Invalid save: tile ${i} bad terrain.`);
@@ -269,6 +271,11 @@ export function deserialize(raw) {
     // Only a highway carries a route beneath it.
     if (under && type !== "highway" && !(type === "road" && under === 2)) throw new Error(`Invalid save: tile ${i} has a viaduct without a highway.`);
     const t = makeTile(x, y, terrain, trees, variant, elev, salt);
+    if (waterLevel !== undefined) {
+      const depth=waterLevel-elev;
+      if(waterLevel===null ? terrain==="water" : !Number.isFinite(waterLevel) || depth<=0 || waterLevel>MAX_ELEVATION+1 || (terrain==="water" ? depth<MIN_WATER_DEPTH-WATER_EPSILON : depth>=MIN_WATER_DEPTH-WATER_EPSILON)) throw new Error(`Invalid save: tile ${i} bad water level.`);
+      t.elev = elev; t.waterLevel = waterLevel;
+    }
     t.type = type; t.density = density; t.level = level; t.abandoned = !!abandoned; t.age = age; t.fire = fire;
     t.powerline = !!powerline; t.pipe = !!pipe; t.subway = !!subway; t.flooded = flooded;
     t.industry = industry ? INDUSTRY_TYPES[industry - 1] : null;

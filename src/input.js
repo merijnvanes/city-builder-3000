@@ -8,10 +8,13 @@ export function attachInput(canvas,renderer,actions,planConstruction){
  const point=e=>{const r=canvas.getBoundingClientRect();return {x:e.clientX-r.left,y:e.clientY-r.top};};
  const pickTile=p=>['inspect','bulldoze'].includes(actions.getTool())?renderer.pickObject(p.x,p.y):renderer.pick(p.x,p.y);
  const gestureInfo=()=>{const [a,b]=[...pointers.values()];return {x:(a.x+b.x)/2,y:(a.y+b.y)/2,d:Math.max(1,Math.hypot(a.x-b.x,a.y-b.y))};};
+ let previewCache=null;
  const showPreview=tile=>{
   if(actions.getTool()==='inspect'){renderer.preview=null;actions.onPreview(null);return;}
   const start=stroke&&!stroke.pan?stroke.start:tile;
-  const plan=planConstruction(actions.getCity(),start,tile,actions.getTool(),{density:actions.getDensity()});
+  const city=actions.getCity(),key=[start.x,start.y,tile.x,tile.y,actions.getTool(),actions.getDensity(),city.revision,city.money].join(':');
+  const plan=previewCache?.city===city && previewCache.key===key ? previewCache.plan : planConstruction(city,start,tile,actions.getTool(),{density:actions.getDensity()});
+  previewCache={city,key,plan};
   renderer.preview=plan;actions.onPreview(plan);
  };
  function cancel(){stroke=null;gesture=null;renderer.preview=null;pointers.clear();actions.onPreview(null);}

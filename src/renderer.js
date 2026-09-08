@@ -1,3 +1,4 @@
+import { waterSurface } from './sim/surface-water.js';
 import { EDGE_DIRECTIONS } from './sim/neighbor-links.js';
 import { drawRail, drawTrain } from './rail-art.js';
 import { withGroundClip } from './ground-effects.js';
@@ -101,6 +102,12 @@ export class CityRenderer {
   // whole lot sits on a flat platform at its tile's level.
   groundZ(x, y) {
     if (this.platform != null) return this.platform;
+    const tx=Math.max(0,Math.min(this.size-1,Math.floor(x))),ty=Math.max(0,Math.min(this.size-1,Math.floor(y)));
+    const tile=this.tiles?.[ty*this.size+tx];
+    if(x>=0 && y>=0 && x<=this.size && y<=this.size && tile?.terrain==='water')return waterSurface(tile)*ELEV_PX;
+    return this.meshZ(x,y);
+  }
+  meshZ(x,y) {
     const c = this.corners;
     if (!c) return 0;
     const n = this.size || 64;
@@ -120,17 +127,22 @@ export class CityRenderer {
         for (const [dx, dy] of [[-1, -1], [0, -1], [-1, 0], [0, 0]]) {
           const tx = vx + dx, ty = vy + dy;
           if (tx < 0 || ty < 0 || tx >= n || ty >= n) continue;
-          sum += city.tiles[ty * n + tx].elev || 0; count++;
+          const tile=city.tiles[ty*n+tx];
+          sum += tile.terrain==='water'?waterSurface(tile):(tile.elev || 0); count++;
         }
         c[vy * w + vx] = count ? (sum / count) * ELEV_PX : 0;
       }
     }
     const boundary = [];
     for (let i = 0; i <= n; i++) boundary.push(c[i], c[n * w + i], c[i * w], c[i * w + n]);
+    for(let i=0;i<n;i++)for(const index of [i,(n-1)*n+i,i*n,i*n+n-1]) {
+      const t=city.tiles[index];boundary.push(t.terrain==='water'?waterSurface(t):t.elev);
+    }
     const boundaryKey = boundary.join(',');
     if (boundaryKey !== this.terrainBoundaryKey) this.terrainBoundaryRevision = (this.terrainBoundaryRevision || 0) + 1;
     this.terrainBoundaryKey = boundaryKey;
     this.corners = c;
+    this.cornerRevision = city.revision;
     this.tiles = city.tiles;
   }
   project(x, y, z = 0) {
@@ -304,6 +316,12 @@ export class CityRenderer {
     return clamp(1 + (ew * 0.5 + ns * 0.35) / ELEV_PX * 0.11, 0.8, 1.2);
   }
   terrain(t, city) {
+    const platform=this.platform;
+    this.platform=t.terrain==='water'?waterSurface(t)*ELEV_PX:null;
+    try { this.paintTerrain(t,city); }
+    finally { this.platform=platform; }
+  }
+  paintTerrain(t, city) {
     const { x, y } = t, water = t.terrain === "water";
     let color = this.surfaceColors?.[y * city.size + x] || surfaceColor(t, city);
     if (!water) {
@@ -436,7 +454,7 @@ export class CityRenderer {
     this.paintEpoch = (this.paintEpoch || 0) + 1;
     this.pickables = [];
     this.size = city.size;
-    if (!this.corners || this.tiles !== city.tiles || city.revision !== this.lastRevision) this.buildCorners(city);
+    if (!this.corners || this.tiles !== city.tiles || city.revision !== this.cornerRevision) this.buildCorners(city);
     const ctx = this.base;
     ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     ctx.clearRect(0, 0, this.w, this.h);

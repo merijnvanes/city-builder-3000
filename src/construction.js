@@ -67,13 +67,17 @@ export function planConstruction(city, start, end, tool, options = {}) {
     {...inMap.at(-1),dx:inMap.at(-1).x-inMap.at(-2).x,dy:inMap.at(-1).y-inMap.at(-2).y},
   ];
   const seen = new Set();
-  const tiles = [], actions = [];
+  const tiles = [], actions = [], effects = new Map();
   let cost = 0;
   const b = footprint(tool);
   // Level flattens the whole drag to the height of the tile it started on.
   const elev = tool === "level" ? city.tiles[sy * city.size + sx]?.elev : undefined;
   for (const c of coords) {
     const ev = evaluate(city, c.x, c.y, tool, { density, elev });
+    for(const change of ev.waterPlan?.changes || []) {
+      const t=change.tile;
+      if(t.terrain!==change.terrain || Math.abs((t.waterLevel ?? t.elev)-(change.waterLevel ?? change.elev))>1e-7)effects.set(`${t.x},${t.y}`,{x:t.x,y:t.y,valid:true,noop:true,effect:true,cost:0,message:'Water settles here'});
+    }
     if (ev.ok && ev.noop) {
       if (!seen.has(`${c.x},${c.y}`)) { seen.add(`${c.x},${c.y}`); tiles.push({ x: c.x, y: c.y, valid: true, noop: true, cost: 0, message: ev.message }); }
       continue;
@@ -97,6 +101,7 @@ export function planConstruction(city, start, end, tool, options = {}) {
     actions.push({ x: c.x, y: c.y, cost: ev.cost });
     cost += ev.cost;
   }
+  for(const [key,tile] of effects)if(!seen.has(key))tiles.push(tile);
   const count = actions.length;
   const valid = count > 0;
   const affordable = valid && cost <= city.money;

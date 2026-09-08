@@ -1,15 +1,16 @@
+import { surfaceWaterPlan, applySurfaceWater, waterVolume, waterSurface, INITIAL_DEPTH } from './surface-water.js';
 // Construction rules: evaluate() prices a single action without mutating;
 // place() applies it. Multi-tile buildings are placed by their top-left
 // anchor and every footprint tile must be free land.
 import { BUILDINGS, ZONE_COST, PORT_TYPES, ZONED_TYPES, OVERLAY_TOOLS, TOOL_MAP, TECH_YEAR, LEVEL_FEE, ROAD_TYPES, carriesRoute } from "./catalog.js";
 import { yearOf } from "./metrics.js";
-import { MAX_ELEVATION } from "./terrain.js";
+import { MAX_ELEVATION, MIN_ELEVATION } from "./terrain.js";
 
 // Terrain changes cascade: every neighbour is dragged to within one level,
 // so a hill grows a gentle base. Nothing built may be in the way, and water
-// stays at its level.
+// settles after earthworks.
 function terraformPlan(city, start, target) {
-  if (target < 0 || target > MAX_ELEVATION) return { error: "Terrain cannot go that far." };
+  if (target < MIN_ELEVATION || target > MAX_ELEVATION) return { error: "Terrain cannot go that far." };
   const changes = new Map();
   const queue = [[start, target]];
   while (queue.length) {
@@ -17,7 +18,6 @@ function terraformPlan(city, start, target) {
     const key = t.y * city.size + t.x;
     if (changes.has(key) && changes.get(key).elev === elev) continue;
     if (t.type !== "empty" || t.lot || t.powerline || t.pipe) return { error: t === start ? "Clear the tile before changing the terrain." : "A building or road is in the way." };
-    if (t.terrain === "water") return { error: t === start ? "Fill the water first." : "Too close to the water." };
     changes.set(key, { tile: t, elev });
     for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
       const n = tileAt(city, t.x + dx, t.y + dy);
@@ -93,21 +93,30 @@ export function evaluate(city, x, y, tool, options = {}) {
   if (tool === "makewater") {
     if (t.terrain === "water") return noop("Already water.", here);
     if (t.type !== "empty" || t.powerline || t.pipe) return fail("Clear the tile before flooding it.");
-    return { ok: true, noop: false, cost: BUILDINGS.makewater.cost, message: "", tiles: here };
+    const waterPlan=surfaceWaterPlan(city,[{tile:t,elev:Math.max(MIN_ELEVATION,t.elev-1)}],new Map([[y*city.size+x,INITIAL_DEPTH]]));
+    if(waterPlan.error)return fail(waterPlan.error);
+    return { ok: true, noop: false, cost: BUILDINGS.makewater.cost, message: "Excavate and fill a pond", tiles: here, waterPlan };
   }
   if (tool === "raise" || tool === "lower" || tool === "level") {
     const target = tool === "level" ? (options.elev ?? t.elev) : t.elev + (tool === "raise" ? 1 : -1);
-    if (target < 0 || target > MAX_ELEVATION) return noop("Terrain cannot go that far.", here);
+    if (target < MIN_ELEVATION || target > MAX_ELEVATION) return noop("Terrain cannot go that far.", here);
     if (t.elev === target) return noop("Already at that level.", here);
     const plan = terraformPlan(city, t, target);
     if (plan.error) return fail(plan.error);
     const tiles = plan.changes.map((c) => ({ x: c.tile.x, y: c.tile.y }));
-    return { ok: true, noop: false, cost: BUILDINGS[tool].cost * plan.changes.length, message: plan.changes.length > 1 ? `Moves ${plan.changes.length} tiles` : "", tiles, changes: plan.changes };
+    const touchesWater=plan.changes.some(({tile})=>waterVolume(tile)>0 || [[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>waterVolume(tileAt(city,tile.x+dx,tile.y+dy) || {})>0));
+    const waterPlan=touchesWater?surfaceWaterPlan(city,plan.changes):null;
+    if(waterPlan?.error)return fail(waterPlan.error);
+    return { ok: true, noop: false, cost: BUILDINGS[tool].cost * plan.changes.length, message: plan.changes.length > 1 ? `Moves ${plan.changes.length} tiles` : "", tiles, changes: plan.changes, waterPlan };
   }
   if (tool === "makeland") {
     if (t.terrain !== "water") return noop("Already dry land.", here);
     if (t.type !== "empty") return fail("Remove the bridge first.");
-    return { ok: true, noop: false, cost: BUILDINGS.makeland.cost, message: "", tiles: here };
+    const earth=terraformPlan(city,t,Math.ceil(waterSurface(t)));
+    if(earth.error)return fail(earth.error);
+    const waterPlan=surfaceWaterPlan(city,earth.changes,new Map([[y*city.size+x,-waterVolume(t)]]));
+    if(waterPlan.error)return fail(waterPlan.error);
+    return { ok: true, noop: false, cost: BUILDINGS.makeland.cost + Math.max(0,earth.changes.length-1)*BUILDINGS.level.cost, message: "Drain and reclaim this tile", tiles: earth.changes.map(c=>({x:c.tile.x,y:c.tile.y})), waterPlan };
   }
 
   // "If the underground distance is sufficient for the tunnel to be
@@ -261,12 +270,11 @@ export function place(city, x, y, tool, options = {}) {
     t[tool] = true;
   } else if (tool === "tree") {
     t.trees = Math.min(3, (t.trees || 0) + 1);
-  } else if (tool === "makewater") {
-    t.terrain = "water"; t.trees = 0; t.elev = Math.max(0, Math.min(t.elev, ...[[1, 0], [-1, 0], [0, 1], [0, -1]].map(([dx, dy]) => tileAt(city, t.x + dx, t.y + dy)?.elev ?? t.elev)));
-  } else if (tool === "makeland") {
-    t.terrain = "sand";
+  } else if (tool === "makewater" || tool === "makeland") {
+    applySurfaceWater(ev.waterPlan);
   } else if (tool === "raise" || tool === "lower" || tool === "level") {
     for (const c of ev.changes) c.tile.elev = c.elev;
+    if(ev.waterPlan)applySurfaceWater(ev.waterPlan);
   } else if (BUILDINGS[tool]?.bores) {
     bore(city, ev.run, BUILDINGS[tool].bores);
   } else if (tool === "road" || tool === "rail" || tool === "highway" || tool === "onramp") {

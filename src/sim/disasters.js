@@ -226,7 +226,7 @@ export function triggerDisaster(city, id, rng) {
       const d = Math.max(Math.abs(dx), Math.abs(dy));
       if (d > R) { if (rng() < 0.4) ignite(city, t, 2); continue; }
       // The cone rises one step per tile toward the crater and buries everything on it.
-      t.terrain = "rock";
+      t.terrain = "rock"; t.waterLevel = null;
       // The maximum of two gentle height fields remains gentle at the rim.
       t.elev = Math.max(t.elev || 0, peak - d);
       if (t.lot) { const a = anchorOf(city, t); if (a) { clearLot(city, a, { keepZone: false }); hit++; } }
