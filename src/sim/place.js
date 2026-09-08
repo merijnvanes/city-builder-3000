@@ -3,7 +3,7 @@ import { surfaceWaterPlan, applySurfaceWater, waterVolume, waterSurface, INITIAL
 // Construction rules: evaluate() prices a single action without mutating;
 // place() applies it. Multi-tile buildings are placed by their top-left
 // anchor and every footprint tile must be free land.
-import { BUILDINGS, ZONE_COST, PORT_TYPES, ZONED_TYPES, OVERLAY_TOOLS, TOOL_MAP, TECH_YEAR, LEVEL_FEE, ROAD_TYPES, carriesRoute } from "./catalog.js";
+import { BUILDINGS, ZONE_COST, PORT_TYPES, ZONED_TYPES, OVERLAY_TOOLS, TOOL_MAP, TECH_YEAR, LEVEL_FEE, ROAD_TYPES, carriesRoute, powerlineSite } from "./catalog.js";
 import { yearOf } from "./metrics.js";
 import { MAX_ELEVATION, MIN_ELEVATION } from "./terrain.js";
 
@@ -57,6 +57,8 @@ export function evaluate(city, x, y, tool, options = {}) {
   const here = [{ x, y }];
 
   if (tool === "inspect") return noop("", here);
+  if(tool==='powerline' && t.terrain==='water')return fail('Power lines need dry land. Bridges carry power across water through built-in cabling.');
+  if(tool==='powerline' && !powerlineSite(t))return fail('Power lines need an empty surface tile. Buildings and transport routes cannot share their tile.');
   if(t.structure && (t.structure.kind==='bridge' || isPortal(t))) {
     if(tool==='bulldoze')return {ok:true,noop:false,cost:DEMOLISH_FEE*(t.structure.length+2),message:`Remove entire ${t.structure.kind}`,tiles:structureTiles(city,t.structure).map(n=>({x:n.x,y:n.y})),removeStructure:t.structure};
     if(tool===t.structure.route)return noop('Route already here.',here);
@@ -84,7 +86,7 @@ export function evaluate(city, x, y, tool, options = {}) {
 
   if (OVERLAY_TOOLS.has(tool)) {
     const b = BUILDINGS[tool];
-    if (t.terrain === "water" && (tool === "subway" || !ROAD_TYPES.has(t.type))) return fail(tool === "pipe" ? "Pipes cannot cross water." : tool === "subway" ? "Subways cannot run under water." : "Power lines need a bridge to cross water.");
+    if (t.terrain === "water" && (tool === "subway" || !ROAD_TYPES.has(t.type))) return fail(tool === "subway" ? "Subways cannot run under water." : "Pipes cannot cross water.");
     if (t[tool]) return noop("Already here.", here);
     return { ok: true, noop: false, cost: b.cost, message: "", tiles: here };
   }
@@ -275,10 +277,12 @@ export function place(city, x, y, tool, options = {}) {
   if(ev.removeStructure) {
     removeStructure(city,ev.removeStructure);
   } else if (ZONED_TYPES.has(tool)) {
-    t.type = tool; t.density = PORT_TYPES.has(tool) ? 1 : density; t.level = 0; t.lot = null; t.trees = 0; t.abandoned = false; t.age = 0;
+    t.powerline = false; t.type = tool; t.density = PORT_TYPES.has(tool) ? 1 : density; t.level = 0; t.lot = null; t.trees = 0; t.abandoned = false; t.age = 0;
   } else if (OVERLAY_TOOLS.has(tool)) {
     t[tool] = true;
+    if(tool==='powerline')t.trees=0;
   } else if (tool === "tree") {
+    t.powerline = false;
     t.trees = Math.min(3, (t.trees || 0) + 1);
   } else if (tool === "makewater" || tool === "makeland") {
     applySurfaceWater(ev.waterPlan);
@@ -288,7 +292,7 @@ export function place(city, x, y, tool, options = {}) {
   } else if (BUILDINGS[tool]?.bores) {
     bore(city, ev.run, BUILDINGS[tool].bores);
   } else if (tool === "road" || tool === "rail" || tool === "highway" || tool === "onramp") {
-    t.type = ev.surface ?? tool; t.trees = 0; t.density = 0; t.level = 0;
+    t.powerline = false; t.type = ev.surface ?? tool; t.trees = 0; t.density = 0; t.level = 0;
     if (ev.under) t.under = ev.under;
   } else if (tool === "dispatch") {
     const a = t.lot ? anchorOf(city, t) : t;

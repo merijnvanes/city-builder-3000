@@ -59,6 +59,7 @@ export function findLot(city, seed) {
 
 export function assignLot(city, lot, level, variant) {
   for (const t of lotTiles(city, lot)) {
+    t.powerline = false;
     t.lot = { x: lot.x, y: lot.y, w: lot.w, h: lot.h };
     t.level = 0;
     t.abandoned = false;

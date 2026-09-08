@@ -1,14 +1,14 @@
 // Power and water networks.
 //
 // Power conducts through power lines, zoned tiles and building footprints.
-// Roads do not carry power. A network is powered when its plants supply at
+// Bridges carry power through built-in cables; ordinary roads do not. A network is powered when its plants supply at
 // least its demand; otherwise buildings are served in tile order until the
 // budget runs out (a brownout).
 //
 // Water flows through pipes. A pipe network serves every tile within
 // WATER_RADIUS (square) of one of its pipes, with the same budget rule.
 import { components, forSquare, forRadius, tileAt } from "./grid.js";
-import { BUILDINGS, ZONED_TYPES, ROAD_TYPES } from "./catalog.js";
+import { BUILDINGS, ROAD_TYPES, conductsPower } from "./catalog.js";
 import { isAnchor, anchorOf, drawOf, lotTiles } from "./lots.js";
 import { dealTerms } from "./neighbors.js";
 import { plantOutput, OVERLOAD_RATIO } from "./power.js";
@@ -54,7 +54,6 @@ function applyDeal(city, resource, netIds, supply, consumers, tilesKey) {
 // Conductors: power lines, zoned tiles and building footprints. Power also
 // jumps across a single road or rail tile, so lots on both sides of a
 // street share a network without lines along every block.
-const conducts = (t) => t.powerline || !!t.lot || ZONED_TYPES.has(t.type);
 const isRoad = (t) => ROAD_TYPES.has(t.type);
 
 function powerComponents(city) {
@@ -64,7 +63,7 @@ function powerComponents(city) {
   let count = 0;
   const step = [[1, 0], [-1, 0], [0, 1], [0, -1]];
   for (let start = 0; start < tiles.length; start++) {
-    if (ids[start] !== -1 || !conducts(tiles[start])) continue;
+    if (ids[start] !== -1 || !conductsPower(tiles[start])) continue;
     let head = 0, tail = 0;
     queue[tail++] = start; ids[start] = count;
     while (head < tail) {
@@ -75,12 +74,12 @@ function powerComponents(city) {
         if (nx < 0 || ny < 0 || nx >= size || ny >= size) continue;
         let ni = ny * size + nx;
         let n = tiles[ni];
-        if (!conducts(n)) {
+        if (!conductsPower(n)) {
           if (!isRoad(n) || n.powerline) continue;
           nx += dx; ny += dy;
           if (nx < 0 || ny < 0 || nx >= size || ny >= size) continue;
           ni = ny * size + nx; n = tiles[ni];
-          if (!conducts(n)) continue;
+          if (!conductsPower(n)) continue;
         }
         if (ids[ni] === -1) { ids[ni] = count; queue[tail++] = ni; }
       }

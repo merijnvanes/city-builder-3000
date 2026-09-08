@@ -419,7 +419,7 @@ describe("saves", () => {
       const restored = at(loaded, t.x, t.y);
       assert.equal(restored.type, t.type);
       assert.equal(restored.terrain, "water");
-      assert.equal(restored.powerline, true);
+      assert.equal(restored.powerline, false);
     }
   });
   test("lots cannot change density or elevation partway through a saved footprint", () => {

@@ -42,7 +42,12 @@ function run(seed) {
   const c = createCity(seed, true);
   const log = [];
   for (let y = 0; y < YEARS; y++) {
-    for (let m = 0; m < 12; m++) tick(c);
+    for (let m = 0; m < 12; m++) {
+      const result=tick(c);
+      // Surface wiring is vulnerable to earthquakes. A maintained town
+      // repairs a reported outage promptly instead of waiting up to a year.
+      if(result.disaster && (getStats(c).power<85 || getStats(c).water<85))maintainUtilities(c);
+    }
     maintainUtilities(c);
     const s = getStats(c);
     log.push({ year: y, pop: s.population, power: s.power, water: s.water, money: s.money, demand: s.demand.residential });

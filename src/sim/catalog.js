@@ -18,6 +18,11 @@ export const ACCESS_TYPES = new Set(["road", "rail", "onramp"]);
 // Multi-route tiles retain the two networks without creating an interchange.
 export const carriesRoute = (t, route) => !!t && (t.type === route || (route === "rail" && t.under === 2) || (route === "road" && t.under === 1));
 export const carriesLocal = (t) => ACCESS_TYPES.has(t.type) || t.under > 0;
+// A pylon occupies the surface. Buried utilities have their own layer.
+// Bridges include utility cabling; legacy water routes also retain it when
+// their old pylons are removed during load.
+export const conductsPower = t => !!t && (t.powerline || !!t.lot || ZONED_TYPES.has(t.type) || t.structure?.kind==='bridge' || t.terrain==='water' && ROAD_TYPES.has(t.type));
+export const powerlineSite = t => !!t && t.type === 'empty' && !t.lot && t.terrain !== 'water';
 export const OVERLAY_TOOLS = new Set(["powerline", "pipe", "subway"]);
 
 // Zone cost per tile scales with density. Density 1 = low, 2 = medium, 3 = high.
@@ -88,7 +93,7 @@ export const BUILDINGS = {
   solar:       { label: "Solar Array",     group: "utilities", cost: 1300,  w: 3, h: 3, upkeep: 15,  dept: "utilities", powerOut: 1000,  pollution: 0,  lifespan: 40 },
   microwave:   { label: "Microwave Plant", group: "utilities", cost: 28000, w: 4, h: 4, upkeep: 300, dept: "utilities", powerOut: 22000, pollution: 6,  lifespan: 60 },
   fusion:      { label: "Fusion Plant",    group: "utilities", cost: 40000, w: 4, h: 4, upkeep: 500, dept: "utilities", powerOut: 45000, pollution: 0,  lifespan: 80 },
-  powerline:   { label: "Power Line",      group: "utilities", cost: 5,     w: 1, h: 1, upkeep: 0,   dept: "utilities", path: true, overlay: true, water: true },
+  powerline:   { label: "Power Line",      group: "utilities", cost: 5,     w: 1, h: 1, upkeep: 0,   dept: "utilities", path: true, overlay: true },
   // source: which water the pump can draw from. A tower needs none - it draws
   // on underground springs, so it works anywhere but yields little.
   // pollutionSensitivity: how much dirty water slows it down.

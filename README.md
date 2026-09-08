@@ -184,3 +184,15 @@ these structures. Old straight bores acquire portal connections when loaded.
 The agent `build()` API returns `requiresConfirmation` and `quote`; repeat the
 same call with `{confirmStructures: true, maxCost: quote}` as the sixth argument
 to accept. `query()` includes the structure's route and both entrances.
+
+Power lines occupy empty surface tiles. Roads, rail, highways, ramps, zoning,
+planted trees and building footprints remove pylons automatically as part of
+construction. A power-line drag skips occupied surfaces and charges only for
+eligible tiles; laying a line clears vegetation, like laying a road. Pipes,
+subways and buried bores occupy a separate underground layer. Buildings and
+zones conduct electricity, and power still jumps a single road or rail tile.
+Bridges include cabling across the complete span, including legacy bridges
+whose visible pylons are removed during load.
+Older saves remove pylons embedded in roads or buildings when loaded. Starter
+town wiring now follows those same network rules instead of running pylons
+along streets.

@@ -1,8 +1,19 @@
+import { landPath } from '../src/sim/starter.js';
+import { powerlineSite } from '../src/sim/catalog.js';
 // Shared helpers for long-running simulation tests. Not a test file itself:
 // `npm test` only picks up tests/*.test.js.
 import assert from "node:assert/strict";
 import { place, tick, refresh, setPolicy, getStats, BUILDINGS } from "../src/sim.js";
 import { ageFactor, wears } from "../src/sim/wear.js";
+
+// The test mayor follows the same legal wiring paths as a new town: existing
+// buildings conduct and a single street can be jumped without a pylon on it.
+function wire(city,x,y,to) {
+  const path=landPath(city,city.tiles[y*city.size+x],city.tiles[to.y*city.size+to.x],{power:true});
+  if(!path)return false;
+  for(const t of path)if(powerlineSite(t))place(city,t.x,t.y,'powerline');
+  return true;
+}
 
 const SPANS = { school: 3, college: 4, hospital: 3, library: 2, museum: 3, coal: 4, gas: 3 };
 
@@ -62,7 +73,6 @@ function addWaterTowers(city, count) {
     if (!beside) continue;
     city.money = 5_000_000;
     if (!place(city, t.x, t.y, "watertower").ok) continue;
-    place(city, t.x, t.y, "powerline");
     placed++;
   }
   return placed;
@@ -85,11 +95,9 @@ function plantOn(city, near, type = "coal") {
       if (x < 1 || y < 1 || x + w >= city.size || y + h >= city.size) continue;
       city.money = 5_000_000;
       if (!place(city, x, y, type).ok) continue;
-      // An L back to the tile that went dark. Lines that will not go down —
-      // water, an existing lot — are skipped; a lot conducts on its own.
+      // Wire back to the reported grid, detouring around occupied streets.
       const sx = x + (w >> 1), sy = y + (h >> 1);
-      for (let px = Math.min(sx, near.x); px <= Math.max(sx, near.x); px++) place(city, px, sy, "powerline");
-      for (let py = Math.min(sy, near.y); py <= Math.max(sy, near.y); py++) place(city, near.x, py, "powerline");
+      wire(city,sx,sy,near);
       refresh(city);
       if (at(x, y) >= 0 && at(x, y) === at(near.x, near.y)) return true;
       place(city, x, y, "bulldoze");
@@ -123,8 +131,7 @@ function burnGarbage(city) {
       if (!place(city, x, y, "incinerator").ok) continue;
       for (let i = -1; i <= w; i++) place(city, x + i, y + h, "road");
       const sx = x + (w >> 1), sy = y + (h >> 1);
-      for (let px = Math.min(sx, lit.x); px <= Math.max(sx, lit.x); px++) place(city, px, sy, "powerline");
-      for (let py = Math.min(sy, lit.y); py <= Math.max(sy, lit.y); py++) place(city, lit.x, py, "powerline");
+      wire(city,sx,sy,lit);
       refresh(city);
       const built = city.tiles[y * city.size + x];
       if (built.powered && built.roadAccess) return 1;

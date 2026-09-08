@@ -1,3 +1,4 @@
+import { conductsPower, powerlineSite, ROAD_TYPES } from './catalog.js';
 // Starter town: a 7×7-block grid town with mixed densities, civic services,
 // a coal plant on the outskirts and pumps at the waterside.
 import { place } from "./place.js";
@@ -9,8 +10,10 @@ import { lcg } from "./terrain.js";
 const pick = (rng, list) => list[Math.floor(rng() * list.length)];
 
 // Shortest 4-neighbour path over land from a to b (tiles), or null.
-export function landPath(city, a, b) {
+export function landPath(city, a, b, {power=false}={}) {
   const { size, tiles } = city;
+  const canWire=t=>t && (conductsPower(t) || powerlineSite(t));
+  if(!a || !b || power && (!canWire(a) || !canWire(b)))return null;
   const prev = new Int32Array(tiles.length).fill(-2);
   const queue = [a.y * size + a.x];
   prev[queue[0]] = -1;
@@ -20,9 +23,16 @@ export function landPath(city, a, b) {
     if (i === goal) break;
     const x = i % size, y = (i - x) / size;
     for (const [dx, dy] of NEIGHBORS4) {
-      const nx = x + dx, ny = y + dy;
+      let nx = x + dx, ny = y + dy;
       if (nx < 0 || ny < 0 || nx >= size || ny >= size) continue;
-      const ni = ny * size + nx;
+      let ni = ny * size + nx;
+      // A wire can cross one street, but cannot run along occupied roads.
+      if(power && !canWire(tiles[ni])) {
+        if(!ROAD_TYPES.has(tiles[ni].type))continue;
+        nx+=dx;ny+=dy;
+        if(nx<0 || ny<0 || nx>=size || ny>=size)continue;
+        ni=ny*size+nx;if(!canWire(tiles[ni]))continue;
+      }
       if (prev[ni] !== -2 || tiles[ni].terrain === "water") continue;
       prev[ni] = i; queue.push(ni);
     }
@@ -44,9 +54,11 @@ export function buildStarterTown(city) {
     for (let y = y1 + sy; y !== y2 + sy; y += sy) put(x2, y, tool);
   };
   const route = (from, to, tools) => {
-    const path = landPath(city, from, to);
-    if (!path) return false;
-    for (const t of path) for (const tool of tools) put(t.x, t.y, tool);
+    for(const tool of tools) {
+      const path=landPath(city,from,to,{power:tool==='powerline'});
+      if(!path)return false;
+      for(const t of path)put(t.x,t.y,tool);
+    }
     return true;
   };
   const zone = (x0, y0, w, h, type, density) => {
@@ -180,7 +192,7 @@ export function buildStarterTown(city) {
     for (const [ex, ey] of [[plantSize, 1], [1, plantSize], [-1, 1], [1, -1]]) {
       const from = tileAt(city, plant.x + ex, plant.y + ey);
       if (!from || from.terrain === "water") continue;
-      const path = landPath(city, from, tileAt(city, near.x, near.y));
+      const path = landPath(city, from, tileAt(city, near.x, near.y), {power:true});
       if (!path) continue;
       if (!put(plant.x, plant.y, plantType).ok) break;
       for (const t of path) put(t.x, t.y, "powerline");
@@ -234,9 +246,9 @@ export function buildStarterTown(city) {
     const edgeX = p.x > cx ? ox + span : ox;
     const edge = dry(edgeX, rowY);
     if (edge) {
-      route(p, edge, ["pipe", "powerline"]);
+      route(p, edge, ["pipe"]);
       const block = nearestBlockTile(edge.x, edge.y);
-      if (block) route(edge, block, ["powerline"]);
+      if (block) route(p, block, ["powerline"]);
     }
     for (const other of pumps.slice(1)) route(other, p, ["pipe", "powerline"]);
     // Pipe mains under every other street and two avenues, detouring around water.

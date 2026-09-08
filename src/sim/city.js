@@ -4,7 +4,7 @@ import { parseConnections } from './neighbor-links.js';
 import { effectState, parseEffects } from "./effects-state.js";
 // City state: tile schema, creation, save format (version 6).
 import { generateTerrain, LAYOUTS, MAX_ELEVATION, MIN_ELEVATION } from "./terrain.js";
-import { BUILDINGS, ZONE_TYPES, PORT_TYPES, ZONED_TYPES, ROAD_TYPES, FUNDED_DEPARTMENTS } from "./catalog.js";
+import { BUILDINGS, ZONE_TYPES, PORT_TYPES, ZONED_TYPES, ROAD_TYPES, FUNDED_DEPARTMENTS, powerlineSite } from "./catalog.js";
 import { tileAt } from "./grid.js";
 import { lotTiles } from "./lots.js";
 import { blankPopulation, serializePopulation, parsePopulation } from "./population.js";
@@ -357,6 +357,9 @@ export function deserialize(raw) {
     }
     if (t !== anchor) { t.level = 0; t.abandoned = false; }
   }
+  // Older cities could keep pylons inside roads and buildings. Migrate
+  // those surface conflicts before computing the electricity network.
+  for(const t of city.tiles)if(t.powerline && !powerlineSite(t))t.powerline=false;
   restoreStructures(city,d.transportStructures);
   city.transportConnections = parseConnections(city, d.transportConnections);
   return city;
