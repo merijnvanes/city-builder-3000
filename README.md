@@ -76,7 +76,7 @@ entry. Nothing ever returns the whole tile array.
 - **Water** comes from pumps (best beside water), towers and treatment plants through underground pipes; each pipe serves the six tiles around it.
 - **Services**: police, fire, hospitals, schools, colleges, libraries, museums, landfills, incinerators, recycling, parks and zoos. Coverage depends on distance and department funding.
 - **Transport**: roads and highways with commuting traffic that routes around jams, rail with stations, subways with stations, bus stops, airport and seaport.
-- **Budget**: separate R/C/I taxes, six funded departments, eighteen ordinances, amortised loans, a monthly ledger and an annual review every January.
+- **Budget**: separate R/C/I taxes, six funded departments, eighteen ordinances, amortised loans, a monthly ledger and yearly figures available in Budget. January autosaves without opening a report or pausing play.
 - **Neighbors**: roads, rails, power lines and pipes to the map edge connect you to a named neighboring city for trade, outside jobs and power/water/garbage deals.
 - **Rewards** unlock at population milestones (Mayor's House, City Hall, Courthouse, Stadium, Statue). **Petitioners** offer business deals with strings attached. **Landmarks** can be bought outright.
 - **Disasters**: fire, earthquake, tornado, flood, riot, toxic cloud, flying saucer and volcano, triggered or random, with fire crews to dispatch. Active hazards and their remaining duration survive saves.

@@ -683,7 +683,7 @@ export function mountUI(actions) {
   deptSection.appendChild(deptGrid);
   budBody.appendChild(deptSection);
 
-  // Annual review (shown every January unless switched off)
+  // Annual figures stay available when the player opens Budget.
   const yearSection = el("div", "modal-section");
   const yearTitle = el("div", "modal-section-title", "Last Year");
   yearSection.appendChild(yearTitle);
@@ -698,17 +698,7 @@ export function mountUI(actions) {
     yearItems[k] = v;
   });
   yearSection.appendChild(yearGrid);
-  const yearToggleRow = el("div", "ordinance-row");
-  yearToggleRow.appendChild(el("span", "ordinance-label", "Review the budget every January"));
-  const yearToggle = btn("toggle-btn on", "ON", "Toggle January budget review", () => {
-    const on = yearToggle.classList.toggle("on");
-    yearToggle.textContent = on ? "ON" : "OFF";
-    actions.setPolicy?.("setting.yearEndBudget", on);
-  });
-  yearToggleRow.appendChild(yearToggle);
-  yearSection.appendChild(yearToggleRow);
   budBody.appendChild(yearSection);
-  let lastReviewYear = -1;
 
   // Budget summary
   const budSummary = el("div", "modal-section");
@@ -1179,7 +1169,7 @@ export function mountUI(actions) {
     "Police, fire, health and education coverage depends on distance and department funding in the Budget. Garbage needs landfills, an incinerator or a recycling center. Parks, trees and water raise land value; industry, pollution, crime and traffic lower it.",
     "Airports and seaports are zones too. Draw at least 3x5 for an airport (from 1930) or 2x6 for a seaport, give the block power, water and a road, and the Sims build the terminal once the city's commerce and industry need outside trade. A seaport only works on a shoreline, and pays best on a seacoast.",
     "Roads, rails, power lines and pipes that reach the map edge connect you to a neighbor: trade lifts demand, roads bring outside jobs, and lines or pipes let you buy or sell power and water. A seaport counts as a connection to every neighbor.",
-    "Population milestones unlock rewards such as the Mayor's House and City Hall. Petitioners bring money-making business deals with strings attached, and neighboring mayors bring power, water and garbage contracts on terms that change from offer to offer. Turn one down and the petitioner may never come back. Every January the budget review pauses the game.",
+    "Population milestones unlock rewards such as the Mayor's House and City Hall. Petitioners bring money-making business deals with strings attached, and neighboring mayors bring power, water and garbage contracts on terms that change from offer to offer. Turn one down and the petitioner may never come back. Open Budget to check yearly figures. January autosaves while play continues.",
   ]);
   helpSection("Navigation", [
     ["WASD / ↑↓←→", "Pan the map"],
@@ -1423,7 +1413,7 @@ export function mountUI(actions) {
         delete petitionDialog.dataset.id;
       }
 
-      // January budget review.
+      // Annual financial figures.
       const hist = stats.history || [];
       if (hist.length >= 12) {
         const year = hist.slice(-12);
@@ -1434,18 +1424,6 @@ export function mountUI(actions) {
         yearItems.net.className = "stat-item-val" + (inc - exp >= 0 ? " pos" : " neg");
         const growth = year[year.length - 1].population - year[0].population;
         yearItems.growth.textContent = (growth >= 0 ? "+" : "") + fmtPop(growth);
-      }
-      if (stats.settings) {
-        const on = stats.settings.yearEndBudget !== false;
-        yearToggle.classList.toggle("on", on);
-        yearToggle.textContent = on ? "ON" : "OFF";
-        const yearNow = Math.floor((stats.month || 0) / 12);
-        if (on && stats.month > 0 && stats.month % 12 === 0 && yearNow !== lastReviewYear && !document.querySelector("dialog[open]")) {
-          lastReviewYear = yearNow;
-          actions.setSpeed?.(0);
-          budgetDialog.showModal();
-          showNotice(`${stats.year}: annual budget review. Adjust taxes and funding, then continue.`);
-        }
       }
 
       // News ticker

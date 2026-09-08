@@ -493,10 +493,8 @@ describe("disasters and inspection", () => {
   });
 });
 
-describe("auto budget", () => {
-  // "As soon as your finances go into the negative, Auto Budget will be turned
-  // off. This way you can hopefully recover before things get too out of hand."
-  test("going into the red brings the year-end review back", () => {
+describe("legacy budget setting", () => {
+  test("going into the red does not restore automatic reviews", () => {
     const c = createCity(44, true);
     assert.equal(setPolicy(c, "setting.yearEndBudget", false).ok, true);
     assert.equal(c.settings.yearEndBudget, false);
@@ -505,8 +503,8 @@ describe("auto budget", () => {
     // Deep enough that one month of income cannot climb back out.
     c.money = -50_000;
     tick(c);
-    assert.equal(c.settings.yearEndBudget, true);
-    assert.ok(c.news.some((n) => /budget review is back on/.test(n)));
+    assert.equal(c.settings.yearEndBudget, false);
+    assert.ok(!c.news.some((n) => /budget review is back on/.test(n)));
   });
 });
 

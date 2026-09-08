@@ -546,10 +546,10 @@ goes; the manual's own limit is ten loans of $25,000.
 both had to learn the annual cadence together or the ledger and the bank
 balance would drift apart. Both now ask the same `loanDue()`.
 
-And from the Financial Advisor's Q&A, on Auto Budget: *"As soon as your
-finances go into the negative, Auto Budget will be turned off. This way you can
-hopefully recover before things get too out of hand."* A city that has switched
-the year-end review off gets it back the month the treasury goes into the red.
+Intentional departure from Auto Budget (September 8): yearly reports never
+open or pause the game automatically, including when funds are negative.
+Players can open Budget for the annual figures. January autosaves continue.
+The old `yearEndBudget` field remains readable for save and agent compatibility.
 
 ## Two more from the advisors' Q&A, September 7
 
