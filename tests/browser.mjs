@@ -10,6 +10,10 @@ const errors = [];
 page.on("pageerror", (e) => errors.push(e.message));
 await mkdir("artifacts", { recursive: true });
 const money = () => page.evaluate(() => civic.city.money);
+async function menuAction(name) {
+  if (!await page.locator('.city-menu').evaluate(el => el.open)) await page.locator('.city-menu summary').click();
+  await page.getByRole('button', { name, exact: true }).click();
+}
 const point = (x, y) => page.evaluate(({ x, y }) => civic.renderer.project(x + 0.5, y + 0.5), { x, y });
 const tile = (x, y) => page.evaluate(({ x, y }) => civic.city.tiles[y * civic.city.size + x], { x, y });
 try {
@@ -55,14 +59,15 @@ try {
   await page.mouse.click(p.x, p.y);
 
   // Save, bulldoze, load.
-  await page.getByRole("button", { name: "Save city", exact: true }).click();
+  await menuAction('Save city');
   await page.locator('[data-tool="bulldoze"]').click(); await page.mouse.click(p.x, p.y);
   assert.equal((await tile(target.x, target.y)).type, "empty");
-  await page.getByRole("button", { name: "Load city", exact: true }).click();
+  await menuAction('Load city');
   assert.equal((await tile(target.x, target.y)).type, "road", "Load restores the road");
 
   // Budget: independent taxes, loans.
   await page.getByRole("button", { name: "Open budget", exact: true }).click();
+  await page.getByRole('tab', { name: 'Taxes & services', exact: true }).click();
   const tax = page.getByRole("slider", { name: "Residential tax rate", exact: true });
   await tax.fill("12"); await tax.dispatchEvent("input");
   assert.deepEqual(await page.evaluate(() => civic.getStats().taxes), { residential: 12, commercial: 7, industrial: 7 }, "Taxes remain independent");
@@ -70,11 +75,13 @@ try {
   // Total payments made will equal approximately 150% of the original loan
   // amount." And there is no repaying one early.
   const beforeLoan = await money();
+  await page.getByRole('tab', { name: 'Overview', exact: true }).click();
   await page.getByRole("button", { name: "Borrow $10,000: $1,500 a year for 10 years", exact: true }).click();
   assert.equal(await page.evaluate(() => civic.city.debt), 15000, "ten annual payments of 15%");
   assert.equal(await money(), beforeLoan + 10000);
   assert.equal(await page.getByRole("button", { name: /Repay/ }).count(), 0, "no early repayment");
   await page.getByRole("button", { name: "Open budget", exact: true }).click();
+  await page.getByRole('tab', { name: 'Policies', exact: true }).click();
   await page.getByRole("button", { name: "Toggle Clean Air Act", exact: true }).click();
   assert.equal(await page.evaluate(() => civic.city.ordinances.cleanAir), true, "ordinance toggles");
   await page.keyboard.press("Escape");
@@ -84,14 +91,16 @@ try {
   assert.ok(await page.getByRole("dialog", { name: "City Report", exact: true }).isVisible()); await page.keyboard.press("Escape");
   await page.getByRole("button", { name: "Advisors", exact: true }).click();
   assert.ok(await page.getByRole("dialog", { name: "Advisors", exact: true }).isVisible()); await page.keyboard.press("Escape");
-  await page.getByRole("button", { name: "Disasters", exact: true }).click();
+  await menuAction('Disasters');
   await page.locator('[data-disaster="fire"]').click();
   assert.ok((await page.evaluate(() => civic.city.tiles.filter((t) => t.fire > 0).length)) > 0, "fire started");
 
   // Overlays and rotation.
+  await page.getByRole('button', { name: 'Toggle data maps', exact: true }).click();
   await page.locator('[data-overlay="crime"]').click();
   assert.equal(await page.evaluate(() => civic.renderer.overlay), "crime");
   await page.locator('[data-overlay="none"]').click();
+  await page.getByRole('button', { name: 'Close data maps', exact: true }).click();
   for (let i = 1; i <= 4; i++) { await page.getByRole("button", { name: "Rotate right", exact: true }).click(); assert.equal(await page.evaluate(() => civic.renderer.rotation), i % 4); }
 
   // Footprint placement: a police station on a 3x3 grass site.
@@ -115,35 +124,37 @@ try {
   await page.keyboard.press("3"); await page.waitForFunction(() => civic.city.month > 0); await page.keyboard.press("0");
   await page.keyboard.press("Escape"); await page.waitForTimeout(100);
   await page.screenshot({ path: "artifacts/desktop.png" });
-  await page.getByRole("button", { name: "Toggle day/night", exact: true }).click(); await page.waitForTimeout(100);
+  await menuAction('Toggle day/night'); await page.waitForTimeout(100);
   assert.equal(await page.evaluate(() => civic.renderer.night), true);
   await page.screenshot({ path: "artifacts/night.png" });
-  await page.getByRole("button", { name: "Toggle day/night", exact: true }).click();
+  await menuAction('Toggle day/night');
 
   // Mobile layout.
   await page.setViewportSize({ width: 390, height: 844 }); await page.waitForTimeout(150);
   await page.getByTitle("Home view [H]", { exact: true }).click(); await page.waitForTimeout(200);
+  await page.locator('.city-menu summary').click();
   for (const name of ["Open budget", "Save city", "Load city", "New city", "Toggle tools"]) {
     const box = await page.getByRole("button", { name, exact: true }).boundingBox();
     assert.ok(box && box.x >= 0 && box.x + box.width <= 390, `${name} reachable on mobile`);
   }
+  await page.locator('.city-menu summary').click();
   await page.getByRole("button", { name: "Toggle tools", exact: true }).click();
   assert.ok(await page.locator("#toolbar").isVisible());
   await page.getByRole("button", { name: "Toggle tools", exact: true }).click();
   await page.screenshot({ path: "artifacts/mobile.png" });
 
   // New city flow.
-  await page.getByRole("button", { name: "New city", exact: true }).click();
+  await menuAction('New city');
   await page.getByRole("button", { name: "Cancel", exact: true }).click();
   assert.ok(await page.evaluate(() => civic.city.population > 0));
-  await page.getByRole("button", { name: "New city", exact: true }).click();
+  await menuAction('New city');
   await page.getByRole("combobox", { name: "Starting funds", exact: true }).selectOption("25000");
   await page.getByRole("combobox", { name: "Terrain", exact: true }).selectOption("coast");
   await page.getByRole("button", { name: "Start city", exact: true }).click();
   assert.equal(await page.evaluate(() => civic.city.population), 0);
   assert.equal(await money(), 25000);
   assert.equal(await page.evaluate(() => civic.city.layout), "coast");
-  await page.getByRole("button", { name: "Load city", exact: true }).click();
+  await menuAction('Load city');
   assert.ok(await page.evaluate(() => civic.city.population > 0));
   assert.deepEqual(errors, [], "No runtime errors");
   console.log("Browser passed: preview/cancel/commit/undo, save/load, taxes, loans, ordinances, dialogs, disasters, overlays, rotation, footprints, simulation, night, mobile, new city.");

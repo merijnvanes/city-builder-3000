@@ -52,7 +52,7 @@ export function attachInput(canvas,renderer,actions,planConstruction){
   if(e.target.matches('input,textarea,select,[contenteditable="true"]')||document.querySelector('dialog[open]'))return;
   if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='z'){e.preventDefault();cancel();actions.onUndo();return;}
   if(e.key==='Escape'){if(stroke||gesture){cancel();return;}actions.onChoose('inspect');renderer.preview=null;return;}
-  if(e.code==='Space'){if(e.target.matches('button'))return;space=true;e.preventDefault();return;}
+  if(e.code==='Space'){if(e.target.matches('button,summary'))return;space=true;e.preventDefault();return;}
   if(['0','1','2','3'].includes(e.key)){actions.onSpeed(Number(e.key));return;}
   const key=e.key.toLowerCase();
   if(moves[key]){held.add(key);e.preventDefault();return;}

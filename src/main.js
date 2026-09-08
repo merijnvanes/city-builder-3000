@@ -195,6 +195,7 @@ function stepMonth() {
 
 const actions = {
   selectTool: choose, setSpeed, setDensity, undo: undoLast, connectNeighbor,
+  clearSelection: () => { selection = null; ui?.setSelection(null); },
   getSpeed: () => speed,
   build: (tool, start, end, options) => commit(planConstruction(city, start, end, tool, options), options),
   stepMonths: (n) => { const events = []; for (let i = 0; i < n; i++) events.push(...stepMonth()); lastTick = performance.now(); return events; },

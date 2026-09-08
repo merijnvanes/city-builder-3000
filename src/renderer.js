@@ -70,8 +70,8 @@ export class CityRenderer {
     this._size = value;
   }
 
-  // Screen origin of the map: centred in the space right of the toolbar.
-  get cx() { return this.w * 0.5 + (this.w > 800 ? 100 : 0); }
+  // Floating controls leave the city centered in the viewport.
+  get cx() { return this.w * 0.5; }
   get cy() { return this.h * 0.5; }
 
   resize() {

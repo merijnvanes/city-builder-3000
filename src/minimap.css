@@ -1,34 +1,5 @@
-.district-map {
-  width: 136px;
-  padding: 6px;
-  background: #233140ee;
-  border: 1px solid #52687f;
-  border-radius: 2px;
-  box-shadow: 0 4px 20px #0004;
-  pointer-events: auto;
-  z-index: 5;
-}
-.district-map-label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-  color: #afc9d1;
-  font:
-    600 8px/1.2 system-ui,
-    sans-serif;
-  letter-spacing: 1px;
-}
-.district-map canvas {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: 4px;
-  cursor: crosshair;
-  touch-action: none;
-}
-@media (max-width: 1050px), (max-height: 700px) {
-  .district-map {
-    display: none;
-  }
-}
+.district-map { width: 172px; padding: 12px; border: var(--edge); border-radius: 16px; background: var(--panel); box-shadow: var(--shadow); pointer-events: auto; }
+.district-map-label { display: flex; justify-content: space-between; color: var(--text-dim); font-size: 8px; letter-spacing: 1.2px; margin-bottom: 4px; }
+.district-map-label span { color: var(--beige); }
+.district-map canvas { display: block; width: 100%; height: auto; cursor: crosshair; touch-action: none; }
+@media (max-width: 1100px), (max-height: 700px) { .district-map { display: none; } }

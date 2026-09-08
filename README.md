@@ -22,6 +22,7 @@ pnpm build         # outputs to dist/
 ```bash
 pnpm test          # node:test unit tests for the simulation, construction and camera
 pnpm test:performance # Chrome renderer benchmark against the running dev server
+pnpm test:ui       # responsive controls, keyboard navigation and UI screenshots
 ```
 
 With Chrome installed, run `pnpm dev --port 4173` in one terminal and `pnpm test:browser` in another for a scripted gameplay check. Screenshots land in `artifacts/`. Run `pnpm test:visuals` against the same server for Canvas pixel checks of courtyard occlusion and earthquake layering, in all camera orientations and day/night lighting. Set `CIVIC_TEST_URL` to use another server port.
@@ -100,6 +101,18 @@ entry. Nothing ever returns the whole tile array.
 | `0` `1` `2` `3` | Pause, normal, fast, fastest |
 
 Tool shortcuts are shown in the tooltips of the tool dock.
+
+The build dock sits along the bottom of the city. Open a category to see building
+previews and prices, then select a card to build. The selected-tool panel shows
+placement instructions and zone density. On phones, use **Build city** to open
+the dock. **Data maps** opens coverage and city-condition overlays beside the
+camera controls.
+
+**City menu** contains saving, loading, new cities, sound, day/night and help.
+Budget opens with a financial overview; its tabs separate taxes and service
+funding, the ledger, policies and neighbor deals. The interface respects the
+system's reduced-motion preference. `pnpm test:ui` saves desktop, palette,
+budget, welcome and mobile screenshots in `artifacts/`.
 
 ## Project layout
 

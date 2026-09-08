@@ -65,8 +65,7 @@ export function createMinimap(renderer) {
       ctx.moveTo(80, 16); ctx.lineTo(144, 80); ctx.lineTo(80, 144); ctx.lineTo(16, 80);
       ctx.closePath(); ctx.clip();
       ctx.beginPath();
-      const left = renderer.w > 800 ? 200 : 0;
-      const view = [[left, 32], [renderer.w, 32], [renderer.w, renderer.h - 30], [left, renderer.h - 30]].map(([x, y]) => renderer.pick(x, y));
+      const view = [[0, 0], [renderer.w, 0], [renderer.w, renderer.h], [0, renderer.h]].map(([x, y]) => renderer.pick(x, y));
       visibleMapPolygon(view, city.size).forEach((p, i) => {
         const m = mapPoint(p.x, p.y, city.size);
         if (i) ctx.lineTo(m.x, m.y); else ctx.moveTo(m.x, m.y);
