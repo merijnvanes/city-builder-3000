@@ -125,3 +125,7 @@ change networks. A tile carries at most two routes, and demolishing a crossing
 removes the road/deck first, leaving its underlying route. Pipes and subways can
 coexist with surface crossings. `tests/crossings.test.js` covers construction,
 saves, route continuity, network separation and underground utilities.
+
+Rail bends draw continuous curves with aligned sleepers and train movement.
+Dead ends, T junctions and four-way junctions use only their connected arms;
+road crossings and highway underpasses participate in the same rail geometry.

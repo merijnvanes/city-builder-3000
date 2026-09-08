@@ -1,3 +1,4 @@
+import { drawRail, drawTrain } from './rail-art.js';
 import { withGroundClip } from './ground-effects.js';
 import { civicSpriteSpec } from './civic-sprites.js';
 import { drawMapBackdrop, drawBoat, drawOutageMarkers, drawAirplane } from "./scene-art.js";
@@ -332,27 +333,7 @@ export class CityRenderer {
 
   // Sleepers, ballast and rails on a track tile.
   railBed(t, city, crossing = false) {
-    const { x, y } = t, water = t.terrain === "water";
-    const adjacent = (dx, dy) => x + dx >= 0 && y + dy >= 0 && x + dx < city.size && y + dy < city.size && carriesRoute(city.tiles[(y + dy) * city.size + x + dx], "rail");
-    if (!crossing) {
-      this.flat(x + 0.015, y + 0.015, 0.97, 0.97, 0.3, "#857f67");
-      this.flat(x + 0.1, y + 0.1, 0.8, 0.8, 0.4, "#736e5c");
-    }
-    const ew = adjacent(1, 0) || adjacent(-1, 0), ns = adjacent(0, 1) || adjacent(0, -1);
-    {
-      for (let a = 0.08; a < 1; a += 0.15) {
-        if (ew) this.line(this.project(x + a, y + 0.2, 0.6), this.project(x + a, y + 0.8, 0.6), "#514c3f", 2);
-        if (ns) this.line(this.project(x + 0.2, y + a, 0.6), this.project(x + 0.8, y + a, 0.6), "#514c3f", 2);
-      }
-      for (const a of [0.32, 0.68]) {
-        if (ew) this.line(this.project(x, y + a, 1), this.project(x + 1, y + a, 1), "#b5b7a5", 1);
-        if (ns) this.line(this.project(x + a, y, 1), this.project(x + a, y + 1, 1), "#b5b7a5", 1);
-      }
-    }
-    if (water) {
-      if (ew) { this.line(this.project(x, y + 0.055, 4), this.project(x + 1, y + 0.055, 4), "#b9bda8", 1.7); this.line(this.project(x, y + 0.94, 4), this.project(x + 1, y + 0.94, 4), "#b9bda8", 1.7); }
-      else { this.line(this.project(x + 0.055, y, 4), this.project(x + 0.055, y + 1, 4), "#b9bda8", 1.7); this.line(this.project(x + 0.94, y, 4), this.project(x + 0.94, y + 1, 4), "#b9bda8", 1.7); }
-    }
+    drawRail(this, t, city, { crossing });
   }
 
   powerline(t, city) {
@@ -636,12 +617,10 @@ export class CityRenderer {
     for (let i = 0; i < city.tiles.length; i++) {
       const t = city.tiles[i];
       if (!carriesRoute(t, "rail") || !t.traffic || random(t.x, t.y, 5) > 0.12) continue;
-      const east = t.x + 1 < city.size && carriesRoute(city.tiles[i + 1], "rail"), south = carriesRoute(city.tiles[i + city.size], "rail");
-      if (!east && !south) continue;
       const f = (time * 0.0002 + random(t.x, t.y, 6)) % 1;
-      const p = this.project(t.x + (east ? f : 0.5), t.y + (east ? 0.5 : f), 3);
+      const p = this.project(t.x + .5, t.y + .5, 3);
       if (p.x < -20 || p.x > this.w + 20 || p.y < -20 || p.y > this.h + 20) continue;
-      drawVehicle(this, t.x + (east ? f : 0.5), t.y + (east ? 0.5 : f), !east, false, "#d0ab54", true);
+      drawTrain(this, t, city, f);
     }
     // Surface traffic remains below buildings; cruising aircraft are above them.
     const aircraft = [];
