@@ -1,3 +1,7 @@
+import {shadowScene} from './shadow-scene.js';
+import {drawTerrainShadows,drawShadedArchitecture} from './shadow-paint.js';
+import {naturalTrees} from './tree-layout.js';
+import {shadowPoint,faceLight} from './sunlight.js';
 import {terrainVertexHeight, drawLotFoundation} from './lot-foundations.js';
 import {TILE_W,TILE_H,ELEV_PX} from './render-scale.js';
 import {pickTransportSurface} from './surface-picking.js';
@@ -7,12 +11,11 @@ import { waterSurface } from './sim/surface-water.js';
 import { EDGE_DIRECTIONS } from './sim/neighbor-links.js';
 import { drawRail, drawTrain } from './rail-art.js';
 import { withGroundClip } from './ground-effects.js';
-import { civicSpriteSpec } from './civic-sprites.js';
 import { drawMapBackdrop, drawBoat, drawOutageMarkers, drawAirplane } from "./scene-art.js";
 // Isometric Canvas 2D renderer. Static ground and buildings are painted into
 // a cache whenever the city revision changes; animated cars, water sparkle,
 // fires and the construction preview are drawn every frame on top.
-import { drawCachedArchitecture, hitUncachedArchitecture } from "./architecture-cache.js";
+import { hitUncachedArchitecture } from "./architecture-cache.js";
 import { drawArchitecture, heightOf, random } from "./building-art.js";
 import { BUILDINGS, PORT_TYPES, carriesRoute } from "./sim/catalog.js";
 import { drawTree } from "./foliage.js";
@@ -183,8 +186,9 @@ export class CityRenderer {
       if (!hit.t.lot || sx < hit.x || sy < hit.y || sx >= hit.x + hit.w || sy >= hit.y + hit.h) continue;
       let opaque;
       if (hit.canvas) {
-        const px = Math.min(hit.canvas.width - 1, Math.floor((sx - hit.x) / hit.w * hit.canvas.width));
-        const py = Math.min(hit.canvas.height - 1, Math.floor((sy - hit.y) / hit.h * hit.canvas.height));
+        const source=hit.source || {x:0,y:0,w:hit.canvas.width,h:hit.canvas.height};
+        const px=source.x+Math.min(source.w-1,Math.floor((sx-hit.x)/hit.w*source.w));
+        const py=source.y+Math.min(source.h-1,Math.floor((sy-hit.y)/hit.h*source.h));
         opaque = hit.canvas.getContext("2d").getImageData(px, py, 1, 1).data[3] > 24;
       } else opaque = hitUncachedArchitecture(this, hit.t, sx, sy);
       if (opaque) return { x: hit.t.x, y: hit.t.y };
@@ -242,11 +246,11 @@ export class CityRenderer {
   }
   box(x, y, w, d, h, color, z = 0) {
     for (const face of this.faces(x, y, w, d, h, z)) {
-      const left = face.points[0].x + face.points[1].x < this.project(x + w / 2, y + d / 2).x * 2;
+      const normal={east:[1,0],west:[-1,0],north:[0,-1],south:[0,1]}[face.name],exposure=faceLight(...normal);
       const top = Math.min(...face.points.map(p => p.y)), bottom = Math.max(...face.points.map(p => p.y));
       const light = this.base.createLinearGradient(0, top, 0, Math.max(top + 1, bottom));
-      light.addColorStop(0, shade(color, left ? 0.78 : 1.02));
-      light.addColorStop(1, shade(color, left ? 0.57 : 0.79));
+      light.addColorStop(0, shade(color, exposure));
+      light.addColorStop(1, shade(color, exposure*.78));
       this.poly(face.points, light);
     }
     this.flat(x, y, w, d, z + h, shade(color, 1.09));
@@ -271,7 +275,11 @@ export class CityRenderer {
     const p = this.project(x, y, z + h), b = this.project(x, y, z), rx = radius * 43 * this.zoom, ry = radius * 23 * this.zoom, ctx = this.base;
     ctx.beginPath(); ctx.ellipse(b.x, b.y, rx, ry, 0, 0, Math.PI); ctx.lineTo(p.x - rx, p.y); ctx.ellipse(p.x, p.y, rx, ry, 0, Math.PI, 0); ctx.closePath();
     const g = ctx.createLinearGradient(p.x - rx, 0, p.x + rx, 0);
-    g.addColorStop(0, shade(color, 0.61)); g.addColorStop(0.4, color); g.addColorStop(1, shade(color, 0.84));
+    const origin=this.unorient(0,0);
+    for(const f of [0,.25,.5,.75,1]) {
+      const u=f*2-1,v=Math.sqrt(1-u*u),n=this.unorient((u+v)/Math.SQRT2,(v-u)/Math.SQRT2);
+      g.addColorStop(f,shade(color,faceLight(n.x-origin.x,n.y-origin.y)));
+    }
     ctx.fillStyle = g; ctx.fill();
     ctx.beginPath(); ctx.ellipse(p.x, p.y, rx, ry, 0, 0, Math.PI * 2); ctx.fillStyle = shade(color, 1.13); ctx.fill();
   }
@@ -438,6 +446,7 @@ export class CityRenderer {
     this.pickables = [];
     this.size = city.size;
     if (!this.corners || this.tiles !== city.tiles || city.revision !== this.cornerRevision) this.buildCorners(city);
+    this.shadowScene=shadowScene(this,city);
     const ctx = this.base;
     ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     ctx.clearRect(0, 0, this.w, this.h);
@@ -466,35 +475,8 @@ export class CityRenderer {
     for (const t of this.sorted) if (visible(t.x + 0.5, t.y + 0.5)) {
       this.terrain(t, city);
       if(t.lot)drawLotFoundation(this,city.tiles[t.lot.y*city.size+t.lot.x],t);
+      drawTerrainShadows(this,t,city);
     }
-    // Shadows for every lot share one clip.
-    withGroundClip(this, () => {
-    for (const t of this.sorted) {
-      if (!t.lot || t.lot.x !== t.x || t.lot.y !== t.y) continue;
-      if (!visible(t.x, t.y)) continue;
-      this.platform = t.elev * ELEV_PX;
-      const h = heightOf(t);
-      if (h) {
-        const { w, h: d } = t.lot;
-        const a = this.project(t.x + 0.15, t.y + 0.15), b = this.project(t.x + w - 0.15, t.y + 0.15), c = this.project(t.x + w - 0.15, t.y + d - 0.15), e = this.project(t.x + 0.15, t.y + d - 0.15);
-        const authored = civicSpriteSpec(t);
-        const dx = (authored ? 1 : -1) * h * 0.3 * this.zoom, dy = h * 0.15 * this.zoom;
-        let shadow = [a, b, c, { x: c.x + dx, y: c.y + dy }, { x: e.x + dx, y: e.y + dy }, e];
-        if (authored) {
-          // New civic assets establish a soft upper-left key light. Extrude
-          // the screen-right edge regardless of the map's current rotation.
-          const corners = [a, b, c, e].sort((p, q) => p.y - q.y);
-          const [left, right] = corners.slice(1, 3).sort((p, q) => p.x - q.x);
-          const top = corners[0], bottom = corners[3];
-          shadow = [top, right, { x: right.x + dx, y: right.y + dy }, { x: bottom.x + dx, y: bottom.y + dy }, bottom, left];
-        }
-        this.poly(shadow, this.night ? "#12202f22" : "#203a4a45");
-      }
-      this.platform = null;
-    }
-
-    });
-
     if (this.night) {
       ctx.fillStyle = '#10284288'; ctx.fillRect(0, 0, this.w, this.h);
     }
@@ -543,14 +525,10 @@ export class CityRenderer {
     for (const it of items) {
       const t = it.t;
       if (!visible(t.x + (t.lot?.w || 1) / 2, t.y + (t.lot?.h || 1) / 2)) continue;
-      if (it.kind === "lot") { this.platform = t.elev * ELEV_PX; drawCachedArchitecture(this, t, city); this.platform = null; }
+      if (it.kind === "lot") { this.platform = t.elev * ELEV_PX; drawShadedArchitecture(this, t, city); this.platform = null; }
       else if (it.kind === "zone") drawArchitecture(this, t);
       else if (it.kind === "trees") {
-        const n = Math.floor(random(t.y, t.x) * 3);
-        const jx = random(t.x, t.y, 11) * 0.4, jy = random(t.x, t.y, 12) * 0.4;
-        if (t.trees >= 1) this.tree(t.x + 0.2 + jx, t.y + 0.3 + jy, n);
-        if (t.trees >= 2) this.tree(t.x + 0.55 + jy * 0.8, t.y + 0.6 + jx * 0.8, (n + 1) % 3);
-        if (t.trees >= 3) this.tree(t.x + 0.65 - jx * 0.5, t.y + 0.15 + jy * 0.5, (n + 2) % 3);
+        drawShadedArchitecture(this,t,city,()=>{for(const [x,y,variant] of naturalTrees(t))this.tree(x,y,variant);});
       } else if (it.kind === "lamp") { if (this.zoom > 0.5) drawStreetLamp(this, t); }
       else this.powerline(t, city);
     }
@@ -642,7 +620,8 @@ export class CityRenderer {
         const x = t.x + 3 + Math.cos(a) * 9, y = t.y + 2 + Math.sin(a) * 6;
         const p = this.project(x, y, this.flightAltitude + Math.sin(a * 2) * 8);
         const next = this.project(x - Math.sin(a) * 0.09, y + Math.cos(a) * 0.06, this.flightAltitude + Math.sin(a * 2) * 8);
-        const shadow = this.project(x, y);
+        const cast=shadowPoint(x,y,this.groundZ(x,y)+this.flightAltitude+Math.sin(a*2)*8,this.groundZ(x,y));
+        const shadow = this.project(cast[0],cast[1]);
         withGroundClip(this, () => { ctx.fillStyle = "#20333d22"; ctx.beginPath(); ctx.ellipse(shadow.x, shadow.y, 7 * this.zoom, 2.5 * this.zoom, 0, 0, Math.PI * 2); ctx.fill(); }, ctx);
         aircraft.push({ p, heading: Math.atan2(next.y - p.y, next.x - p.x) });
       }

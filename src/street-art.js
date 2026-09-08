@@ -1,3 +1,5 @@
+import {VIADUCT_HEIGHT} from './render-scale.js';
+export {VIADUCT_HEIGHT} from './render-scale.js';
 import { bridgePlatform } from './bridge-art.js';
 import { surfaceStep, isPortal } from './sim/structures.js';
 import { outwardConnection } from './sim/neighbor-links.js';
@@ -99,11 +101,10 @@ export function drawStreet(r, t, city, { as = t.type, lift = 0 } = {}) {
 // built over roads, but if you want your Sims to be able to get from one to
 // the other, the intersection requires an on-ramp." Where a highway crosses a
 // street, the street stays on the ground and the deck rides over it on piers.
-export const VIADUCT_HEIGHT = 9;
 
 export function drawViaduct(r, t, city) {
   const { x, y } = t;
-  // The deck throws a shadow on the street it crosses.
+  // Ambient contact darkening underneath the deck; sunlight is scene-wide.
   r.flat(x + 0.06, y + 0.06, 0.88, 0.88, 0.92, '#1c242899');
   for (const [a, b] of [[0.04, 0.04], [0.84, 0.04], [0.04, 0.84], [0.84, 0.84]]) {
     r.box(x + a, y + b, 0.12, 0.12, VIADUCT_HEIGHT, '#79837f');

@@ -1,3 +1,5 @@
+import {shadowPoint,SUN} from './sunlight.js';
+import {treeHeight} from './tree-layout.js';
 // Small, deterministic tree silhouettes shared by lots and natural forests.
 // Screen-space crowns stay legible at city scale as the map rotates.
 import { random } from './building-art.js';
@@ -5,11 +7,16 @@ import { withGroundClip } from './ground-effects.js';
 
 function paintTree(r, x, y, variant = 0) {
   const z = r.zoom;
-  const seed = random(x, y, variant);
   const species = ((variant % 3) + 3) % 3;
-  const height = 13 + seed * 9;
+  const height = treeHeight(x,y,variant);
   const foot = r.project(x, y);
   const crown = r.project(x, y, height);
+  const orient=r.orient?.bind(r) || ((x,y)=>({x,y}));
+  const origin=orient(0,0),sun=orient(-SUN.x,-SUN.y);
+  // SUN is displacement per vertical pixel: include that upward pixel so
+  // crown highlights follow the elevated light, not its ground projection.
+  const lightAngle=Math.atan2((sun.x+sun.y-origin.x-origin.y)*16-1,(sun.x-sun.y-origin.x+origin.y)*32);
+  const litIndex=Math.round(lightAngle/(Math.PI*2)*9+9)%9;
   const colors = r.night
     ? ['#203e32', '#2a4d3b', '#385b42', '#486849', '#55744e']
     : ['#304d2b', '#416432', '#587d3b', '#71934b', '#8aa75a'];
@@ -27,8 +34,8 @@ function paintTree(r, x, y, variant = 0) {
       const bottom = { x: crown.x, y: cy + 2 * z };
       const right = { x: crown.x + width, y: cy };
       r.poly([tip, left, bottom, right], colors[1]);
-      r.poly([tip, left, bottom], colors[2]);
-      r.poly([tip, { x: crown.x - width * 0.4, y: cy - z }, bottom], colors[3]);
+      r.poly([tip, Math.cos(lightAngle)<0?left:right, bottom], colors[2]);
+      r.poly([tip, { x: crown.x + (Math.cos(lightAngle)<0?-1:1) * width * 0.4, y: cy - z }, bottom], colors[3]);
     }
     return;
   }
@@ -53,17 +60,25 @@ function paintTree(r, x, y, variant = 0) {
     });
     r.poly(points, colors[1 + (i % 3)]);
     if (z >= 0.65) {
-      r.poly([points[4], points[5], points[6], points[7], { x: cx, y: cy }], colors[Math.min(4, 2 + (i % 3))]);
+      r.poly([points[(litIndex+7)%9], points[(litIndex+8)%9], points[litIndex], points[(litIndex+1)%9], { x: cx, y: cy }], colors[Math.min(4, 2 + (i % 3))]);
     }
   }
 }
 
-function drawTreeShadow(r, x, y) {
+function drawTreeShadow(r, x, y, variant) {
   const z = r.zoom, ctx = r.base, foot = r.project(x, y);
+  if(r.shadowScene) {
+    // Contact darkening belongs to the tree, including trees inside a
+    // procedural lot whose distant cast shadow is represented by the site.
+    const contact=()=>{ctx.fillStyle='#24352336';ctx.beginPath();ctx.ellipse(foot.x,foot.y,2.3*z,1.1*z,0,0,Math.PI*2);ctx.fill();};
+    if(x>=1 && y>=1 && x<=r.size-1 && y<=r.size-1)contact();else withGroundClip(r,contact);
+    return;
+  }
+  const drop=treeHeight(x,y,variant)*.6,point=shadowPoint(x,y,drop),cast=r.project(point[0],point[1]);
   const paint = () => {
     // Contact shadow and a longer soft cast shadow underneath the trunk.
     ctx.fillStyle = '#24352328';
-    ctx.beginPath(); ctx.ellipse(foot.x - 4 * z, foot.y + 2 * z, 9 * z, 3.4 * z, -0.12, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(cast.x, cast.y, 9 * z, 3.4 * z, -0.12, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = '#24352336';
     ctx.beginPath(); ctx.ellipse(foot.x, foot.y, 2.3 * z, 1.1 * z, 0, 0, Math.PI * 2); ctx.fill();
   };
@@ -75,10 +90,10 @@ function drawTreeShadow(r, x, y) {
 // Cache belongs to the renderer and is discarded on scale/lighting changes.
 const atlases = new WeakMap();
 export function drawTree(r, x, y, variant = 0) {
-  drawTreeShadow(r, x, y);
+  drawTreeShadow(r, x, y, variant);
   if (typeof document === 'undefined') return paintTree(r, x, y, variant);
   const dpr = Math.max(2, r.dpr || 1), scale = 2;
-  const key = `${scale}:${dpr}:${!!r.night}`;
+  const key = `${scale}:${dpr}:${!!r.night}:${r.rotation || 0}`;
   const owner = r.atlasOwner || r;
   let atlas = atlases.get(owner);
   if (!atlas || atlas.key !== key) { atlas = { key, sprites: new Map() }; atlases.set(owner, atlas); }

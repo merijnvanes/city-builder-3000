@@ -95,8 +95,13 @@ incremental migration.
 - Keep async redraw and portrait refresh, fallback cleanup, failed-load fallback,
   alpha picking, device-pixel snapping and subdirectory-safe asset URLs. Expand the
   loader/manifest tests alongside the new contract, not by weakening civic checks.
-- The baked key light is upper-left in screen space. Renderer shadows for new
-  assets must agree in all rotations; old procedural lighting is transitional.
+- The key and fill lights stay fixed in world space while the camera rotates.
+  `src/sunlight-config.json` is shared by the exporter and runtime shadow volumes.
+  Every packaged frame must use the same `world-v1` convention; never mix old
+  camera-relative bakes into a rebuilt catalog. See [SHADOWS.md](SHADOWS.md).
+  Metal-capable hosts can add `--device METAL` to rendering commands without
+  changing sample count, framing or output resolution. The packager accepts
+  `--jobs N` to control parallel encoding while retaining the same image quality.
 
 One tile is four model units. Model X maps to game X and model Y to negative game
 Y. `render.py` uses an orthographic camera at 30° elevation, azimuth -45° plus

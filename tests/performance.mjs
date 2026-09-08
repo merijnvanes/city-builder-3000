@@ -8,6 +8,8 @@ try {
   await page.goto(process.env.CIVIC_TEST_URL || 'http://127.0.0.1:4173');
   await page.waitForFunction(() => window.civic);
   const results = await page.evaluate(async () => {
+    // Measure this scene alone, not the landing-page city's concurrent redraws.
+    civic.renderer.resizeObserver.disconnect();civic.renderer.render=()=>{};
     const { CityRenderer } = await import('/src/renderer.js');
     const { preloadCivicSprites, civicSpriteSpec, civicSpriteKey } = await import('/src/building-art.js');
     const { spriteVariant } = await import('/src/architecture-variation.js');

@@ -212,3 +212,13 @@ steep sites require leveling, and zoning develops only level footprints.
 
 Checks: `node --test tests/lot-foundations.test.js` and
 `node tests/lot-foundations.mjs` (against the running development server).
+
+### Sunlight and shadows
+
+The sun stays fixed in the world when the view rotates. Buildings and trees
+cast onto terrain, paved sites and neighboring artwork; lower receivers use
+their own roof and wall heights. Imported artwork is baked with the same world
+light. Shadow volumes use simplified bodies and exact artwork alpha clipping,
+with cached intersections, bounded scratch canvases and a shared 16 MiB
+composite atlas for smooth panning. See [SHADOWS.md](SHADOWS.md)
+for the research, rendering contract, fidelity limits and validation.

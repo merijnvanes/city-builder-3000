@@ -31,24 +31,29 @@ def encode(job):
 
 def main():
     p = argparse.ArgumentParser(); p.add_argument('--input',default='artifacts/civic-renders')
+    p.add_argument('--jobs',type=int,choices=range(1,33),default=4,help='Parallel image encoders (default: 4)')
     p.add_argument('--types', help='Incrementally replace comma-separated types in an existing complete export')
     args = p.parse_args()
     root = Path(__file__).resolve().parents[2]; source = root/args.input; out = root/'public/assets/civic'; out.mkdir(parents=True,exist_ok=True)
+    lighting=json.loads((root/'src/sunlight-config.json').read_text())['version']
     if args.types and not (out/'catalog.json').is_file():
         raise ValueError('Incremental packaging requires the tracked catalog.json; restore it or bake and package all types first')
     manifest = json.loads((out/'catalog.json').read_text()) if args.types else {}
     selected = {name for name,spec in REGISTRY.items() if spec['family']==args.types} if args.types in {spec['family'] for spec in REGISTRY.values()} else set(args.types.split(',')) if args.types else TYPES
     if not selected <= TYPES: raise ValueError('Unknown building type')
+    if any(spec.get('lighting') != lighting for kind,spec in manifest.items() if kind not in selected):
+        raise ValueError('Mixed lighting catalog; rebuild and package all types together')
     jobs = []
     for kind in sorted(selected):
         meta = json.loads((source/f'{kind}.json').read_text())
+        if meta.get('lighting') != lighting: raise ValueError(f'{kind}: lighting differs; rebuild every view with {lighting}')
         if set(meta['frames']) != expected_frames(kind): raise ValueError(f'{kind}: render all rotations, lighting states and registered variants before packaging')
         footprint = meta.get('footprint') or dict(w=meta['tiles'], h=meta['tiles'])
         expected = REGISTRY[kind].get('footprint') or dict(w=REGISTRY[kind]['tiles'], h=REGISTRY[kind]['tiles'])
         if footprint != expected: raise ValueError(f'{kind}: render footprint differs from registry')
-        manifest[kind] = {**({'footprint':footprint} if 'footprint' in REGISTRY[kind] else {'tiles':meta['tiles']}), 'scale':meta['scale'], 'height':round(meta['maxHeight']+1), 'frames':{}}
+        manifest[kind] = {**({'footprint':footprint} if 'footprint' in REGISTRY[kind] else {'tiles':meta['tiles']}), 'scale':meta['scale'], 'height':round(meta['maxHeight']+1), **({'lighting':meta['lighting']} if 'lighting' in meta else {}), 'frames':{}}
         jobs += [(str(source),str(out),kind,key,frame) for key,frame in meta['frames'].items()]
-    with ProcessPoolExecutor(max_workers=4) as pool:
+    with ProcessPoolExecutor(max_workers=args.jobs) as pool:
         for kind,key,frame in pool.map(encode,jobs): manifest[kind]['frames'][key] = frame
     for kind, spec in manifest.items():
         spec.update({key:value for key,value in REGISTRY[kind].items() if key in {'family','label','description','variants','zone'}})

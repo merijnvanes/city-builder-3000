@@ -8,10 +8,11 @@ import common
 from contextlib import nullcontext
 from fast_primitives import zone_primitives
 
-p=argparse.ArgumentParser();p.add_argument('--types',default='fire');p.add_argument('--states',default='day');p.add_argument('--rotations',default='0');p.add_argument('--samples',type=int,default=32);p.add_argument('--scale',type=float,default=3);p.add_argument('--output',default='artifacts/civic-renders');p.add_argument('--save-blend',action='store_true')
+p=argparse.ArgumentParser();p.add_argument('--types',default='fire');p.add_argument('--states',default='day');p.add_argument('--rotations',default='0');p.add_argument('--samples',type=int,default=32);p.add_argument('--scale',type=float,default=3);p.add_argument('--output',default='artifacts/civic-renders');p.add_argument('--save-blend',action='store_true');p.add_argument('--device',choices=['CPU','METAL'],default='CPU')
 args=p.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
 root=Path(__file__).resolve().parents[2];out=root/args.output;out.mkdir(parents=True,exist_ok=True)
 registry=json.loads((Path(__file__).parent/'registry.json').read_text())
+lighting=json.loads((root/'src/sunlight-config.json').read_text())
 selected=list(registry) if args.types=='all' else [name for name,spec in registry.items() if spec['family']==args.types] if args.types in {spec['family'] for spec in registry.values()} else args.types.split(',')
 
 def look(o,target):o.rotation_euler=(Vector(target)-o.location).to_track_quat('-Z','Y').to_euler()
@@ -29,7 +30,12 @@ for kind,variant,model in work:
     width,depth=footprint['w'],footprint['h'];tiles=max(width,depth)
     with zone_primitives() if registry[kind].get('zone') else nullcontext():
         getattr(importlib.import_module(registry[kind]['module']),model)()
-    scene=bpy.context.scene;scene.render.engine='CYCLES';scene.cycles.samples=args.samples;scene.cycles.use_denoising=True;scene.render.use_persistent_data=True
+    scene=bpy.context.scene;scene.render.engine='CYCLES'
+    if args.device=='METAL':
+        prefs=bpy.context.preferences.addons['cycles'].preferences;prefs.compute_device_type='METAL';prefs.get_devices()
+        for device in prefs.devices:device.use=device.type=='METAL'
+        scene.cycles.device='GPU'
+    scene.cycles.samples=args.samples;scene.cycles.use_denoising=True;scene.render.use_persistent_data=True
     scene.cycles.max_bounces=5;scene.cycles.diffuse_bounces=3;scene.cycles.glossy_bounces=3
     scene.render.film_transparent=True;scene.render.image_settings.file_format='PNG';scene.render.image_settings.color_mode='RGBA';scene.render.image_settings.color_depth='8'
     scene.render.resolution_percentage=100
@@ -57,11 +63,11 @@ for kind,variant,model in work:
     world=bpy.data.worlds.new('soft studio sky');scene.world=world;world.use_nodes=True
     sky=world.node_tree.nodes.get('Background');sky.inputs['Color'].default_value=(.73,.82,1,1);sky.inputs['Strength'].default_value=.6
     bpy.ops.object.camera_add();camera=bpy.context.object;scene.camera=camera;camera.data.type='ORTHO';camera.data.ortho_scale=size/(32*args.scale/(4/math.sqrt(2)))
-    bpy.ops.object.light_add(type='AREA',location=(-8,-12,18));key=bpy.context.object;key.data.energy=2100;key.data.shape='DISK';key.data.size=9;key.data.color=(1,.83,.63)
-    bpy.ops.object.light_add(type='AREA',location=(10,3,12));fill=bpy.context.object;fill.data.energy=750;fill.data.size=12;fill.data.color=(.69,.82,1)
+    bpy.ops.object.light_add(type='SUN',location=lighting['key']);key=bpy.context.object;key.data.energy=1.5;key.data.angle=.35;key.data.color=(1,.83,.63)
+    bpy.ops.object.light_add(type='AREA',location=lighting['fill']);fill=bpy.context.object;fill.data.energy=750;fill.data.size=12;fill.data.color=(.69,.82,1)
     look(key,(0,0,0));look(fill,(0,0,2))
     radius=25
-    metadata=metadata_by_type.setdefault(kind,{'type':kind,**({'footprint':footprint} if 'footprint' in registry[kind] else {'tiles':tiles}),'scale':args.scale,'frames':{},'maxHeight':0})
+    metadata=metadata_by_type.setdefault(kind,{'type':kind,'lighting':lighting['version'],**({'footprint':footprint} if 'footprint' in registry[kind] else {'tiles':tiles}),'scale':args.scale,'frames':{},'maxHeight':0})
     # Bounds are measured from the authored geometry, not hand-estimated.
     bpy.context.view_layer.update()
     for obj in scene.objects:
@@ -69,7 +75,7 @@ for kind,variant,model in work:
             metadata['maxHeight']=max(metadata['maxHeight'],max((obj.matrix_world@Vector(v)).z for v in obj.bound_box)*math.sqrt(3/4)*32/(4/math.sqrt(2)))
     for state in args.states.split(','):
         night=state!='day';sky.inputs['Strength'].default_value=.16 if night else .6
-        key.data.energy=330 if night else 2100;key.data.color=(.49,.65,1) if night else (1,.83,.63)
+        key.data.energy=.22 if night else 1.5;key.data.color=(.49,.65,1) if night else (1,.83,.63)
         fill.data.energy=170 if night else 750
         for node,strength in common.LIGHTS:node.inputs['Emission Strength'].default_value=strength if state=='night' else 0
         scene.view_settings.exposure=.15 if night else .25
@@ -77,10 +83,8 @@ for kind,variant,model in work:
             a=math.radians(-45+rotation*90)
             camera.location=target+Vector((math.cos(a)*radius,math.sin(a)*radius,radius*math.tan(math.radians(30))))
             look(camera,target)
-            # Light remains upper-left in screen space for all map rotations.
-            theta=rotation*math.pi/2;c,s=math.cos(theta),math.sin(theta)
-            for light,original in [(key,(-8,-12,18)),(fill,(10,3,12))]:
-                x,y,z=original;light.location=(x*c-y*s,x*s+y*c,z);look(light,(0,0,1))
+            # The sun stays in model/world space while only the camera turns.
+            # Runtime shadow displacement uses the same X / -Y convention.
             bpy.context.view_layer.update()
             anchor=world_to_camera_view(scene,camera,Vector((0,0,0)))
             name=f'{kind}-{state}-{rotation}{suffix}.png';scene.render.filepath=str(out/name)

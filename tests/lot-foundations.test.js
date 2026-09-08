@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {faceLight} from '../src/sunlight.js';
+import {shadeHex} from '../src/art-colors.js';
 import {CityRenderer} from '../src/renderer.js';
 import {lotVertexHeight,foundationEdges} from '../src/lot-foundations.js';
 function scene() {
@@ -27,7 +29,7 @@ test('roads meet a graded building site exactly in all orientations without chan
 test('terraced lots use the lower shared grade and higher solid retaining walls',()=>{
  const {city,r}=scene();const high=lot(city,3,3,3,3,3);lot(city,6,3,2,3,2);r.buildCorners(city);
  assert.equal(lotVertexHeight(city,6,4),16);
- for(const rotation of [0,1]){r.rotation=rotation;const walls=foundationEdges(r,high).filter(e=>e.a[0]===6 && e.b[0]===6);assert.equal(walls.length,3);assert.ok(walls.every(e=>e.shade===(rotation===0?'#8a836c':'#6f6a58')));assert.ok(walls.every(e=>e.top===24 && e.a[2]===16 && e.b[2]===16));}
+ for(const rotation of [0,1]){r.rotation=rotation;const walls=foundationEdges(r,high).filter(e=>e.a[0]===6 && e.b[0]===6);assert.equal(walls.length,3);assert.ok(walls.every(e=>e.shade===shadeHex('#9c9480',faceLight(1,0))));assert.ok(walls.every(e=>e.top===24 && e.a[2]===16 && e.b[2]===16));}
  for(const rotation of [2,3]){r.rotation=rotation;assert.equal(foundationEdges(r,high).filter(e=>e.a[0]===6 && e.b[0]===6).length,0);}
 });
 test('long retaining walls follow intervening dips and never produce inverted faces',()=>{

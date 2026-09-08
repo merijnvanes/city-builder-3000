@@ -1,3 +1,5 @@
+import {faceLight} from './sunlight.js';
+import {shadeHex} from './art-colors.js';
 import {ELEV_PX} from './render-scale.js';
 import {waterSurface} from './sim/surface-water.js';
 
@@ -32,7 +34,7 @@ export function foundationEdges(r,t,cell=null) {
     if(out.x+out.y<=center.x+center.y)return;
     const za=Math.min(top,r.meshZ(ax,ay)),zb=Math.min(top,r.meshZ(bx,by));
     if(top-za<.01 && top-zb<.01)return;
-    edges.push({a:[ax,ay,za],b:[bx,by,zb],top,shade:out.x>center.x?'#8a836c':'#6f6a58'});
+    edges.push({a:[ax,ay,za],b:[bx,by,zb],top,shade:shadeHex('#9c9480',faceLight(nx,ny))});
   };
   if(cell) {
     const {x:cx,y:cy}=cell;

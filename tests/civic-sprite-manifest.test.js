@@ -21,6 +21,8 @@ test('every authored building family ships all four angles and three lighting st
   assert.deepEqual(Object.keys(registry).sort(), expected);
   let compressedBytes = 0, parksBytes = 0, transportBytes = 0, rewardsBytes = 0, dealsBytes = 0, landmarksBytes = 0, residentialBytes = 0, commercialBytes = 0, industrialBytes = 0;
   for (const [type, spec] of Object.entries(CIVIC_SPRITES)) {
+    const lighting=JSON.parse(readFileSync(new URL('../src/sunlight-config.json',import.meta.url)));
+    assert.equal(spec.lighting,lighting.version,`${type} uses the current world lighting`);
     assert.equal(spec.label, registry[type].label);
     assert.equal(spec.description, registry[type].description);
     assert.ok(spec.label && spec.description);

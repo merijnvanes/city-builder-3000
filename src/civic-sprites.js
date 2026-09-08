@@ -142,6 +142,7 @@ function loadFrame(key, entry) {
       entry.loading = false;
       for (const renderer of entry.waiters) {
         renderer.dirty = true;
+        renderer.artRevision=(renderer.artRevision || 0)+1;
         renderer.onArtworkReady?.();
       }
       entry.waiters.clear(); image.onload = null; image.onerror = null;
@@ -243,7 +244,7 @@ export function civicSpriteStats() {
 
 export function civicSpriteKey(t) { return zoneArtKey(t) || t.type; }
 
-// Drawing, culling heights and shadow direction must agree on eligibility.
+// Drawing, culling and shadow proxy heights must agree on eligibility.
 export function civicSpriteSpec(t) {
   const spec = CIVIC_SPRITES[civicSpriteKey(t)];
   return spec && t.lot && t.lot.w === (spec.footprint?.w ?? spec.tiles) && t.lot.h === (spec.footprint?.h ?? spec.tiles) ? spec : null;
