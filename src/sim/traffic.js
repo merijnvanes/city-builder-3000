@@ -107,10 +107,10 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
   const N = tiles.length;
   // Surface nodes 0..N-1, subway nodes N..2N-1, and the street under a
   // viaduct at 2N..3N-1. The third band is only allocated when the city has
-  // one, so a city without viaducts pays nothing for them.
+  // one, so a city without crossings pays nothing for them.
   const UNDER = N * 2;
-  const viaducts = tiles.some((t) => t.under);
-  const nodes = viaducts ? N * 3 : N * 2;
+  const crossings = tiles.some((t) => t.under);
+  const nodes = crossings ? N * 3 : N * 2;
   const kind = new Uint8Array(nodes);
   // "If the budget is far below adequate, transit workers will go out on
   // strike." Nobody boards a train that is not running.
@@ -132,19 +132,19 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
     else if (t.type === "onramp") kind[i] = RAMP;
     else if (t.tunnel) kind[i] = BORE;
     if (!strike && (t.subway || t.type === "substation")) kind[N + i] = TUNNEL;
-    if (viaducts && t.under) kind[UNDER + i] = t.under === 2 ? RAIL : ROAD;
+    if (crossings && t.under) kind[UNDER + i] = t.under === 2 ? RAIL : ROAD;
   }
 
   // A step onto tile `ni` from a node on the ground: under a viaduct, the
   // street is the lower node, never the highway carried above it.
-  const groundAt = viaducts ? (ni) => (kind[UNDER + ni] ? UNDER + ni : ni) : (ni) => ni;
+  const groundAt = crossings ? (ni) => (kind[ni] === ROAD || kind[ni] === RAMP ? ni : kind[UNDER + ni] ? UNDER + ni : ni) : (ni) => ni;
   // Everything but the subway climbs the same hills.
   const onGround = (n) => n < N || n >= UNDER;
 
   // Jobs reachable from each road tile.
   const jobsAt = new Map();
   const jobList = [];
-  const addJobs = (entry, anchor, cap) => { const j = { anchor, cap, open: cap }; jobList.push(j); if (!jobsAt.has(entry)) jobsAt.set(entry, []); jobsAt.get(entry).push(j); };
+  const addJobs = (entry, anchor, cap) => { const j = { anchor, cap, open: cap }; jobList.push(j); if (!jobsAt.has(entry)) jobsAt.set(entry, []); jobsAt.get(entry).push(j); return j; };
   const homes = [];
   let workers = 0, jobsTotal = 0;
   for (const t of tiles) {
@@ -176,11 +176,19 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
       if (entry >= 0) addJobs(entry, t, cap);
     }
   }
-  // Jobs in neighbouring cities at every road that reaches the map edge.
+  // Jobs in neighbouring cities at connected road exits.
   let externalJobs = 0;
   const outside = { filled: 0 };
   for (const side of Object.values(city._connections || {})) {
-    for (const t of side.roadTiles || []) { addJobs(t.y * size + t.x, outside, EXTERNAL_JOBS_PER_ROAD); externalJobs += EXTERNAL_JOBS_PER_ROAD; }
+    for (const t of side.roadTiles || []) {
+      const i = t.y * size + t.x;
+      const job = addJobs(i, outside, EXTERNAL_JOBS_PER_ROAD);
+      if (crossings && kind[UNDER + i] === ROAD) {
+        if (!jobsAt.has(UNDER + i)) jobsAt.set(UNDER + i, []);
+        jobsAt.get(UNDER + i).push(job);
+      }
+      externalJobs += EXTERNAL_JOBS_PER_ROAD;
+    }
   }
 
   const parent = new Int32Array(nodes).fill(-1);
@@ -193,7 +201,7 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
   // stations; subway stations join the street to the tunnel beneath them.
   const canStep = (from, to) => {
     const a = kind[from], b = kind[to];
-    if (a === STATION || b === STATION || a === SUBSTATION || b === SUBSTATION) return b !== 0;
+    if (a === STATION || b === STATION || a === SUBSTATION || b === SUBSTATION) return b !== 0 && a !== HIGHWAY && b !== HIGHWAY;
     if (a === RAIL || b === RAIL) return a === b;
     // "Highways may be built over roads, but if you want your Sims to be able
     // to get from one to the other, the intersection requires an on-ramp."
@@ -235,28 +243,27 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
     return out;
   };
 
-  // Where viaducts exist, a step onto the next tile lands on whichever deck
-  // carries this kind of traffic: the highway stays up, everything else takes
-  // the street below.
-  const viaductNeighbors = (n) => {
+  // Crossings expose both routes to adjacent tiles. canStep keeps cars,
+  // trains and highways separate, with transfers only at stations and ramps.
+  const crossingNeighbors = (n) => {
     const out = [];
     const band = n < N ? 0 : n < UNDER ? 1 : 2;
     const i = n - band * N;
     const x = i % size, y = (i - x) / size;
     if (band === 1) return tunnelNeighbors(n, i, x, y, out);
-    const elevated = band === 0 && kind[n] === HIGHWAY;
     for (const [dx, dy] of NEIGHBORS4) {
       const nx = x + dx, ny = y + dy;
       if (nx < 0 || ny < 0 || nx >= size || ny >= size) continue;
       const ni = ny * size + nx;
-      const target = elevated ? ni : groundAt(ni);
-      if (kind[target] && canStep(n, target)) out.push(target);
+      if (kind[ni] && canStep(n, ni)) out.push(ni);
+      const below = UNDER + ni;
+      if (kind[below] && canStep(n, below)) out.push(below);
     }
     if (band === 0 && kind[n] === SUBSTATION) out.push(N + i);
     return out;
   };
 
-  const neighborsOf = viaducts ? viaductNeighbors : plainNeighbors;
+  const neighborsOf = crossings ? crossingNeighbors : plainNeighbors;
 
   // Cheapest cost from any of `sources` to every node, capped at maxCost.
   // Used for "is there anything within a reasonable commute of here", which
@@ -358,7 +365,7 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
   let jams = 0;
   // Both street bands: the surface, and anything running under a viaduct.
   // Subway tunnels never jam.
-  for (const base of viaducts ? [0, UNDER] : [0]) {
+  for (const base of crossings ? [0, UNDER] : [0]) {
     for (let i = base; i < base + N; i++) {
       if (kind[i] !== ROAD && kind[i] !== HIGHWAY && kind[i] !== RAMP) continue;
       if (trafficOf(i, first.load) >= 80) { jam[i] = 1; jams++; }
@@ -370,7 +377,7 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
   for (let i = N; i < N * 2; i++) if (kind[i] === TUNNEL) subwayRiders += load[i];
   for (let i = 0; i < N; i++) {
     const t = tiles[i];
-    const below = viaducts ? kind[UNDER + i] : 0;
+    const below = crossings ? kind[UNDER + i] : 0;
     // A viaduct tile carries the highway above and the street below, and the
     // tile shows the pair of them.
     const local = below ? trafficOf(UNDER + i, load) : 0;
@@ -418,7 +425,7 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
     const out = new Int32Array(N).fill(-1);
     if (!sources.length) return out;
     const cost = reachFrom(sources, maxCost);
-    for (const base of viaducts ? [0, UNDER] : [0]) {
+    for (const base of crossings ? [0, UNDER] : [0]) {
       for (let i = base; i < base + N; i++) {
         if (cost[i] < 0 || (kind[i] !== ROAD && kind[i] !== RAMP)) continue;
         const tile = i - base, x = tile % size, y = (tile - x) / size;

@@ -117,3 +117,11 @@ Ground shadows (trees, lots, aircraft and UFOs) and streetlight glow are clipped
 terrain boundary in every camera orientation. Raised artwork can overhang it.
 Run `node tests/ground-effects.mjs` against the dev server on port 4173 to check
 this distinction in a real Canvas renderer.
+
+Roads and rails support level crossings in either construction order. Highways
+can cross either route on dry land on a viaduct in either order. Bridges cannot cross. Crossings preserve both
+traffic networks and maintenance costs; stations and ramps remain the places to
+change networks. A tile carries at most two routes, and demolishing a crossing
+removes the road/deck first, leaving its underlying route. Pipes and subways can
+coexist with surface crossings. `tests/crossings.test.js` covers construction,
+saves, route continuity, network separation and underground utilities.

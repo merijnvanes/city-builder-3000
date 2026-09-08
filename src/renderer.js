@@ -6,7 +6,7 @@ import { drawMapBackdrop, drawBoat, drawOutageMarkers, drawAirplane } from "./sc
 // fires and the construction preview are drawn every frame on top.
 import { drawCachedArchitecture, hitUncachedArchitecture } from "./architecture-cache.js";
 import { drawArchitecture, heightOf, random } from "./building-art.js";
-import { BUILDINGS, PORT_TYPES } from "./sim/catalog.js";
+import { BUILDINGS, PORT_TYPES, carriesRoute } from "./sim/catalog.js";
 import { drawTree } from "./foliage.js";
 import { surfaceColor, drawShoreline } from "./terrain-art.js";
 import { drawStreet, drawViaduct, hasStreetLamp, drawStreetLamp, drawVehicle, tunnelPortal, drawTunnelMouth } from "./street-art.js";
@@ -316,7 +316,11 @@ export class CityRenderer {
     if (!ROAD.has(t.type)) return;
     // A viaduct is two surfaces: the street it was built over, then the deck.
     if (t.under === 1) { drawStreet(this, t, city, { as: "road" }); drawViaduct(this, t, city); return; }
-    if (t.under === 2) { this.railBed(t, city); drawViaduct(this, t, city); return; }
+    if (t.under === 2) {
+      if (t.type === "road") { drawStreet(this, t, city); this.railBed(t, city, true); }
+      else { this.railBed(t, city); drawViaduct(this, t, city); }
+      return;
+    }
     if (t.type !== "rail") {
       drawStreet(this, t, city);
       const portal = tunnelPortal(t, city);
@@ -327,12 +331,13 @@ export class CityRenderer {
   }
 
   // Sleepers, ballast and rails on a track tile.
-  railBed(t, city) {
+  railBed(t, city, crossing = false) {
     const { x, y } = t, water = t.terrain === "water";
-    const joins = (a, b) => a === b || (a !== "rail" && b !== "rail" && ROAD.has(a) && ROAD.has(b));
-    const adjacent = (dx, dy) => x + dx >= 0 && y + dy >= 0 && x + dx < city.size && y + dy < city.size && joins(city.tiles[(y + dy) * city.size + x + dx]?.type, t.type);
-    this.flat(x + 0.015, y + 0.015, 0.97, 0.97, 0.3, "#857f67");
-    this.flat(x + 0.1, y + 0.1, 0.8, 0.8, 0.4, "#736e5c");
+    const adjacent = (dx, dy) => x + dx >= 0 && y + dy >= 0 && x + dx < city.size && y + dy < city.size && carriesRoute(city.tiles[(y + dy) * city.size + x + dx], "rail");
+    if (!crossing) {
+      this.flat(x + 0.015, y + 0.015, 0.97, 0.97, 0.3, "#857f67");
+      this.flat(x + 0.1, y + 0.1, 0.8, 0.8, 0.4, "#736e5c");
+    }
     const ew = adjacent(1, 0) || adjacent(-1, 0), ns = adjacent(0, 1) || adjacent(0, -1);
     {
       for (let a = 0.08; a < 1; a += 0.15) {
@@ -617,7 +622,7 @@ export class CityRenderer {
         const t = city.tiles[i];
         const hw = t.type === "highway";
         if ((t.type !== "road" && !hw) || random(t.x, t.y, 9) > (hw ? 0.3 : 0.18) + (t.traffic || 0) * 0.008) continue;
-        const east = t.x + 1 < city.size && city.tiles[i + 1]?.type === t.type, south = city.tiles[i + city.size]?.type === t.type;
+        const east = t.x + 1 < city.size && carriesRoute(city.tiles[i + 1], hw ? "highway" : "road"), south = carriesRoute(city.tiles[i + city.size], hw ? "highway" : "road");
         if (!east && !south) continue;
         const vertical = south && (!east || i % 2 === 0), f = (time * (hw ? 0.0003 : 0.00016) + random(t.x, t.y)) % 1, back = i % 3 === 0;
         const a = back ? 1 - f : f, p = this.project(t.x + (vertical ? (back ? 0.68 : 0.32) : a), t.y + (vertical ? a : back ? 0.68 : 0.32), 2.1);
@@ -630,8 +635,8 @@ export class CityRenderer {
     // Trains on busy rails.
     for (let i = 0; i < city.tiles.length; i++) {
       const t = city.tiles[i];
-      if (t.type !== "rail" || !t.traffic || random(t.x, t.y, 5) > 0.12) continue;
-      const east = city.tiles[i + 1]?.type === "rail" && t.x + 1 < city.size, south = city.tiles[i + city.size]?.type === "rail";
+      if (!carriesRoute(t, "rail") || !t.traffic || random(t.x, t.y, 5) > 0.12) continue;
+      const east = t.x + 1 < city.size && carriesRoute(city.tiles[i + 1], "rail"), south = carriesRoute(city.tiles[i + city.size], "rail");
       if (!east && !south) continue;
       const f = (time * 0.0002 + random(t.x, t.y, 6)) % 1;
       const p = this.project(t.x + (east ? f : 0.5), t.y + (east ? 0.5 : f), 3);

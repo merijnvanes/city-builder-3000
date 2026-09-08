@@ -460,6 +460,7 @@ export function inspectTile(city, x, y) {
   details.push(`Land value: ${t.landValue}/100`);
   if (t.pollution) details.push(`Pollution: ${t.pollution}/100`);
   if (t.crime) details.push(`Crime: ${t.crime}/100`);
+  if (t.under) details.push(t.type === "road" ? "Road–rail level crossing" : `Highway viaduct over ${t.under === 2 ? "rail" : "road"}`);
   if (t.traffic) details.push(`Traffic: ${t.traffic}/100`);
   if (t.type !== "empty" && t.type !== "road" && t.type !== "rail") {
     details.push(`Power: ${yesNo(t.powered)} · Water: ${yesNo(t.watered)} · Road: ${yesNo(t.roadAccess)}`);

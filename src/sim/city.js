@@ -264,7 +264,7 @@ export function deserialize(raw) {
     const terrain = TERRAIN_NAME[terrainCode];
     if (terrain === "water" && type !== "empty" && !ROAD_TYPES.has(type)) throw new Error(`Invalid save: tile ${i} built on water.`);
     // Only a highway carries a route beneath it.
-    if (under && type !== "highway") throw new Error(`Invalid save: tile ${i} has a viaduct without a highway.`);
+    if (under && type !== "highway" && !(type === "road" && under === 2)) throw new Error(`Invalid save: tile ${i} has a viaduct without a highway.`);
     const t = makeTile(x, y, terrain, trees, variant, elev, salt);
     t.type = type; t.density = density; t.level = level; t.abandoned = !!abandoned; t.age = age; t.fire = fire;
     t.powerline = !!powerline; t.pipe = !!pipe; t.subway = !!subway; t.flooded = flooded;

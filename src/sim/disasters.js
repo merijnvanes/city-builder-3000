@@ -145,7 +145,7 @@ export function triggerDisaster(city, id, rng) {
     let hit = 0;
     forRadius(city, center.x, center.y, 7, (t, d) => {
       if (!hits(0.65 * (1 - d / 8))) return;
-      if (t.type === "road" && t.terrain !== "water") { t.type = "empty"; hit++; }
+      if (t.type === "road" && t.terrain !== "water") { t.type = "empty"; t.under = 0; hit++; }
       else if (t.lot) { const a = anchorOf(city, t); if (a && !a._quake) { a._quake = true; damageLot(city, a, rng, rng() < 0.4); hit++; } }
     });
     for (const t of city.tiles) delete t._quake;
@@ -230,7 +230,7 @@ export function triggerDisaster(city, id, rng) {
       // The maximum of two gentle height fields remains gentle at the rim.
       t.elev = Math.max(t.elev || 0, peak - d);
       if (t.lot) { const a = anchorOf(city, t); if (a) { clearLot(city, a, { keepZone: false }); hit++; } }
-      else if (t.type !== "empty") { t.type = "empty"; hit++; }
+      else if (t.type !== "empty") { t.type = "empty"; t.under = 0; hit++; }
       t.density = 0; t.level = 0; t.abandoned = false; t.trees = 0; t.powerline = false; t.pipe = false; t.subway = false; t.fire = 0;
     }
     addEffect(city, { type: "lava", x: center.x, y: center.y, radius: 3, ttl: 6 });
@@ -291,7 +291,7 @@ export function advanceFires(city, rng) {
       else if (t.type === "empty") t.trees = 0;
       // Burning out a zoned but undeveloped tile has to clear its density
       // too, or the tile is left as empty land still marked high density.
-      else if (t.type !== "road") { t.type = "empty"; t.density = 0; }
+      else if (t.type !== "road") { t.type = "empty"; t.under = 0; t.density = 0; }
       destroyed++;
     }
   }

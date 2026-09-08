@@ -1,7 +1,7 @@
 // Construction rules: evaluate() prices a single action without mutating;
 // place() applies it. Multi-tile buildings are placed by their top-left
 // anchor and every footprint tile must be free land.
-import { BUILDINGS, ZONE_COST, PORT_TYPES, ZONED_TYPES, OVERLAY_TOOLS, TOOL_MAP, TECH_YEAR, LEVEL_FEE, ROAD_TYPES } from "./catalog.js";
+import { BUILDINGS, ZONE_COST, PORT_TYPES, ZONED_TYPES, OVERLAY_TOOLS, TOOL_MAP, TECH_YEAR, LEVEL_FEE, ROAD_TYPES, carriesRoute } from "./catalog.js";
 import { yearOf } from "./metrics.js";
 import { MAX_ELEVATION } from "./terrain.js";
 
@@ -127,6 +127,7 @@ export function evaluate(city, x, y, tool, options = {}) {
   // An on-ramp is the only place cars move between a street and a highway.
   // It has to touch both, so it can only go where the two actually meet.
   if (tool === "onramp") {
+    if (t.under) return fail("A crossing cannot be replaced by an on-ramp. Build the ramp beside it.");
     if (t.type === "onramp") return noop("On-ramp already here.", here);
     if (t.terrain === "water") return fail("On-ramps cannot be built on water.");
     if (t.type !== "empty" && t.type !== "road" && t.type !== "highway") return fail("Tile is occupied. Bulldoze first.");
@@ -134,8 +135,8 @@ export function evaluate(city, x, y, tool, options = {}) {
     let road = t.type === "road", highway = t.type === "highway";
     for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
       const n = tileAt(city, x + dx, y + dy);
-      if (n?.type === "road" || n?.type === "onramp") road = true;
-      if (n?.type === "highway") highway = true;
+      if (carriesRoute(n, "road") || n?.type === "onramp") road = true;
+      if (carriesRoute(n, "highway")) highway = true;
     }
     if (!highway) return fail("An on-ramp must touch a highway.");
     if (!road) return fail("An on-ramp must touch a road.");
@@ -144,13 +145,19 @@ export function evaluate(city, x, y, tool, options = {}) {
 
   if (tool === "road" || tool === "rail" || tool === "highway") {
     const b = BUILDINGS[tool];
-    if (t.type === tool) return noop(`${b.label} already here.`, here);
+    if (carriesRoute(t, tool)) return noop(`${b.label} already here.`, here);
+    if (t.under) return fail("This tile already carries two transport routes.");
+    if (t.terrain !== "water" && ((tool === "road" && t.type === "rail") || (tool === "rail" && t.type === "road"))) {
+      return { ok: true, noop: false, cost: b.cost * VIADUCT_MULTIPLIER, message: "Road–rail level crossing", tiles: here, surface: "road", under: 2 };
+    }
+    if (t.terrain !== "water" && t.type === "highway" && (tool === "road" || tool === "rail")) {
+      return { ok: true, noop: false, cost: b.cost * VIADUCT_MULTIPLIER, message: `Viaduct over the ${tool}`, tiles: here, surface: "highway", under: tool === "rail" ? 2 : 1 };
+    }
     // "Highways may be built over roads, but if you want your Sims to be able
     // to get from one to the other, the intersection requires an on-ramp." The
     // street keeps running underneath; the two never meet without a ramp.
-    if (tool === "highway" && (t.type === "road" || t.type === "rail") && !t.under) {
-      const span = t.terrain === "water" ? BRIDGE_MULTIPLIER : 1;
-      return { ok: true, noop: false, cost: Math.round(b.cost * VIADUCT_MULTIPLIER * span), message: `Viaduct over the ${t.type}`, tiles: here, under: t.type === "rail" ? 2 : 1 };
+    if (t.terrain !== "water" && tool === "highway" && (t.type === "road" || t.type === "rail") && !t.under) {
+      return { ok: true, noop: false, cost: Math.round(b.cost * VIADUCT_MULTIPLIER), message: `Viaduct over the ${t.type}`, tiles: here, under: t.type === "rail" ? 2 : 1 };
     }
     if (t.type !== "empty") return fail("Tile is occupied. Bulldoze first.");
     if (t.terrain === "water") return { ok: true, noop: false, cost: b.cost * BRIDGE_MULTIPLIER, message: "Bridge", tiles: here };
@@ -263,7 +270,7 @@ export function place(city, x, y, tool, options = {}) {
   } else if (BUILDINGS[tool]?.bores) {
     bore(city, ev.run, BUILDINGS[tool].bores);
   } else if (tool === "road" || tool === "rail" || tool === "highway" || tool === "onramp") {
-    t.type = tool; t.trees = 0; t.density = 0; t.level = 0;
+    t.type = ev.surface ?? tool; t.trees = 0; t.density = 0; t.level = 0;
     if (ev.under) t.under = ev.under;
   } else if (tool === "dispatch") {
     const a = t.lot ? anchorOf(city, t) : t;

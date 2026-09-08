@@ -15,6 +15,8 @@ export const ROAD_TYPES = new Set(["road", "rail", "highway", "onramp"]);
 export const ACCESS_TYPES = new Set(["road", "rail", "onramp"]);
 // Does this tile put a street or a track at ground level? A viaduct tile is a
 // highway on top, but whatever it was built over is still down there.
+// Multi-route tiles retain the two networks without creating an interchange.
+export const carriesRoute = (t, route) => !!t && (t.type === route || (route === "rail" && t.under === 2) || (route === "road" && t.under === 1));
 export const carriesLocal = (t) => ACCESS_TYPES.has(t.type) || t.under > 0;
 export const OVERLAY_TOOLS = new Set(["powerline", "pipe", "subway"]);
 

@@ -1,3 +1,4 @@
+import { carriesRoute } from './sim/catalog.js';
 // Connected street surfaces and small, camera-aware street furniture.
 const DIRECTIONS = [[1, 0], [0, 1], [-1, 0], [0, -1]];
 
@@ -24,11 +25,12 @@ export function drawTunnelMouth(r, t, city, portal) {
   r.box(wx - mx, wy - my, mx * 2, my * 2, 6, "#26302f");
   r.flat(wx - mx, wy - my, mx * 2, my * 2, 6.1, portal.rail ? "#3a3f42" : "#1d2523");
 }
-export function streetConnections(t, city) {
+export function streetConnections(t, city, as = t.type) {
   return DIRECTIONS.map(([dx, dy]) => {
     const x = t.x + dx, y = t.y + dy;
     if (x < 0 || y < 0 || x >= city.size || y >= city.size) return false;
-    return ['road', 'highway', 'onramp'].includes(city.tiles[y * city.size + x].type);
+    const n = city.tiles[y * city.size + x];
+    return carriesRoute(n, as) || n.type === 'onramp' || as === 'onramp' && (carriesRoute(n, 'road') || carriesRoute(n, 'highway'));
   });
 }
 
@@ -36,7 +38,7 @@ export function streetConnections(t, city) {
 // `lift` raises the whole surface, for the deck that runs over it.
 export function drawStreet(r, t, city, { as = t.type, lift = 0 } = {}) {
   const { x, y } = t, highway = as === 'highway', ramp = as === 'onramp';
-  const joins = streetConnections(t, city), junction = !ramp && joins.filter(Boolean).length >= 3;
+  const joins = streetConnections(t, city, as), junction = !ramp && joins.filter(Boolean).length >= 3;
   const inset = highway ? 0.055 : ramp ? 0.09 : 0.14, width = 1 - inset * 2;
   const asphalt = highway ? '#424c53' : ramp ? '#4a555b' : '#525f63';
   const flat = (a, b, w, d, color, z = 0.5) => r.flat(x + a, y + b, w, d, z + lift, color);

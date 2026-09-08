@@ -418,7 +418,7 @@ export function createAgentAPI({ getCity, actions, renderer, ui, undo }) {
           x: t.x, y: t.y, type: t.type, terrain: t.terrain, elev: t.elev, trees: t.trees, salt: t.salt,
           density: t.density, level: t.level, abandoned: t.abandoned, lot: t.lot, fire: t.fire,
           powered: t.powered, watered: t.watered, roadAccess: t.roadAccess,
-          powerline: t.powerline, pipe: t.pipe, subway: t.subway, tunnel: t.tunnel,
+          powerline: t.powerline, pipe: t.pipe, subway: t.subway, tunnel: t.tunnel, under: t.under,
           pollution: round1(t.pollution), crime: round1(t.crime), traffic: round1(t.traffic),
           landValue: round1(t.landValue), aura: round1(t.aura ?? 0), reach: t.reach,
           svc: t.svc, industry: t.industry, commerce: t.commerce,

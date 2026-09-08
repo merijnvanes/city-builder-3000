@@ -11,7 +11,7 @@
 //
 // Seaports carry the same idea, but they are zones rather than buildings; the
 // berth rule lives in ports.js.
-import { BUILDINGS } from "./catalog.js";
+import { BUILDINGS, carriesRoute } from "./catalog.js";
 import { lotTiles } from "./lots.js";
 import { tileAt } from "./grid.js";
 
@@ -26,7 +26,7 @@ export function besideWhatItNeeds(city, t) {
     for (const [dx, dy] of NEIGHBOURS) {
       const n = tileAt(city, cell.x + dx, cell.y + dy);
       if (!n) continue;
-      if (needs === "subway" ? n.subway : n.type === needs) return true;
+      if (needs === "subway" ? n.subway : carriesRoute(n, needs)) return true;
     }
   }
   return false;
