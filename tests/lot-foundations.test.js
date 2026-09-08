@@ -30,7 +30,16 @@ test('terraced lots use the lower shared grade and higher solid retaining walls'
  const {city,r}=scene();const high=lot(city,3,3,3,3,3);lot(city,6,3,2,3,2);r.buildCorners(city);
  assert.equal(lotVertexHeight(city,6,4),16);
  for(const rotation of [0,1]){r.rotation=rotation;const walls=foundationEdges(r,high).filter(e=>e.a[0]===6 && e.b[0]===6);assert.equal(walls.length,3);assert.ok(walls.every(e=>e.shade===shadeHex('#9c9480',faceLight(1,0))));assert.ok(walls.every(e=>e.top===24 && e.a[2]===16 && e.b[2]===16));}
- for(const rotation of [2,3]){r.rotation=rotation;assert.equal(foundationEdges(r,high).filter(e=>e.a[0]===6 && e.b[0]===6).length,0);}
+ for(const rotation of [2,3]){r.rotation=rotation;const walls=foundationEdges(r,high).filter(e=>e.a[0]===6 && e.b[0]===6);assert.equal(walls.length,3);assert.ok(walls.every(e=>!e.facing));}
+});
+test('both sides seal a lowered terraced corner even when they face away',()=>{
+ const {city,r}=scene(),high=lot(city,3,3,3,3,3);lot(city,6,3,2,2,1);r.buildCorners(city);
+ for(let rotation=0;rotation<4;rotation++) {
+  r.rotation=rotation;
+  const edges=foundationEdges(r,high).filter(e=>[e.a,e.b].some(p=>p[0]===6 && p[1]===3));
+  assert.equal(edges.length,2);
+  assert.ok(edges.every(e=>e.top===24 && Math.min(e.a[2],e.b[2])===8));
+ }
 });
 test('long retaining walls follow intervening dips and never produce inverted faces',()=>{
  const {city,r}=scene(),t=lot(city,3,3,3,3,3);r.buildCorners(city);r.corners[6*13+4]=8;

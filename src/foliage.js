@@ -1,5 +1,5 @@
 import {shadowPoint,SUN} from './sunlight.js';
-import {treeHeight} from './tree-layout.js';
+import {treeHeight,naturalTrees} from './tree-layout.js';
 // Small, deterministic tree silhouettes shared by lots and natural forests.
 // Screen-space crowns stay legible at city scale as the map rotates.
 import { random } from './building-art.js';
@@ -91,7 +91,23 @@ function drawTreeShadow(r, x, y, variant) {
 const atlases = new WeakMap();
 export function drawTree(r, x, y, variant = 0) {
   drawTreeShadow(r, x, y, variant);
-  if (typeof document === 'undefined') return paintTree(r, x, y, variant);
+  const sprite=treeSprite(r,x,y,variant);
+  if(!sprite)return paintTree(r,x,y,variant);
+  r.base.drawImage(sprite.canvas,sprite.x,sprite.y,sprite.w,sprite.h);
+}
+
+// Record natural trees even when the shaded scene atlas skips their draw
+// callback. The foliage atlas supplies the same alpha silhouette in both paths.
+export function recordTreePicks(r,t) {
+  if(!r.pickables)return;
+  for(const [x,y,variant] of naturalTrees(t)) {
+    const sprite=treeSprite(r,x,y,variant);
+    if(sprite)r.pickables.push({t,...sprite});
+  }
+}
+
+function treeSprite(r,x,y,variant) {
+  if(typeof document==='undefined')return null;
   const dpr = Math.max(2, r.dpr || 1), scale = 2;
   const key = `${scale}:${dpr}:${!!r.night}:${r.rotation || 0}`;
   const owner = r.atlasOwner || r;
@@ -113,5 +129,5 @@ export function drawTree(r, x, y, variant = 0) {
   }
   const p = r.project(x, y);
   const ratio = r.zoom / scale, snap = value => Math.round(value * dpr) / dpr;
-  r.base.drawImage(sprite.canvas, snap(p.x - 22 * r.zoom), snap(p.y - 46 * r.zoom), sprite.width * ratio, sprite.height * ratio);
+  return {canvas:sprite.canvas,x:snap(p.x-22*r.zoom),y:snap(p.y-46*r.zoom),w:sprite.width*ratio,h:sprite.height*ratio};
 }

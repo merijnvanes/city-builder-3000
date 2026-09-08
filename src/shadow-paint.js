@@ -30,7 +30,8 @@ export function drawTerrainShadows(r,t,city) {
   const height=(x,y)=>bridge!==null?(typeof bridge==='function'?bridge(x,y):bridge):t.lot?owner.elev*ELEV_PX:t.terrain==='water'?waterSurface(t)*ELEV_PX:r.meshZ(x,y)+(t.type==='highway' && t.under?VIADUCT_HEIGHT:0);
   const points=[[t.x,t.y],[t.x+1,t.y],[t.x+1,t.y+1],[t.x,t.y+1]].map(([x,y])=>[x,y,height(x,y)]);
   polygons=intersections(points,casters);
-  if(t.lot)for(const {a,b,top} of foundationEdges(r,owner,t)) {
+  if(t.lot)for(const {a,b,top,facing} of foundationEdges(r,owner,t)) {
+    if(!facing)continue;
     polygons.push(...intersections([[a[0],a[1],top],[b[0],b[1],top],b,a],casters));
   }
   cache.set(t,polygons);

@@ -204,14 +204,16 @@ Developed lots keep a flat grade. The terrain mesh meets that grade along the
 lot perimeter, so adjoining roads and open ground do not dip underneath a
 floating slab. Adjacent lots at different heights form terraces: the lower
 site owns the shared ground edge and the higher site has a retaining wall.
-Walls follow every terrain vertex, including coastlines and long footprints,
-and rotate with the site. This presentation applies to both sprite and
+Walls follow every terrain vertex, including coastlines and long footprints.
+The full foundation shell stays closed at far corners when the view rotates.
+Foundations hide objects behind them, and footprint-based drawing order keeps
+trees beside the near edge in front. This presentation applies to both sprite and
 procedural buildings and does not change saved elevations or earthwork prices.
 Catalog buildings still auto-level modest slopes within their existing quote;
 steep sites require leveling, and zoning develops only level footprints.
 
-Checks: `node --test tests/lot-foundations.test.js` and
-`node tests/lot-foundations.mjs` (against the running development server).
+Checks: `pnpm test:foundations` (against the running development server), including
+terraced corner support and tree overlap at all four rotations.
 
 ### Sunlight and shadows
 

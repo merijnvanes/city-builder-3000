@@ -1,8 +1,10 @@
 import {shadowScene} from './shadow-scene.js';
 import {drawTerrainShadows,drawShadedArchitecture} from './shadow-paint.js';
+import {orderScene} from './scene-order.js';
+import {recordTreePicks} from './foliage.js';
 import {naturalTrees} from './tree-layout.js';
 import {shadowPoint,faceLight} from './sunlight.js';
-import {terrainVertexHeight, drawLotFoundation} from './lot-foundations.js';
+import {terrainVertexHeight, drawLotFoundation,occludeLotFoundation,hitFoundation} from './lot-foundations.js';
 import {TILE_W,TILE_H,ELEV_PX} from './render-scale.js';
 import {pickTransportSurface} from './surface-picking.js';
 import { drawBridgeFrame, bridgePlatform } from './bridge-art.js';
@@ -183,9 +185,10 @@ export class CityRenderer {
     if (this.dirty || !this.pickables || this.overlay === "water" || ["pipe", "subway", "substation"].includes(this.tool)) return this.pick(sx, sy);
     for (let i = this.pickables.length - 1; i >= 0; i--) {
       const hit = this.pickables[i];
-      if (!hit.t.lot || sx < hit.x || sy < hit.y || sx >= hit.x + hit.w || sy >= hit.y + hit.h) continue;
+      if (sx < hit.x || sy < hit.y || sx >= hit.x + hit.w || sy >= hit.y + hit.h) continue;
       let opaque;
-      if (hit.canvas) {
+      if(hit.polygons)opaque=hitFoundation(hit.polygons,sx,sy);
+      else if (hit.canvas) {
         const source=hit.source || {x:0,y:0,w:hit.canvas.width,h:hit.canvas.height};
         const px=source.x+Math.min(source.w-1,Math.floor((sx-hit.x)/hit.w*source.w));
         const py=source.y+Math.min(source.h-1,Math.floor((sy-hit.y)/hit.h*source.h));
@@ -501,7 +504,7 @@ export class CityRenderer {
     if (showPipes) ctx.globalAlpha = 0.3;
 
     this.paintingSolids = true;
-    // Buildings, trees and poles sorted by their front-most corner.
+    // Use footprint separation where wide lots overlap neighboring solids.
     if (this.itemTiles !== city.tiles || this.itemRevision !== city.revision || this.itemRotation !== this.rotation) {
       const items = [];
     for (const t of city.tiles) {
@@ -519,16 +522,17 @@ export class CityRenderer {
       this.flightAltitude = items.reduce((height, it) => it.kind === "lot" ? Math.max(height, heightOf(it.t) * 1.7 + 80 + it.t.elev * ELEV_PX) : height, 210);
       this.outages = items.filter(it => it.kind === "lot" && !it.t.powered && !it.t.abandoned && (ZONE_TINT[it.t.type] || BUILDINGS[it.t.type]?.powerUse))
         .map(it => ({ t: it.t, height: heightOf(it.t) }));
-      this.items = items; this.itemTiles = city.tiles; this.itemRevision = city.revision; this.itemRotation = this.rotation;
+      this.items = orderScene(items,this); this.itemTiles = city.tiles; this.itemRevision = city.revision; this.itemRotation = this.rotation;
     }
     const items = this.items;
     for (const it of items) {
       const t = it.t;
       if (!visible(t.x + (t.lot?.w || 1) / 2, t.y + (t.lot?.h || 1) / 2)) continue;
-      if (it.kind === "lot") { this.platform = t.elev * ELEV_PX; drawShadedArchitecture(this, t, city); this.platform = null; }
+      if (it.kind === "lot") { occludeLotFoundation(this,t);this.platform = t.elev * ELEV_PX; drawShadedArchitecture(this, t, city); this.platform = null; }
       else if (it.kind === "zone") drawArchitecture(this, t);
       else if (it.kind === "trees") {
         drawShadedArchitecture(this,t,city,()=>{for(const [x,y,variant] of naturalTrees(t))this.tree(x,y,variant);});
+        recordTreePicks(this,t);
       } else if (it.kind === "lamp") { if (this.zoom > 0.5) drawStreetLamp(this, t); }
       else this.powerline(t, city);
     }

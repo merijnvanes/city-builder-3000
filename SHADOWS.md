@@ -40,6 +40,8 @@ sprite loader without adding a second renderer or full-resolution depth textures
 - Terrain shadows are clipped to each actual receiving tile, including level
   water, graded building sites, retaining walls and bridge decks. They cannot escape the map.
   World-space intersections are cached across camera movement.
+  Foundation geometry includes its full shell to seal terraced corners; only
+  camera-facing wall surfaces receive the visible shadow pass.
 - Building shadows use a ground pad plus two visible walls and a roof. A raised
   receiver replaces the ground shadow behind it. The result is composited on
   an isolated, reusable scratch surface with the artwork's alpha; using
@@ -59,6 +61,19 @@ resolve every courtyard, antenna, gutter, branch or roof pitch. The artwork's
 baked self-shading supplies fine detail; dynamic shadows supply relationships
 between separate objects. New asset types automatically participate through
 the existing lot footprint and measured height contract.
+
+Foundations also participate in solid occlusion. Before a building is drawn,
+its pad and walls clear earlier solids from the transparent object layer,
+revealing the shaded ground cache underneath. The foundation and its building
+therefore hide rear objects together. Overlapping footprints are ordered by
+their separating world axis; a large lot's front corner alone cannot order
+trees beside its far half. This follows the same need to interleave terrain and
+objects described in Unity's [individual tile rendering mode](https://docs.unity.cn/Manual/Tilemap-Isometric-RenderModes.html).
+Picking follows the same foundation polygons, so erased rear artwork cannot
+be selected through a retaining wall. Natural trees use their foliage atlas
+alpha for picking, including when their shaded draw comes from the scene cache.
+Visible foreground trees therefore select their own tile. The scene regression checks actual rear
+trees and cached buildings, plus all four diagonal corners in each view.
 
 ## Validation
 
