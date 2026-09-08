@@ -1,4 +1,5 @@
 import "./minimap.css";
+import { mapPoint, worldPoint, visibleMapPolygon } from './minimap-geometry.js';
 
 const colors = {
   road: "#647b75",
@@ -28,9 +29,9 @@ export function createMinimap(renderer) {
   canvas.addEventListener("pointerdown", (event) => {
     if (!city) return;
     const rect = canvas.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / rect.width) * city.size;
-    const y = ((event.clientY - rect.top) / rect.height) * city.size;
-    const p = renderer.project(x, y);
+    const world = worldPoint((event.clientX - rect.left) / rect.width * 160, (event.clientY - rect.top) / rect.height * 160, city.size);
+    if (!world) return;
+    const p = renderer.project(world.x, world.y);
     renderer.pan(renderer.cx - p.x, renderer.cy - p.y);
   });
   return {
@@ -54,17 +55,29 @@ export function createMinimap(renderer) {
       }
         mapCity = city; mapRevision = city.revision;
       }
-      ctx.clearRect(0, 0, 160, 160); ctx.drawImage(terrain, 0, 0);
+      ctx.clearRect(0, 0, 160, 160);
+      ctx.save();
+      ctx.setTransform(0.4, 0.4, -0.4, 0.4, 80, 16);
+      ctx.drawImage(terrain, 0, 0);
+      ctx.restore();
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(80, 16); ctx.lineTo(144, 80); ctx.lineTo(80, 144); ctx.lineTo(16, 80);
+      ctx.closePath(); ctx.clip();
       ctx.beginPath();
       const left = renderer.w > 800 ? 200 : 0;
-      [[left, 32], [renderer.w, 32], [renderer.w, renderer.h - 30], [left, renderer.h - 30]].forEach(([x, y], i) => {
-        const p = renderer.pick(x, y);
-        if (i) ctx.lineTo(p.x * s, p.y * s); else ctx.moveTo(p.x * s, p.y * s);
+      const view = [[left, 32], [renderer.w, 32], [renderer.w, renderer.h - 30], [left, renderer.h - 30]].map(([x, y]) => renderer.pick(x, y));
+      visibleMapPolygon(view, city.size).forEach((p, i) => {
+        const m = mapPoint(p.x, p.y, city.size);
+        if (i) ctx.lineTo(m.x, m.y); else ctx.moveTo(m.x, m.y);
       });
       ctx.closePath();
       ctx.strokeStyle = "#fff9e9";
       ctx.lineWidth = 1.5;
       ctx.stroke();
+      ctx.restore();
+      ctx.fillStyle = '#e8e2ce'; ctx.font = '600 9px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      for (const [label, x, y] of [['N', 119, 39], ['E', 121, 121], ['S', 39, 121], ['W', 39, 39]]) ctx.fillText(label, x, y);
     },
   };
 }
