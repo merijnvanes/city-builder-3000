@@ -5,3 +5,6 @@ playwright-report/
 .DS_Store
 artifacts/
 .playwright-mcp/
+
+tools/civic_art/__pycache__/
+source-art/civic/*.blend1

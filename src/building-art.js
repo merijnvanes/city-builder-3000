@@ -1,26 +1,33 @@
-import { drawFireStation, drawCollege, drawStadium } from "./civic-art.js";
+import { NIGHT_EXPOSURE, shadeHex } from './art-colors.js';
+export { NIGHT_EXPOSURE, shadeHex } from './art-colors.js';
+import { drawLotEffects } from './lot-art-effects.js';
+import { drawCivicSprite, civicSpriteSpec } from './civic-sprites.js';
+export { preloadCivicSprites, civicSpriteStats, civicSpriteSpec, civicSpriteKey } from './civic-sprites.js';
+import { drawStadium } from "./civic-art.js";
+import { drawPolice, drawFire, drawHospital, drawSchool, drawJail } from "./civic-services-art.js";
+import { drawCollegeCampus, drawLibrary, drawMuseum } from "./civic-culture-art.js";
+import { drawLandfill, drawIncinerator, drawRecycling, drawWasteEnergy } from "./civic-sanitation-art.js";
 import { drawIndustrialYard, drawPort, drawMarina } from "./industrial-art.js";
 import { drawPocketPark, drawGardenPark } from "./park-art.js";
 // Original procedural architecture for every lot. A recipe draws into the
 // lot rectangle using fractions of its width/depth, so the same recipe fits
 // 1×1, 2×2 and 3×3 lots. Heights are in renderer z units (≈ pixels at zoom 1).
-export const random = (x, y, n = 0) => {
-  const v = Math.sin(x * 127.1 + y * 311.7 + n * 73.3) * 43758.5453;
-  return v - Math.floor(v);
-};
+import { random } from './architecture-variation.js';
+export { random } from './architecture-variation.js';
 const pick = (list, n) => list[Math.floor(n * list.length) % list.length];
-const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
 // Approximate roof height for depth sorting, shadows and fire markers.
 export function heightOf(t) {
   const lot = t.lot;
   if (!lot) return 0;
+  const sprite = civicSpriteSpec(t);
+  if (sprite) return sprite.height;
   const level = t.level || 1;
   if (t.type === "residential") return t.density === 1 ? 10 + level * 3 : t.density === 2 ? 18 + level * 6 : 30 + level * 18;
   if (t.type === "commercial") return t.density === 1 ? 10 + level * 2 : t.density === 2 ? 20 + level * 7 : 40 + level * 24;
   if (t.type === "industrial") return t.density === 1 ? 12 : t.density === 2 ? 18 : 26;
   return { coal: 46, oil: 34, gas: 30, nuclear: 60, wind: 42, solar: 6, microwave: 45, fusion: 40, waterpump: 10, watertower: 47, treatment: 14, desalination: 20,
-    police: 24, fire: 21, jail: 25, hospital: 40, school: 22, college: 30, library: 18, museum: 26, landfill: 6, incinerator: 40, wasteenergy: 46, recycling: 16,
+    police: 38, fire: 44, jail: 30, hospital: 37, school: 33, college: 52, library: 25, museum: 36, landfill: 8, incinerator: 46, wasteenergy: 51, recycling: 20,
     park: 14, largepark: 16, zoo: 14, bus: 9, railstation: 16, airport: 18, seaport: 16, substation: 8,
     mayorhouse: 24, cityhall: 46, courthouse: 27, stadium: 30, statue: 25, prison: 20, casino: 36, toxicdump: 10, armybase: 14,
     marina: 14, university: 34, medcenter: 40, gigamall: 20,
@@ -35,6 +42,7 @@ function scoped(r, lot, dim, powered = true) {
   const tone = (c) => (k !== 1 ? shadeHex(c, k) : c);
   return {
     w, h, x, y,
+    visible: (side) => [["south", "east"], ["east", "north"], ["north", "west"], ["west", "south"]][r.rotation || 0].includes(side),
     // Keep each solid and its surface details together as the camera rotates.
     parts: (parts) => parts.map(([a, b, draw]) => {
       const p = r.orient(...s(a, b));
@@ -65,15 +73,6 @@ function scoped(r, lot, dim, powered = true) {
     },
     pt: (a, b, z = 0) => r.project(x + a * w, y + b * h, z),
   };
-}
-
-// One definition of the night exposure so drawing code and tests agree.
-export const NIGHT_EXPOSURE = 0.62;
-export function shadeHex(hex, k) {
-  if (typeof hex !== "string" || !/^#[0-9a-f]{6}([0-9a-f]{2})?$/i.test(hex)) return hex;
-  const n = parseInt(hex.slice(1, 7), 16);
-  const c = [n >> 16, (n >> 8) & 255, n & 255].map((v) => clamp(v * k, 0, 255) | 0);
-  return "#" + c.map((v) => v.toString(16).padStart(2, "0")).join("") + hex.slice(7);
 }
 
 const WALLS = ["#d0b690", "#c2b69c", "#d8c6a6", "#a69583", "#c1baa5", "#d8c4b0", "#e0d2b8", "#b9a98f"];
@@ -547,88 +546,20 @@ const RECIPES = {
     d.fence(0.03, 0.97, 0.94, 0, "#7d877f");
   },
   // A county jail: a low cell block behind a walled yard, with a watchtower.
-  jail(d, t, n) {
-    d.flat(0.02, 0.02, 0.96, 0.96, 0.2, "#9c9a8c");
-    d.flat(0.08, 0.6, 0.84, 0.34, 0.4, "#8b8a80");
-    d.box(0.1, 0.12, 0.8, 0.4, 16, "#a9a597"); d.windows(0.1, 0.12, 0.8, 0.4, 16, t.x + t.y, false, 0, true, 8);
-    d.roof(0.08, 0.1, 0.84, 0.44, 16, 4, "#5c5f5c");
-    d.box(0.1, 0.52, 0.16, 0.1, 20, "#b4b0a1");
-    d.hip(0.08, 0.5, 0.2, 0.14, 20, 5, "#585c58");
-    for (let i = 0; i < 5; i++) d.box(0.14 + i * 0.17, 0.66, 0.02, 0.24, 7, "#7c7f78");
-    d.fence(0.06, 0.94, 0.88, 0, "#8f9186");
-  },
-  police(d, t, n) {
-    d.flat(0.03, 0.03, 0.94, 0.94, 0.2, "#a6ac97");
-    d.box(0.1, 0.14, 0.78, 0.6, 19, "#a7b2a6"); d.windows(0.1, 0.14, 0.78, 0.6, 19, t.x + t.y, true);
-    d.flat(0.08, 0.12, 0.82, 0.64, 19.1, "#557580"); d.box(0.34, 0.23, 0.25, 0.24, 5, "#c5c6ac", 19);
-    d.flat(0.1, 0.78, 0.78, 0.16, 0.3, "#727b72"); for (let a = 0; a < 4; a++) d.box(0.13 + a * 0.19, 0.8, 0.12, 0.1, 3, "#dfe3ea");
-    d.line(0.9, 0.5, 0, 0.9, 0.5, 26, "#c9c9c9", 1);
-  },
-  fire: drawFireStation,
-  hospital(d, t, n) {
-    d.flat(0.02, 0.02, 0.96, 0.96, 0.2, "#aaad99");
-    d.box(0.08, 0.12, 0.84, 0.6, 12, "#d0d1bc"); d.windows(0.08, 0.12, 0.84, 0.6, 12, t.x + t.y);
-    d.box(0.26, 0.16, 0.48, 0.5, 34, "#c8cec0"); d.windows(0.26, 0.16, 0.48, 0.5, 34, t.x + t.y, true);
-    d.flat(0.28, 0.18, 0.44, 0.46, 34.1, "#768b79"); d.flat(0.42, 0.22, 0.16, 0.38, 34.3, "#e4ded0"); d.flat(0.31, 0.33, 0.38, 0.16, 34.3, "#e4ded0");
-    d.flat(0.08, 0.76, 0.84, 0.18, 0.3, "#727b72"); d.box(0.62, 0.8, 0.12, 0.12, 3, "#e3dfca"); d.box(0.2, 0.8, 0.12, 0.12, 3, "#e3dfca");
-  },
-  school(d, t, n) {
-    d.flat(0.025, 0.025, 0.95, 0.95, 0.2, "#a6ac8c");
-    d.box(0.08, 0.1, 0.84, 0.36, 15, "#ae785b"); d.roof(0.06, 0.08, 0.88, 0.4, 15, 6, "#6c7666"); d.windows(0.08, 0.1, 0.84, 0.36, 15, t.x + t.y);
-    d.box(0.4, 0.08, 0.2, 0.22, 21, "#bca986"); d.roof(0.38, 0.06, 0.24, 0.26, 21, 5, "#737c6e");
-    d.flat(0.1, 0.55, 0.8, 0.38, 0.3, "#87976f"); d.flat(0.16, 0.6, 0.68, 0.28, 0.5, "#a0ad83");
-    d.line(0.2, 0.68, 0, 0.2, 0.68, 12, "#c5c5b2", 1); d.tree(0.9, 0.9, 1);
-  },
-  college: drawCollege,
-  library(d, t, n) {
-    d.flat(0.04, 0.04, 0.92, 0.92, 0.2, "#aab09a");
-    d.box(0.12, 0.12, 0.76, 0.66, 14, "#d4c9b2"); d.windows(0.12, 0.12, 0.76, 0.66, 14, t.x + t.y);
-    for (let a = 0.16; a < 0.86; a += 0.14) d.box(a, 0.8, 0.04, 0.04, 14, "#e7e1cf");
-    d.flat(0.1, 0.1, 0.8, 0.76, 14.1, "#8a8d7c"); d.roof(0.3, 0.28, 0.4, 0.34, 14, 6, "#7b8a80");
-  },
-  museum(d, t, n) {
-    d.flat(0.03, 0.03, 0.94, 0.94, 0.2, "#b0b3a1");
-    d.box(0.1, 0.1, 0.8, 0.62, 18, "#ded6c1"); d.windows(0.1, 0.1, 0.8, 0.62, 18, t.x + t.y);
-    for (let a = 0.14; a < 0.86; a += 0.12) d.box(a, 0.74, 0.04, 0.04, 18, "#efe9d8");
-    d.flat(0.08, 0.08, 0.84, 0.68, 18.1, "#9a9d8c");
-    d.cyl(0.5, 0.4, 0.2, 5, "#c8c3ad", 18); d.cyl(0.5, 0.4, 0.15, 5, "#7e9b8f", 23);
-    d.flat(0.1, 0.8, 0.8, 0.14, 0.3, "#c2bda6");
-  },
-  landfill(d, t, n) {
-    d.flat(0.04, 0.04, 0.92, 0.92, 0.2, "#847957");
-    for (let i = 0; i < 6; i++) d.box(0.1 + (i % 3) * 0.28, 0.15 + Math.floor(i / 3) * 0.4, 0.22, 0.25, 2 + random(t.x, t.y, i) * 5, pick(["#9a926d", "#b7a780", "#706e51", "#a0a187"], random(t.x, t.y, i)));
-    d.fence(0.03, 0.96, 0.92, 0, "#9b9a82");
-  },
-  incinerator(d, t, n) {
-    d.flat(0.02, 0.02, 0.96, 0.96, 0.3, "#8e8c7c");
-    d.box(0.08, 0.3, 0.6, 0.6, 18, "#8f8a7c"); d.windows(0.08, 0.3, 0.6, 0.6, 18, t.x + t.y); d.roof(0.08, 0.3, 0.6, 0.6, 18, 5, "#5f5f58");
-    d.cyl(0.8, 0.3, 0.06, 40, "#c0b9a4"); d.cyl(0.8, 0.3, 0.062, 4, "#a4624c", 28);
-    d.box(0.72, 0.62, 0.22, 0.3, 8, "#77756b");
-  },
+  jail: drawJail,
+  police: drawPolice,
+  fire: drawFire,
+  hospital: drawHospital,
+  school: drawSchool,
+  college: drawCollegeCampus,
+  library: drawLibrary,
+  museum: drawMuseum,
+  landfill: drawLandfill,
+  incinerator: drawIncinerator,
   // Burns refuse and sells the heat back to the grid: a boiler hall with a
   // scrubbed stack, a turbine house and the switchyard that ties it in.
-  wasteenergy(d, t, n) {
-    d.flat(0.02, 0.02, 0.96, 0.96, 0.3, "#8b9088");
-    d.box(0.06, 0.24, 0.5, 0.5, 24, "#a9ada0"); d.windows(0.06, 0.24, 0.5, 0.5, 24, t.x + t.y, true);
-    d.roof(0.04, 0.22, 0.54, 0.54, 24, 6, "#5a655f");
-    d.cyl(0.74, 0.26, 0.075, 44, "#cfd2c4");
-    d.cyl(0.74, 0.26, 0.08, 5, "#7f9aa2", 39);
-    d.box(0.62, 0.56, 0.32, 0.3, 13, "#b9bdb0"); d.windows(0.62, 0.56, 0.32, 0.3, 13, t.x + t.y + 3, true);
-    d.roof(0.6, 0.54, 0.36, 0.34, 13, 4, "#5a655f");
-    // Switchyard: pylons and busbars carrying the output away.
-    for (let i = 0; i < 3; i++) {
-      const a = 0.1 + i * 0.14;
-      d.line(a, 0.9, 0, a, 0.9, 12, "#c8ccbe", 1.2);
-      d.line(a, 0.9, 11, a + 0.14, 0.9, 11, "#c8ccbe", 0.9);
-    }
-    d.box(0.08, 0.06, 0.34, 0.12, 6, "#9aa096");
-    d.fence(0.03, 0.97, 0.94, 0, "#7f867e");
-  },
-  recycling(d, t, n) {
-    d.flat(0.03, 0.03, 0.94, 0.94, 0.2, "#96a08c");
-    d.box(0.1, 0.12, 0.8, 0.44, 12, "#a5ad9c"); d.windows(0.1, 0.12, 0.8, 0.44, 12, t.x + t.y); d.roof(0.1, 0.12, 0.8, 0.44, 12, 4, "#6b8071");
-    for (let i = 0; i < 4; i++) d.box(0.12 + i * 0.2, 0.68, 0.14, 0.2, 5, pick(["#3f7a5c", "#4d6f9a", "#b28e48", "#a24d3e"], i / 4));
-  },
+  wasteenergy: drawWasteEnergy,
+  recycling: drawRecycling,
   park: drawPocketPark,
   largepark: drawGardenPark,
   zoo(d, t, n) {
@@ -807,6 +738,7 @@ export function drawZoneMarker(r, t) {
 }
 
 export function drawArchitecture(r, t) {
+  if (drawCivicSprite(r, t)) return;
   const lot = t.lot;
   if (!lot) { drawZoneMarker(r, t); return; }
   const n = t.variant ?? random(t.x, t.y);
@@ -817,16 +749,5 @@ export function drawArchitecture(r, t) {
   else if (t.type === "industrial") industrial(d, t, n, level, r);
   else if (RECIPES[t.type]) RECIPES[t.type](d, t, n, r);
   else { d.box(0.15, 0.15, 0.7, 0.7, 12, "#b0aa96"); }
-  if (t.abandoned) {
-    // Boarded windows and weeds.
-    for (let i = 0; i < 4; i++) d.flat(0.1 + random(t.x, t.y, i) * 0.7, 0.1 + random(t.y, t.x, i + 3) * 0.7, 0.12, 0.08, 0.5, "#6b6a4c");
-  } else if (t.age === 0 && ["residential", "commercial", "industrial"].includes(t.type)) {
-    // Freshly built or expanded: a crane and scaffolding for the month.
-    const h = heightOf(t) + 10;
-    d.line(0.85, 0.15, 0, 0.85, 0.15, h, "#d9c24a", 1.4);
-    d.line(0.85, 0.15, h, 0.3, 0.15, h, "#d9c24a", 1.2);
-    d.line(0.45, 0.15, h, 0.45, 0.15, h * 0.55, "#d9c24a", 0.7);
-    d.box(0.42, 0.12, 0.06, 0.06, 3, "#8a8a80", h * 0.55 - 3);
-    for (let z = 4; z < Math.min(h - 6, 30); z += 6) d.line(0.06, 0.94, z, 0.94, 0.94, z, "#c9c4a8", 0.6);
-  }
+  drawLotEffects(r, t, heightOf(t));
 }

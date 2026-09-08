@@ -1,0 +1,3481 @@
+{
+  "police": {
+    "module": "services",
+    "tiles": 3,
+    "family": "civic",
+    "label": "Police station",
+    "description": "Limestone ribs, bronze insignia, and a stepped Art Deco entrance."
+  },
+  "fire": {
+    "module": "services",
+    "tiles": 3,
+    "family": "civic",
+    "label": "Fire station",
+    "description": "A brick firehouse with deep engine portals, slate dormers, and a hose tower."
+  },
+  "hospital": {
+    "module": "services",
+    "tiles": 3,
+    "family": "civic",
+    "label": "Hospital",
+    "description": "Stepped white wards, prominent medical crosses, and a separate red emergency canopy."
+  },
+  "school": {
+    "module": "services",
+    "tiles": 3,
+    "family": "civic",
+    "label": "School",
+    "description": "Warm brick wings, a bell cupola, and a welcoming play-and-learning garden."
+  },
+  "jail": {
+    "module": "services",
+    "tiles": 3,
+    "family": "civic",
+    "label": "County jail",
+    "description": "A robust entrance lodge, secure exercise court, and restrained masonry."
+  },
+  "college": {
+    "module": "culture",
+    "tiles": 4,
+    "family": "civic",
+    "label": "College",
+    "description": "A collegiate quadrangle, copper clock tower, cloisters, and a shaded court."
+  },
+  "library": {
+    "module": "culture",
+    "tiles": 2,
+    "family": "civic",
+    "label": "Library",
+    "description": "A copper-vaulted reading room, timber archive wing, and a small public terrace."
+  },
+  "museum": {
+    "module": "culture",
+    "tiles": 3,
+    "family": "civic",
+    "label": "Museum",
+    "description": "A limestone colonnade, copper rotunda, and a curated sculpture forecourt."
+  },
+  "landfill": {
+    "module": "sanitation",
+    "tiles": 1,
+    "family": "civic",
+    "label": "Landfill",
+    "description": "Managed earth cells and retaining walls that join into a larger working site."
+  },
+  "incinerator": {
+    "module": "sanitation",
+    "tiles": 3,
+    "family": "civic",
+    "label": "Incinerator",
+    "description": "A brick furnace hall, tapering stacks, loading doors, and exposed service ducts."
+  },
+  "recycling": {
+    "module": "sanitation",
+    "tiles": 3,
+    "family": "civic",
+    "label": "Recycling center",
+    "description": "A folded green roof, clerestory glazing, and four clearly separated sorting bays."
+  },
+  "wasteenergy": {
+    "module": "sanitation",
+    "tiles": 3,
+    "family": "civic",
+    "label": "Waste-to-energy plant",
+    "description": "A blue boiler hall, glazed turbine gallery, and insulated district-heating pipes."
+  },
+  "coal": {
+    "module": "power_fossil",
+    "tiles": 4,
+    "family": "power",
+    "label": "Coal plant",
+    "description": "Brick turbine halls, twin masonry stacks, and a coal bunker feeding an elevated conveyor."
+  },
+  "oil": {
+    "module": "power_fossil",
+    "tiles": 4,
+    "family": "power",
+    "label": "Oil plant",
+    "description": "Bunded fuel tanks, an ochre boiler house, and a single striped exhaust stack."
+  },
+  "gas": {
+    "module": "power_fossil",
+    "tiles": 3,
+    "family": "power",
+    "label": "Gas plant",
+    "description": "Twin turbine modules, ribbed air intakes, slender exhausts, and a yellow gas manifold."
+  },
+  "nuclear": {
+    "module": "power_clean",
+    "tiles": 4,
+    "family": "power",
+    "label": "Nuclear plant",
+    "description": "Hollow concrete cooling towers, domed containment, and a separate turbine hall."
+  },
+  "wind": {
+    "module": "power_clean",
+    "tiles": 1,
+    "family": "power",
+    "label": "Wind turbine",
+    "description": "Three sculpted airfoil blades, a tapered white mast, and a compact transformer cabinet."
+  },
+  "solar": {
+    "module": "power_clean",
+    "tiles": 3,
+    "family": "power",
+    "label": "Solar array",
+    "description": "Tilted blue photovoltaic rows on steel supports, with an inverter service lane."
+  },
+  "microwave": {
+    "module": "power_future",
+    "tiles": 4,
+    "family": "power",
+    "label": "Microwave plant",
+    "description": "A concave satellite-power receiver, copper rectenna grids, and conversion equipment."
+  },
+  "fusion": {
+    "module": "power_future",
+    "tiles": 4,
+    "family": "power",
+    "label": "Fusion plant",
+    "description": "An annular reactor enclosure, radial copper housings, and a teal control gallery."
+  },
+  "waterpump": {
+    "module": "water",
+    "tiles": 1,
+    "family": "water",
+    "label": "Water pump",
+    "description": "A copper-roofed brick wet-well house with paired teal pumps and exposed intake pipes."
+  },
+  "watertower": {
+    "module": "water",
+    "tiles": 1,
+    "family": "water",
+    "label": "Water tower",
+    "description": "An elevated teal reservoir on splayed steel legs, with cross bracing and an access ladder."
+  },
+  "desalination": {
+    "module": "water",
+    "tiles": 3,
+    "family": "water",
+    "label": "Desalination plant",
+    "description": "White membrane pressure-vessel racks, intake filters, and a clerestory process hall."
+  },
+  "treatment": {
+    "module": "water",
+    "tiles": 3,
+    "family": "water",
+    "label": "Water treatment",
+    "description": "Twin open clarifiers, bridge-mounted drives, and baffled aeration channels beside a brick blower house."
+  },
+  "park": {
+    "module": "parks",
+    "tiles": 1,
+    "family": "parks",
+    "label": "Small park",
+    "description": "Three neighborhood layouts: a fountain garden, gazebo garden, and playground.",
+    "variants": [
+      {
+        "model": "park",
+        "label": "Fountain garden",
+        "description": "A stone fountain, flower beds, and shade trees around crossing paths."
+      },
+      {
+        "model": "park_gazebo",
+        "label": "Gazebo garden",
+        "description": "A copper-roofed garden shelter, shaded seating, and flowering borders."
+      },
+      {
+        "model": "park_playground",
+        "label": "Playground",
+        "description": "A timber swing, a small slide, and a sandy play area among trees."
+      }
+    ]
+  },
+  "largepark": {
+    "module": "parks",
+    "tiles": 3,
+    "family": "parks",
+    "label": "Large park",
+    "description": "An octagonal copper bandstand, lily pond, rose pergola, and generous tree-lined lawns."
+  },
+  "zoo": {
+    "module": "parks",
+    "tiles": 4,
+    "family": "parks",
+    "label": "Zoo",
+    "description": "Twin entrance lodges, an open aviary, elephant and giraffe habitats, and a rocky penguin pool."
+  },
+  "bus": {
+    "family": "transport",
+    "module": "transport",
+    "tiles": 1,
+    "label": "Bus Stop",
+    "description": "A cantilevered glass shelter with sheltered seats, timetable and a clear boarding edge."
+  },
+  "substation": {
+    "family": "transport",
+    "module": "transport",
+    "tiles": 1,
+    "label": "Subway Station",
+    "description": "An open stair descends beneath a teal metro portal, with handrails and a ticket machine."
+  },
+  "railstation": {
+    "family": "transport",
+    "module": "transport",
+    "tiles": 2,
+    "label": "Rail Station",
+    "description": "A brick ticket hall with a clock gable and a butterfly canopy over the boarding platform."
+  },
+  "airport": {
+    "family": "transport",
+    "module": "transport_ports",
+    "footprint": {
+      "w": 6,
+      "h": 5
+    },
+    "label": "Airport",
+    "description": "A glazed terminal, control tower, hangar and marked runway on a rectangular airfield."
+  },
+  "seaport": {
+    "family": "transport",
+    "module": "transport_ports",
+    "tiles": 4,
+    "label": "Seaport",
+    "description": "A working cargo yard with brick freight shed, stacked containers and a braced loading gantry.",
+    "variants": [
+      {
+        "model": "seaport",
+        "label": "Cargo arrangement 1",
+        "description": "Five original deterministic container palettes, with shared yard circulation and lifting equipment."
+      },
+      {
+        "model": "seaport_v1",
+        "label": "Cargo arrangement 2",
+        "description": "Five original deterministic container palettes, with shared yard circulation and lifting equipment."
+      },
+      {
+        "model": "seaport_v2",
+        "label": "Cargo arrangement 3",
+        "description": "Five original deterministic container palettes, with shared yard circulation and lifting equipment."
+      },
+      {
+        "model": "seaport_v3",
+        "label": "Cargo arrangement 4",
+        "description": "Five original deterministic container palettes, with shared yard circulation and lifting equipment."
+      },
+      {
+        "model": "seaport_v4",
+        "label": "Cargo arrangement 5",
+        "description": "Five original deterministic container palettes, with shared yard circulation and lifting equipment."
+      }
+    ]
+  },
+  "mayorhouse": {
+    "family": "rewards",
+    "module": "reward_government",
+    "tiles": 2,
+    "label": "Mayor's House",
+    "description": "A warm domestic manor with a columned veranda, terracotta roof and private garden."
+  },
+  "cityhall": {
+    "family": "rewards",
+    "module": "reward_government",
+    "tiles": 3,
+    "label": "City Hall",
+    "description": "A limestone municipal hall crowned by a square clock tower and copper lantern."
+  },
+  "courthouse": {
+    "family": "rewards",
+    "module": "reward_government",
+    "tiles": 3,
+    "label": "Courthouse",
+    "description": "A six-column stone portico, carved pediment and broad public stair."
+  },
+  "statue": {
+    "family": "rewards",
+    "module": "reward_government",
+    "tiles": 1,
+    "label": "Mayor's Statue",
+    "description": "A bronze civic figure on a layered stone plinth, with a plaque and low uplights."
+  },
+  "university": {
+    "family": "rewards",
+    "module": "reward_campuses",
+    "tiles": 4,
+    "label": "University",
+    "description": "A domed academic rotunda, faculty wings, lecture theatre and reading garden."
+  },
+  "medcenter": {
+    "family": "rewards",
+    "module": "reward_campuses",
+    "tiles": 4,
+    "label": "Medical Research Center",
+    "description": "Paired laboratories, glazed skybridge, rooftop plant and a northlit public research hall."
+  },
+  "stadium": {
+    "family": "rewards",
+    "module": "reward_recreation",
+    "tiles": 5,
+    "label": "Stadium",
+    "description": "An open elliptical bowl with a striped pitch, tiered seating, canopies and floodlights.",
+    "variants": [
+      {
+        "model": "stadium",
+        "label": "Teal seating",
+        "description": "The original lower-half seed palette, with teal seating around the open pitch."
+      },
+      {
+        "model": "stadium_red",
+        "label": "Red seating",
+        "description": "The original upper-half seed palette, with warm red seating around the open pitch."
+      }
+    ]
+  },
+  "marina": {
+    "family": "rewards",
+    "module": "reward_recreation",
+    "tiles": 3,
+    "label": "Marina",
+    "description": "A copper-roofed clubhouse, timber jetties and sculpted sailing yachts in a sheltered basin."
+  },
+  "prison": {
+    "family": "deals",
+    "module": "business_secure",
+    "tiles": 4,
+    "label": "Maximum Security Prison",
+    "description": "Stone perimeter towers, paired cell wings and a controlled gate with a central exercise court."
+  },
+  "casino": {
+    "family": "deals",
+    "module": "business_leisure",
+    "tiles": 3,
+    "label": "Casino",
+    "description": "A stepped Art Deco hotel above a rounded gaming hall, with a gold entrance marquee.",
+    "variants": [
+      {
+        "model": "casino",
+        "label": "Palette 1",
+        "description": "A stepped Art Deco hotel above a rounded gaming hall, with a gold entrance marquee."
+      },
+      {
+        "model": "casino_v1",
+        "label": "Palette 2",
+        "description": "A stepped Art Deco hotel above a rounded gaming hall, with a gold entrance marquee."
+      },
+      {
+        "model": "casino_v2",
+        "label": "Palette 3",
+        "description": "A stepped Art Deco hotel above a rounded gaming hall, with a gold entrance marquee."
+      },
+      {
+        "model": "casino_v3",
+        "label": "Palette 4",
+        "description": "A stepped Art Deco hotel above a rounded gaming hall, with a gold entrance marquee."
+      }
+    ]
+  },
+  "toxicdump": {
+    "family": "deals",
+    "module": "business_waste",
+    "tiles": 3,
+    "label": "Toxic Waste Dump",
+    "description": "Segregated containment bunds, color-coded storage drums and a broad service aisle.",
+    "variants": [
+      {
+        "model": "toxicdump",
+        "label": "Palette 1",
+        "description": "Segregated containment bunds, color-coded storage drums and a broad service aisle."
+      },
+      {
+        "model": "toxicdump_v1",
+        "label": "Palette 2",
+        "description": "Segregated containment bunds, color-coded storage drums and a broad service aisle."
+      },
+      {
+        "model": "toxicdump_v2",
+        "label": "Palette 3",
+        "description": "Segregated containment bunds, color-coded storage drums and a broad service aisle."
+      }
+    ]
+  },
+  "armybase": {
+    "family": "deals",
+    "module": "business_secure",
+    "tiles": 5,
+    "label": "Army Base",
+    "description": "Four pitched-roof barracks, a headquarters, parade square and controlled entrance."
+  },
+  "gigamall": {
+    "family": "deals",
+    "module": "business_leisure",
+    "tiles": 4,
+    "label": "Gigamall",
+    "description": "Anchor stores flank a long glass lantern, with covered entrances and separate rear loading.",
+    "variants": [
+      {
+        "model": "gigamall",
+        "label": "Palette 1",
+        "description": "Anchor stores flank a long glass lantern, with covered entrances and separate rear loading."
+      },
+      {
+        "model": "gigamall_v1",
+        "label": "Palette 2",
+        "description": "Anchor stores flank a long glass lantern, with covered entrances and separate rear loading."
+      },
+      {
+        "model": "gigamall_v2",
+        "label": "Palette 3",
+        "description": "Anchor stores flank a long glass lantern, with covered entrances and separate rear loading."
+      },
+      {
+        "model": "gigamall_v3",
+        "label": "Palette 4",
+        "description": "Anchor stores flank a long glass lantern, with covered entrances and separate rear loading."
+      },
+      {
+        "model": "gigamall_v4",
+        "label": "Palette 5",
+        "description": "Anchor stores flank a long glass lantern, with covered entrances and separate rear loading."
+      }
+    ]
+  },
+  "clocktower": {
+    "family": "landmarks",
+    "module": "landmark_monuments",
+    "tiles": 2,
+    "label": "Clock Tower",
+    "description": "A slender brick campanile with four clock faces, a copper spire and a planted square."
+  },
+  "cathedral": {
+    "family": "landmarks",
+    "module": "landmark_monuments",
+    "tiles": 3,
+    "label": "Cathedral",
+    "description": "Twin stone spires frame a rose window, with a long nave, lower aisles and a projecting transept."
+  },
+  "operahouse": {
+    "family": "landmarks",
+    "module": "landmark_destinations",
+    "tiles": 3,
+    "label": "Opera House",
+    "description": "A copper-domed auditorium, columned foyer and backstage fly tower, crowned by a golden lyre."
+  },
+  "observatory": {
+    "family": "landmarks",
+    "module": "landmark_destinations",
+    "tiles": 2,
+    "label": "Observatory",
+    "description": "An open silver telescope dome above a compact astronomy hall with low shielded lights."
+  },
+  "aquarium": {
+    "family": "landmarks",
+    "module": "landmark_destinations",
+    "tiles": 3,
+    "label": "Aquarium",
+    "description": "Paired wave roofs cover a glazed marine hall, with shallow tidal exhibits beside the entrance."
+  },
+  "residential-d1-l1-s1": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 1,
+    "zone": {
+      "type": "residential",
+      "density": 1,
+      "level": 1
+    },
+    "label": "Residential \u00b7 density 1 \u00b7 stage 1 \u00b7 1\u00d71",
+    "description": "Residential density 1, growth stage 1, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d1-l1-s1",
+        "label": "Gabled cottage",
+        "description": "Residential density 1, growth stage 1, authored specifically for a 1\u00d71 lot. Gabled cottage."
+      },
+      {
+        "model": "residential-d1-l1-s1_v1",
+        "label": "Hipped home",
+        "description": "Residential density 1, growth stage 1, authored specifically for a 1\u00d71 lot. Hipped home."
+      },
+      {
+        "model": "residential-d1-l1-s1_v2",
+        "label": "Craftsman veranda",
+        "description": "Residential density 1, growth stage 1, authored specifically for a 1\u00d71 lot. Craftsman veranda."
+      },
+      {
+        "model": "residential-d1-l1-s1_v3",
+        "label": "Garden-roof modern",
+        "description": "Residential density 1, growth stage 1, authored specifically for a 1\u00d71 lot. Garden-roof modern."
+      }
+    ]
+  },
+  "residential-d1-l2-s1": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 1,
+    "zone": {
+      "type": "residential",
+      "density": 1,
+      "level": 2
+    },
+    "label": "Residential \u00b7 density 1 \u00b7 stage 2 \u00b7 1\u00d71",
+    "description": "Residential density 1, growth stage 2, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d1-l2-s1",
+        "label": "Gabled cottage",
+        "description": "Residential density 1, growth stage 2, authored specifically for a 1\u00d71 lot. Gabled cottage."
+      },
+      {
+        "model": "residential-d1-l2-s1_v1",
+        "label": "Hipped home",
+        "description": "Residential density 1, growth stage 2, authored specifically for a 1\u00d71 lot. Hipped home."
+      },
+      {
+        "model": "residential-d1-l2-s1_v2",
+        "label": "Craftsman veranda",
+        "description": "Residential density 1, growth stage 2, authored specifically for a 1\u00d71 lot. Craftsman veranda."
+      },
+      {
+        "model": "residential-d1-l2-s1_v3",
+        "label": "Garden-roof modern",
+        "description": "Residential density 1, growth stage 2, authored specifically for a 1\u00d71 lot. Garden-roof modern."
+      }
+    ]
+  },
+  "residential-d1-l3-s1": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 1,
+    "zone": {
+      "type": "residential",
+      "density": 1,
+      "level": 3
+    },
+    "label": "Residential \u00b7 density 1 \u00b7 stage 3 \u00b7 1\u00d71",
+    "description": "Residential density 1, growth stage 3, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d1-l3-s1",
+        "label": "Gabled cottage",
+        "description": "Residential density 1, growth stage 3, authored specifically for a 1\u00d71 lot. Gabled cottage."
+      },
+      {
+        "model": "residential-d1-l3-s1_v1",
+        "label": "Hipped home",
+        "description": "Residential density 1, growth stage 3, authored specifically for a 1\u00d71 lot. Hipped home."
+      },
+      {
+        "model": "residential-d1-l3-s1_v2",
+        "label": "Craftsman veranda",
+        "description": "Residential density 1, growth stage 3, authored specifically for a 1\u00d71 lot. Craftsman veranda."
+      },
+      {
+        "model": "residential-d1-l3-s1_v3",
+        "label": "Garden-roof modern",
+        "description": "Residential density 1, growth stage 3, authored specifically for a 1\u00d71 lot. Garden-roof modern."
+      }
+    ]
+  },
+  "residential-d1-l4-s1": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 1,
+    "zone": {
+      "type": "residential",
+      "density": 1,
+      "level": 4
+    },
+    "label": "Residential \u00b7 density 1 \u00b7 stage 4 \u00b7 1\u00d71",
+    "description": "Residential density 1, growth stage 4, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d1-l4-s1",
+        "label": "Gabled cottage",
+        "description": "Residential density 1, growth stage 4, authored specifically for a 1\u00d71 lot. Gabled cottage."
+      },
+      {
+        "model": "residential-d1-l4-s1_v1",
+        "label": "Hipped home",
+        "description": "Residential density 1, growth stage 4, authored specifically for a 1\u00d71 lot. Hipped home."
+      },
+      {
+        "model": "residential-d1-l4-s1_v2",
+        "label": "Craftsman veranda",
+        "description": "Residential density 1, growth stage 4, authored specifically for a 1\u00d71 lot. Craftsman veranda."
+      },
+      {
+        "model": "residential-d1-l4-s1_v3",
+        "label": "Garden-roof modern",
+        "description": "Residential density 1, growth stage 4, authored specifically for a 1\u00d71 lot. Garden-roof modern."
+      }
+    ]
+  },
+  "residential-d2-l1-s1": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 1,
+    "zone": {
+      "type": "residential",
+      "density": 2,
+      "level": 1
+    },
+    "label": "Residential \u00b7 density 2 \u00b7 stage 1 \u00b7 1\u00d71",
+    "description": "Residential density 2, growth stage 1, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d2-l1-s1",
+        "label": "Masonry apartments",
+        "description": "Residential density 2, growth stage 1, authored specifically for a 1\u00d71 lot. Masonry apartments."
+      },
+      {
+        "model": "residential-d2-l1-s1_v1",
+        "label": "Brick brownstones",
+        "description": "Residential density 2, growth stage 1, authored specifically for a 1\u00d71 lot. Brick brownstones."
+      },
+      {
+        "model": "residential-d2-l1-s1_v2",
+        "label": "Balcony apartments",
+        "description": "Residential density 2, growth stage 1, authored specifically for a 1\u00d71 lot. Balcony apartments."
+      }
+    ]
+  },
+  "residential-d2-l1-s2": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 2,
+    "zone": {
+      "type": "residential",
+      "density": 2,
+      "level": 1
+    },
+    "label": "Residential \u00b7 density 2 \u00b7 stage 1 \u00b7 2\u00d72",
+    "description": "Residential density 2, growth stage 1, authored specifically for a 2\u00d72 lot.",
+    "variants": [
+      {
+        "model": "residential-d2-l1-s2",
+        "label": "Masonry apartments",
+        "description": "Residential density 2, growth stage 1, authored specifically for a 2\u00d72 lot. Masonry apartments."
+      },
+      {
+        "model": "residential-d2-l1-s2_v1",
+        "label": "Brick brownstones",
+        "description": "Residential density 2, growth stage 1, authored specifically for a 2\u00d72 lot. Brick brownstones."
+      },
+      {
+        "model": "residential-d2-l1-s2_v2",
+        "label": "Balcony apartments",
+        "description": "Residential density 2, growth stage 1, authored specifically for a 2\u00d72 lot. Balcony apartments."
+      }
+    ]
+  },
+  "residential-d2-l2-s1": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 1,
+    "zone": {
+      "type": "residential",
+      "density": 2,
+      "level": 2
+    },
+    "label": "Residential \u00b7 density 2 \u00b7 stage 2 \u00b7 1\u00d71",
+    "description": "Residential density 2, growth stage 2, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d2-l2-s1",
+        "label": "Masonry apartments",
+        "description": "Residential density 2, growth stage 2, authored specifically for a 1\u00d71 lot. Masonry apartments."
+      },
+      {
+        "model": "residential-d2-l2-s1_v1",
+        "label": "Brick brownstones",
+        "description": "Residential density 2, growth stage 2, authored specifically for a 1\u00d71 lot. Brick brownstones."
+      },
+      {
+        "model": "residential-d2-l2-s1_v2",
+        "label": "Balcony apartments",
+        "description": "Residential density 2, growth stage 2, authored specifically for a 1\u00d71 lot. Balcony apartments."
+      }
+    ]
+  },
+  "residential-d2-l2-s2": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 2,
+    "zone": {
+      "type": "residential",
+      "density": 2,
+      "level": 2
+    },
+    "label": "Residential \u00b7 density 2 \u00b7 stage 2 \u00b7 2\u00d72",
+    "description": "Residential density 2, growth stage 2, authored specifically for a 2\u00d72 lot.",
+    "variants": [
+      {
+        "model": "residential-d2-l2-s2",
+        "label": "Masonry apartments",
+        "description": "Residential density 2, growth stage 2, authored specifically for a 2\u00d72 lot. Masonry apartments."
+      },
+      {
+        "model": "residential-d2-l2-s2_v1",
+        "label": "Brick brownstones",
+        "description": "Residential density 2, growth stage 2, authored specifically for a 2\u00d72 lot. Brick brownstones."
+      },
+      {
+        "model": "residential-d2-l2-s2_v2",
+        "label": "Balcony apartments",
+        "description": "Residential density 2, growth stage 2, authored specifically for a 2\u00d72 lot. Balcony apartments."
+      }
+    ]
+  },
+  "residential-d2-l3-s1": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 1,
+    "zone": {
+      "type": "residential",
+      "density": 2,
+      "level": 3
+    },
+    "label": "Residential \u00b7 density 2 \u00b7 stage 3 \u00b7 1\u00d71",
+    "description": "Residential density 2, growth stage 3, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d2-l3-s1",
+        "label": "Masonry apartments",
+        "description": "Residential density 2, growth stage 3, authored specifically for a 1\u00d71 lot. Masonry apartments."
+      },
+      {
+        "model": "residential-d2-l3-s1_v1",
+        "label": "Brick brownstones",
+        "description": "Residential density 2, growth stage 3, authored specifically for a 1\u00d71 lot. Brick brownstones."
+      },
+      {
+        "model": "residential-d2-l3-s1_v2",
+        "label": "Balcony apartments",
+        "description": "Residential density 2, growth stage 3, authored specifically for a 1\u00d71 lot. Balcony apartments."
+      }
+    ]
+  },
+  "residential-d2-l3-s2": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 2,
+    "zone": {
+      "type": "residential",
+      "density": 2,
+      "level": 3
+    },
+    "label": "Residential \u00b7 density 2 \u00b7 stage 3 \u00b7 2\u00d72",
+    "description": "Residential density 2, growth stage 3, authored specifically for a 2\u00d72 lot.",
+    "variants": [
+      {
+        "model": "residential-d2-l3-s2",
+        "label": "Masonry apartments",
+        "description": "Residential density 2, growth stage 3, authored specifically for a 2\u00d72 lot. Masonry apartments."
+      },
+      {
+        "model": "residential-d2-l3-s2_v1",
+        "label": "Brick brownstones",
+        "description": "Residential density 2, growth stage 3, authored specifically for a 2\u00d72 lot. Brick brownstones."
+      },
+      {
+        "model": "residential-d2-l3-s2_v2",
+        "label": "Balcony apartments",
+        "description": "Residential density 2, growth stage 3, authored specifically for a 2\u00d72 lot. Balcony apartments."
+      }
+    ]
+  },
+  "residential-d2-l4-s1": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 1,
+    "zone": {
+      "type": "residential",
+      "density": 2,
+      "level": 4
+    },
+    "label": "Residential \u00b7 density 2 \u00b7 stage 4 \u00b7 1\u00d71",
+    "description": "Residential density 2, growth stage 4, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d2-l4-s1",
+        "label": "Masonry apartments",
+        "description": "Residential density 2, growth stage 4, authored specifically for a 1\u00d71 lot. Masonry apartments."
+      },
+      {
+        "model": "residential-d2-l4-s1_v1",
+        "label": "Brick brownstones",
+        "description": "Residential density 2, growth stage 4, authored specifically for a 1\u00d71 lot. Brick brownstones."
+      },
+      {
+        "model": "residential-d2-l4-s1_v2",
+        "label": "Balcony apartments",
+        "description": "Residential density 2, growth stage 4, authored specifically for a 1\u00d71 lot. Balcony apartments."
+      }
+    ]
+  },
+  "residential-d2-l4-s2": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 2,
+    "zone": {
+      "type": "residential",
+      "density": 2,
+      "level": 4
+    },
+    "label": "Residential \u00b7 density 2 \u00b7 stage 4 \u00b7 2\u00d72",
+    "description": "Residential density 2, growth stage 4, authored specifically for a 2\u00d72 lot.",
+    "variants": [
+      {
+        "model": "residential-d2-l4-s2",
+        "label": "Masonry apartments",
+        "description": "Residential density 2, growth stage 4, authored specifically for a 2\u00d72 lot. Masonry apartments."
+      },
+      {
+        "model": "residential-d2-l4-s2_v1",
+        "label": "Brick brownstones",
+        "description": "Residential density 2, growth stage 4, authored specifically for a 2\u00d72 lot. Brick brownstones."
+      },
+      {
+        "model": "residential-d2-l4-s2_v2",
+        "label": "Balcony apartments",
+        "description": "Residential density 2, growth stage 4, authored specifically for a 2\u00d72 lot. Balcony apartments."
+      }
+    ]
+  },
+  "residential-d3-l1-s1": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 1,
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 1
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 1 \u00b7 1\u00d71",
+    "description": "Residential density 3, growth stage 1, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l1-s1",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 1\u00d71 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l1-s1_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 1\u00d71 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l1-s1_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 1\u00d71 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l1-s1_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 1\u00d71 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l1-s1_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 1\u00d71 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l1-s2": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 2,
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 1
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 1 \u00b7 2\u00d72",
+    "description": "Residential density 3, growth stage 1, authored specifically for a 2\u00d72 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l1-s2",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 2\u00d72 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l1-s2_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 2\u00d72 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l1-s2_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 2\u00d72 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l1-s2_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 2\u00d72 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l1-s2_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 2\u00d72 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l1-s3": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 3,
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 1
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 1 \u00b7 3\u00d73",
+    "description": "Residential density 3, growth stage 1, authored specifically for a 3\u00d73 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l1-s3",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 3\u00d73 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l1-s3_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 3\u00d73 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l1-s3_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 3\u00d73 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l1-s3_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 3\u00d73 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l1-s3_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 1, authored specifically for a 3\u00d73 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l2-s1": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 1,
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 2
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 2 \u00b7 1\u00d71",
+    "description": "Residential density 3, growth stage 2, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l2-s1",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 1\u00d71 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l2-s1_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 1\u00d71 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l2-s1_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 1\u00d71 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l2-s1_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 1\u00d71 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l2-s1_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 1\u00d71 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l2-s2": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 2,
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 2
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 2 \u00b7 2\u00d72",
+    "description": "Residential density 3, growth stage 2, authored specifically for a 2\u00d72 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l2-s2",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 2\u00d72 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l2-s2_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 2\u00d72 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l2-s2_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 2\u00d72 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l2-s2_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 2\u00d72 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l2-s2_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 2\u00d72 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l2-s3": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 3,
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 2
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 2 \u00b7 3\u00d73",
+    "description": "Residential density 3, growth stage 2, authored specifically for a 3\u00d73 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l2-s3",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 3\u00d73 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l2-s3_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 3\u00d73 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l2-s3_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 3\u00d73 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l2-s3_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 3\u00d73 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l2-s3_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 2, authored specifically for a 3\u00d73 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l3-s1": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 1,
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 3
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 3 \u00b7 1\u00d71",
+    "description": "Residential density 3, growth stage 3, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l3-s1",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 1\u00d71 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l3-s1_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 1\u00d71 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l3-s1_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 1\u00d71 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l3-s1_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 1\u00d71 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l3-s1_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 1\u00d71 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l3-s2": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 2,
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 3
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 3 \u00b7 2\u00d72",
+    "description": "Residential density 3, growth stage 3, authored specifically for a 2\u00d72 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l3-s2",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 2\u00d72 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l3-s2_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 2\u00d72 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l3-s2_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 2\u00d72 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l3-s2_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 2\u00d72 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l3-s2_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 2\u00d72 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l3-s3": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 3,
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 3
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 3 \u00b7 3\u00d73",
+    "description": "Residential density 3, growth stage 3, authored specifically for a 3\u00d73 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l3-s3",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 3\u00d73 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l3-s3_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 3\u00d73 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l3-s3_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 3\u00d73 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l3-s3_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 3\u00d73 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l3-s3_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 3, authored specifically for a 3\u00d73 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l4-s1": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 1,
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 4
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 4 \u00b7 1\u00d71",
+    "description": "Residential density 3, growth stage 4, authored specifically for a 1\u00d71 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l4-s1",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 1\u00d71 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l4-s1_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 1\u00d71 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l4-s1_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 1\u00d71 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l4-s1_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 1\u00d71 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l4-s1_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 1\u00d71 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l4-s2": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 2,
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 4
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 4 \u00b7 2\u00d72",
+    "description": "Residential density 3, growth stage 4, authored specifically for a 2\u00d72 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l4-s2",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 2\u00d72 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l4-s2_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 2\u00d72 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l4-s2_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 2\u00d72 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l4-s2_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 2\u00d72 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l4-s2_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 2\u00d72 lot. Brick setbacks."
+      }
+    ]
+  },
+  "residential-d3-l4-s3": {
+    "family": "residential",
+    "module": "zone_residential",
+    "tiles": 3,
+    "zone": {
+      "type": "residential",
+      "density": 3,
+      "level": 4
+    },
+    "label": "Residential \u00b7 density 3 \u00b7 stage 4 \u00b7 3\u00d73",
+    "description": "Residential density 3, growth stage 4, authored specifically for a 3\u00d73 lot.",
+    "variants": [
+      {
+        "model": "residential-d3-l4-s3",
+        "label": "Stone podium tower",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 3\u00d73 lot. Stone podium tower."
+      },
+      {
+        "model": "residential-d3-l4-s3_v1",
+        "label": "Terracotta setbacks",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 3\u00d73 lot. Terracotta setbacks."
+      },
+      {
+        "model": "residential-d3-l4-s3_v2",
+        "label": "Balcony tower",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 3\u00d73 lot. Balcony tower."
+      },
+      {
+        "model": "residential-d3-l4-s3_v3",
+        "label": "Glazed podium tower",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 3\u00d73 lot. Glazed podium tower."
+      },
+      {
+        "model": "residential-d3-l4-s3_v4",
+        "label": "Brick setbacks",
+        "description": "Residential density 3, growth stage 4, authored specifically for a 3\u00d73 lot. Brick setbacks."
+      }
+    ]
+  },
+  "commercial-d1-l1-s1": {
+    "module": "zone_commercial",
+    "tiles": 1,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 1 \u00b7 stage 1 \u00b7 1\u00d71",
+    "description": "Commercial density 1, growth stage 1, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 1,
+      "level": 1
+    },
+    "variants": [
+      {
+        "model": "commercial-d1-l1-s1",
+        "label": "Corner market",
+        "description": "Corner market."
+      },
+      {
+        "model": "commercial-d1-l1-s1_v1",
+        "label": "Scarlet diner",
+        "description": "Scarlet diner."
+      },
+      {
+        "model": "commercial-d1-l1-s1_v2",
+        "label": "Filling station",
+        "description": "Filling station."
+      },
+      {
+        "model": "commercial-d1-l1-s1_v3",
+        "label": "Plum shops",
+        "description": "Plum shops."
+      },
+      {
+        "model": "commercial-d1-l1-s1_v4",
+        "label": "Blue diner",
+        "description": "Blue diner."
+      }
+    ]
+  },
+  "commercial-d1-l2-s1": {
+    "module": "zone_commercial",
+    "tiles": 1,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 1 \u00b7 stage 2 \u00b7 1\u00d71",
+    "description": "Commercial density 1, growth stage 2, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 1,
+      "level": 2
+    },
+    "variants": [
+      {
+        "model": "commercial-d1-l2-s1",
+        "label": "Corner market",
+        "description": "Corner market."
+      },
+      {
+        "model": "commercial-d1-l2-s1_v1",
+        "label": "Scarlet diner",
+        "description": "Scarlet diner."
+      },
+      {
+        "model": "commercial-d1-l2-s1_v2",
+        "label": "Filling station",
+        "description": "Filling station."
+      },
+      {
+        "model": "commercial-d1-l2-s1_v3",
+        "label": "Plum shops",
+        "description": "Plum shops."
+      },
+      {
+        "model": "commercial-d1-l2-s1_v4",
+        "label": "Blue diner",
+        "description": "Blue diner."
+      }
+    ]
+  },
+  "commercial-d1-l3-s1": {
+    "module": "zone_commercial",
+    "tiles": 1,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 1 \u00b7 stage 3 \u00b7 1\u00d71",
+    "description": "Commercial density 1, growth stage 3, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 1,
+      "level": 3
+    },
+    "variants": [
+      {
+        "model": "commercial-d1-l3-s1",
+        "label": "Corner market",
+        "description": "Corner market."
+      },
+      {
+        "model": "commercial-d1-l3-s1_v1",
+        "label": "Scarlet diner",
+        "description": "Scarlet diner."
+      },
+      {
+        "model": "commercial-d1-l3-s1_v2",
+        "label": "Retail upgrade",
+        "description": "Retail upgrade."
+      },
+      {
+        "model": "commercial-d1-l3-s1_v3",
+        "label": "Plum shops",
+        "description": "Plum shops."
+      },
+      {
+        "model": "commercial-d1-l3-s1_v4",
+        "label": "Blue diner",
+        "description": "Blue diner."
+      }
+    ]
+  },
+  "commercial-d1-l4-s1": {
+    "module": "zone_commercial",
+    "tiles": 1,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 1 \u00b7 stage 4 \u00b7 1\u00d71",
+    "description": "Commercial density 1, growth stage 4, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 1,
+      "level": 4
+    },
+    "variants": [
+      {
+        "model": "commercial-d1-l4-s1",
+        "label": "Corner market",
+        "description": "Corner market."
+      },
+      {
+        "model": "commercial-d1-l4-s1_v1",
+        "label": "Scarlet diner",
+        "description": "Scarlet diner."
+      },
+      {
+        "model": "commercial-d1-l4-s1_v2",
+        "label": "Retail upgrade",
+        "description": "Retail upgrade."
+      },
+      {
+        "model": "commercial-d1-l4-s1_v3",
+        "label": "Plum shops",
+        "description": "Plum shops."
+      },
+      {
+        "model": "commercial-d1-l4-s1_v4",
+        "label": "Blue diner",
+        "description": "Blue diner."
+      }
+    ]
+  },
+  "commercial-d2-l1-s1": {
+    "module": "zone_commercial",
+    "tiles": 1,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 2 \u00b7 stage 1 \u00b7 1\u00d71",
+    "description": "Commercial density 2, growth stage 1, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 2,
+      "level": 1
+    },
+    "variants": [
+      {
+        "model": "commercial-d2-l1-s1",
+        "label": "Limestone offices",
+        "description": "Limestone offices."
+      },
+      {
+        "model": "commercial-d2-l1-s1_v1",
+        "label": "Brick hotel",
+        "description": "Brick hotel."
+      },
+      {
+        "model": "commercial-d2-l1-s1_v2",
+        "label": "Department store",
+        "description": "Department store."
+      },
+      {
+        "model": "commercial-d2-l1-s1_v3",
+        "label": "Glazed offices",
+        "description": "Glazed offices."
+      },
+      {
+        "model": "commercial-d2-l1-s1_v4",
+        "label": "Grand hotel",
+        "description": "Grand hotel."
+      },
+      {
+        "model": "commercial-d2-l1-s1_v5",
+        "label": "City department store",
+        "description": "City department store."
+      },
+      {
+        "model": "commercial-d2-l1-s1_v6",
+        "label": "Teal offices",
+        "description": "Teal offices."
+      }
+    ]
+  },
+  "commercial-d2-l1-s2": {
+    "module": "zone_commercial",
+    "tiles": 2,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 2 \u00b7 stage 1 \u00b7 2\u00d72",
+    "description": "Commercial density 2, growth stage 1, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 2,
+      "level": 1
+    },
+    "variants": [
+      {
+        "model": "commercial-d2-l1-s2",
+        "label": "Limestone offices",
+        "description": "Limestone offices."
+      },
+      {
+        "model": "commercial-d2-l1-s2_v1",
+        "label": "Brick hotel",
+        "description": "Brick hotel."
+      },
+      {
+        "model": "commercial-d2-l1-s2_v2",
+        "label": "Department store",
+        "description": "Department store."
+      },
+      {
+        "model": "commercial-d2-l1-s2_v3",
+        "label": "Glazed offices",
+        "description": "Glazed offices."
+      },
+      {
+        "model": "commercial-d2-l1-s2_v4",
+        "label": "Grand hotel",
+        "description": "Grand hotel."
+      },
+      {
+        "model": "commercial-d2-l1-s2_v5",
+        "label": "City department store",
+        "description": "City department store."
+      },
+      {
+        "model": "commercial-d2-l1-s2_v6",
+        "label": "Teal offices",
+        "description": "Teal offices."
+      }
+    ]
+  },
+  "commercial-d2-l2-s1": {
+    "module": "zone_commercial",
+    "tiles": 1,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 2 \u00b7 stage 2 \u00b7 1\u00d71",
+    "description": "Commercial density 2, growth stage 2, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 2,
+      "level": 2
+    },
+    "variants": [
+      {
+        "model": "commercial-d2-l2-s1",
+        "label": "Limestone offices",
+        "description": "Limestone offices."
+      },
+      {
+        "model": "commercial-d2-l2-s1_v1",
+        "label": "Brick hotel",
+        "description": "Brick hotel."
+      },
+      {
+        "model": "commercial-d2-l2-s1_v2",
+        "label": "Department store",
+        "description": "Department store."
+      },
+      {
+        "model": "commercial-d2-l2-s1_v3",
+        "label": "Glazed offices",
+        "description": "Glazed offices."
+      },
+      {
+        "model": "commercial-d2-l2-s1_v4",
+        "label": "Grand hotel",
+        "description": "Grand hotel."
+      },
+      {
+        "model": "commercial-d2-l2-s1_v5",
+        "label": "City department store",
+        "description": "City department store."
+      },
+      {
+        "model": "commercial-d2-l2-s1_v6",
+        "label": "Teal offices",
+        "description": "Teal offices."
+      }
+    ]
+  },
+  "commercial-d2-l2-s2": {
+    "module": "zone_commercial",
+    "tiles": 2,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 2 \u00b7 stage 2 \u00b7 2\u00d72",
+    "description": "Commercial density 2, growth stage 2, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 2,
+      "level": 2
+    },
+    "variants": [
+      {
+        "model": "commercial-d2-l2-s2",
+        "label": "Limestone offices",
+        "description": "Limestone offices."
+      },
+      {
+        "model": "commercial-d2-l2-s2_v1",
+        "label": "Brick hotel",
+        "description": "Brick hotel."
+      },
+      {
+        "model": "commercial-d2-l2-s2_v2",
+        "label": "Department store",
+        "description": "Department store."
+      },
+      {
+        "model": "commercial-d2-l2-s2_v3",
+        "label": "Glazed offices",
+        "description": "Glazed offices."
+      },
+      {
+        "model": "commercial-d2-l2-s2_v4",
+        "label": "Grand hotel",
+        "description": "Grand hotel."
+      },
+      {
+        "model": "commercial-d2-l2-s2_v5",
+        "label": "City department store",
+        "description": "City department store."
+      },
+      {
+        "model": "commercial-d2-l2-s2_v6",
+        "label": "Teal offices",
+        "description": "Teal offices."
+      }
+    ]
+  },
+  "commercial-d2-l3-s1": {
+    "module": "zone_commercial",
+    "tiles": 1,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 2 \u00b7 stage 3 \u00b7 1\u00d71",
+    "description": "Commercial density 2, growth stage 3, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 2,
+      "level": 3
+    },
+    "variants": [
+      {
+        "model": "commercial-d2-l3-s1",
+        "label": "Limestone offices",
+        "description": "Limestone offices."
+      },
+      {
+        "model": "commercial-d2-l3-s1_v1",
+        "label": "Brick hotel",
+        "description": "Brick hotel."
+      },
+      {
+        "model": "commercial-d2-l3-s1_v2",
+        "label": "Department store",
+        "description": "Department store."
+      },
+      {
+        "model": "commercial-d2-l3-s1_v3",
+        "label": "Glazed offices",
+        "description": "Glazed offices."
+      },
+      {
+        "model": "commercial-d2-l3-s1_v4",
+        "label": "Grand hotel",
+        "description": "Grand hotel."
+      },
+      {
+        "model": "commercial-d2-l3-s1_v5",
+        "label": "City department store",
+        "description": "City department store."
+      },
+      {
+        "model": "commercial-d2-l3-s1_v6",
+        "label": "Teal offices",
+        "description": "Teal offices."
+      }
+    ]
+  },
+  "commercial-d2-l3-s2": {
+    "module": "zone_commercial",
+    "tiles": 2,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 2 \u00b7 stage 3 \u00b7 2\u00d72",
+    "description": "Commercial density 2, growth stage 3, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 2,
+      "level": 3
+    },
+    "variants": [
+      {
+        "model": "commercial-d2-l3-s2",
+        "label": "Limestone offices",
+        "description": "Limestone offices."
+      },
+      {
+        "model": "commercial-d2-l3-s2_v1",
+        "label": "Brick hotel",
+        "description": "Brick hotel."
+      },
+      {
+        "model": "commercial-d2-l3-s2_v2",
+        "label": "Department store",
+        "description": "Department store."
+      },
+      {
+        "model": "commercial-d2-l3-s2_v3",
+        "label": "Glazed offices",
+        "description": "Glazed offices."
+      },
+      {
+        "model": "commercial-d2-l3-s2_v4",
+        "label": "Grand hotel",
+        "description": "Grand hotel."
+      },
+      {
+        "model": "commercial-d2-l3-s2_v5",
+        "label": "City department store",
+        "description": "City department store."
+      },
+      {
+        "model": "commercial-d2-l3-s2_v6",
+        "label": "Teal offices",
+        "description": "Teal offices."
+      }
+    ]
+  },
+  "commercial-d2-l4-s1": {
+    "module": "zone_commercial",
+    "tiles": 1,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 2 \u00b7 stage 4 \u00b7 1\u00d71",
+    "description": "Commercial density 2, growth stage 4, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 2,
+      "level": 4
+    },
+    "variants": [
+      {
+        "model": "commercial-d2-l4-s1",
+        "label": "Limestone offices",
+        "description": "Limestone offices."
+      },
+      {
+        "model": "commercial-d2-l4-s1_v1",
+        "label": "Brick hotel",
+        "description": "Brick hotel."
+      },
+      {
+        "model": "commercial-d2-l4-s1_v2",
+        "label": "Department store",
+        "description": "Department store."
+      },
+      {
+        "model": "commercial-d2-l4-s1_v3",
+        "label": "Glazed offices",
+        "description": "Glazed offices."
+      },
+      {
+        "model": "commercial-d2-l4-s1_v4",
+        "label": "Grand hotel",
+        "description": "Grand hotel."
+      },
+      {
+        "model": "commercial-d2-l4-s1_v5",
+        "label": "City department store",
+        "description": "City department store."
+      },
+      {
+        "model": "commercial-d2-l4-s1_v6",
+        "label": "Teal offices",
+        "description": "Teal offices."
+      }
+    ]
+  },
+  "commercial-d2-l4-s2": {
+    "module": "zone_commercial",
+    "tiles": 2,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 2 \u00b7 stage 4 \u00b7 2\u00d72",
+    "description": "Commercial density 2, growth stage 4, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 2,
+      "level": 4
+    },
+    "variants": [
+      {
+        "model": "commercial-d2-l4-s2",
+        "label": "Limestone offices",
+        "description": "Limestone offices."
+      },
+      {
+        "model": "commercial-d2-l4-s2_v1",
+        "label": "Brick hotel",
+        "description": "Brick hotel."
+      },
+      {
+        "model": "commercial-d2-l4-s2_v2",
+        "label": "Department store",
+        "description": "Department store."
+      },
+      {
+        "model": "commercial-d2-l4-s2_v3",
+        "label": "Glazed offices",
+        "description": "Glazed offices."
+      },
+      {
+        "model": "commercial-d2-l4-s2_v4",
+        "label": "Grand hotel",
+        "description": "Grand hotel."
+      },
+      {
+        "model": "commercial-d2-l4-s2_v5",
+        "label": "City department store",
+        "description": "City department store."
+      },
+      {
+        "model": "commercial-d2-l4-s2_v6",
+        "label": "Teal offices",
+        "description": "Teal offices."
+      }
+    ]
+  },
+  "commercial-d3-l1-s1": {
+    "module": "zone_commercial",
+    "tiles": 1,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 3 \u00b7 stage 1 \u00b7 1\u00d71",
+    "description": "Commercial density 3, growth stage 1, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 3,
+      "level": 1
+    },
+    "variants": [
+      {
+        "model": "commercial-d3-l1-s1",
+        "label": "Curtain-wall tower",
+        "description": "Curtain-wall tower."
+      },
+      {
+        "model": "commercial-d3-l1-s1_v1",
+        "label": "Stepped spire",
+        "description": "Stepped spire."
+      },
+      {
+        "model": "commercial-d3-l1-s1_v2",
+        "label": "Copper gable",
+        "description": "Copper gable."
+      }
+    ]
+  },
+  "commercial-d3-l1-s2": {
+    "module": "zone_commercial",
+    "tiles": 2,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 3 \u00b7 stage 1 \u00b7 2\u00d72",
+    "description": "Commercial density 3, growth stage 1, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 3,
+      "level": 1
+    },
+    "variants": [
+      {
+        "model": "commercial-d3-l1-s2",
+        "label": "Curtain-wall tower",
+        "description": "Curtain-wall tower."
+      },
+      {
+        "model": "commercial-d3-l1-s2_v1",
+        "label": "Stepped spire",
+        "description": "Stepped spire."
+      },
+      {
+        "model": "commercial-d3-l1-s2_v2",
+        "label": "Copper gable",
+        "description": "Copper gable."
+      },
+      {
+        "model": "commercial-d3-l1-s2_v3",
+        "label": "Limestone crown",
+        "description": "Limestone crown."
+      },
+      {
+        "model": "commercial-d3-l1-s2_v4",
+        "label": "Recessed glass crown",
+        "description": "Recessed glass crown."
+      },
+      {
+        "model": "commercial-d3-l1-s2_v5",
+        "label": "Garden terraces",
+        "description": "Garden terraces."
+      }
+    ]
+  },
+  "commercial-d3-l1-s3": {
+    "module": "zone_commercial",
+    "tiles": 3,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 3 \u00b7 stage 1 \u00b7 3\u00d73",
+    "description": "Commercial density 3, growth stage 1, authored specifically for a 3\u00d73 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 3,
+      "level": 1
+    },
+    "variants": [
+      {
+        "model": "commercial-d3-l1-s3",
+        "label": "Curtain-wall tower",
+        "description": "Curtain-wall tower."
+      },
+      {
+        "model": "commercial-d3-l1-s3_v1",
+        "label": "Stepped spire",
+        "description": "Stepped spire."
+      },
+      {
+        "model": "commercial-d3-l1-s3_v2",
+        "label": "Copper gable",
+        "description": "Copper gable."
+      },
+      {
+        "model": "commercial-d3-l1-s3_v3",
+        "label": "Limestone crown",
+        "description": "Limestone crown."
+      },
+      {
+        "model": "commercial-d3-l1-s3_v4",
+        "label": "Recessed glass crown",
+        "description": "Recessed glass crown."
+      },
+      {
+        "model": "commercial-d3-l1-s3_v5",
+        "label": "Garden terraces",
+        "description": "Garden terraces."
+      }
+    ]
+  },
+  "commercial-d3-l2-s1": {
+    "module": "zone_commercial",
+    "tiles": 1,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 3 \u00b7 stage 2 \u00b7 1\u00d71",
+    "description": "Commercial density 3, growth stage 2, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 3,
+      "level": 2
+    },
+    "variants": [
+      {
+        "model": "commercial-d3-l2-s1",
+        "label": "Curtain-wall tower",
+        "description": "Curtain-wall tower."
+      },
+      {
+        "model": "commercial-d3-l2-s1_v1",
+        "label": "Stepped spire",
+        "description": "Stepped spire."
+      },
+      {
+        "model": "commercial-d3-l2-s1_v2",
+        "label": "Copper gable",
+        "description": "Copper gable."
+      }
+    ]
+  },
+  "commercial-d3-l2-s2": {
+    "module": "zone_commercial",
+    "tiles": 2,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 3 \u00b7 stage 2 \u00b7 2\u00d72",
+    "description": "Commercial density 3, growth stage 2, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 3,
+      "level": 2
+    },
+    "variants": [
+      {
+        "model": "commercial-d3-l2-s2",
+        "label": "Curtain-wall tower",
+        "description": "Curtain-wall tower."
+      },
+      {
+        "model": "commercial-d3-l2-s2_v1",
+        "label": "Stepped spire",
+        "description": "Stepped spire."
+      },
+      {
+        "model": "commercial-d3-l2-s2_v2",
+        "label": "Copper gable",
+        "description": "Copper gable."
+      },
+      {
+        "model": "commercial-d3-l2-s2_v3",
+        "label": "Limestone crown",
+        "description": "Limestone crown."
+      },
+      {
+        "model": "commercial-d3-l2-s2_v4",
+        "label": "Recessed glass crown",
+        "description": "Recessed glass crown."
+      },
+      {
+        "model": "commercial-d3-l2-s2_v5",
+        "label": "Garden terraces",
+        "description": "Garden terraces."
+      }
+    ]
+  },
+  "commercial-d3-l2-s3": {
+    "module": "zone_commercial",
+    "tiles": 3,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 3 \u00b7 stage 2 \u00b7 3\u00d73",
+    "description": "Commercial density 3, growth stage 2, authored specifically for a 3\u00d73 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 3,
+      "level": 2
+    },
+    "variants": [
+      {
+        "model": "commercial-d3-l2-s3",
+        "label": "Curtain-wall tower",
+        "description": "Curtain-wall tower."
+      },
+      {
+        "model": "commercial-d3-l2-s3_v1",
+        "label": "Stepped spire",
+        "description": "Stepped spire."
+      },
+      {
+        "model": "commercial-d3-l2-s3_v2",
+        "label": "Copper gable",
+        "description": "Copper gable."
+      },
+      {
+        "model": "commercial-d3-l2-s3_v3",
+        "label": "Limestone crown",
+        "description": "Limestone crown."
+      },
+      {
+        "model": "commercial-d3-l2-s3_v4",
+        "label": "Recessed glass crown",
+        "description": "Recessed glass crown."
+      },
+      {
+        "model": "commercial-d3-l2-s3_v5",
+        "label": "Garden terraces",
+        "description": "Garden terraces."
+      }
+    ]
+  },
+  "commercial-d3-l3-s1": {
+    "module": "zone_commercial",
+    "tiles": 1,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 3 \u00b7 stage 3 \u00b7 1\u00d71",
+    "description": "Commercial density 3, growth stage 3, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 3,
+      "level": 3
+    },
+    "variants": [
+      {
+        "model": "commercial-d3-l3-s1",
+        "label": "Curtain-wall tower",
+        "description": "Curtain-wall tower."
+      },
+      {
+        "model": "commercial-d3-l3-s1_v1",
+        "label": "Stepped spire",
+        "description": "Stepped spire."
+      },
+      {
+        "model": "commercial-d3-l3-s1_v2",
+        "label": "Copper gable",
+        "description": "Copper gable."
+      }
+    ]
+  },
+  "commercial-d3-l3-s2": {
+    "module": "zone_commercial",
+    "tiles": 2,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 3 \u00b7 stage 3 \u00b7 2\u00d72",
+    "description": "Commercial density 3, growth stage 3, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 3,
+      "level": 3
+    },
+    "variants": [
+      {
+        "model": "commercial-d3-l3-s2",
+        "label": "Curtain-wall tower",
+        "description": "Curtain-wall tower."
+      },
+      {
+        "model": "commercial-d3-l3-s2_v1",
+        "label": "Stepped spire",
+        "description": "Stepped spire."
+      },
+      {
+        "model": "commercial-d3-l3-s2_v2",
+        "label": "Copper gable",
+        "description": "Copper gable."
+      },
+      {
+        "model": "commercial-d3-l3-s2_v3",
+        "label": "Limestone crown",
+        "description": "Limestone crown."
+      },
+      {
+        "model": "commercial-d3-l3-s2_v4",
+        "label": "Recessed glass crown",
+        "description": "Recessed glass crown."
+      },
+      {
+        "model": "commercial-d3-l3-s2_v5",
+        "label": "Garden terraces",
+        "description": "Garden terraces."
+      }
+    ]
+  },
+  "commercial-d3-l3-s3": {
+    "module": "zone_commercial",
+    "tiles": 3,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 3 \u00b7 stage 3 \u00b7 3\u00d73",
+    "description": "Commercial density 3, growth stage 3, authored specifically for a 3\u00d73 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 3,
+      "level": 3
+    },
+    "variants": [
+      {
+        "model": "commercial-d3-l3-s3",
+        "label": "Curtain-wall tower",
+        "description": "Curtain-wall tower."
+      },
+      {
+        "model": "commercial-d3-l3-s3_v1",
+        "label": "Stepped spire",
+        "description": "Stepped spire."
+      },
+      {
+        "model": "commercial-d3-l3-s3_v2",
+        "label": "Copper gable",
+        "description": "Copper gable."
+      },
+      {
+        "model": "commercial-d3-l3-s3_v3",
+        "label": "Limestone crown",
+        "description": "Limestone crown."
+      },
+      {
+        "model": "commercial-d3-l3-s3_v4",
+        "label": "Recessed glass crown",
+        "description": "Recessed glass crown."
+      },
+      {
+        "model": "commercial-d3-l3-s3_v5",
+        "label": "Garden terraces",
+        "description": "Garden terraces."
+      }
+    ]
+  },
+  "commercial-d3-l4-s1": {
+    "module": "zone_commercial",
+    "tiles": 1,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 3 \u00b7 stage 4 \u00b7 1\u00d71",
+    "description": "Commercial density 3, growth stage 4, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 3,
+      "level": 4
+    },
+    "variants": [
+      {
+        "model": "commercial-d3-l4-s1",
+        "label": "Curtain-wall tower",
+        "description": "Curtain-wall tower."
+      },
+      {
+        "model": "commercial-d3-l4-s1_v1",
+        "label": "Stepped spire",
+        "description": "Stepped spire."
+      },
+      {
+        "model": "commercial-d3-l4-s1_v2",
+        "label": "Copper gable",
+        "description": "Copper gable."
+      }
+    ]
+  },
+  "commercial-d3-l4-s2": {
+    "module": "zone_commercial",
+    "tiles": 2,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 3 \u00b7 stage 4 \u00b7 2\u00d72",
+    "description": "Commercial density 3, growth stage 4, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 3,
+      "level": 4
+    },
+    "variants": [
+      {
+        "model": "commercial-d3-l4-s2",
+        "label": "Curtain-wall tower",
+        "description": "Curtain-wall tower."
+      },
+      {
+        "model": "commercial-d3-l4-s2_v1",
+        "label": "Stepped spire",
+        "description": "Stepped spire."
+      },
+      {
+        "model": "commercial-d3-l4-s2_v2",
+        "label": "Copper gable",
+        "description": "Copper gable."
+      },
+      {
+        "model": "commercial-d3-l4-s2_v3",
+        "label": "Limestone crown",
+        "description": "Limestone crown."
+      },
+      {
+        "model": "commercial-d3-l4-s2_v4",
+        "label": "Recessed glass crown",
+        "description": "Recessed glass crown."
+      },
+      {
+        "model": "commercial-d3-l4-s2_v5",
+        "label": "Garden terraces",
+        "description": "Garden terraces."
+      }
+    ]
+  },
+  "commercial-d3-l4-s3": {
+    "module": "zone_commercial",
+    "tiles": 3,
+    "family": "commercial",
+    "label": "Commercial \u00b7 density 3 \u00b7 stage 4 \u00b7 3\u00d73",
+    "description": "Commercial density 3, growth stage 4, authored specifically for a 3\u00d73 lot.",
+    "zone": {
+      "type": "commercial",
+      "density": 3,
+      "level": 4
+    },
+    "variants": [
+      {
+        "model": "commercial-d3-l4-s3",
+        "label": "Curtain-wall tower",
+        "description": "Curtain-wall tower."
+      },
+      {
+        "model": "commercial-d3-l4-s3_v1",
+        "label": "Stepped spire",
+        "description": "Stepped spire."
+      },
+      {
+        "model": "commercial-d3-l4-s3_v2",
+        "label": "Copper gable",
+        "description": "Copper gable."
+      },
+      {
+        "model": "commercial-d3-l4-s3_v3",
+        "label": "Limestone crown",
+        "description": "Limestone crown."
+      },
+      {
+        "model": "commercial-d3-l4-s3_v4",
+        "label": "Recessed glass crown",
+        "description": "Recessed glass crown."
+      },
+      {
+        "model": "commercial-d3-l4-s3_v5",
+        "label": "Garden terraces",
+        "description": "Garden terraces."
+      }
+    ]
+  },
+  "industrial-d1-l1-s1": {
+    "module": "zone_industrial",
+    "tiles": 1,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 1 \u00b7 stage 1 \u00b7 1\u00d71",
+    "description": "Industrial density 1, growth stage 1, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 1,
+      "level": 1
+    },
+    "variants": [
+      {
+        "model": "industrial-d1-l1-s1",
+        "label": "Terracotta workshop",
+        "description": "Terracotta workshop."
+      },
+      {
+        "model": "industrial-d1-l1-s1_v1",
+        "label": "Blue workshop",
+        "description": "Blue workshop."
+      },
+      {
+        "model": "industrial-d1-l1-s1_v2",
+        "label": "Ochre workshop",
+        "description": "Ochre workshop."
+      },
+      {
+        "model": "industrial-d1-l1-s1_v3",
+        "label": "Teal workshop",
+        "description": "Teal workshop."
+      },
+      {
+        "model": "industrial-d1-l1-s1_v4",
+        "label": "Plum workshop",
+        "description": "Plum workshop."
+      }
+    ]
+  },
+  "industrial-d1-l1-s3": {
+    "module": "zone_industrial",
+    "tiles": 3,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 1 \u00b7 stage 1 \u00b7 3\u00d73",
+    "description": "Industrial density 1, growth stage 1, authored specifically for a 3\u00d73 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 1,
+      "level": 1
+    },
+    "variants": [
+      {
+        "model": "industrial-d1-l1-s3",
+        "label": "Golden grain farm",
+        "description": "Golden grain farm."
+      },
+      {
+        "model": "industrial-d1-l1-s3_v1",
+        "label": "Green row-crop farm",
+        "description": "Green row-crop farm."
+      },
+      {
+        "model": "industrial-d1-l1-s3_v2",
+        "label": "Furrowed farm",
+        "description": "Furrowed farm."
+      },
+      {
+        "model": "industrial-d1-l1-s3_v3",
+        "label": "Orchard farm",
+        "description": "Orchard farm."
+      }
+    ]
+  },
+  "industrial-d1-l2-s1": {
+    "module": "zone_industrial",
+    "tiles": 1,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 1 \u00b7 stage 2 \u00b7 1\u00d71",
+    "description": "Industrial density 1, growth stage 2, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 1,
+      "level": 2
+    },
+    "variants": [
+      {
+        "model": "industrial-d1-l2-s1",
+        "label": "Terracotta workshop",
+        "description": "Terracotta workshop."
+      },
+      {
+        "model": "industrial-d1-l2-s1_v1",
+        "label": "Blue workshop",
+        "description": "Blue workshop."
+      },
+      {
+        "model": "industrial-d1-l2-s1_v2",
+        "label": "Ochre workshop",
+        "description": "Ochre workshop."
+      },
+      {
+        "model": "industrial-d1-l2-s1_v3",
+        "label": "Teal workshop",
+        "description": "Teal workshop."
+      },
+      {
+        "model": "industrial-d1-l2-s1_v4",
+        "label": "Plum workshop",
+        "description": "Plum workshop."
+      }
+    ]
+  },
+  "industrial-d1-l2-s3": {
+    "module": "zone_industrial",
+    "tiles": 3,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 1 \u00b7 stage 2 \u00b7 3\u00d73",
+    "description": "Industrial density 1, growth stage 2, authored specifically for a 3\u00d73 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 1,
+      "level": 2
+    },
+    "variants": [
+      {
+        "model": "industrial-d1-l2-s3",
+        "label": "Golden grain farm",
+        "description": "Golden grain farm."
+      },
+      {
+        "model": "industrial-d1-l2-s3_v1",
+        "label": "Green row-crop farm",
+        "description": "Green row-crop farm."
+      },
+      {
+        "model": "industrial-d1-l2-s3_v2",
+        "label": "Furrowed farm",
+        "description": "Furrowed farm."
+      },
+      {
+        "model": "industrial-d1-l2-s3_v3",
+        "label": "Orchard farm",
+        "description": "Orchard farm."
+      }
+    ]
+  },
+  "industrial-d1-l3-s1": {
+    "module": "zone_industrial",
+    "tiles": 1,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 1 \u00b7 stage 3 \u00b7 1\u00d71",
+    "description": "Industrial density 1, growth stage 3, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 1,
+      "level": 3
+    },
+    "variants": [
+      {
+        "model": "industrial-d1-l3-s1",
+        "label": "Terracotta workshop",
+        "description": "Terracotta workshop."
+      },
+      {
+        "model": "industrial-d1-l3-s1_v1",
+        "label": "Blue workshop",
+        "description": "Blue workshop."
+      },
+      {
+        "model": "industrial-d1-l3-s1_v2",
+        "label": "Ochre workshop",
+        "description": "Ochre workshop."
+      },
+      {
+        "model": "industrial-d1-l3-s1_v3",
+        "label": "Teal workshop",
+        "description": "Teal workshop."
+      },
+      {
+        "model": "industrial-d1-l3-s1_v4",
+        "label": "Plum workshop",
+        "description": "Plum workshop."
+      }
+    ]
+  },
+  "industrial-d1-l3-s3": {
+    "module": "zone_industrial",
+    "tiles": 3,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 1 \u00b7 stage 3 \u00b7 3\u00d73",
+    "description": "Industrial density 1, growth stage 3, authored specifically for a 3\u00d73 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 1,
+      "level": 3
+    },
+    "variants": [
+      {
+        "model": "industrial-d1-l3-s3",
+        "label": "Golden grain farm",
+        "description": "Golden grain farm."
+      },
+      {
+        "model": "industrial-d1-l3-s3_v1",
+        "label": "Green row-crop farm",
+        "description": "Green row-crop farm."
+      },
+      {
+        "model": "industrial-d1-l3-s3_v2",
+        "label": "Furrowed farm",
+        "description": "Furrowed farm."
+      },
+      {
+        "model": "industrial-d1-l3-s3_v3",
+        "label": "Orchard farm",
+        "description": "Orchard farm."
+      }
+    ]
+  },
+  "industrial-d1-l4-s1": {
+    "module": "zone_industrial",
+    "tiles": 1,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 1 \u00b7 stage 4 \u00b7 1\u00d71",
+    "description": "Industrial density 1, growth stage 4, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 1,
+      "level": 4
+    },
+    "variants": [
+      {
+        "model": "industrial-d1-l4-s1",
+        "label": "Terracotta workshop",
+        "description": "Terracotta workshop."
+      },
+      {
+        "model": "industrial-d1-l4-s1_v1",
+        "label": "Blue workshop",
+        "description": "Blue workshop."
+      },
+      {
+        "model": "industrial-d1-l4-s1_v2",
+        "label": "Ochre workshop",
+        "description": "Ochre workshop."
+      },
+      {
+        "model": "industrial-d1-l4-s1_v3",
+        "label": "Teal workshop",
+        "description": "Teal workshop."
+      },
+      {
+        "model": "industrial-d1-l4-s1_v4",
+        "label": "Plum workshop",
+        "description": "Plum workshop."
+      }
+    ]
+  },
+  "industrial-d1-l4-s3": {
+    "module": "zone_industrial",
+    "tiles": 3,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 1 \u00b7 stage 4 \u00b7 3\u00d73",
+    "description": "Industrial density 1, growth stage 4, authored specifically for a 3\u00d73 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 1,
+      "level": 4
+    },
+    "variants": [
+      {
+        "model": "industrial-d1-l4-s3",
+        "label": "Golden grain farm",
+        "description": "Golden grain farm."
+      },
+      {
+        "model": "industrial-d1-l4-s3_v1",
+        "label": "Green row-crop farm",
+        "description": "Green row-crop farm."
+      },
+      {
+        "model": "industrial-d1-l4-s3_v2",
+        "label": "Furrowed farm",
+        "description": "Furrowed farm."
+      },
+      {
+        "model": "industrial-d1-l4-s3_v3",
+        "label": "Orchard farm",
+        "description": "Orchard farm."
+      }
+    ]
+  },
+  "industrial-d2-l1-s1": {
+    "module": "zone_industrial",
+    "tiles": 1,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 2 \u00b7 stage 1 \u00b7 1\u00d71",
+    "description": "Industrial density 2, growth stage 1, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 2,
+      "level": 1
+    },
+    "variants": [
+      {
+        "model": "industrial-d2-l1-s1",
+        "label": "Red-cargo works",
+        "description": "Red-cargo works."
+      },
+      {
+        "model": "industrial-d2-l1-s1_v1",
+        "label": "Blue-cargo works",
+        "description": "Blue-cargo works."
+      },
+      {
+        "model": "industrial-d2-l1-s1_v2",
+        "label": "Blue-cargo warehouse",
+        "description": "Blue-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l1-s1_v3",
+        "label": "Ochre-cargo warehouse",
+        "description": "Ochre-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l1-s1_v4",
+        "label": "Green-cargo warehouse",
+        "description": "Green-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l1-s1_v5",
+        "label": "Green-cargo works",
+        "description": "Green-cargo works."
+      },
+      {
+        "model": "industrial-d2-l1-s1_v6",
+        "label": "Plum-cargo works",
+        "description": "Plum-cargo works."
+      }
+    ]
+  },
+  "industrial-d2-l1-s2": {
+    "module": "zone_industrial",
+    "tiles": 2,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 2 \u00b7 stage 1 \u00b7 2\u00d72",
+    "description": "Industrial density 2, growth stage 1, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 2,
+      "level": 1
+    },
+    "variants": [
+      {
+        "model": "industrial-d2-l1-s2",
+        "label": "Red-cargo works",
+        "description": "Red-cargo works."
+      },
+      {
+        "model": "industrial-d2-l1-s2_v1",
+        "label": "Blue-cargo works",
+        "description": "Blue-cargo works."
+      },
+      {
+        "model": "industrial-d2-l1-s2_v2",
+        "label": "Blue-cargo warehouse",
+        "description": "Blue-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l1-s2_v3",
+        "label": "Ochre-cargo warehouse",
+        "description": "Ochre-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l1-s2_v4",
+        "label": "Green-cargo warehouse",
+        "description": "Green-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l1-s2_v5",
+        "label": "Green-cargo works",
+        "description": "Green-cargo works."
+      },
+      {
+        "model": "industrial-d2-l1-s2_v6",
+        "label": "Plum-cargo works",
+        "description": "Plum-cargo works."
+      }
+    ]
+  },
+  "industrial-d2-l2-s1": {
+    "module": "zone_industrial",
+    "tiles": 1,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 2 \u00b7 stage 2 \u00b7 1\u00d71",
+    "description": "Industrial density 2, growth stage 2, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 2,
+      "level": 2
+    },
+    "variants": [
+      {
+        "model": "industrial-d2-l2-s1",
+        "label": "Red-cargo works",
+        "description": "Red-cargo works."
+      },
+      {
+        "model": "industrial-d2-l2-s1_v1",
+        "label": "Blue-cargo works",
+        "description": "Blue-cargo works."
+      },
+      {
+        "model": "industrial-d2-l2-s1_v2",
+        "label": "Blue-cargo warehouse",
+        "description": "Blue-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l2-s1_v3",
+        "label": "Ochre-cargo warehouse",
+        "description": "Ochre-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l2-s1_v4",
+        "label": "Green-cargo warehouse",
+        "description": "Green-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l2-s1_v5",
+        "label": "Green-cargo works",
+        "description": "Green-cargo works."
+      },
+      {
+        "model": "industrial-d2-l2-s1_v6",
+        "label": "Plum-cargo works",
+        "description": "Plum-cargo works."
+      }
+    ]
+  },
+  "industrial-d2-l2-s2": {
+    "module": "zone_industrial",
+    "tiles": 2,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 2 \u00b7 stage 2 \u00b7 2\u00d72",
+    "description": "Industrial density 2, growth stage 2, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 2,
+      "level": 2
+    },
+    "variants": [
+      {
+        "model": "industrial-d2-l2-s2",
+        "label": "Red-cargo works",
+        "description": "Red-cargo works."
+      },
+      {
+        "model": "industrial-d2-l2-s2_v1",
+        "label": "Blue-cargo works",
+        "description": "Blue-cargo works."
+      },
+      {
+        "model": "industrial-d2-l2-s2_v2",
+        "label": "Blue-cargo warehouse",
+        "description": "Blue-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l2-s2_v3",
+        "label": "Ochre-cargo warehouse",
+        "description": "Ochre-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l2-s2_v4",
+        "label": "Green-cargo warehouse",
+        "description": "Green-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l2-s2_v5",
+        "label": "Green-cargo works",
+        "description": "Green-cargo works."
+      },
+      {
+        "model": "industrial-d2-l2-s2_v6",
+        "label": "Plum-cargo works",
+        "description": "Plum-cargo works."
+      }
+    ]
+  },
+  "industrial-d2-l3-s1": {
+    "module": "zone_industrial",
+    "tiles": 1,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 2 \u00b7 stage 3 \u00b7 1\u00d71",
+    "description": "Industrial density 2, growth stage 3, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 2,
+      "level": 3
+    },
+    "variants": [
+      {
+        "model": "industrial-d2-l3-s1",
+        "label": "Red-cargo works",
+        "description": "Red-cargo works."
+      },
+      {
+        "model": "industrial-d2-l3-s1_v1",
+        "label": "Blue-cargo works",
+        "description": "Blue-cargo works."
+      },
+      {
+        "model": "industrial-d2-l3-s1_v2",
+        "label": "Blue-cargo warehouse",
+        "description": "Blue-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l3-s1_v3",
+        "label": "Ochre-cargo warehouse",
+        "description": "Ochre-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l3-s1_v4",
+        "label": "Green-cargo warehouse",
+        "description": "Green-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l3-s1_v5",
+        "label": "Green-cargo works",
+        "description": "Green-cargo works."
+      },
+      {
+        "model": "industrial-d2-l3-s1_v6",
+        "label": "Plum-cargo works",
+        "description": "Plum-cargo works."
+      }
+    ]
+  },
+  "industrial-d2-l3-s2": {
+    "module": "zone_industrial",
+    "tiles": 2,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 2 \u00b7 stage 3 \u00b7 2\u00d72",
+    "description": "Industrial density 2, growth stage 3, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 2,
+      "level": 3
+    },
+    "variants": [
+      {
+        "model": "industrial-d2-l3-s2",
+        "label": "Red-cargo works",
+        "description": "Red-cargo works."
+      },
+      {
+        "model": "industrial-d2-l3-s2_v1",
+        "label": "Blue-cargo works",
+        "description": "Blue-cargo works."
+      },
+      {
+        "model": "industrial-d2-l3-s2_v2",
+        "label": "Blue-cargo warehouse",
+        "description": "Blue-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l3-s2_v3",
+        "label": "Ochre-cargo warehouse",
+        "description": "Ochre-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l3-s2_v4",
+        "label": "Green-cargo warehouse",
+        "description": "Green-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l3-s2_v5",
+        "label": "Green-cargo works",
+        "description": "Green-cargo works."
+      },
+      {
+        "model": "industrial-d2-l3-s2_v6",
+        "label": "Plum-cargo works",
+        "description": "Plum-cargo works."
+      }
+    ]
+  },
+  "industrial-d2-l4-s1": {
+    "module": "zone_industrial",
+    "tiles": 1,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 2 \u00b7 stage 4 \u00b7 1\u00d71",
+    "description": "Industrial density 2, growth stage 4, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 2,
+      "level": 4
+    },
+    "variants": [
+      {
+        "model": "industrial-d2-l4-s1",
+        "label": "Red-cargo works",
+        "description": "Red-cargo works."
+      },
+      {
+        "model": "industrial-d2-l4-s1_v1",
+        "label": "Blue-cargo works",
+        "description": "Blue-cargo works."
+      },
+      {
+        "model": "industrial-d2-l4-s1_v2",
+        "label": "Blue-cargo warehouse",
+        "description": "Blue-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l4-s1_v3",
+        "label": "Ochre-cargo warehouse",
+        "description": "Ochre-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l4-s1_v4",
+        "label": "Green-cargo warehouse",
+        "description": "Green-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l4-s1_v5",
+        "label": "Green-cargo works",
+        "description": "Green-cargo works."
+      },
+      {
+        "model": "industrial-d2-l4-s1_v6",
+        "label": "Plum-cargo works",
+        "description": "Plum-cargo works."
+      }
+    ]
+  },
+  "industrial-d2-l4-s2": {
+    "module": "zone_industrial",
+    "tiles": 2,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 2 \u00b7 stage 4 \u00b7 2\u00d72",
+    "description": "Industrial density 2, growth stage 4, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 2,
+      "level": 4
+    },
+    "variants": [
+      {
+        "model": "industrial-d2-l4-s2",
+        "label": "Red-cargo works",
+        "description": "Red-cargo works."
+      },
+      {
+        "model": "industrial-d2-l4-s2_v1",
+        "label": "Blue-cargo works",
+        "description": "Blue-cargo works."
+      },
+      {
+        "model": "industrial-d2-l4-s2_v2",
+        "label": "Blue-cargo warehouse",
+        "description": "Blue-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l4-s2_v3",
+        "label": "Ochre-cargo warehouse",
+        "description": "Ochre-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l4-s2_v4",
+        "label": "Green-cargo warehouse",
+        "description": "Green-cargo warehouse."
+      },
+      {
+        "model": "industrial-d2-l4-s2_v5",
+        "label": "Green-cargo works",
+        "description": "Green-cargo works."
+      },
+      {
+        "model": "industrial-d2-l4-s2_v6",
+        "label": "Plum-cargo works",
+        "description": "Plum-cargo works."
+      }
+    ]
+  },
+  "industrial-d3-l1-s1": {
+    "module": "zone_industrial",
+    "tiles": 1,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 3 \u00b7 stage 1 \u00b7 1\u00d71",
+    "description": "Industrial density 3, growth stage 1, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 3,
+      "level": 1
+    },
+    "variants": [
+      {
+        "model": "industrial-d3-l1-s1",
+        "label": "Red-cargo process plant",
+        "description": "Red-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l1-s1_v1",
+        "label": "Blue-cargo process plant",
+        "description": "Blue-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l1-s1_v2",
+        "label": "Ochre-cargo process plant",
+        "description": "Ochre-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l1-s1_v3",
+        "label": "Green-cargo process plant",
+        "description": "Green-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l1-s1_v4",
+        "label": "Plum-cargo process plant",
+        "description": "Plum-cargo process plant."
+      }
+    ]
+  },
+  "industrial-d3-l1-s2": {
+    "module": "zone_industrial",
+    "tiles": 2,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 3 \u00b7 stage 1 \u00b7 2\u00d72",
+    "description": "Industrial density 3, growth stage 1, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 3,
+      "level": 1
+    },
+    "variants": [
+      {
+        "model": "industrial-d3-l1-s2",
+        "label": "Red-cargo process plant",
+        "description": "Red-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l1-s2_v1",
+        "label": "Blue-cargo process plant",
+        "description": "Blue-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l1-s2_v2",
+        "label": "Ochre-cargo process plant",
+        "description": "Ochre-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l1-s2_v3",
+        "label": "Green-cargo process plant",
+        "description": "Green-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l1-s2_v4",
+        "label": "Plum-cargo process plant",
+        "description": "Plum-cargo process plant."
+      }
+    ]
+  },
+  "industrial-d3-l1-s3": {
+    "module": "zone_industrial",
+    "tiles": 3,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 3 \u00b7 stage 1 \u00b7 3\u00d73",
+    "description": "Industrial density 3, growth stage 1, authored specifically for a 3\u00d73 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 3,
+      "level": 1
+    },
+    "variants": [
+      {
+        "model": "industrial-d3-l1-s3",
+        "label": "Red-cargo process plant",
+        "description": "Red-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l1-s3_v1",
+        "label": "Blue-cargo process plant",
+        "description": "Blue-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l1-s3_v2",
+        "label": "Ochre-cargo process plant",
+        "description": "Ochre-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l1-s3_v3",
+        "label": "Green-cargo process plant",
+        "description": "Green-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l1-s3_v4",
+        "label": "Plum-cargo process plant",
+        "description": "Plum-cargo process plant."
+      }
+    ]
+  },
+  "industrial-d3-l2-s1": {
+    "module": "zone_industrial",
+    "tiles": 1,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 3 \u00b7 stage 2 \u00b7 1\u00d71",
+    "description": "Industrial density 3, growth stage 2, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 3,
+      "level": 2
+    },
+    "variants": [
+      {
+        "model": "industrial-d3-l2-s1",
+        "label": "Red-cargo process plant",
+        "description": "Red-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l2-s1_v1",
+        "label": "Blue-cargo process plant",
+        "description": "Blue-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l2-s1_v2",
+        "label": "Ochre-cargo process plant",
+        "description": "Ochre-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l2-s1_v3",
+        "label": "Green-cargo process plant",
+        "description": "Green-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l2-s1_v4",
+        "label": "Plum-cargo process plant",
+        "description": "Plum-cargo process plant."
+      }
+    ]
+  },
+  "industrial-d3-l2-s2": {
+    "module": "zone_industrial",
+    "tiles": 2,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 3 \u00b7 stage 2 \u00b7 2\u00d72",
+    "description": "Industrial density 3, growth stage 2, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 3,
+      "level": 2
+    },
+    "variants": [
+      {
+        "model": "industrial-d3-l2-s2",
+        "label": "Red-cargo process plant",
+        "description": "Red-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l2-s2_v1",
+        "label": "Blue-cargo process plant",
+        "description": "Blue-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l2-s2_v2",
+        "label": "Ochre-cargo process plant",
+        "description": "Ochre-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l2-s2_v3",
+        "label": "Green-cargo process plant",
+        "description": "Green-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l2-s2_v4",
+        "label": "Plum-cargo process plant",
+        "description": "Plum-cargo process plant."
+      }
+    ]
+  },
+  "industrial-d3-l2-s3": {
+    "module": "zone_industrial",
+    "tiles": 3,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 3 \u00b7 stage 2 \u00b7 3\u00d73",
+    "description": "Industrial density 3, growth stage 2, authored specifically for a 3\u00d73 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 3,
+      "level": 2
+    },
+    "variants": [
+      {
+        "model": "industrial-d3-l2-s3",
+        "label": "Red-cargo process plant",
+        "description": "Red-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l2-s3_v1",
+        "label": "Blue-cargo process plant",
+        "description": "Blue-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l2-s3_v2",
+        "label": "Ochre-cargo process plant",
+        "description": "Ochre-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l2-s3_v3",
+        "label": "Green-cargo process plant",
+        "description": "Green-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l2-s3_v4",
+        "label": "Plum-cargo process plant",
+        "description": "Plum-cargo process plant."
+      }
+    ]
+  },
+  "industrial-d3-l3-s1": {
+    "module": "zone_industrial",
+    "tiles": 1,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 3 \u00b7 stage 3 \u00b7 1\u00d71",
+    "description": "Industrial density 3, growth stage 3, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 3,
+      "level": 3
+    },
+    "variants": [
+      {
+        "model": "industrial-d3-l3-s1",
+        "label": "Red-cargo process plant",
+        "description": "Red-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l3-s1_v1",
+        "label": "Blue-cargo process plant",
+        "description": "Blue-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l3-s1_v2",
+        "label": "Ochre-cargo process plant",
+        "description": "Ochre-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l3-s1_v3",
+        "label": "Green-cargo process plant",
+        "description": "Green-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l3-s1_v4",
+        "label": "Plum-cargo process plant",
+        "description": "Plum-cargo process plant."
+      }
+    ]
+  },
+  "industrial-d3-l3-s2": {
+    "module": "zone_industrial",
+    "tiles": 2,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 3 \u00b7 stage 3 \u00b7 2\u00d72",
+    "description": "Industrial density 3, growth stage 3, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 3,
+      "level": 3
+    },
+    "variants": [
+      {
+        "model": "industrial-d3-l3-s2",
+        "label": "Red-cargo process plant",
+        "description": "Red-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l3-s2_v1",
+        "label": "Blue-cargo process plant",
+        "description": "Blue-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l3-s2_v2",
+        "label": "Ochre-cargo process plant",
+        "description": "Ochre-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l3-s2_v3",
+        "label": "Green-cargo process plant",
+        "description": "Green-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l3-s2_v4",
+        "label": "Plum-cargo process plant",
+        "description": "Plum-cargo process plant."
+      }
+    ]
+  },
+  "industrial-d3-l3-s3": {
+    "module": "zone_industrial",
+    "tiles": 3,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 3 \u00b7 stage 3 \u00b7 3\u00d73",
+    "description": "Industrial density 3, growth stage 3, authored specifically for a 3\u00d73 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 3,
+      "level": 3
+    },
+    "variants": [
+      {
+        "model": "industrial-d3-l3-s3",
+        "label": "Red-cargo process plant",
+        "description": "Red-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l3-s3_v1",
+        "label": "Blue-cargo process plant",
+        "description": "Blue-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l3-s3_v2",
+        "label": "Ochre-cargo process plant",
+        "description": "Ochre-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l3-s3_v3",
+        "label": "Green-cargo process plant",
+        "description": "Green-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l3-s3_v4",
+        "label": "Plum-cargo process plant",
+        "description": "Plum-cargo process plant."
+      }
+    ]
+  },
+  "industrial-d3-l4-s1": {
+    "module": "zone_industrial",
+    "tiles": 1,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 3 \u00b7 stage 4 \u00b7 1\u00d71",
+    "description": "Industrial density 3, growth stage 4, authored specifically for a 1\u00d71 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 3,
+      "level": 4
+    },
+    "variants": [
+      {
+        "model": "industrial-d3-l4-s1",
+        "label": "Red-cargo process plant",
+        "description": "Red-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l4-s1_v1",
+        "label": "Blue-cargo process plant",
+        "description": "Blue-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l4-s1_v2",
+        "label": "Ochre-cargo process plant",
+        "description": "Ochre-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l4-s1_v3",
+        "label": "Green-cargo process plant",
+        "description": "Green-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l4-s1_v4",
+        "label": "Plum-cargo process plant",
+        "description": "Plum-cargo process plant."
+      }
+    ]
+  },
+  "industrial-d3-l4-s2": {
+    "module": "zone_industrial",
+    "tiles": 2,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 3 \u00b7 stage 4 \u00b7 2\u00d72",
+    "description": "Industrial density 3, growth stage 4, authored specifically for a 2\u00d72 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 3,
+      "level": 4
+    },
+    "variants": [
+      {
+        "model": "industrial-d3-l4-s2",
+        "label": "Red-cargo process plant",
+        "description": "Red-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l4-s2_v1",
+        "label": "Blue-cargo process plant",
+        "description": "Blue-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l4-s2_v2",
+        "label": "Ochre-cargo process plant",
+        "description": "Ochre-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l4-s2_v3",
+        "label": "Green-cargo process plant",
+        "description": "Green-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l4-s2_v4",
+        "label": "Plum-cargo process plant",
+        "description": "Plum-cargo process plant."
+      }
+    ]
+  },
+  "industrial-d3-l4-s3": {
+    "module": "zone_industrial",
+    "tiles": 3,
+    "family": "industrial",
+    "label": "Industrial \u00b7 density 3 \u00b7 stage 4 \u00b7 3\u00d73",
+    "description": "Industrial density 3, growth stage 4, authored specifically for a 3\u00d73 lot.",
+    "zone": {
+      "type": "industrial",
+      "density": 3,
+      "level": 4
+    },
+    "variants": [
+      {
+        "model": "industrial-d3-l4-s3",
+        "label": "Red-cargo process plant",
+        "description": "Red-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l4-s3_v1",
+        "label": "Blue-cargo process plant",
+        "description": "Blue-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l4-s3_v2",
+        "label": "Ochre-cargo process plant",
+        "description": "Ochre-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l4-s3_v3",
+        "label": "Green-cargo process plant",
+        "description": "Green-cargo process plant."
+      },
+      {
+        "model": "industrial-d3-l4-s3_v4",
+        "label": "Plum-cargo process plant",
+        "description": "Plum-cargo process plant."
+      }
+    ]
+  }
+}
