@@ -1266,19 +1266,43 @@ export function mountUI(actions) {
   filFooter.appendChild(btn("btn btn-teal", "Close", null, () => filesDialog.close()));
   filesDialog.appendChild(filFooter);
   filesDialog.addEventListener("click", (e) => { if (e.target === filesDialog) filesDialog.close(); });
-  function buildFiles() {
-    slotList.innerHTML = "";
-    const slots = actions.listSaves?.() || [];
+  // Reading the slots is asynchronous. The dialog says what it is doing rather
+  // than leaving the previous visit's list on screen as if it were current.
+  let filesPass = 0;
+  async function buildFiles() {
+    const pass = ++filesPass;
+    slotList.replaceChildren(el("div", "save-slot-info", "Reading saved cities…"));
+    const slots = (await actions.listSaves?.()) || [];
+    if (pass !== filesPass) return;
+    slotList.replaceChildren();
     for (const s of slots) {
       const row = el("div", "save-slot");
       const label = s.label || `Slot ${s.slot}`;
       const info = el("div", "save-slot-info", s.empty ? `${label}: empty` : `${label}: ${s.name}`);
-      if (!s.empty) { const small = document.createElement("small"); small.textContent = `${s.date} · ${fmtPop(s.population)} residents · ${fmtMoney(s.money)}`; info.appendChild(small); }
+      if (!s.empty && !s.damaged) { const small = document.createElement("small"); small.textContent = `${s.date} · ${fmtPop(s.population)} residents · ${fmtMoney(s.money)}`; info.appendChild(small); }
+      // A slot the store could not read still holds something. It is offered
+      // for loading, which is where the failed load hands the file back.
+      if (s.damaged) { const small = document.createElement("small"); small.textContent = "Stored, but unreadable. Load it to download a copy."; info.appendChild(small); }
       row.appendChild(info);
-      if (s.slot > 0) row.appendChild(btn("btn btn-sm", "Save", `Save to slot ${s.slot}`, () => { actions.save?.(s.slot); buildFiles(); }));
-      const load = btn("btn btn-sm btn-teal", "Load", s.slot === 0 ? "Load autosave" : `Load slot ${s.slot}`, () => { filesDialog.close(); actions.load?.(s.slot); });
+      if (s.slot > 0) {
+        // One write at a time. Without the lock a double click starts two saves
+        // of the same city and two refreshes racing to draw the result.
+        const save = btn("btn btn-sm", "Save", `Save to slot ${s.slot}`, async () => {
+          save.disabled = true;
+          try { await actions.save?.(s.slot); } finally { buildFiles(); }
+        });
+        row.appendChild(save);
+      }
+      const load = btn("btn btn-sm btn-teal", "Load", `Load ${label.toLowerCase()}`, () => { filesDialog.close(); actions.load?.(s.slot); });
       if (s.empty) load.disabled = true;
       row.appendChild(load);
+      // Clearing a slot is the only way back from a full disk, which is exactly
+      // what the storage-full message tells the player to do.
+      if (!s.empty) row.appendChild(btn("btn btn-sm", "Clear", `Clear ${label.toLowerCase()}`, async (event) => {
+        event.currentTarget.disabled = true;
+        await actions.clearSave?.(s.slot);
+        buildFiles();
+      }));
       slotList.appendChild(row);
     }
   }

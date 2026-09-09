@@ -303,7 +303,9 @@ describe("simulation control", () => {
     assert.ok(agent.state().ordinances.includes("recycling"));
   });
 
-  test("slot 0 is a real slot, not a falsy default", () => {
+  // Storage is asynchronous now, so save() and load() resolve once the city has
+  // actually been written. The slot arithmetic they answer with is unchanged.
+  test("slot 0 is a real slot, not a falsy default", async () => {
     const seen = [];
     let city = sim.createCity({ seed: 1, starter: false, hills: 0 });
     const agent = createAgentAPI({
@@ -312,11 +314,11 @@ describe("simulation control", () => {
       renderer: null, ui: { notify: () => {} }, undo: createUndoManager(1),
     });
     // The January autosave lives in slot 0; `int(slot) || 1` sent it to slot 1.
-    assert.equal(agent.save(0).slot, 0);
-    assert.equal(agent.load(0).slot, 0);
+    assert.equal((await agent.save(0)).slot, 0);
+    assert.equal((await agent.load(0)).slot, 0);
     assert.deepEqual(seen, [["save", 0], ["load", 0]]);
-    assert.equal(agent.load(9).slot, 3);
-    assert.equal(agent.load("x").slot, 1);
+    assert.equal((await agent.load(9)).slot, 3);
+    assert.equal((await agent.load("x")).slot, 1);
   });
 
   test("disaster() only accepts known ids", () => {

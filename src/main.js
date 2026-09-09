@@ -10,11 +10,27 @@ import { attachInput } from "./input.js";
 import { CityAudio } from "./audio.js";
 import { SCENARIOS, startScenario, updateScenario } from "./scenarios.js";
 import { createAgentAPI } from "./agent-api.js";
+import { saveStore, AUTOSAVE_SLOT, slotLabel } from "./save-store.js";
 
-const SAVE_KEY = "city-builder-3000-save-v3";
 const MONTH_MS = 2500;
-const SLOTS = 3;
-const slotKey = (slot) => (slot === 0 ? `${SAVE_KEY}-autosave` : slot === 1 ? SAVE_KEY : `${SAVE_KEY}-slot${slot}`);
+
+// The four fields the save dialog prints. They travel with the city so listing
+// the slots never has to parse a megabyte of stored JSON back out.
+const metaOf = (c) => ({ name: c.name, population: c.population, money: c.money, month: c.month, startYear: c.startYear });
+
+// Set while a city is being read back, so nothing writes over the slot the
+// player is in the middle of loading from.
+let loading = false;
+
+// One place that writes a city and says what happened. Every caller reports the
+// failure: a save that quietly did not happen is how a long game disappears.
+async function storeCity(slot, { quiet = false } = {}) {
+  if (loading) return { ok: false, message: "A city is being loaded." };
+  const result = await saveStore.write(slot, sim.serialize(city), metaOf(city));
+  if (!result.ok) ui?.notify(result.message);
+  else if (!quiet) ui?.notify(slot === AUTOSAVE_SLOT ? "City autosaved." : `City saved to ${slotLabel(slot).toLowerCase()}.`);
+  return result;
+}
 
 let city = startScenario(sim.createCity(42, true));
 let tool = "inspect", density = 1, speed = 0;
@@ -125,7 +141,12 @@ function loadFrom(raw, message) {
     restore();
     lookAtCity();
     ui.notify(message);
-  } catch (err) { ui.notify(`That save could not be loaded: ${err.message}`); }
+    return { ok: true };
+  } catch (err) {
+    const failure = `That save could not be loaded: ${err.message}`;
+    ui.notify(failure);
+    return { ok: false, message: failure };
+  }
 }
 
 // Commit a construction plan. The mouse and the agent API both land here, so
@@ -189,7 +210,7 @@ function stepMonth() {
   if (result.disaster) { ui.notify(result.disaster); audio.effect(/fire|riot/i.test(result.disaster) ? "siren" : "disaster"); }
   if (goal) { ui.notify(goal); audio.effect("cash"); }
   // Autosave every January.
-  if (city.month % 12 === 0) { try { localStorage.setItem(slotKey(0), sim.serialize(city)); } catch { /* storage full or blocked */ } }
+  if (city.month % 12 === 0) void storeCity(AUTOSAVE_SLOT, { quiet: true });
   return [result.disaster, goal].filter(Boolean);
 }
 
@@ -202,26 +223,27 @@ const actions = {
   setTax: (n) => { for (const key of ["residential", "commercial", "industrial"]) sim.setPolicy(city, `tax.${key}`, Number(n)); refresh(); },
   setPolicy: policy,
   renameCity: (name) => policy("name", name),
-  save: (slot = 1) => {
+  save: (slot = 1) => storeCity(slot),
+  load: async (slot = 1) => {
+    // The clock stops before the read, not after it. Reading a city takes long
+    // enough for a month to tick over, and a January tick during that gap would
+    // autosave the city being replaced over the one being loaded.
+    setSpeed(0);
+    loading = true;
     try {
-      localStorage.setItem(slotKey(slot), sim.serialize(city));
-      ui.notify(slot === 1 ? "City saved in this browser." : `City saved to slot ${slot}.`);
-    } catch { ui.notify("Unable to save: browser storage is unavailable or full."); }
+      const result = await saveStore.read(slot);
+      if (!result.ok) { ui.notify(result.message); return result; }
+      return loadFrom(result.text, "Saved city restored. Simulation paused.");
+    } finally { loading = false; }
   },
-  load: (slot = 1) => {
-    const raw = localStorage.getItem(slotKey(slot));
-    if (!raw) { ui.notify("No saved city yet."); return; }
-    loadFrom(raw, "Saved city restored. Simulation paused.");
+  clearSave: async (slot) => {
+    const result = await saveStore.remove(slot);
+    ui.notify(result.ok ? `${slotLabel(slot)} cleared.` : result.message);
+    return result;
   },
-  listSaves: () => Array.from({ length: SLOTS + 1 }, (_, slot) => {
-    const label = slot === 0 ? "Autosave" : `Slot ${slot}`;
-    try {
-      const raw = localStorage.getItem(slotKey(slot));
-      if (!raw) return { slot, label, empty: true };
-      const d = JSON.parse(raw);
-      return { slot, label, empty: false, name: d.name, population: d.population, money: d.money, date: sim.dateOf(d.month, d.startYear) };
-    } catch { return { slot, label, empty: true }; }
-  }),
+  listSaves: async () => (await saveStore.list()).map((s) => (
+    s.empty || s.damaged ? s : { ...s, date: sim.dateOf(s.month, s.startYear) }
+  )),
   exportSave: () => {
     try {
       const blob = new Blob([sim.serialize(city)], { type: "application/json" });
@@ -297,6 +319,7 @@ window.civic = {
   get renderer() { return renderer; },
   getStats: () => sim.getStats(city),
   sim,
+  saveStore,
   // Machine-facing command surface. Start with civic.agent.help().
   agent: createAgentAPI({ getCity: () => city, actions, renderer, ui, undo }),
 };

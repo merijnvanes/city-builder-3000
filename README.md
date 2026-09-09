@@ -117,7 +117,7 @@ entry. Nothing ever returns the whole tile array.
 - **Disasters**: fire, earthquake, tornado, flood, riot, toxic cloud, flying saucer and volcano, triggered or random, with fire crews to dispatch. Active hazards and their remaining duration survive saves.
 - **Data maps** for power, water, land value, pollution, crime, traffic, transit and service coverage; a report with eight history graphs; seven advisors with portraits; a news ticker.
 - **Scenarios**: open play, grow to 20,000, Boomtown, rescue a failing town, clear the air of a factory town, rebuild after a quake. Start years from 1900 gate technology.
-- **Saves**: three browser slots, an autosave every January, plus export and import as a file.
+- **Saves**: three browser slots, an autosave every January, plus export and import as a file. Cities are stored in IndexedDB, not localStorage: a developed 128×128 city is about 1.1 MB of JSON, which UTF-16 localStorage would double against a ~5 MB origin quota. The game asks for persistent storage on the first save, carries cities over from the older localStorage keys on first run, and reports every failed write instead of losing the city silently.
 
 ## Controls
 
@@ -169,6 +169,7 @@ budget, welcome and mobile screenshots in `artifacts/`.
 - `src/street-art.js`, `src/foliage.js`, `src/architecture-cache.js` — street details and bounded artwork caches
 - `src/ui.js`, `src/style.css` — the interface
 - `src/agent-api.js` — the `civic.agent` command surface, an adapter over the same paths the mouse drives
+- `src/save-store.js` — where saved cities live: IndexedDB, with a localStorage fallback and a refusal that reports itself
 - `src/main.js` — game loop, saves, wiring
 
 City Builder 3000 is an original work. No copyrighted assets are used.

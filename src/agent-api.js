@@ -67,6 +67,12 @@ const int = (v) => (Number.isFinite(v) ? Math.round(v) : NaN);
 // Save slots run 0..3 and 0 is a real slot (the January autosave), so a
 // falsy-check default would silently retarget it.
 const slotOf = (v) => (Number.isFinite(int(v)) ? clamp(int(v), 0, 3) : 1);
+// The game speaks in `message` and this surface answers in `error`. One place
+// translates, so a storage refusal reads like every other failure here.
+const reply = (result) => {
+  const { message, ...rest } = result || { ok: true };
+  return message && rest.ok === false ? { ...rest, error: message } : rest;
+};
 const round1 = (v) => Math.round(v * 10) / 10;
 
 function charFor(t) {
@@ -563,8 +569,13 @@ export function createAgentAPI({ getCity, actions, renderer, ui, undo }) {
     disaster(id) { if (!Object.hasOwn(DISASTERS, String(id))) return { ok: false, error: `Unknown disaster. Known: ${Object.keys(DISASTERS).join(", ")}` }; actions.setDisaster(id); announce({ text: `triggered ${id}`, disaster: id }); return { ok: true }; },
     // Slot 0 is the January autosave, and `|| 1` would quietly rewrite it to
     // slot 1 because 0 is falsy. Fall back only when the number is unusable.
-    save(slot = 1) { const n = slotOf(slot); actions.save(n); return { ok: true, slot: n }; },
-    load(slot = 1) { const n = slotOf(slot); actions.load(n); return { ok: true, slot: n }; },
+    // Storage is asynchronous, so these resolve once the city has actually
+    // landed. An agent that saved and moved on would otherwise report a write
+    // the browser had not committed yet. A refusal arrives as `message` from
+    // the storage layer and leaves as `error`, which is what every other call
+    // here answers with.
+    async save(slot = 1) { const n = slotOf(slot); return { ...reply(await actions.save(n)), slot: n }; },
+    async load(slot = 1) { const n = slotOf(slot); return { ...reply(await actions.load(n)), slot: n }; },
     saves() { return actions.listSaves(); },
     newCity(options = {}) { actions.newCity(options); announce({ text: `new city: ${getCity().name}`, options }); return api.state(); },
   };
@@ -572,7 +583,13 @@ export function createAgentAPI({ getCity, actions, renderer, ui, undo }) {
   // One place that turns a throw into a reply, so a bad argument never breaks
   // the page the human is watching.
   return Object.fromEntries(Object.entries(api).map(([name, fn]) => [name, (...args) => {
-    try { return fn(...args); }
-    catch (err) { return { ok: false, error: `${name}() failed: ${err.message}` }; }
+    const failure = (err) => ({ ok: false, error: `${name}() failed: ${err.message}` });
+    try {
+      const result = fn(...args);
+      // Saving and loading return promises. A rejection there has to become the
+      // same reply shape, or it escapes as an unhandled rejection instead.
+      return result instanceof Promise ? result.catch(failure) : result;
+    }
+    catch (err) { return failure(err); }
   }]));
 }

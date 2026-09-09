@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1",
     "test": "node --test tests/*.test.js",
-    "test:browser": "node tests/browser.mjs && node tests/year-rollover.mjs && node tests/zoom-stability.mjs",
+    "test:browser": "node tests/browser.mjs && node tests/year-rollover.mjs && node tests/zoom-stability.mjs && node tests/saves.mjs",
     "test:ui": "node --test tests/ui-signals.test.js && node tests/ui-design.mjs && node tests/game-ui.mjs && node tests/periwinkle.mjs && node tests/ui-groups.mjs",
     "test:construction-art": "node tests/construction-art.mjs && node tests/zone-lifecycle.mjs",
     "test:coastlines": "node --test tests/water-geometry.test.js tests/surface-water.test.js && node tests/coastlines.mjs && node tests/surface-water.mjs",
