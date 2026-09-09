@@ -166,14 +166,14 @@ export function mountUI(actions) {
     tools: g.tools.filter((id) => toolMap[id]),
   })).filter((g) => g.tools.length > 0);
 
-  // Two HUD surfaces: city command bar and expandable construction console.
+  // A right tool rail meets the bottom news and city status strips.
   const commandBar = el('header');
   commandBar.id = 'command-bar';
-  commandBar.setAttribute('aria-label', 'City command bar');
+  commandBar.setAttribute('aria-label', 'City status and time');
   app.appendChild(commandBar);
   const buildConsole = el('section');
   buildConsole.id = 'build-console';
-  buildConsole.setAttribute('aria-label', 'City building console');
+  buildConsole.setAttribute('aria-label', 'City tools');
   const consoleContext = el('div');
   consoleContext.id = 'console-context';
   const consoleDeck = el('div');
@@ -181,13 +181,12 @@ export function mountUI(actions) {
   buildConsole.append(consoleContext, consoleDeck);
   app.appendChild(buildConsole);
 
-  // ── Top bar ────────────────────────────────────────────────────────────────
+  // ── City management ────────────────────────────────────────────────────────
   const managementPanel = el("div");
   managementPanel.id = "management-panel";
   commandBar.appendChild(managementPanel);
   const topBar = el("div");
   topBar.id = "top-bar";
-  managementPanel.appendChild(topBar);
 
   // Logo
   const logoMark = el("button");
@@ -197,7 +196,7 @@ export function mountUI(actions) {
   logoMark.title = "Center view";
   logoMark.addEventListener("click", () => actions.home?.());
 
-  // City name remains editable in the command bar.
+  // City name remains editable in the bottom status strip.
   const cityName = document.createElement("input");
   cityName.id = "city-name";
   cityName.type = "text";
@@ -219,7 +218,8 @@ export function mountUI(actions) {
   const advisorBtn = btn("btn", "Advisors", "Advisors", () => { buildAdvisors(); advisorDialog.showModal(); });
   topMenuBtns.appendChild(advisorBtn);
   const cityMenu = el('details', 'city-menu');
-  const menuSummary = el('summary', 'btn', 'City menu');
+  const menuSummary = el('summary', 'btn', 'City');
+  menuSummary.setAttribute('aria-label', 'City menu');
   cityMenu.appendChild(menuSummary);
   const menuBody = el('div', 'city-menu-body');
   cityMenu.appendChild(menuBody);
@@ -241,27 +241,9 @@ export function mountUI(actions) {
   menuBody.addEventListener('click', e => { if (e.target.closest('button')) cityMenu.open = false; });
   document.addEventListener('pointerdown', e => { if (!cityMenu.contains(e.target)) cityMenu.open = false; });
 
-  // Mobile toolbar toggle
-  const mobileDockBtn = btn("btn mobile-build", "Build city", "Toggle tools", () => {
-    cityMenu.open = false;
-    overlaySection.classList.remove('open'); overlayToggle.setAttribute('aria-expanded', 'false');
-    if (openGroupId) {
-      closeFlyout(true); toolbar.classList.add('mobile-open'); mobileDockBtn.setAttribute('aria-expanded', 'true');
-      return;
-    }
-    const open = toolbar.classList.toggle("mobile-open");
-    mobileDockBtn.setAttribute("aria-expanded", String(open));
-    if (open && inspPanel.classList.contains('visible')) closeInspector(false);
-    if (open) dockScroll.querySelector('.group-header')?.focus();
-    if (!open) closeFlyout();
-  });
-  mobileDockBtn.setAttribute("aria-expanded", "false");
-  consoleDeck.appendChild(mobileDockBtn);
-  menuSummary.addEventListener('click', () => {
-    closeFlyout(); toolbar.classList.remove('mobile-open'); mobileDockBtn.setAttribute('aria-expanded', 'false');
-  });
+  menuSummary.addEventListener('click', () => closeFlyout());
 
-  // ── Construction deck ─────────────────────────────────────────────────────
+  // ── Right tool rail ────────────────────────────────────────────────────────
   const toolbar = el("div");
   toolbar.id = "toolbar";
   consoleDeck.appendChild(toolbar);
@@ -372,21 +354,10 @@ export function mountUI(actions) {
   dockScroll.id = "dock-scroll";
   const dockRail = el('div');
   dockRail.id = 'dock-rail';
-  const scrollCategories = direction => dockScroll.scrollBy({ left: direction * dockScroll.clientWidth * .7, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
-  const previousCategories = btn('dock-page', '‹', 'Previous building categories', () => scrollCategories(-1));
-  const nextCategories = btn('dock-page', '›', 'More building categories', () => scrollCategories(1));
-  dockRail.append(previousCategories, dockScroll, nextCategories);
+  dockRail.appendChild(dockScroll);
   toolbar.appendChild(dockRail);
-  function updateCategoryScroll() {
-    dockRail.classList.toggle('scrollable', dockScroll.scrollWidth > dockRail.clientWidth + 1);
-    previousCategories.disabled = dockScroll.scrollLeft < 1;
-    nextCategories.disabled = dockScroll.scrollLeft + dockScroll.clientWidth >= dockScroll.scrollWidth - 1;
-  }
-  dockScroll.addEventListener('scroll', updateCategoryScroll, { passive: true });
-  const categoryResize = new ResizeObserver(updateCategoryScroll);
-  categoryResize.observe(dockScroll);
 
-  // Palettes expand the console above its category rail.
+  // Compact palettes open against the left edge of the rail.
   const flyout = el("div");
   flyout.id = "flyout";
   flyout.setAttribute("role", "region");
@@ -409,7 +380,7 @@ export function mountUI(actions) {
     if (restoreFocus) trigger?.focus({ preventScroll: true });
   }
 
-  // Inspection shares the same console drawer as construction.
+  // Inspection shares the compact panel beside the tool rail.
   const inspPanel = el("div");
   inspPanel.id = "inspector-panel";
   inspPanel.setAttribute("aria-live", "polite");
@@ -419,7 +390,7 @@ export function mountUI(actions) {
   inspPanel.appendChild(inspHeading);
   function closeInspector(restoreFocus = true) {
     actions.clearSelection?.(); inspPanel.classList.remove('visible');
-    if (restoreFocus) (matchMedia('(max-width: 800px)').matches ? mobileDockBtn : inspectBtn).focus();
+    if (restoreFocus) inspectBtn.focus();
   }
   inspHeading.appendChild(btn('panel-close', '×', 'Close inspector', () => closeInspector()));
   const inspPortrait = el("canvas", "insp-portrait");
@@ -450,7 +421,7 @@ export function mountUI(actions) {
   activeTool.append(activeTitle, activeDescription);
   activeTool.appendChild(btn('panel-close', '×', 'Cancel construction tool', () => {
     actions.selectTool('inspect');
-    (matchMedia('(max-width: 800px)').matches ? mobileDockBtn : inspectBtn).focus();
+    inspectBtn.focus();
   }));
   consoleContext.appendChild(activeTool);
 
@@ -461,10 +432,10 @@ export function mountUI(actions) {
   const groupIcons = { zone: "residential", transport: "road", power: "power", water: "water", civic: "police", sanitation: "landfill", landscape: "park", landmark: "commercial", special: "school", emergency: "fire" };
   groups.forEach((g) => {
     const groupEl = el("div", "tool-group");
-    categoryResize.observe(groupEl);
     groupEl.dataset.group=g.id;
     const header = el("button", "group-header");
     header.setAttribute("aria-label", g.label);
+    header.title = g.label;
     header.setAttribute("aria-expanded", "false");
     header.setAttribute('aria-controls', 'flyout');
     const icon = el("span", "group-icon");
@@ -499,8 +470,6 @@ export function mountUI(actions) {
       b.addEventListener('focus', () => { paletteDetail.textContent = t.description || t.label; });
       b.addEventListener("click", () => {
         actions.selectTool(toolId); closeFlyout(true);
-        toolbar.classList.remove('mobile-open'); mobileDockBtn.setAttribute('aria-expanded', 'false');
-        if (matchMedia('(max-width: 800px)').matches) mobileDockBtn.focus();
       });
       grid.appendChild(b);
       toolBtns[toolId] = b;
@@ -561,7 +530,7 @@ export function mountUI(actions) {
     expandGroup(id);
   }
 
-  // Open a group's tools in the console drawer.
+  // Open a group's tools beside the rail.
   function expandGroup(id) {
     const g = groupEls[id];
     if (!g) return;
@@ -677,9 +646,10 @@ export function mountUI(actions) {
   // ── Navigator (lower-right, above bottom bar) ──────────────────────────────
   const navigator = el("div");
   navigator.id = "navigator";
-  consoleDeck.appendChild(navigator);
+  consoleDeck.append(topBar, navigator);
+  navigator.appendChild(rciSection);
   const overlayToggle = btn('btn map-toggle', 'Data maps', 'Toggle data maps', () => {
-    closeFlyout(); toolbar.classList.remove('mobile-open'); mobileDockBtn.setAttribute('aria-expanded', 'false');
+    closeFlyout();
     if (inspPanel.classList.contains('visible')) closeInspector(false);
     const open = overlaySection.classList.toggle('open');
     overlayToggle.setAttribute('aria-expanded', String(open));
@@ -770,17 +740,6 @@ export function mountUI(actions) {
   notif.id = "notif";
   notif.setAttribute("role", "status");
   bottomBar.appendChild(notif);
-  // Size drawers from the rendered HUD, including wrapped labels.
-  function fitConsole() {
-    const inset = innerHeight - buildConsole.getBoundingClientRect().bottom;
-    const frame = getComputedStyle(buildConsole);
-    const borders = parseFloat(frame.borderTopWidth) + parseFloat(frame.borderBottomWidth);
-    buildConsole.style.setProperty('--command-space', `${commandBar.getBoundingClientRect().bottom}px`);
-    buildConsole.style.setProperty('--console-fixed-space', `${consoleDeck.offsetHeight + bottomBar.offsetHeight + inset + borders}px`);
-  }
-  const hudResize = new ResizeObserver(fitConsole);
-  for (const surface of [commandBar, consoleDeck, bottomBar]) hudResize.observe(surface);
-  window.addEventListener('resize', fitConsole);
   let notifTimer = null;
   function showNotice(message) {
     lastNotice = message;
@@ -1679,11 +1638,9 @@ export function mountUI(actions) {
     },
 
     setTool(id) {
-      const wasBrowsing = openGroupId || toolbar.classList.contains('mobile-open');
       closeFlyout(true);
-      toolbar.classList.remove('mobile-open'); mobileDockBtn.setAttribute('aria-expanded', 'false');
+
       overlaySection.classList.remove('open'); overlayToggle.setAttribute('aria-expanded', 'false');
-      if (wasBrowsing && matchMedia('(max-width: 800px)').matches) mobileDockBtn.focus();
       // Update all tool buttons
       Object.entries(toolBtns).forEach(([tid, b]) => {
         b.classList.toggle("active", tid === id); b.setAttribute('aria-pressed', String(tid === id));
@@ -1719,7 +1676,7 @@ export function mountUI(actions) {
         return;
       }
       closeFlyout();
-      toolbar.classList.remove('mobile-open'); mobileDockBtn.setAttribute('aria-expanded', 'false');
+
       overlaySection.classList.remove('open'); overlayToggle.setAttribute('aria-expanded', 'false');
       inspPanel.classList.add("visible");
       inspPortrait.classList.toggle("visible", !!info.anchor);

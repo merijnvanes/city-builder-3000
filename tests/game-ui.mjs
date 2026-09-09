@@ -25,6 +25,7 @@ try {
   }
   await page.screenshot({path:'artifacts/game-report.png'});
   await page.keyboard.press('Escape');
+  await report.waitFor({state:'hidden'});
   await page.mouse.click(720,500);
   assert.ok(await page.locator('#inspector-panel').isVisible());
   assert.equal(await page.locator('.inspection-notes').evaluate(el=>el.open),false);

@@ -32,8 +32,20 @@ async function cohesiveHud() {
   });
   assert.deepEqual(layout.surfaces, ['command-bar', 'build-console'], 'The HUD has exactly two connected surfaces');
   for (const box of [layout.header, layout.console]) assert.ok(box.left >= 0 && box.right <= layout.width && box.top >= 0 && box.bottom <= layout.height, `HUD stays on screen: ${JSON.stringify(layout)}`);
-  assert.ok(layout.console.top - layout.header.bottom >= layout.height * .2 - 1, `At least a fifth of the screen remains city space: ${JSON.stringify(layout)}`);
-  if (layout.drawer) assert.ok(Math.abs(layout.drawer.bottom - layout.deck.top) <= 1, `Open drawer touches the construction rail: ${JSON.stringify(layout)}`);
+  assert.equal(layout.console.right, layout.width, 'Tool rail touches the right edge');
+  assert.equal(layout.console.top, 0, 'No top bar covers the city');
+  assert.equal(layout.header.bottom, layout.height, 'Status strip touches the bottom edge');
+  assert.ok(Math.abs(layout.header.right - layout.console.left) <= 1, 'The status strip joins the rail');
+  const news = await page.locator('#bottom-bar').boundingBox();
+  const cityArea = layout.console.left * news.y;
+  if (layout.width >= 1000 && layout.height >= 640) {
+    assert.ok(cityArea / (layout.width * layout.height) >= .83, 'Idle HUD leaves at least 83% of desktop for the city');
+    if (layout.drawer) assert.ok((cityArea - layout.drawer.width * layout.drawer.height) / (layout.width * layout.height) >= .68, 'A compact drawer keeps at least 68% of desktop city space');
+  }
+  if (layout.drawer) {
+    assert.ok(Math.abs(layout.drawer.right - layout.console.left) <= 1, 'Drawer joins the right rail');
+    assert.ok(layout.drawer.top >= 0 && layout.drawer.bottom <= news.y + 1 && layout.drawer.left >= 0, 'Drawer stays above the city wire');
+  }
 }
 try {
   await page.goto(url);
@@ -53,7 +65,7 @@ try {
   await page.keyboard.press('Escape');
   assert.ok(await page.locator('#inspector-panel').isVisible(), 'Modal Escape preserves the inspected tile');
   const inspector = await page.locator('#inspector-panel').boundingBox(), mini = await page.locator('.district-map').boundingBox();
-  assert.ok(inspector.y + inspector.height < mini.y, 'Inspector stays above the minimap');
+  assert.ok(inspector.x + inspector.width <= mini.x, 'Inspector stays beside the minimap');
   await page.getByRole('button', { name: 'Close inspector', exact: true }).click();
   await page.evaluate(() => civic.agent.run(1));
   assert.ok(!await page.locator('#inspector-panel').isVisible(), 'A dismissed inspector stays closed after simulation updates');
@@ -86,7 +98,6 @@ try {
   for (const [width, height] of [[1440,1000], [1280,720], [1280,640], [1024,768], [768,1024], [390,844], [320,568], [844,390], [667,375]]) {
     await page.setViewportSize({ width, height });
     await page.keyboard.press('Escape');
-    const mobile = width <= 800;
     await cohesiveHud();
     if (await page.locator('.district-map').isVisible()) {
       const map = await page.locator('.district-map').boundingBox(), nav = await page.locator('#navigator').boundingBox();
@@ -96,15 +107,7 @@ try {
     await reachable(page.locator('.status-money'));
     for (const name of ['Open budget', 'City report', 'Advisors']) await reachable(page.getByRole('button', { name, exact: true }));
     await reachable(page.locator('.status-date'));
-    await reachable(page.locator('.clock-state'));
-    if (mobile) await reachable(page.getByRole('button', { name: 'Toggle tools', exact: true }));
-    if (mobile) await page.getByRole('button', { name: 'Toggle tools', exact: true }).click();
-    const nextCategories = page.getByRole('button', { name: 'More building categories', exact: true });
-    if (await nextCategories.isVisible() && await nextCategories.isEnabled()) {
-      const before = await page.locator('#dock-scroll').evaluate(el => el.scrollLeft);
-      await reachable(nextCategories); await nextCategories.click();
-      await page.waitForFunction(before => document.querySelector('#dock-scroll').scrollLeft > before, before);
-    }
+    if (await page.locator('.clock-state').isVisible()) await reachable(page.locator('.clock-state'));
     const groups = await page.locator('#dock-scroll .group-header[aria-controls="flyout"]:visible').evaluateAll(headers => headers.map(header => header.getAttribute('aria-label')));
     assert.ok(groups.length >= 5, 'Every viewport tests a populated category rail');
     for (const group of groups) {
@@ -149,12 +152,6 @@ try {
       await close.click();
       assert.ok(await trigger.evaluate(el => el === document.activeElement), 'Closing a palette restores focus');
     }
-    if (mobile) {
-      await page.getByRole('button', { name: 'Transport', exact: true }).click();
-      await page.getByRole('button', { name: 'Toggle tools', exact: true }).click();
-      assert.ok(!await page.locator('#flyout').isVisible(), 'Build city returns from the palette to its category rail');
-      await reachable(page.getByRole('button', { name: 'Transport', exact: true }));
-    }
     await page.getByRole('button', { name: 'Zones', exact: true }).click();
     await page.locator('[data-tool="residential"]').click();
     const density = page.getByRole('button', { name: 'Density 3', exact: true });
@@ -194,8 +191,8 @@ try {
   await cohesiveHud();
   await reachable(petitionButton);
   for (const name of ['Open budget', 'City report', 'Advisors']) await reachable(page.getByRole('button', { name, exact: true }));
-  const petitionBox = await petitionButton.boundingBox(), commandBox = await page.locator('#command-bar').boundingBox();
-  assert.ok(petitionBox.x >= commandBox.x && petitionBox.x + petitionBox.width <= commandBox.x + commandBox.width, 'Petitions stay inside the command bar');
+  const petitionBox = await petitionButton.boundingBox(), commandBox = await page.locator('#build-console').boundingBox();
+  assert.ok(petitionBox.x >= commandBox.x && petitionBox.x + petitionBox.width <= commandBox.x + commandBox.width, 'Petitions stay inside the tool rail');
   await petitionButton.evaluate(el => { el.style.display = 'none'; });
 
   await page.setViewportSize({ width: 1440, height: 1000 });
@@ -222,7 +219,7 @@ try {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   assert.equal(await page.locator('#news-ticker').evaluate(el => getComputedStyle(el).animationName), 'none');
   assert.deepEqual(failures, []);
-  console.log('UI design passed: nine viewport sizes, connected drawers, visible city space, every category, notifications, petitions, keyboard access, pricing and artwork.');
+  console.log('UI design passed: nine viewport sizes, a compact right rail, at least 83% idle desktop city space, every category, notifications, petitions, keyboard access, pricing and artwork.');
 } catch (error) {
   await page.screenshot({ path: 'artifacts/ui-failure.png', animations: 'disabled' });
   throw error;
