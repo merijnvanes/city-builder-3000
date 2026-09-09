@@ -60,7 +60,7 @@ test('a station touching a highway crossing does not substitute for an on-ramp',
   for(let x=11;x<=30;x++) put(c,x,21,'highway');
   // Allocate both route bands at the tile beside the station.
   put(c,11,21,'rail');
-  put(c,30,22,'road'); put(c,30,23,'road'); put(c,30,21,'onramp'); lot(c,30,24,'industrial');
+  put(c,31,21,'road'); put(c,32,21,'road'); put(c,30,21,'onramp'); lot(c,32,22,'industrial');
   updateTraffic(c); assert.equal(at(c,9,24).commute,0);
 });
 test('bridge crossings are refused in both construction orders',()=>{
@@ -69,17 +69,17 @@ test('bridge crossings are refused in both construction orders',()=>{
     assert.equal(evaluate(c,20,20,b).ok,false);
   }
 });
-test('a ramp can join both decks from beside a viaduct',()=>{
-  const c=town(); put(c,20,20,'road'); put(c,20,20,'highway');
+test('a ramp can climb to a viaduct from the street beyond it',()=>{
+  const c=town(); put(c,20,20,'road'); put(c,20,20,'highway'); put(c,20,22,'road');
   assert.equal(evaluate(c,20,21,'onramp').ok,true);
 });
 test('border highway crossings connect for trade without supplying jobs',()=>{
   for(const lower of ['road','rail']) {
     const c=town();
     for(let x=0;x<=20;x++) put(c,x,20,'highway');
-    put(c,20,21,'road'); put(c,20,20,'onramp'); lot(c,20,22,'residential');
+    put(c,21,20,'road'); put(c,20,20,'onramp'); lot(c,21,21,'residential');
     put(c,0,20,lower); connectNeighbor(c,{x:0,y:20,side:'northwest',route:'highway'}); refresh(c);
-    assert.ok(c._connections.northwest.road>0); assert.equal(at(c,20,22).commute,0);
+    assert.ok(c._connections.northwest.road>0); assert.equal(at(c,21,21).commute,0);
     assert.equal(c._traffic.employed,0);
   }
 });

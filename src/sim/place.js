@@ -33,12 +33,20 @@ function terraformPlan(city, start, target) {
 }
 
 export const techAvailable = (city, type) => !(type in TECH_YEAR) || yearOf(city.month, city.startYear) >= TECH_YEAR[type];
+
+// Water a pier may stand on: open water touching dry land, with nothing
+// crossing it.
+export const pierSite = (city, t) => t.terrain === "water" && !t.structure && [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => {
+  const n = tileAt(city, t.x + dx, t.y + dy);
+  return n && n.terrain !== "water";
+});
 import { tileAt, inBounds, nextRandom } from "./grid.js";
 import { lotTiles, assignLot, clearLot, anchorOf } from "./lots.js";
 import { refreshCity } from "./refresh.js";
 import { specialAvailable } from "./events.js";
 import { isLandfill } from "./waste.js";
 import { findBore, bore, MIN_BORE } from "./tunnels.js";
+import { rampSite } from "./highways.js";
 import { crewsAvailable, fireCrews, unitsAvailable, policeUnits } from "./fire.js";
 import { riotAt, RIOT_REACH } from "./disasters.js";
 
@@ -73,7 +81,9 @@ export function evaluate(city, x, y, tool, options = {}) {
     const band = port ? 1 : density;
     if (!port && ![1, 2, 3].includes(density)) return fail("Invalid density.");
     if (!techAvailable(city, tool)) return fail(`${TOOL_MAP[tool].label} zoning is not available until ${TECH_YEAR[tool]}.`);
-    if (t.terrain === "water") return fail("Cannot zone on water.");
+    // A seaport reaches into the water it works: shallow water along the
+    // shore may be zoned, and the Sims build piers on it.
+    if (t.terrain === "water" && !(tool === "seaport" && pierSite(city, t))) return fail(tool === "seaport" ? "A seaport may only reach into water beside dry land." : "Cannot zone on water.");
     const cost = ZONE_COST[tool][band];
     if (t.type === tool && t.density === band) return noop("Zone already set.", here);
     if (ZONED_TYPES.has(t.type)) {
@@ -119,7 +129,7 @@ export function evaluate(city, x, y, tool, options = {}) {
   }
   if (tool === "makeland") {
     if (t.terrain !== "water") return noop("Already dry land.", here);
-    if (t.type !== "empty") return fail("Remove the bridge first.");
+    if (t.type !== "empty") return fail(ROAD_TYPES.has(t.type) ? "Remove the bridge first." : "Clear the tile first.");
     const earth=terraformPlan(city,t,Math.ceil(waterSurface(t)));
     if(earth.error)return fail(earth.error);
     const waterPlan=surfaceWaterPlan(city,earth.changes,new Map([[y*city.size+x,-waterVolume(t)]]));
@@ -142,21 +152,15 @@ export function evaluate(city, x, y, tool, options = {}) {
   }
 
   // An on-ramp is the only place cars move between a street and a highway.
-  // It has to touch both, so it can only go where the two actually meet.
+  // It climbs from the street at its foot to the deck at its head, so it
+  // needs the highway on one side and the street on the opposite side. It may
+  // replace the last tile of either.
   if (tool === "onramp") {
     if (t.under) return fail("A crossing cannot be replaced by an on-ramp. Build the ramp beside it.");
     if (t.type === "onramp") return noop("On-ramp already here.", here);
     if (t.terrain === "water") return fail("On-ramps cannot be built on water.");
     if (t.type !== "empty" && t.type !== "road" && t.type !== "highway") return fail("Tile is occupied. Bulldoze first.");
-    // The ramp itself may stand on the street it joins, or beside it.
-    let road = t.type === "road", highway = t.type === "highway";
-    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-      const n = tileAt(city, x + dx, y + dy);
-      if (carriesRoute(n, "road") || n?.type === "onramp") road = true;
-      if (carriesRoute(n, "highway")) highway = true;
-    }
-    if (!highway) return fail("An on-ramp must touch a highway.");
-    if (!road) return fail("An on-ramp must touch a road.");
+    if (!rampSite(city, x, y)) return fail("An on-ramp needs a highway on one side and a road on the opposite side.");
     return { ok: true, noop: false, cost: BUILDINGS.onramp.cost, message: "", tiles: here };
   }
 

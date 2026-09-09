@@ -11,12 +11,14 @@ import { surfaceStep, isPortal, providesAccess } from './structures.js';
 // highway on the surface and a road or rail line below, and the two do not
 // meet: "Highways may be built over roads, but if you want your Sims to be
 // able to get from one to the other, the intersection requires an on-ramp."
+// See highways.js for how a ramp's head and foot are found.
 import { forRadius, NEIGHBORS4 } from "./grid.js";
 import { ZONE_TYPES, PORT_TYPES, BUILDINGS } from "./catalog.js";
 import { isAnchor, capacityOf, lotTiles } from "./lots.js";
 import { roadCapacity } from "./roads.js";
 import { besideWhatItNeeds } from "./siting.js";
 import { portJobs } from "./ports.js";
+import { rampAxis } from "./highways.js";
 
 // How far a Sim will go to work on empty roads, and how far once the roads
 // are full. "Sims aren't willing to drive as far if traffic is bad. That means
@@ -117,6 +119,9 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
   const transitBudget = Math.min(1, (city.funding?.transit ?? 100) / 100);
   const stepCost = STEP_COST.slice();
   stepCost[STATION] = stepCost[SUBSTATION] = STEP_COST[STATION] + Math.round(TRANSIT_NEGLECT * (1 - transitBudget));
+  // A ramp climbs from the street at its foot to the highway at its head.
+  // Those two tiles are the only ones it exchanges traffic with.
+  const rampHead = new Int32Array(N).fill(-1), rampFoot = new Int32Array(N).fill(-1);
   for (let i = 0; i < N; i++) {
     const t = tiles[i];
     if (t.type === "road") kind[i] = ROAD;
@@ -126,7 +131,15 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
     else if (t.type === "railstation") kind[i] = besideWhatItNeeds(city, t) && !strike ? STATION : ROAD;
     else if (t.type === "highway") kind[i] = HIGHWAY;
     else if (t.type === "substation") kind[i] = besideWhatItNeeds(city, t) && !strike ? SUBSTATION : ROAD;
-    else if (t.type === "onramp") kind[i] = RAMP;
+    else if (t.type === "onramp") {
+      const axis = rampAxis(city, t);
+      // A ramp with no highway left to serve is just a piece of street.
+      kind[i] = axis ? RAMP : ROAD;
+      if (axis) {
+        rampHead[i] = (t.y + axis.dy) * size + t.x + axis.dx;
+        if (t.x - axis.dx >= 0 && t.y - axis.dy >= 0 && t.x - axis.dx < size && t.y - axis.dy < size) rampFoot[i] = (t.y - axis.dy) * size + t.x - axis.dx;
+      }
+    }
 
     if (!strike && (t.subway || t.type === "substation")) kind[N + i] = TUNNEL;
     if (crossings && t.under) kind[UNDER + i] = t.under === 2 ? RAIL : ROAD;
@@ -192,12 +205,18 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
       if(aTile.structure?.kind==='tunnel' && isPortal(aTile) && bTile.structure===aTile.structure || bTile.structure?.kind==='tunnel' && isPortal(bTile) && aTile.structure===bTile.structure)return false;
     }
     const a = kind[from], b = kind[to];
-    if (a === STATION || b === STATION || a === SUBSTATION || b === SUBSTATION) return b !== 0 && a !== HIGHWAY && b !== HIGHWAY;
-    if (a === RAIL || b === RAIL) return a === b;
     // "Highways may be built over roads, but if you want your Sims to be able
     // to get from one to the other, the intersection requires an on-ramp."
-    // A ramp is the only tile both a street and a highway will step onto.
-    if (a === RAMP || b === RAMP) return true;
+    // A ramp is the only tile both a street and a highway will step onto: the
+    // highway at its head, the street (or a station) at its foot.
+    if (a === RAMP || b === RAMP) {
+      if (a === RAMP && b === RAMP) return false;
+      const ramp = a === RAMP ? from : to, other = a === RAMP ? to : from, otherKind = a === RAMP ? b : a;
+      if (otherKind === HIGHWAY) return other === rampHead[ramp];
+      return (otherKind === ROAD || otherKind === STATION || otherKind === SUBSTATION) && other % N === rampFoot[ramp];
+    }
+    if (a === STATION || b === STATION || a === SUBSTATION || b === SUBSTATION) return b !== 0 && a !== HIGHWAY && b !== HIGHWAY;
+    if (a === RAIL || b === RAIL) return a === b;
     if ((a === HIGHWAY) !== (b === HIGHWAY)) return false;
     return true; // road <-> road, highway <-> highway
   };

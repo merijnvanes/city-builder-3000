@@ -6,7 +6,8 @@ import { effectState, parseEffects } from "./effects-state.js";
 import { generateTerrain, LAYOUTS, MAX_ELEVATION, MIN_ELEVATION } from "./terrain.js";
 import { BUILDINGS, ZONE_TYPES, PORT_TYPES, ZONED_TYPES, ROAD_TYPES, FUNDED_DEPARTMENTS, powerlineSite } from "./catalog.js";
 import { tileAt } from "./grid.js";
-import { lotTiles } from "./lots.js";
+import { lotTiles, clearLot } from "./lots.js";
+import { PART_CODES, partCode, partFromCode, partSpec } from "./port-layout.js";
 import { blankPopulation, serializePopulation, parsePopulation } from "./population.js";
 import { INDUSTRY_TYPES } from "./industry.js";
 import { COMMERCE_TYPES } from "./commerce.js";
@@ -18,7 +19,9 @@ import { MAX_LOANS, LOAN_MAX, LOAN_YEARS } from "./economy.js";
 // Nothing holds more trash than the largest landfill tile.
 const MAX_FILL = Math.max(...Object.values(BUILDINGS).map((b) => b.hold || 0));
 
-export const SAVE_VERSION = 8;
+// Version 9 records port modules (tile.part). Version 8 saves load with
+// their old one-slab ports cleared, so the zones develop again as modules.
+export const SAVE_VERSION = 9;
 export const DEFAULT_SIZE = 64;
 export const MAX_SIZE = 128;
 export const START_MONEY = 50000;
@@ -68,6 +71,8 @@ export function makeTile(x, y, terrain, trees, variant, elev = 0, salt = 0) {
     // Fallout from a meltdown. "The only time Sims won't return is when an
     // area has been contaminated by radiation from a nuclear explosion."
     radiation: false,
+    // Which module of a port this lot is ("runway-x", "quay"); see port-layout.js.
+    part: null,
     powered: false, watered: false, roadAccess: false, powerline: false, pipe: false, subway: false,
     // Travel cost to the nearest workplace (homes) or customers (shops), -1
     // when nothing is within a reasonable commute. Derived; see traffic.js.
@@ -172,6 +177,7 @@ export function serialize(city) {
     t.industry ? INDUSTRY_TYPES.indexOf(t.industry) + 1 : 0, t.strain | 0, t.salt ? 1 : 0,
     Math.round((t.fill || 0) * 100) / 100, t.tunnel | 0,
     t.commerce ? COMMERCE_TYPES.indexOf(t.commerce) + 1 : 0, t.radiation ? 1 : 0, t.under | 0, waterVolume(t)>0 ? waterSurface(t) : null,
+    partCode(t.type, t.part),
   ]);
   return JSON.stringify({
     version: SAVE_VERSION,
@@ -215,7 +221,9 @@ export function deserialize(raw) {
     if (Array.isArray(d.petitions)) d.petitions = d.petitions.map(p => p?.deal ? { ...p, deal: migrate(p.deal) } : p);
     d.version = SAVE_VERSION;
   }
-  if (d.version === 7) d.version = SAVE_VERSION;
+  if (d.version === 7) d.version = 8;
+  const slabPorts = d.version === 8;
+  if (d.version === 8) d.version = SAVE_VERSION;
   if (d.version !== SAVE_VERSION) throw new Error("This save is from an older version and cannot be loaded.");
   const size = d.size;
   if (!Number.isInteger(size) || size < 16 || size > MAX_SIZE) throw new Error("Invalid save: bad size.");
@@ -254,8 +262,9 @@ export function deserialize(raw) {
   for (let i = 0; i < d.tiles.length; i++) {
     const r = d.tiles[i];
     const x = i % size, y = (i - x) / size;
-    if (!Array.isArray(r) || r.length < 15 || r.length > 27) throw new Error(`Invalid save: tile ${i} malformed.`);
-    const [terrainCode, trees, typeCode, density, lotX, lotY, lotW, lotH, level, variant, abandoned, age, fire, powerline, pipe, elev = 0, subway = 0, flooded = 0, industry = 0, strain = 0, salt = 0, fill = 0, tunnel = 0, commerce = 0, radiation = 0, under = 0, waterLevel = undefined] = r;
+    if (!Array.isArray(r) || r.length < 15 || r.length > 28) throw new Error(`Invalid save: tile ${i} malformed.`);
+    const [terrainCode, trees, typeCode, density, lotX, lotY, lotW, lotH, level, variant, abandoned, age, fire, powerline, pipe, elev = 0, subway = 0, flooded = 0, industry = 0, strain = 0, salt = 0, fill = 0, tunnel = 0, commerce = 0, radiation = 0, under = 0, waterLevel = undefined, part = 0] = r;
+    if (!Number.isInteger(part) || part < 0 || part > PART_CODES.length) throw new Error(`Invalid save: tile ${i} bad port module.`);
     if (![0, 1].includes(radiation)) throw new Error(`Invalid save: tile ${i} bad radiation.`);
     if (![0, 1, 2].includes(under)) throw new Error(`Invalid save: tile ${i} bad viaduct.`);
     if (!Number.isInteger(commerce) || commerce < 0 || commerce > COMMERCE_TYPES.length) throw new Error(`Invalid save: tile ${i} bad commerce.`);
@@ -280,7 +289,8 @@ export function deserialize(raw) {
     if (![0, 1].includes(abandoned) || ![0, 1].includes(powerline) || ![0, 1].includes(pipe)) throw new Error(`Invalid save: tile ${i} bad flags.`);
     if (!Number.isInteger(age) || age < 0 || !Number.isInteger(fire) || fire < 0 || fire > 6) throw new Error(`Invalid save: tile ${i} bad counters.`);
     const terrain = TERRAIN_NAME[terrainCode];
-    if (terrain === "water" && type !== "empty" && !ROAD_TYPES.has(type)) throw new Error(`Invalid save: tile ${i} built on water.`);
+    // Only routes cross water, and only a seaport zones it (for piers).
+    if (terrain === "water" && type !== "empty" && type !== "seaport" && !ROAD_TYPES.has(type)) throw new Error(`Invalid save: tile ${i} built on water.`);
     // Only a highway carries a route beneath it.
     if (under && type !== "highway" && !(type === "road" && under === 2)) throw new Error(`Invalid save: tile ${i} has a viaduct without a highway.`);
     const t = makeTile(x, y, terrain, trees, variant, elev, salt);
@@ -305,6 +315,13 @@ export function deserialize(raw) {
     } else if (level !== 0 || abandoned) {
       throw new Error(`Invalid save: tile ${i} has development without a lot.`);
     }
+    if (part) {
+      // A module is a port lot anchored here, of exactly the footprint its kind has.
+      const [portType, name] = partFromCode(part), spec = partSpec(portType, name);
+      if (portType !== type || !t.lot || lotX !== x || lotY !== y || lotW !== spec.w || lotH !== spec.h || (spec.water ? terrain !== "water" : terrain === "water"))
+        throw new Error(`Invalid save: tile ${i} bad port module.`);
+      t.part = name;
+    } else if (terrain === "water" && lotW > 0) throw new Error(`Invalid save: tile ${i} built on water.`);
     tiles.push(t);
   }
   const city = {
@@ -367,6 +384,10 @@ export function deserialize(raw) {
     }
     if (t !== anchor) { t.level = 0; t.abandoned = false; }
   }
+  // A port lot from before modules existed is one slab of the old shape.
+  // Clear it, keeping the zone: the Sims rebuild it as runway, quay and sheds.
+  if (slabPorts) for (const t of tiles) if (t.lot && PORT_TYPES.has(t.type) && t.lot.x === t.x && t.lot.y === t.y && !t.part) clearLot(city, t, { keepZone: true });
+  for (const t of tiles) if (t.lot && PORT_TYPES.has(t.type) && !tileAt(city, t.lot.x, t.lot.y).part) throw new Error("Invalid save: port lot without a module.");
   // Older cities could keep pylons inside roads and buildings. Migrate
   // those surface conflicts before computing the electricity network.
   for(const t of city.tiles)if(t.powerline && !powerlineSite(t))t.powerline=false;

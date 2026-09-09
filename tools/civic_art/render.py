@@ -18,7 +18,9 @@ selected=list(registry) if args.types=='all' else [name for name,spec in registr
 def look(o,target):o.rotation_euler=(Vector(target)-o.location).to_track_quat('-Z','Y').to_euler()
 
 metadata_by_type={}
-work=[(kind,i,variant['model']) for kind in selected for i,variant in enumerate(registry[kind].get('variants',[{'model':kind}]))]
+# A registry key names its model function unless it declares `model` (keys with
+# dashes cannot) or a list of `variants`, each with its own model.
+work=[(kind,i,variant['model']) for kind in selected for i,variant in enumerate(registry[kind].get('variants',[{'model':registry[kind].get('model',kind)}]))]
 for kind,variant,model in work:
     suffix=f'-v{variant}' if variant else ''
     started=time.time(); bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)

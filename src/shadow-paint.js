@@ -4,10 +4,9 @@ import {foundationEdges} from './lot-foundations.js';
 import {clipShadow,boxFaces,groundQuad,SHADOW_ALPHA} from './sunlight.js';
 import {drawCachedArchitecture} from './architecture-cache.js';
 import {lotBody} from './shadow-scene.js';
-import {bridgePlatform} from './bridge-art.js';
-import {waterSurface} from './sim/surface-water.js';
+import {platformHeight,lotPlatform} from './deck-geometry.js';
 import {waterGeometry,waterPath} from './water-geometry.js';
-import {ELEV_PX,VIADUCT_HEIGHT} from './render-scale.js';
+import {ELEV_PX} from './render-scale.js';
 
 function path(r,ctx,polygon) {
  polygon.forEach((p,i)=>{const q=r.project(...p);if(i)ctx.lineTo(q.x,q.y);else ctx.moveTo(q.x,q.y);});ctx.closePath();
@@ -20,48 +19,70 @@ function shadows(r,ctx,polygons) {
  ctx.beginPath();for(const polygon of polygons)path(r,ctx,polygon);
  ctx.fill(); // One union fill: overlapping casters never multiply darkness.
 }
+function paintShadows(r,polygons) {
+ if(!polygons.length)return;
+ const old=r.platform,ctx=r.base;r.platform=0;ctx.save();
+ try {ctx.fillStyle=`rgba(21,35,45,${SHADOW_ALPHA})`;shadows(r,ctx,polygons);}
+ finally {ctx.restore();r.platform=old;}
+}
+
+// Shadows received by the ground of one tile: level water, a graded pad with
+// its retaining walls, or the terrain mesh. Decks above the tile cast onto it
+// like anything else; their own surface is shaded by drawDeckShadows.
 export function drawTerrainShadows(r,t,city) {
  if(r.night || !r.shadowScene)return;
  const scene=r.shadowScene;
- const coast=!t.lot && waterGeometry(r,t);
- if(coast && bridgePlatform(r,t)===null) {
+ const graded=t.lot && t.terrain!=='water';
+ const coast=!graded && waterGeometry(r,t);
+ if(coast) {
   scene.waterPolygons ??= new Map();
   let shadow=scene.waterPolygons.get(t);
-  const geometry=coast;
   if(!shadow) {
    const casters=scene.candidates(t.x,t.y);
-   shadow={wet:geometry.wet.flatMap(p=>intersections(p,casters)),dry:geometry.dry.flatMap(p=>intersections(p,casters))};
+   shadow={wet:coast.wet.flatMap(p=>intersections(p,casters)),dry:coast.dry.flatMap(p=>intersections(p,casters))};
    scene.waterPolygons.set(t,shadow);
   }
   if(!shadow.wet.length && !shadow.dry.length)return;
   const old=r.platform,ctx=r.base;r.platform=0;ctx.save();
   try {
    ctx.fillStyle=`rgba(21,35,45,${SHADOW_ALPHA})`;
-   ctx.save();waterPath(r,ctx,geometry.wet);ctx.clip();
-   for(const polygon of geometry.dry) {waterPath(r,ctx,[polygon]);ctx.rect(0,0,r.w,r.h);ctx.clip('evenodd');}
+   ctx.save();waterPath(r,ctx,coast.wet);ctx.clip();
+   for(const polygon of coast.dry) {waterPath(r,ctx,[polygon]);ctx.rect(0,0,r.w,r.h);ctx.clip('evenodd');}
    waterPath(r,ctx,shadow.wet);ctx.fill();ctx.restore();
    waterPath(r,ctx,shadow.dry);ctx.fill();
   } finally {ctx.restore();r.platform=old;}
   return;
  }
  scene.terrainPolygons ??= Array.from({length:4},()=>new Map());
- const cache=scene.terrainPolygons[t.lot?(r.rotation || 0):0];
+ const cache=scene.terrainPolygons[graded?(r.rotation || 0):0];
  let polygons=cache.get(t);
  if(!polygons) {
-  const owner=t.lot?city.tiles[t.lot.y*city.size+t.lot.x]:(t.structure?.kind==='bridge' || (t.type==='highway' && t.under)?t:null),casters=scene.candidates(t.x,t.y,1,1,owner),bridge=bridgePlatform(r,t);
-  const height=(x,y)=>bridge!==null?(typeof bridge==='function'?bridge(x,y):bridge):t.lot?owner.elev*ELEV_PX:t.terrain==='water'?waterSurface(t)*ELEV_PX:r.meshZ(x,y)+(t.type==='highway' && t.under?VIADUCT_HEIGHT:0);
+  const owner=graded?city.tiles[t.lot.y*city.size+t.lot.x]:null,casters=scene.candidates(t.x,t.y,1,1,owner);
+  const height=(x,y)=>graded?owner.elev*ELEV_PX:r.meshZ(x,y);
   const points=[[t.x,t.y],[t.x+1,t.y],[t.x+1,t.y+1],[t.x,t.y+1]].map(([x,y])=>[x,y,height(x,y)]);
   polygons=intersections(points,casters);
-  if(t.lot)for(const {a,b,top,facing} of foundationEdges(r,owner,t)) {
+  if(graded)for(const {a,b,top,facing} of foundationEdges(r,owner,t)) {
     if(!facing)continue;
     polygons.push(...intersections([[a[0],a[1],top],[b[0],b[1],top],b,a],casters));
   }
   cache.set(t,polygons);
  }
- if(!polygons.length)return;
- const old=r.platform,ctx=r.base;r.platform=0;ctx.save();
- try {ctx.fillStyle=`rgba(21,35,45,${SHADOW_ALPHA})`;shadows(r,ctx,polygons);}
- finally {ctx.restore();r.platform=old;}
+ paintShadows(r,polygons);
+}
+
+// Shadows received by an elevated deck: everything but its own slab.
+export function drawDeckShadows(r,t,city,platform) {
+ if(r.night || !r.shadowScene)return;
+ const scene=r.shadowScene;
+ scene.deckPolygons ??= new Map();
+ let polygons=scene.deckPolygons.get(t);
+ if(!polygons) {
+  const casters=scene.candidates(t.x,t.y,1,1,t);
+  const points=[[t.x,t.y],[t.x+1,t.y],[t.x+1,t.y+1],[t.x,t.y+1]].map(([x,y])=>[x,y,platformHeight(platform,x,y)]);
+  polygons=intersections(points,casters);
+  scene.deckPolygons.set(t,polygons);
+ }
+ paintShadows(r,polygons);
 }
 
 const buffers=new WeakMap();
@@ -86,7 +107,7 @@ export function drawShadedArchitecture(r,t,city,paint=()=>drawCachedArchitecture
  let views=scene.buildingPolygons.get(t);if(!views)scene.buildingPolygons.set(t,views=[]);
  let geometry=views[r.rotation || 0];
  if(!geometry) {
-  const body=scene.bodies.get(t) || lotBody(t),pad=groundQuad(lot.x,lot.y,lot.w,lot.h,t.elev*ELEV_PX),faces=boxFaces(body,r);
+  const body=scene.bodies.get(t) || lotBody(t),pad=groundQuad(lot.x,lot.y,lot.w,lot.h,t.lot?lotPlatform(t):t.elev*ELEV_PX),faces=boxFaces(body,r);
   const casters=scene.candidates(lot.x,lot.y,lot.w,lot.h,t).filter(c=>t.lot || c.owner?.lot);
   const groundShadows=intersections(pad,casters);
   for(const face of faces)face.shadows=intersections(face.points,casters);

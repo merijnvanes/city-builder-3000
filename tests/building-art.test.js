@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { drawArchitecture } from '../src/building-art.js';
 import { CityRenderer } from '../src/renderer.js';
+import { PORT_PARTS } from '../src/sim/port-layout.js';
 
 test('detached home structures and paving stay inside their lot at every stage', () => {
   for (const variant of [0.1, 0.35, 0.6, 0.85]) for (let level = 1; level <= 4; level++) {
@@ -20,14 +21,11 @@ test('detached home structures and paving stay inside their lot at every stage',
   }
 });
 
-// A port lot is whatever block the mayor zoned, from the manual's minimum up
-// to eight tiles a side, so its recipe has to fit every one of those shapes.
-test('terminal artwork stays inside its lot at every legal footprint', () => {
-  for (const [type, sizes] of [
-    ['airport', [[3, 5], [5, 3], [5, 6], [8, 8]]],
-    ['seaport', [[2, 6], [6, 2], [4, 8], [8, 8]]],
-  ]) {
-    for (const [w, h] of sizes) {
+// Every port module has a fixed footprint; its procedural recipe stays inside it.
+test('port module artwork stays inside its lot', () => {
+  for (const [type, parts] of Object.entries(PORT_PARTS)) {
+    for (const [part, spec] of Object.entries(parts)) {
+      const { w, h } = spec;
       const footprints = [];
       const rectangle = (x, y, bw, bh) => footprints.push([x, y, x + bw, y + bh]);
       const r = {
@@ -39,8 +37,8 @@ test('terminal artwork stays inside its lot at every legal footprint', () => {
         project: (x, y, z) => ({ x, y, z }),
         line: (a, b) => footprints.push([a.x, a.y, b.x, b.y]),
       };
-      drawArchitecture(r, { x: 0, y: 0, lot: { x: 0, y: 0, w, h }, type, density: 1, level: 1, variant: 0.4, age: 10 });
-      assert.ok(footprints.length > 4, `${type} ${w}x${h} drew almost nothing`);
+      drawArchitecture(r, { x: 0, y: 0, lot: { x: 0, y: 0, w, h }, type, part, density: 1, level: 1, variant: 0.4, age: 10 });
+      assert.ok(footprints.length > 4, `${type} ${part} drew almost nothing`);
       for (const f of footprints) {
         assert.ok(f[0] >= -0.01 && f[2] <= w + 0.01 && f[1] >= -0.01 && f[3] <= h + 0.01,
           `${type} ${w}x${h} overflows its lot: ${f}`);

@@ -6,7 +6,7 @@ import { TOOLS } from '../src/sim.js';
 const catalog = TOOL_GROUPS.flatMap(group => group.tools);
 assert.equal(new Set(catalog).size, catalog.length, 'Each tool has one home');
 // Tunnel and ramp tools were not in the existing Transport palette, which stays unchanged.
-assert.deepEqual([...catalog].sort(), TOOLS.filter(tool => !['inspect', 'tunnel', 'railtunnel', 'onramp'].includes(tool.id)).map(tool => tool.id).sort(), 'Every building and land tool is available');
+assert.deepEqual([...catalog].sort(), TOOLS.filter(tool => !['inspect', 'tunnel', 'railtunnel'].includes(tool.id)).map(tool => tool.id).sort(), 'Every building and land tool is available');
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
 const page = await browser.newPage({ reducedMotion: 'reduce' });
 const errors = []; page.on('pageerror', error => errors.push(error.message));

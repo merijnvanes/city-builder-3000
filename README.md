@@ -109,7 +109,7 @@ entry. Nothing ever returns the whole tile array.
 - **Power** flows from six plant types through power lines, zones and buildings and hops a single road. Plants have capacity; overload means brownouts.
 - **Water** comes from pumps (best beside water), towers and treatment plants through underground pipes; each pipe serves the six tiles around it.
 - **Services**: police, fire, hospitals, schools, colleges, libraries, museums, landfills, incinerators, recycling, parks and zoos. Coverage depends on distance and department funding.
-- **Transport**: roads and highways with commuting traffic that routes around jams, rail with stations, subways with stations, bus stops, airport and seaport.
+- **Transport**: roads and elevated highways with commuting traffic that routes around jams, on-ramps that climb from a street to the deck, rail with stations, subways with stations, bus stops, and airport and seaport zones that fill with runways, terminals, hangars, quays, piers and cargo yards as trade grows.
 - **Budget**: separate R/C/I taxes, six funded departments, eighteen ordinances, amortised loans, a monthly ledger and yearly figures available in Budget. January autosaves without opening a report or pausing play.
 - **Directions**: the map corners are N `(0,0)`, E `(size,0)`, S `(size,size)`, W `(0,size)`. North is at the top in the default view. The edges are NE (`y=0`), SE (`x=size-1`), SW (`y=size-1`), NW (`x=0`). The simulation and API use `northeast`, `southeast`, `southwest`, `northwest` for border sides, independent of camera rotation. Version 6 saves migrate their old edge names when loaded into version 7.
 - **Neighbors**: roads, highways and rails to the map edge connect you to a named neighboring city for trade and garbage deals. Power lines and pipes enable power and water deals. Each endpoint requires a separate connection purchase: road $500, rail $750, highway $1,000, electricity $500, water $500. Types, fees and infrastructure checks live in `CONNECTION_TYPES` in `src/sim/neighbor-links.js`. Version 8 saves preserve utility connections from older cities without retroactive fees. Employment is local; connections do not add jobs.
@@ -178,13 +178,25 @@ terrain boundary in every camera orientation. Raised artwork can overhang it.
 Run `node tests/ground-effects.mjs` against the dev server on port 4173 to check
 this distinction in a real Canvas renderer.
 
-Roads and rails support level crossings in either construction order. Highways
-can cross either route on dry land on a viaduct in either order. Bridges cannot cross. Crossings preserve both
-traffic networks and maintenance costs; stations and ramps remain the places to
-change networks. A tile carries at most two routes, and demolishing a crossing
-removes the road/deck first, leaving its underlying route. Pipes and subways can
-coexist with surface crossings. `tests/crossings.test.js` covers construction,
-saves, route continuity, network separation and underground utilities.
+Roads and rails support level crossings in either construction order. Every
+highway tile is a viaduct on piers, so a highway crosses either route on dry
+land in either order and the street keeps running underneath. Bridges cannot
+cross. Crossings preserve both traffic networks and maintenance costs; stations
+and ramps remain the places to change networks. An on-ramp needs a highway on
+one side and a road on the opposite side: it climbs from the road at its foot
+to the deck at its head, and traffic uses it only along that axis
+(`src/sim/highways.js`). A tile carries at most two routes, and demolishing a
+crossing removes the road/deck first, leaving its underlying route. Pipes and
+subways can coexist with surface crossings. `tests/crossings.test.js` and
+`tests/highways.test.js` cover construction, saves, route continuity, ramp
+direction, network separation and underground utilities.
+
+The renderer keeps two cached layers. The ground cache holds only surfaces on
+the terrain mesh; everything raised (buildings with their graded sites, decks,
+ramps, tunnel mouths, trees, lamps, pylons) is a scene item painted afterwards
+in footprint order. `src/scene-items.js` states the rule; `pnpm test:foundations`
+and `pnpm test:bridges` check it in a real browser. Beaches meet the grass along
+a noisy contour (`src/terrain-contours.js`) rather than tile edges.
 
 Rail bends draw continuous curves with aligned sleepers and train movement.
 Dead ends, T junctions and four-way junctions use only their connected arms;

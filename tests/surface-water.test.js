@@ -57,7 +57,8 @@ test('earthworks refuse inundation of occupied land without mutation or a charge
 });
 test('water-level save data is validated and old water rows migrate once',()=>{
  const c=town();pond(c,5,5,1,1);const raw=JSON.parse(serialize(c));raw.tiles[85][26]=-2;assert.throws(()=>deserialize(JSON.stringify(raw)),/water level/);
- const old=JSON.parse(serialize(c));for(const row of old.tiles){if(old.types[row[2]]==='empty' && row[0]===1)row[15]=0;row.pop();}
+ // Rows from before water levels (and port modules) stop at the viaduct field.
+ const old=JSON.parse(serialize(c));for(const row of old.tiles){if(old.types[row[2]]==='empty' && row[0]===1)row[15]=0;row.length=26;}
  const migrated=deserialize(JSON.stringify(old));assert.equal(at(migrated,5,5).elev,-1);assert.equal(at(migrated,5,5).waterLevel,-.25);
 });
 test('overflow enters the nearer receiving basin before crossing its lower dry saddle',()=>{

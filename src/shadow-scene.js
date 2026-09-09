@@ -1,6 +1,6 @@
 import {heightOf} from './building-art.js';
-import {bridgePlatform} from './bridge-art.js';
-import {ELEV_PX,VIADUCT_HEIGHT} from './render-scale.js';
+import {surfacePlatform,platformHeight,lotPlatform} from './deck-geometry.js';
+import {ELEV_PX} from './render-scale.js';
 import {shadowPlanes,shadowPoint} from './sunlight.js';
 import {naturalTrees,treeHeight} from './tree-layout.js';
 import {MIN_ELEVATION} from './sim/terrain.js';
@@ -10,7 +10,7 @@ import {isWaterPoint,waterGeometry,waterHeightAt} from './water-geometry.js';
 // gutter and leaf. All artwork providers share the same receiver contract.
 export function lotBody(t) {
  const {x,y,w,h}=t.lot,inset=Math.min(w,h)*.12;
- return {x:x+inset,y:y+inset,w:w-inset*2,d:h-inset*2,z:t.elev*ELEV_PX,h:heightOf(t)};
+ return {x:x+inset,y:y+inset,w:w-inset*2,d:h-inset*2,z:lotPlatform(t),h:heightOf(t)};
 }
 const scenes=new WeakMap();
 export function shadowScene(r,city) {
@@ -40,9 +40,9 @@ export function shadowScene(r,city) {
    bodies.set(t,{x:t.x,y:t.y,w:1,d:1,z:t.elev*ELEV_PX,h:Math.max(1,top-t.elev*ELEV_PX)});
   }
   if(t.powerline)add({x:t.x+.48,y:t.y+.48,w:.04,d:.04,z:r.meshZ(t.x+.5,t.y+.5),h:24},t);
-  const bridge=bridgePlatform(r,t);
-  const deck=bridge!==null?(typeof bridge==='function'?bridge(t.x+.5,t.y+.5):bridge):t.type==='highway' && t.under?r.meshZ(t.x+.5,t.y+.5)+VIADUCT_HEIGHT:null;
-  if(deck!==null)add({x:t.x+.06,y:t.y+.06,w:.88,d:.88,z:deck-2,h:2},t);
+  // Every elevated deck is a thin slab that shades the ground beneath it.
+  const deck=surfacePlatform(r,t,city);
+  if(deck!==null)add({x:t.x+.06,y:t.y+.06,w:.88,d:.88,z:platformHeight(deck,t.x+.5,t.y+.5)-2,h:2},t);
  }
  const scene={tiles:city.tiles,revision:city.revision,corners:r.corners,bins,bodies,casters,
   candidates(x,y,w=1,h=1,exclude=null) {

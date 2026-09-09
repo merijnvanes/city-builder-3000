@@ -42,15 +42,17 @@ test('rectangular frames retain their scale and world-center anchor in every vie
 });
 
 
-test('unmatched ports retain procedural height and shadow eligibility', () => {
-  for (const [type, w, h, fallbackHeight] of [['airport', 6, 5, 18], ['seaport', 4, 4, 16]]) {
-    const tile = { type, lot: { x: 0, y: 0, w, h } };
-    assert.equal(civicSpriteSpec(tile), CIVIC_SPRITES[type]);
-    assert.equal(heightOf(tile), CIVIC_SPRITES[type].height);
-    for (const lot of [{ ...tile.lot, w: 8, h: 8 }, { ...tile.lot, w: w + 1 }]) {
+test('port modules draw their own sprite and keep a procedural height otherwise', () => {
+  for (const [type, part, w, h, fallbackHeight] of [['airport', 'terminal', 2, 2, 22], ['seaport', 'quay', 1, 1, 20]]) {
+    const tile = { type, part, lot: { x: 0, y: 0, w, h } };
+    assert.equal(civicSpriteSpec(tile), CIVIC_SPRITES[`${type}-${part}`]);
+    assert.equal(heightOf(tile), CIVIC_SPRITES[`${type}-${part}`].height);
+    for (const lot of [{ ...tile.lot, w: w + 1 }, { ...tile.lot, h: h + 1 }]) {
       assert.equal(civicSpriteSpec({ ...tile, lot }), null);
       assert.equal(heightOf({ ...tile, lot }), fallbackHeight);
     }
+    // A port lot without a module, or a zone tile without a lot, has no art.
+    assert.equal(civicSpriteSpec({ type, lot: tile.lot }), null);
     assert.equal(civicSpriteSpec({ type }), null);
     assert.equal(heightOf({ type }), 0);
   }

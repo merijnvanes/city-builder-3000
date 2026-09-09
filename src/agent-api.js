@@ -353,6 +353,7 @@ export function createAgentAPI({ getCity, actions, renderer, ui, undo }) {
         if (wantGroup && !wantGroup.has(group)) continue;
         const o = { type: t.type, group, x: t.x, y: t.y, w: t.lot.w, h: t.lot.h };
         if (ZONE_TYPES.has(t.type)) { o.density = t.density; o.level = t.level; o.capacity = capacityOf(t); }
+        if (t.part) o.part = t.part;
         if (t.abandoned) o.abandoned = true;
         if (t.fire > 0) o.onFire = true;
         if (!t.powered) o.unpowered = true;

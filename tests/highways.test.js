@@ -7,6 +7,7 @@ import assert from "node:assert/strict";
 import { createCity, tick, getStats, place, evaluate, refresh, serialize, deserialize } from "../src/sim.js";
 import { findLot, assignLot } from "../src/sim/lots.js";
 import { TECH_YEAR, ACCESS_TYPES, ROAD_TYPES } from "../src/sim/catalog.js";
+import { rampAxis } from "../src/sim/highways.js";
 
 const at = (c, x, y) => c.tiles[y * c.size + x];
 const plains = () => createCity({ seed: 5, starter: false, layout: "plains", startYear: 2000 });
@@ -40,15 +41,50 @@ describe("on-ramps join streets to highways", () => {
     assert.ok(getStats(corridor(true)).employed > 0);
   });
 
-  test("a ramp must touch both a road and a highway", () => {
+  test("a ramp needs the highway at its head and a road at its foot", () => {
     const c = plains();
     for (let x = 10; x <= 20; x++) put(c, x, 10, "highway");
-    assert.match(evaluate(c, 10, 12, "onramp").message, /must touch a highway/);
-    put(c, 10, 11, "road");
-    // Beside the highway but with no street on the other side.
-    assert.match(evaluate(c, 25, 25, "onramp").message, /must touch a highway/);
-    // Between the two, it fits.
+    assert.match(evaluate(c, 10, 12, "onramp").message, /highway on one side and a road on the opposite side/);
+    // Beside the highway but with no street beyond the far side.
+    assert.equal(evaluate(c, 10, 11, "onramp").ok, false);
+    put(c, 10, 12, "road");
+    // Between the two, it fits, and it climbs toward the highway.
     assert.equal(evaluate(c, 10, 11, "onramp").ok, true);
+    put(c, 10, 11, "onramp");
+    assert.deepEqual(rampAxis(c, at(c, 10, 11)), { dx: 0, dy: -1 });
+    // A street beside the ramp, rather than at its foot, is not enough.
+    put(c, 12, 11, "road");
+    assert.equal(evaluate(c, 13, 11, "onramp").ok, false);
+    // A ramp cannot sit in the middle of a highway either.
+    assert.equal(evaluate(c, 15, 10, "onramp").ok, false);
+  });
+
+  test("traffic uses a ramp only along its axis", () => {
+    // Homes reach the highway through a ramp at its foot; a street that
+    // merely touches the ramp's side never gets onto the deck.
+    const c = plains();
+    for (let x = 9; x <= 46; x++) put(c, x, 20, "highway");
+    put(c, 2, 10, "coal");
+    for (let x = 6; x <= 8; x++) put(c, x, 12, "powerline");
+    for (let y = 13; y <= 19; y++) put(c, 8, y, "powerline");
+    for (let x = 9; x <= 52; x++) put(c, x, 19, "powerline");
+    for (let x = 47; x <= 52; x++) put(c, x, 20, "road");
+    put(c, 47, 20, "onramp");
+    for (let y = 21; y <= 23; y++) for (let x = 47; x <= 52; x++) put(c, x, y, "industrial", { density: 1 });
+    // The western ramp's foot faces west, but the street arrives at its side.
+    // Homes stay more than three tiles from the ramp and its foot, so the only
+    // way onto the network is that side street.
+    put(c, 8, 20, "road"); put(c, 7, 20, "road");
+    put(c, 8, 20, "onramp");
+    for (let y = 21; y <= 24; y++) put(c, 8, y, "road");
+    for (let y = 24; y <= 25; y++) for (let x = 2; x <= 6; x++) put(c, x, y, "residential", { density: 1 });
+    refresh(c);
+    for (const t of c.tiles) if (["residential", "industrial"].includes(t.type) && !t.lot) { const lot = findLot(c, t); if (lot) assignLot(c, lot, 2, 0.5); }
+    refresh(c); tick(c);
+    assert.equal(getStats(c).employed, 0, "the side street cannot join the ramp");
+    for (let x = 2; x <= 7; x++) put(c, x, 21, "road");
+    refresh(c); tick(c);
+    assert.ok(getStats(c).employed > 0, "a street reaching the foot can");
   });
 
   test("it can be laid straight over the road it replaces", () => {
@@ -73,7 +109,7 @@ describe("a ramp behaves like a street", () => {
     assert.equal(ACCESS_TYPES.has("highway"), false);
     const c = plains();
     for (let x = 10; x <= 20; x++) put(c, x, 10, "highway");
-    put(c, 12, 11, "road");
+    put(c, 12, 11, "road"); put(c, 12, 12, "road");
     put(c, 12, 11, "onramp");
     put(c, 13, 12, "residential", { density: 1 });
     refresh(c);

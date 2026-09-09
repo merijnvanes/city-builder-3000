@@ -1,6 +1,7 @@
 // Cached presentation around the map. The skirt follows actual terrain
 // heights; it adds depth at the city boundary without changing tile geometry.
 import {groundEdgePoints,isWaterPoint,waterGeometry,waterPath} from './water-geometry.js';
+import {lotPlatform} from './deck-geometry.js';
 export function drawMapBackdrop(r, city) {
   const ctx = r.base;
   const sky = ctx.createLinearGradient(0, 0, 0, r.h);
@@ -67,7 +68,7 @@ export function drawOutageMarkers(r, time) {
   const ctx = r.ctx, radius = Math.min(8, 5 + r.zoom * 1.5);
   for (const warning of r.outages || []) {
     const { t, height } = warning;
-    r.platform = t.elev * 8;
+    r.platform = lotPlatform(t);
     const p = r.project(t.x + t.lot.w / 2, t.y + t.lot.h / 2, height + 12);
     r.platform = null;
     if (p.x < -15 || p.x > r.w + 15 || p.y < -15 || p.y > r.h + 15) continue;

@@ -6,7 +6,7 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 
 | Area | Reference behavior | Current gap |
 | --- | --- | --- |
-| Highways | Elevated routes; ramps provide road access | **Done.** They interchange only at on-ramps, and one may be built over a street, which keeps running underneath. The deck is drawn raised at crossings; the rest of a highway is still drawn flat |
+| Highways | Elevated routes; ramps provide road access | **Done.** Every highway tile rides a viaduct on piers; a street it crosses keeps running underneath. A ramp is one sloped tile that climbs from the street at its foot to the deck at its head, and traffic uses it only along that axis |
 | Tunnels | Transport can pass through terrain | **Done.** Road and rail bores through high ground, six tiles minimum |
 | Power | Eight plant types; aging reduces capacity; prolonged overload can destroy plants; blackouts are local to a grid | **Done.** All eight types with the manual's invention years; output slides after 55% of a plant's life; a year of overdraw destroys one; the advisor reads the worst-off network rather than the city-wide total |
 | Water | Freshwater pumps, towers, coastal desalinization; pumps age | **Done.** Sea and fresh water are distinct; three sources with the manual's weaknesses; pumps age and slow in dirty water; pipes reach seven tiles |
@@ -27,7 +27,7 @@ Reference: [SimCity 3000 manual](https://manuals.plus/m/6c7512d61bba2d2ecc77b80c
 | Fire | Per-building flammability, halved by water and cut by ordinance; relief scaled by preparedness; one crew per station plus the volunteers | **Done.** See below |
 | Disasters | Permanent radiation after a meltdown; an early warning siren that can be abused; riots the police can break up | **Done.** See below |
 | Siting | Stops need roads, stations need track | **Done.** See below |
-| Ports | Airports and seaports are zones the Sims develop, with a minimum footprint | **Done.** See below |
+| Ports | Airports and seaports are zones the Sims develop, with a minimum footprint | **Done.** A zone opens with its core (a five-tile runway and terminal, or a freight shed) and fills module by module: hangars, towers and aprons; quays along the shore, piers on zoned water, cranes and yards. See below |
 | Neighbour deals | Purchases meter the deficit with a minimum fee; sales are an obligation; cancelling costs a large penalty | **Done.** See below |
 | Petitioners | Neighbours bring deals to the Meet window on terms that change; a rejected petitioner may never return | **Done.** See below |
 | Commuting | Zones beyond a reasonable commute do not develop; bad traffic shortens how far Sims will go | **Done.** See below |
@@ -241,8 +241,11 @@ A ramp behaves like a street in every other respect: it gives lots road
 access, power jumps it, it carries traffic and pollution, and it costs
 transport upkeep. Highways still give no lot access on their own.
 
-Still open here: highways are not yet drawn elevated over the roads they
-cross.
+September 9: a ramp now has a direction. It climbs from the street at its
+foot to the deck at its head, so it needs the highway on one side and a road
+on the opposite side, and cars use it only along that axis; a street that
+merely touches its flank does not get onto the deck. See "Elevated highways"
+below.
 
 ## Tunnels, September 7
 
@@ -1199,3 +1202,52 @@ At the user's request, no further tests or benchmarks were run for this follow-u
 - Retain terrain colors when monthly updates do not change terrain. Cache minimap terrain independently of camera movement.
 
 The artwork and cache changes are implemented but remain unverified following the explicit stop-testing instruction. Exact gameplay parity remains unfinished.
+
+## Elevated highways, September 9
+
+> *"Highways are basically elevated, high capacity roads."*
+
+The deck used to rise only where a highway crossed a street; everywhere else
+it was drawn as a wide grey road on the ground. Every highway tile is now a
+viaduct: a slab on piers at the same height a crossing always had, railings
+along it, a level deck across a bridge, and the ground beneath it left as it
+was. An on-ramp is an embankment: retaining walls climb from the street at its
+foot to the deck at its head, the road surface climbs on top of them, and the
+chevrons point up the slope. Placement asks for exactly that shape: a highway
+on one side and a road on the opposite side. `rampAxis` in
+`src/sim/highways.js` derives the direction from the neighbours, never from
+the save, and traffic, artwork and picking all read it there.
+
+Drawing a raised deck everywhere exposed the renderer's real fault, which had
+been patched once for bridges and once for graded building sites: anything
+with height that was painted into the ground layer got overdrawn by whatever
+stood behind it. The renderer now has one rule, documented in
+`src/scene-items.js`. The ground cache holds only surfaces on the terrain
+mesh. Everything raised - a building with its pad and retaining walls, a deck,
+a ramp, a tunnel mouth, trees, lamps, pylons - is a scene item painted after
+the ground in footprint order. The erase-and-reveal tricks are gone.
+
+## Port modules, September 9
+
+> *"Just like RCI zones, you zone for airports and wait for Sims to develop
+> them... airports must be at least 3x5 tiles or larger in order to develop."*
+
+A port was one slab covering whatever rectangle the mayor had zoned, and only
+one exact size had artwork. It is now a facility that grows on its zone: an
+airport opens with a runway of five to eight tiles and a 2×2 terminal, then
+adds a tower, hangars, freight and fuel, and finally aprons until the zone is
+full; a seaport opens with a 2×2 freight shed, then makes every shore tile a
+quay, builds piers on any water the mayor zoned beside the shore, and fills the
+rest with a container gantry, an office, tanks and container yards. The whole
+zone opens, closes and empties together, and its berth, readiness and jobs
+belong to the zone rather than to any one piece. Saves record the module on
+each lot (version 9); a version 8 city keeps its zones and loses the slabs, and
+the Sims rebuild them.
+
+## Beaches, September 9
+
+Sand tiles were painted as squares. The beach is now a contour: each tile's
+sand value (water beside a beach counts as sand) is sampled at the corners and
+centre with a little noise, and the sand region is where the field passes one
+half, clipped to the dry side of the shore. The line wanders, follows the
+hills and continues across tile edges; the water keeps its own edge.

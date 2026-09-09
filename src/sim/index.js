@@ -30,7 +30,7 @@ import { sitingNote } from "./siting.js";
 import { sound, advanceSiren, sirenSounding, blankSiren } from "./siren.js";
 import { flammability, reliefGrant, developedLots, fireCrews, crewsAvailable, policeUnits, unitsAvailable } from "./fire.js";
 import { ageFactor } from "./wear.js";
-import { PORTS, portJobs, portUpkeep, portNote, portReady, portObstacle } from "./ports.js";
+import { PORTS, portJobs, portComponentJobs, portUpkeep, portNote, portReady, portObstacle, partLabel } from "./ports.js";
 
 export { TOOLS, TOOL_MAP, BUILDINGS, ZONE_TYPES, PORT_TYPES, ZONED_TYPES, ORDINANCES, ADVISORS, DISASTERS, START_YEAR, DEFAULT_SIZE, FUNDED_DEPARTMENTS, SPECIAL_TYPES, PETITIONS, DEALS, SIDES, serialize, place, evaluate, isZone };
 
@@ -378,15 +378,17 @@ export function inspectTile(city, x, y) {
     const spec = PORTS[t.type];
     title = `${spec.label} zone`;
     if (!a.lot) {
-      description = `Zoned, waiting for development. Needs at least ${spec.short}×${spec.long} tiles of ${t.type} zone, power, water and a road nearby.`;
+      description = t.type === "airport"
+        ? "Zoned, waiting for development. Needs a straight run of five level tiles for a runway, a 2×2 block for the terminal, power, water and a road nearby."
+        : "Zoned, waiting for development. Needs a 2×2 block of dry land for the freight shed, power, water and a road nearby; quays and piers follow along the shore.";
       details.push(portObstacle(city, t) || `Ready to build. City demand for ${t.type}s: ${city.demand?.[t.type] ?? 0}`);
     } else if (a.abandoned) {
       description = `Closed ${spec.label.toLowerCase()}. Restore power, water and road access to bring the traffic back.`;
     } else {
-      title = spec.label;
-      description = `${spec.label}, ${a.lot.w}×${a.lot.h}. Serves the city's ${spec.serves} sector.`;
-      const jobs = portJobs(city, a);
-      details.push(`Jobs: ${jobs.toLocaleString()}${a.filled != null ? ` (${Math.min(jobs, Math.round(a.filled)).toLocaleString()} filled)` : ""}`);
+      title = `${spec.label} · ${partLabel(t.type, a.part)}`;
+      description = `${partLabel(t.type, a.part)}, ${a.lot.w}×${a.lot.h}, part of the ${spec.label.toLowerCase()} serving the city's ${spec.serves} sector.`;
+      const jobs = portComponentJobs(city, a), here = portJobs(city, a);
+      details.push(`Jobs: ${jobs.toLocaleString()} across the ${spec.label.toLowerCase()}${here && a.filled != null ? ` (${Math.min(here, Math.round(a.filled)).toLocaleString()} filled here)` : ""}`);
       const d = drawOf(a);
       details.push(`Power draw: ${Math.round(d.power)} · Water draw: ${Math.round(d.water)}`);
       details.push(`Upkeep: $${portUpkeep(a).toLocaleString()}/month`);
@@ -394,7 +396,7 @@ export function inspectTile(city, x, y) {
     if (a.lot) {
       const note = portNote(city, a);
       if (note) details.push(note);
-      details.push(`Conditions: ${portReady(a) ? "OK" : "Not met"}`);
+      details.push(`Conditions: ${portReady(city, a) ? "OK" : "Not met"}`);
       details.push(`Flammability: ${flammability(city, a)}/100${a.watered ? " (watered)" : ""}`);
     }
   } else if (BUILDINGS[t.type]) {

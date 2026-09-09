@@ -4,17 +4,17 @@ import assert from 'node:assert/strict';
 import { readFileSync, statSync } from 'node:fs';
 import { CIVIC_SPRITES } from '../src/civic-sprite-manifest.js';
 import { belongsToFamily, FAMILY_COUNTS, EXPECTED_VARIANTS } from './art-families.mjs';
-import { BUILDINGS, PORT_TYPES } from '../src/sim/catalog.js';
+import { BUILDINGS } from '../src/sim/catalog.js';
+import { PORT_PARTS, partSpec } from '../src/sim/port-layout.js';
 
 test('every authored building family ships all four angles and three lighting states', () => {
   const expected = Object.entries(BUILDINGS).filter(([, s]) => Object.keys(FAMILY_COUNTS).some(f => belongsToFamily(s, f))).map(([type]) => type).sort();
   const zones=expectedZoneEntries();
-  // Ports left BUILDINGS when they became zones the player sizes, but they
-  // still ship authored transport art. civic-footprint.test.js pins the rest
-  // of that arrangement: the sprite draws on a lot matching its baked
-  // footprint, and every other size falls back to procedural art.
-  const ports=new Set(PORT_TYPES);
-  expected.push(...ports);
+  // Ports are zones the Sims fill with modules; every module kind ships as
+  // transport art keyed `type-part`. civic-footprint.test.js pins that a
+  // sprite draws only on a lot matching its baked footprint.
+  const ports=new Map(Object.entries(PORT_PARTS).flatMap(([type,parts])=>Object.keys(parts).map(part=>[`${type}-${part}`,partSpec(type,part)])));
+  expected.push(...ports.keys());
   expected.push(...zones.map(z=>z.key));expected.sort();
   assert.deepEqual(Object.keys(CIVIC_SPRITES).sort(), expected);
   const registry = JSON.parse(readFileSync(new URL('../tools/civic_art/registry.json', import.meta.url)));
@@ -31,9 +31,7 @@ test('every authored building family ships all four angles and three lighting st
     assert.deepEqual(spec.zone, zone ? {type:zone.type,density:zone.density,level:zone.level} : undefined);
     const footprint = spec.footprint || { w: spec.tiles, h: spec.tiles };
     assert.deepEqual(footprint, registry[type].footprint || { w: registry[type].tiles, h: registry[type].tiles });
-    // A port has no catalog footprint to check the baked art against; the
-    // player draws the lot. Manifest and registry must still agree, above.
-    if (!ports.has(type)) assert.deepEqual(footprint, zone ? {w:zone.size,h:zone.size} : { w: BUILDINGS[type].w, h: BUILDINGS[type].h });
+    assert.deepEqual(footprint, zone ? {w:zone.size,h:zone.size} : ports.has(type) ? { w: ports.get(type).w, h: ports.get(type).h } : { w: BUILDINGS[type].w, h: BUILDINGS[type].h });
     const variants = zone?.variants || EXPECTED_VARIANTS[type] || 1;
     assert.equal(spec.variants?.length || 1, variants);
     assert.deepEqual(spec.variants, registry[type].variants);
@@ -67,7 +65,7 @@ test('every authored building family ships all four angles and three lighting st
   assert.ok(landmarksBytes < 2 * 1024 * 1024, '60 landmark frames stay below 2 MiB');
   assert.ok(dealsBytes < 5 * 1024 * 1024, '168 business deal frames stay below 5 MiB');
   assert.ok(rewardsBytes < 4 * 1024 * 1024, '108 reward frames stay below 4 MiB');
-  assert.ok(transportBytes < 4 * 1024 * 1024, '108 transport frames stay below 4 MiB');
+  assert.ok(transportBytes < 8 * 1024 * 1024, '264 transport frames, including the port modules, stay below 8 MiB');
   assert.ok(parksBytes < 0.75 * 1024 * 1024, '60 park frames stay below 0.75 MiB');
   assert.ok(compressedBytes < 6 * 1024 * 1024, 'the combined civic/power/water asset set stays below 6 MiB');
 });

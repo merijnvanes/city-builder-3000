@@ -42,7 +42,7 @@ rewards and landmarks are separate assets.
 | Industrial zones | Complete: all densities, levels 1–4, supported footprints and 152 authored layouts, including 3×3 farms and 1×1 workshops; see [INDUSTRIAL-ART.md](INDUSTRIAL-ART.md) |
 | Power | Complete: `coal`, `oil`, `gas`, `nuclear`, `wind`, `solar`, `microwave`, `fusion`; see [POWER-ART.md](POWER-ART.md) |
 | Water | Complete: `waterpump`, `watertower`, `desalination`, `treatment`; see [WATER-ART.md](WATER-ART.md) |
-| Transport buildings | Complete on this branch: `bus`, `railstation`, `substation`, `airport` (6×5), `seaport`; see [TRANSPORT-ART.md](TRANSPORT-ART.md) for the growing-port integration boundary |
+| Transport buildings | Complete: `bus`, `railstation`, `substation`, and the seventeen port modules (`airport-runway-x` … `seaport-containers`) that airport and seaport zones fill with; see [TRANSPORT-ART.md](TRANSPORT-ART.md) |
 | Parks | Complete: `park` (three layouts), `largepark`, `zoo`; see [PARKS-ART.md](PARKS-ART.md) |
 | Rewards | Complete: `mayorhouse`, `cityhall`, `courthouse`, `stadium` (two palettes), `statue`, `marina`, `university`, `medcenter`; see [REWARDS-ART.md](REWARDS-ART.md) |
 | Landmarks | Complete: `clocktower`, `operahouse`, `observatory`, `cathedral`, `aquarium`; see [LANDMARKS-ART.md](LANDMARKS-ART.md) |
@@ -187,10 +187,10 @@ state hashes and portrait framing through the browser runtime (3,313,440 decoded
 bytes). Four daylight views were visually inspected. Production models still
 require their own geometry and real-game visual checks.
 
-Integration discovery: current `main` has replaced fixed airport/seaport buildings
-with port zones that grow to varying rectangles up to 8×8. Do not merge fixed-lot
-art into that contract without deliberately covering those sizes and both orientations.
-The art branch's gameplay catalog is unchanged by this infrastructure checkpoint.
+Port zones no longer take one slab of art. They fill with modules, each a small
+lot keyed `type-part` (`airport-terminal`, `seaport-quay`), so every size and
+orientation of zone is covered by the same seventeen pieces. Registry entries
+whose key is not a Python identifier name their model with `model`.
 
 Independent review: fresh Codex fallback found no blocking issues after the Claude
 CLI rejected its effort flag. Its discoverability suggestion is addressed by

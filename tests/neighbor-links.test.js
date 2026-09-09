@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createCity,place,connectNeighbor,refresh,serialize,deserialize} from '../src/sim/index.js';
+import {SAVE_VERSION} from '../src/sim/city.js';
 import {connectionOffers,quoteConnection,CONNECTION_FEES} from '../src/sim/neighbor-links.js';
 import {planConstruction,applyConstruction,createUndoManager} from '../src/construction.js';
 import {streetConnections} from '../src/street-art.js';
@@ -37,7 +38,7 @@ test('utility layers require separate purchases and legacy saves retain automati
  const raw=JSON.parse(serialize(c));raw.version=7;raw.transportConnections=[];
  const legacy=deserialize(JSON.stringify(raw));
  assert.equal(legacy._connections.northwest.power,1);assert.equal(legacy._connections.northwest.water,1);
- const saved=JSON.parse(serialize(legacy));assert.equal(saved.version,8);assert.equal(saved.transportConnections.length,2);
+ const saved=JSON.parse(serialize(legacy));assert.equal(saved.version,SAVE_VERSION);assert.equal(saved.transportConnections.length,2);
  assert.equal(deserialize(JSON.stringify(saved)).transportConnections.length,2);
 });
 test('an unpurchased border road remains a dead end and quotes do not mutate the city',()=>{

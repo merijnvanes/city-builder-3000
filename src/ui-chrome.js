@@ -32,10 +32,13 @@ export function mountNavigatorFrame(navigator) {
   navigator.innerHTML = '<svg class="navigator-frame" aria-hidden="true"><defs><linearGradient id="navigator-enamel" gradientUnits="userSpaceOnUse"><stop stop-color="#eef0ff"/><stop offset=".45" stop-color="#dce0f6"/><stop offset="1" stop-color="#adb6de"/></linearGradient></defs><path fill="url(#navigator-enamel)"/><path fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="3"/><path fill="none" stroke="#a2add5" stroke-opacity=".4" stroke-width="4"/></svg>';
   const observer = new ResizeObserver(() => {
     const w = navigator.clientWidth, h = navigator.clientHeight;
-    const console = document.querySelector('#build-console');
+    const console = document.querySelector('#build-console'), deck = document.querySelector('#console-deck');
+    // A resize can arrive after the interface has been torn down or before
+    // the console exists; there is nothing to frame then.
+    if (!console || !deck || !navigator.isConnected) return;
     const rail = console.clientWidth, height = console.clientHeight;
     const shoulder = height - h;
-    const radius = parseFloat(getComputedStyle(document.querySelector('#console-deck')).borderTopLeftRadius);
+    const radius = parseFloat(getComputedStyle(deck).borderTopLeftRadius);
     const x = w - rail;
     const footer = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--status-height')) + parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--news-height'));
     const join = Math.max(0, h - footer);

@@ -66,42 +66,6 @@ export function drawIndustrialYard(d, t, n, level) {
   d.parts(parts);
 }
 
-export function drawPort(d, t, n) {
-  d.flat(0.015, 0.015, 0.97, 0.97, 0.2, '#a4aea5');
-  d.flat(0.04, 0.04, 0.92, 0.32, 0.3, '#718286');
-  d.flat(0.04, 0.76, 0.92, 0.16, 0.3, '#718286');
-  for (let x = 0.07; x < 0.94; x += 0.08) d.flat(x, 0.79, 0.04, 0.012, 0.5, '#d5c687');
-  const parts = [];
-  for (let row = 0; row < 2; row++) for (let col = 0; col < 3; col++) {
-    const x = 0.07 + col * 0.19, y = 0.07 + row * 0.14;
-    parts.push([x + 0.08, y + 0.05, () => {
-      container(d, x, y, 0.16, 0.1, 4.5, COLORS[(col + row + Math.floor(n * 5)) % 5]);
-      if ((col + row) % 2 === 0) container(d, x, y, 0.16, 0.1, 4, COLORS[(col + row + 2) % 5], 4.6);
-    }]);
-  }
-  parts.push([0.31, 0.56, () => {
-    d.box(0.07, 0.42, 0.48, 0.27, 12, '#bbc0b0');
-    d.windows(0.07, 0.42, 0.48, 0.27, 12, t.x + t.y);
-    d.roof(0.055, 0.405, 0.51, 0.3, 12, 5, '#64868d');
-  }]);
-  parts.push([0.76, 0.48, () => {
-    // Steel gantry with diagonal braces, trolley and hanging cable.
-    for (const x of [0.66, 0.86]) {
-      d.box(x, 0.4, 0.026, 0.24, 2, '#546d75');
-      for (const y of [0.42, 0.61]) d.line(x + 0.013, y, 2, x + 0.013, y, 30, '#c5a663', 2.2);
-      d.line(x + 0.013, 0.42, 8, x + 0.013, 0.61, 26, '#d7bf86', 0.8);
-      d.line(x + 0.013, 0.61, 8, x + 0.013, 0.42, 26, '#d7bf86', 0.8);
-    }
-    d.box(0.63, 0.4, 0.3, 0.055, 2, '#d4b774', 30);
-    d.box(0.63, 0.59, 0.3, 0.055, 2, '#d4b774', 30);
-    d.box(0.74, 0.4, 0.06, 0.24, 2, '#75909a', 32);
-    d.line(0.77, 0.52, 32, 0.77, 0.52, 12, '#5c7479', 0.7);
-    d.box(0.73, 0.49, 0.08, 0.06, 1.5, '#c1ac74', 10.5);
-  }]);
-  for (const x of [0.11, 0.35, 0.59, 0.83]) parts.push([x, 0.945, () => d.cyl(x, 0.945, 0.012, 3, '#556c73')]);
-  d.parts(parts);
-}
-
 export function drawMarina(d, t, n) {
   d.flat(0.015, 0.015, 0.97, 0.97, 0.2, '#548e9e');
   d.flat(0.04, 0.3, 0.92, 0.65, 0.25, '#659fa9');

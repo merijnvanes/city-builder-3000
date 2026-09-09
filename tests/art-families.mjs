@@ -1,6 +1,6 @@
 import { BUILDINGS } from '../src/sim/catalog.js';
 import { expectedZoneEntries, ZONE_FAMILIES } from './zone-art-contract.mjs';
-export const EXPECTED_VARIANTS = { park: 3, seaport: 5, stadium: 2, casino: 4, toxicdump: 3, gigamall: 5 };
+export const EXPECTED_VARIANTS = { park: 3, 'seaport-containers': 3, stadium: 2, casino: 4, toxicdump: 3, gigamall: 5 };
 export const FAMILY_LAYOUT_COUNTS = { civic: 12, power: 8, water: 4, parks: 5, transport: 9, rewards: 9, deals: 14, landmarks: 5, residential: 100, commercial: 136, industrial: 152 };
 export const FAMILY_COUNTS = { civic: 12, power: 8, water: 4, parks: 3, transport: 5, rewards: 8, deals: 5, landmarks: 5 };
 

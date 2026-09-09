@@ -226,47 +226,155 @@
     "label": "Rail Station",
     "description": "A brick ticket hall with a clock gable and a butterfly canopy over the boarding platform."
   },
-  "airport": {
+  "airport-runway-x": {
     "family": "transport",
     "module": "transport_ports",
-    "footprint": {
-      "w": 6,
-      "h": 5
-    },
-    "label": "Airport",
-    "description": "A glazed terminal, control tower, hangar and marked runway on a rectangular airfield."
+    "tiles": 1,
+    "label": "Runway",
+    "description": "A marked runway section running east to west, with edge lights and a centreline.",
+    "model": "airport_runway_x"
   },
-  "seaport": {
+  "airport-runway-y": {
     "family": "transport",
     "module": "transport_ports",
-    "tiles": 4,
-    "label": "Seaport",
-    "description": "A working cargo yard with brick freight shed, stacked containers and a braced loading gantry.",
+    "tiles": 1,
+    "label": "Runway",
+    "description": "A marked runway section running north to south, with edge lights and a centreline.",
+    "model": "airport_runway_y"
+  },
+  "airport-threshold-x": {
+    "family": "transport",
+    "module": "transport_ports",
+    "tiles": 1,
+    "label": "Runway threshold",
+    "description": "The end of an east-west runway: threshold bars, edge lights and an approach beacon.",
+    "model": "airport_threshold_x"
+  },
+  "airport-threshold-y": {
+    "family": "transport",
+    "module": "transport_ports",
+    "tiles": 1,
+    "label": "Runway threshold",
+    "description": "The end of a north-south runway: threshold bars, edge lights and an approach beacon.",
+    "model": "airport_threshold_y"
+  },
+  "airport-terminal": {
+    "family": "transport",
+    "module": "transport_ports",
+    "tiles": 2,
+    "label": "Terminal",
+    "description": "A glazed passenger hall with a cantilevered concourse, a jet bridge and a landside forecourt.",
+    "model": "airport_terminal"
+  },
+  "airport-tower": {
+    "family": "transport",
+    "module": "transport_ports",
+    "tiles": 1,
+    "label": "Control tower",
+    "description": "A tapered concrete shaft carrying a glazed control cab under a radar mast.",
+    "model": "airport_tower"
+  },
+  "airport-hangar": {
+    "family": "transport",
+    "module": "transport_ports",
+    "tiles": 2,
+    "label": "Hangar",
+    "description": "A wide steel maintenance hangar with a full-height sliding door onto its apron.",
+    "model": "airport_hangar"
+  },
+  "airport-cargo": {
+    "family": "transport",
+    "module": "transport_ports",
+    "tiles": 1,
+    "label": "Air freight shed",
+    "description": "A small freight shed with a roller door and pallets on its loading pad.",
+    "model": "airport_cargo"
+  },
+  "airport-fuel": {
+    "family": "transport",
+    "module": "transport_ports",
+    "tiles": 1,
+    "label": "Fuel farm",
+    "description": "Three white fuel tanks inside a bund wall, tied together by pipework.",
+    "model": "airport_fuel"
+  },
+  "airport-apron": {
+    "family": "transport",
+    "module": "transport_ports",
+    "tiles": 1,
+    "label": "Apron",
+    "description": "Taxiway paving with a yellow guide line and blue edge lights.",
+    "model": "airport_apron"
+  },
+  "seaport-warehouse": {
+    "family": "transport",
+    "module": "transport_ports",
+    "tiles": 2,
+    "label": "Freight shed",
+    "description": "A brick transit shed with three loading doors and a paved yard.",
+    "model": "seaport_warehouse"
+  },
+  "seaport-quay": {
+    "family": "transport",
+    "module": "transport_ports",
+    "tiles": 1,
+    "label": "Quay",
+    "description": "A paved quay with bollards on every edge and a mobile harbour crane.",
+    "model": "seaport_quay"
+  },
+  "seaport-pier": {
+    "family": "transport",
+    "module": "transport_ports",
+    "tiles": 1,
+    "label": "Pier",
+    "description": "A timber deck on piles standing in the water, with bollards and a lamp.",
+    "model": "seaport_pier"
+  },
+  "seaport-gantry": {
+    "family": "transport",
+    "module": "transport_ports",
+    "tiles": 2,
+    "label": "Container gantry",
+    "description": "A rail-mounted gantry crane over stacked containers.",
+    "model": "seaport_gantry"
+  },
+  "seaport-office": {
+    "family": "transport",
+    "module": "transport_ports",
+    "tiles": 1,
+    "label": "Harbour office",
+    "description": "A two-storey harbour office with a flag on its mast.",
+    "model": "seaport_office"
+  },
+  "seaport-tanks": {
+    "family": "transport",
+    "module": "transport_ports",
+    "tiles": 1,
+    "label": "Tank farm",
+    "description": "Two storage tanks with catwalk rails and connecting pipework.",
+    "model": "seaport_tanks"
+  },
+  "seaport-containers": {
+    "family": "transport",
+    "module": "transport_ports",
+    "tiles": 1,
+    "label": "Container yard",
+    "description": "Stacked shipping containers in three colour arrangements.",
     "variants": [
       {
-        "model": "seaport",
-        "label": "Cargo arrangement 1",
-        "description": "Five original deterministic container palettes, with shared yard circulation and lifting equipment."
+        "model": "seaport_containers",
+        "label": "Arrangement 1",
+        "description": "Two rows of stacked containers, first palette."
       },
       {
-        "model": "seaport_v1",
-        "label": "Cargo arrangement 2",
-        "description": "Five original deterministic container palettes, with shared yard circulation and lifting equipment."
+        "model": "seaport_containers_v1",
+        "label": "Arrangement 2",
+        "description": "Two rows of stacked containers, second palette."
       },
       {
-        "model": "seaport_v2",
-        "label": "Cargo arrangement 3",
-        "description": "Five original deterministic container palettes, with shared yard circulation and lifting equipment."
-      },
-      {
-        "model": "seaport_v3",
-        "label": "Cargo arrangement 4",
-        "description": "Five original deterministic container palettes, with shared yard circulation and lifting equipment."
-      },
-      {
-        "model": "seaport_v4",
-        "label": "Cargo arrangement 5",
-        "description": "Five original deterministic container palettes, with shared yard circulation and lifting equipment."
+        "model": "seaport_containers_v2",
+        "label": "Arrangement 3",
+        "description": "Two rows of stacked containers, third palette."
       }
     ]
   },

@@ -33,7 +33,7 @@ test('single-layout assets keep legacy frame keys; variants have distinct stable
 });
 
 
-test('seaport cargo palettes preserve all five normalized seed ranges', () => {
+test('five-way palettes preserve all five normalized seed ranges', () => {
   for (let index = 0; index < 5; index++) {
     const tile = { x: 7, y: 13, variant: index / 5 };
     assert.equal(spriteVariant(tile, 5), index);

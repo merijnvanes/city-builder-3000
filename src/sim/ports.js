@@ -17,34 +17,37 @@
 //   "Seaports help your Industrial and Commercial sector to grow by providing
 //   a means to transport goods to the outside world. They also allow your city
 //   to make deals to import or export garbage to neighboring cities...
-//   Seaports must be zoned at least 2x6 tiles or larger in order to develop.
 //   They require power, water, and a road nearby. They must be located along a
 //   shoreline to do anything, but if you want to see real results, build one
 //   on a seacoast."
 //
 // And page 69: "Seaports and airports are considered connections to all
 // neighbors."
-import { tileAt } from "./grid.js";
-
-// The manual gives the minimum footprints and nothing else. Everything below
-// them is calibrated so a port's first development lands where the manual
-// says it should: when the city "requires outside sources for commerce and
-// industry", not before.
 //
-// short/long: the minimum rectangle, in either orientation.
-// serves:     the sector the port mainly exists for.
-// carries:    sector jobs one tile of working port can serve. A minimum
-//             airport (15 tiles) carries 6,000 commercial jobs; a minimum
-//             seaport (12 tiles) carries 3,600 industrial ones.
+// A port grows module by module on its zone; see port-layout.js. This file
+// is what the port is worth: its jobs, draw, upkeep, demand and readiness.
+import { portComponents, portOf, portModules, portReady as componentReady, planPortCore, coreObstacle, partSpec } from "./port-layout.js";
+
+// Balance for each port type, calibrated so a port's first development lands
+// where the manual says it should: when the city "requires outside sources
+// for commerce and industry", not before.
+//
+// serves:  the sector the port mainly exists for.
+// carries: sector jobs one tile of working port can serve.
+// scale:   the port the city thinks in when it measures its want: the
+//          manual's minimum, a five-tile runway with a 2×2 terminal (nine
+//          tiles) or a 2×6 harbour. A seaport can open smaller than that,
+//          with just its freight shed; the want still reads against a real
+//          harbour, so a village never asks for one.
 export const PORTS = {
   airport: {
-    label: "Airport", short: 3, long: 5,
+    label: "Airport", scale: 9, // RUNWAY_MIN + a 2×2 terminal; a literal, as lots.js and this file import each other.
     serves: "commercial", carries: 400,
     jobs: 18, power: 0.5, water: 0.25, upkeep: 7, pollution: 0.9,
     demand: 0.8, crossDemand: 0.25,
   },
   seaport: {
-    label: "Seaport", short: 2, long: 6,
+    label: "Seaport", scale: 12,
     serves: "industrial", carries: 300,
     jobs: 22, power: 0.5, water: 0.25, upkeep: 7, pollution: 1.1,
     demand: 0.9, crossDemand: 0.25,
@@ -58,88 +61,25 @@ export const DEMAND_CAP = 20;
 export const PORT_TYPES = Object.keys(PORTS);
 export const isPort = (type) => Object.hasOwn(PORTS, type);
 
-// A save may not carry a lot wider or deeper than this; see city.js.
-export const MAX_PORT = 8;
-// How far from the quay a berth still counts as being on the water.
-const SHORE_REACH = 2;
-
-export const minTiles = (spec) => spec.short * spec.long;
-export const fitsPort = (spec, w, h) =>
-  (w >= spec.short && h >= spec.long) || (w >= spec.long && h >= spec.short);
-
-const rect = (lot) => {
-  const out = [];
-  for (let y = lot.y; y < lot.y + lot.h; y++) for (let x = lot.x; x < lot.x + lot.w; x++) out.push([x, y]);
-  return out;
-};
-
-// Water within reach of the footprint. `salt` asks for the open sea.
-function nearWater(city, lot, salt) {
-  for (const [cx, cy] of rect(lot)) {
-    for (let dy = -SHORE_REACH; dy <= SHORE_REACH; dy++) {
-      for (let dx = -SHORE_REACH; dx <= SHORE_REACH; dx++) {
-        const n = tileAt(city, cx + dx, cy + dy);
-        if (n?.terrain === "water" && (!salt || n.salt)) return true;
-      }
-    }
-  }
-  return false;
-}
-
 // "They must be located along a shoreline to do anything, but if you want to
 // see real results, build one on a seacoast." So an inland berth works; it
 // just does not pay like a sea one. An airport does not care where it is.
-export function berthFactor(city, anchor) {
-  const spec = PORTS[anchor.type];
-  if (!spec?.shoreline) return 1;
-  const lot = anchor.lot || { x: anchor.x, y: anchor.y, w: 1, h: 1 };
-  if (nearWater(city, lot, true)) return 1;
-  return nearWater(city, lot, false) ? 0.4 : 0;
-}
-
-// The largest rectangle of free port zone that contains `seed`, or null if
-// the zone is smaller than the manual's minimum. Ports are one facility on
-// one block, so unlike an RCI lot this takes as much of the block as it can.
-export function findPortLot(city, seed) {
-  const spec = PORTS[seed.type];
-  if (!spec || seed.lot) return null;
-  const free = (x, y) => {
-    const t = tileAt(city, x, y);
-    return !!t && t.type === seed.type && !t.lot && t.terrain !== "water" && t.elev === seed.elev;
-  };
-  let best = null;
-  for (let top = seed.y; top > seed.y - MAX_PORT; top--) {
-    if (!free(seed.x, top)) break;
-    for (let bottom = seed.y; bottom < top + MAX_PORT; bottom++) {
-      if (!free(seed.x, bottom)) break;
-      const column = (x) => { for (let y = top; y <= bottom; y++) if (!free(x, y)) return false; return true; };
-      let left = seed.x, right = seed.x;
-      while (column(left - 1)) left--;
-      while (column(right + 1)) right++;
-      // Trim an over-wide block from the right, then the left, so the lot
-      // still contains the seed and hugs the top-left like every other lot.
-      if (right - left + 1 > MAX_PORT) right = Math.max(seed.x, left + MAX_PORT - 1);
-      if (right - left + 1 > MAX_PORT) left = right - MAX_PORT + 1;
-      const w = right - left + 1, h = bottom - top + 1;
-      if (!fitsPort(spec, w, h)) continue;
-      if (!best || w * h > best.w * best.h) best = { x: left, y: top, w, h };
-    }
-  }
-  return best;
+export function berthFactor(city, t) {
+  return portOf(city, t)?.berth ?? 0;
 }
 
 // Is this port standing where it can work at all? "They require power, water,
 // and a road nearby" - all three, whatever the size.
-export function portReady(t) {
-  if (t.radiation) return false;
-  return !!(t.roadAccess && t.powered && t.watered);
+export function portReady(city, t) {
+  return componentReady(city, portOf(city, t));
 }
 
-// Working tiles of port: the footprint, scaled by how good the berth is.
-// Zero while it is unpowered, dry, cut off or abandoned.
+const standing = (anchor) => !!anchor.lot && !!anchor.part && anchor.level > 0 && !anchor.abandoned;
+
+// Working tiles of one module: its footprint, scaled by how good the berth is.
+// Zero while the port is unpowered, dry, cut off or abandoned.
 export function portTiles(city, anchor) {
-  if (!anchor.lot || !isPort(anchor.type) || !anchor.level || anchor.abandoned) return 0;
-  if (!portReady(anchor)) return 0;
+  if (!standing(anchor) || !isPort(anchor.type) || !portReady(city, anchor)) return 0;
   return anchor.lot.w * anchor.lot.h * berthFactor(city, anchor);
 }
 
@@ -147,18 +87,24 @@ export function portJobs(city, anchor) {
   return Math.round(portTiles(city, anchor) * PORTS[anchor.type].jobs);
 }
 
-// Power and water draw, and monthly upkeep. A port that has been zoned but
-// not developed draws nothing.
+// Everything the whole port employs, for the query card.
+export function portComponentJobs(city, t) {
+  const component = portOf(city, t);
+  return component ? portModules(component).reduce((sum, anchor) => sum + portJobs(city, anchor), 0) : 0;
+}
+
+// Power and water draw, and monthly upkeep. A zoned but undeveloped tile
+// draws nothing.
 export function portDraw(anchor) {
   const spec = PORTS[anchor.type];
-  if (!spec || !anchor.lot || !anchor.level || anchor.abandoned) return { power: 0, water: 0 };
+  if (!spec || !standing(anchor)) return { power: 0, water: 0 };
   const tiles = anchor.lot.w * anchor.lot.h;
   return { power: spec.power * tiles, water: spec.water * tiles };
 }
 
 export function portUpkeep(anchor) {
   const spec = PORTS[anchor.type];
-  if (!spec || !anchor.lot || !anchor.level || anchor.abandoned) return 0;
+  if (!spec || !standing(anchor)) return 0;
   return spec.upkeep * anchor.lot.w * anchor.lot.h;
 }
 
@@ -168,10 +114,9 @@ export function portUpkeep(anchor) {
 // sector it lifts is the same one that decides whether more port is wanted.
 export function portDemandBonus(city) {
   const bonus = {};
-  for (const t of city.tiles) {
-    if (!t.lot || t.lot.x !== t.x || t.lot.y !== t.y || !isPort(t.type)) continue;
-    const spec = PORTS[t.type];
-    const tiles = portTiles(city, t);
+  for (const component of portComponents(city).list) {
+    const spec = PORTS[component.type];
+    const tiles = portModules(component).reduce((sum, anchor) => sum + portTiles(city, anchor), 0);
     if (!tiles) continue;
     const other = spec.serves === "commercial" ? "industrial" : "commercial";
     bonus[spec.serves] = (bonus[spec.serves] || 0) + tiles * spec.demand;
@@ -186,43 +131,42 @@ export function portDemandBonus(city) {
 // industry", so the yardstick is the sector the port serves.
 export function portDemand(city, m) {
   const jobs = { commercial: m.jobsCommercial, industrial: m.jobsIndustrial };
-  const standing = { airport: 0, seaport: 0 };
-  for (const t of city.tiles) {
-    if (!t.lot || t.lot.x !== t.x || t.lot.y !== t.y || !isPort(t.type)) continue;
+  const built = { airport: 0, seaport: 0 };
+  for (const component of portComponents(city).list) {
     // Zoned tiles already built on count against the want even when idle:
     // a dark, dry airport is still an airport the city paid for.
-    standing[t.type] += t.abandoned ? 0 : t.lot.w * t.lot.h * berthFactor(city, t);
+    for (const anchor of portModules(component)) if (standing(anchor)) built[component.type] += anchor.lot.w * anchor.lot.h * component.berth;
   }
   const out = {};
   for (const [type, spec] of Object.entries(PORTS)) {
     const wanted = (jobs[spec.serves] || 0) / spec.carries;
-    const d = (wanted - standing[type]) / Math.max(minTiles(spec), wanted) * 100;
+    const d = (wanted - built[type]) / Math.max(spec.scale, wanted) * 100;
     out[type] = Math.round(Math.max(-100, Math.min(100, d)));
   }
   return out;
 }
 
-// Why a zoned port has not been built on yet. A terminal is one flat slab, so
-// unlike an RCI block it cannot fall back to a smaller lot and quietly build
-// something: if the block is short, or steps up a hill, nothing happens at all
-// and the mayor deserves to be told which.
+// Why a zoned tile has nothing on it yet. A port cannot open on a zone that
+// has no room for its core, and the mayor deserves to be told which.
 export function portObstacle(city, t) {
-  const spec = PORTS[t.type];
-  if (!spec || t.lot) return null;
+  const component = portOf(city, t);
+  if (!component || t.lot) return null;
   if (t.radiation) return "Contaminated ground: nothing will be built here.";
-  const missing = [!t.powered && "power", !t.watered && "water", !t.roadAccess && "a road nearby"].filter(Boolean);
+  const missing = [
+    !component.tiles.some((n) => n.powered) && "power",
+    !component.tiles.some((n) => n.watered) && "water",
+    !component.tiles.some((n) => n.roadAccess) && "a road nearby",
+  ].filter(Boolean);
   if (missing.length) return `Waiting on ${missing.join(", ")}.`;
-  if (!findPortLot(city, t)) {
-    return `Not big enough: needs ${spec.short}×${spec.long} tiles of ${t.type} zone at one elevation. Level the ground or zone more.`;
-  }
-  return null;
+  if (portModules(component).length) return null;
+  return coreObstacle(city, component);
 }
 
 // One line for the query card when a berth is in the wrong place.
-export function portNote(city, anchor) {
-  const spec = PORTS[anchor.type];
+export function portNote(city, t) {
+  const spec = PORTS[t.type];
   if (!spec?.shoreline) return null;
-  const factor = berthFactor(city, anchor);
+  const factor = berthFactor(city, t);
   if (factor === 0) return "Not on a shoreline: this port does nothing.";
   if (factor < 1) return "Inland water only: a seacoast berth would carry far more trade.";
   return null;
@@ -231,7 +175,7 @@ export function portNote(city, anchor) {
 // Ports that are running this month: lit, watered, reachable and on a berth
 // that works. What the city's trade is actually worth.
 export function workingPorts(city) {
-  return countPorts(city, (t) => portTiles(city, t) > 0);
+  return countPorts(city, (component) => componentReady(city, component) && component.berth > 0 && portModules(component).some(standing));
 }
 
 // "Seaports and airports are considered connections to all neighbors."
@@ -241,15 +185,15 @@ export function workingPorts(city) {
 // derived before the power and water networks are, so a test on `powered`
 // here would come out differently on load than it does in a running city.
 export function standingPorts(city) {
-  return countPorts(city, (t) => !t.abandoned && t.level > 0 && berthFactor(city, t) > 0);
+  return countPorts(city, (component) => component.berth > 0 && portModules(component).some(standing));
 }
 
 function countPorts(city, test) {
-  let airport = 0, seaport = 0;
-  for (const t of city.tiles) {
-    if (!t.lot || t.lot.x !== t.x || t.lot.y !== t.y || !isPort(t.type)) continue;
-    if (!test(t)) continue;
-    if (t.type === "airport") airport++; else seaport++;
-  }
-  return { airport, seaport };
+  const out = { airport: 0, seaport: 0 };
+  for (const component of portComponents(city).list) if (test(component)) out[component.type]++;
+  return out;
 }
+
+// What a module is, for labels: "Runway", "Freight shed".
+export const partLabel = (type, part) => partSpec(type, part)?.label || null;
+export { planPortCore };

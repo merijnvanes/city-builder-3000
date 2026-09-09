@@ -1,5 +1,6 @@
 import { drawCivicSprite } from './civic-sprites.js';
 import { drawArchitecture, heightOf } from './building-art.js';
+import { lotPlatform } from './deck-geometry.js';
 
 // Bounded lot artwork, retained across months when a building has not changed.
 // Half-step raster scales avoid rebuilding on every wheel event.
@@ -16,7 +17,7 @@ function recordPick(r, t, bounds, canvas = null) {
 export function hitUncachedArchitecture(r, t, sx, sy) {
   const pixel = document.createElement('canvas'); pixel.width = pixel.height = 1;
   const base = pixel.getContext('2d', { willReadFrequently: true });
-  const proxy = Object.assign(Object.create(r), { base, platform: t.elev * 8, atlasOwner: r });
+  const proxy = Object.assign(Object.create(r), { base, platform: lotPlatform(t), atlasOwner: r });
   const project = r.project.bind(proxy);
   proxy.project = (x, y, z = 0) => { const p = project(x, y, z); return { x: p.x - sx, y: p.y - sy }; };
   drawArchitecture(proxy, t);

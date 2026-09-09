@@ -8,6 +8,7 @@ try {
  await page.goto(process.env.CIVIC_TEST_URL || 'http://127.0.0.1:4173/?play');await page.waitForFunction(()=>!!window.civic?.agent);
  const checks=await page.evaluate(async()=>{
   const {bridgePlatform}=await import('/src/bridge-art.js');
+  const {VIADUCT_HEIGHT}=await import('/src/render-scale.js');
   civic.agent.newCity({size:32,starter:false,layout:'plains',hills:0,seed:12});const c=civic.city,r=civic.renderer;c.money=1e7;
   for(const t of c.tiles)Object.assign(t,{terrain:t.x>=12 && t.x<=19?'water':'grass',elev:t.x>=12 && t.x<=19?0:1,waterLevel:t.x>=12 && t.x<=19?.75:null,trees:0});
   for(const [tool,y] of [['road',11],['rail',16],['highway',21]]) {
@@ -18,7 +19,8 @@ try {
    r.rotation=rotation;r.focusOn(16,16,1.4);r.render(c,1000);
    for(const s of c.transportStructures)for(const t of [c.tiles[s.from.y*c.size+s.from.x],c.tiles[s.to.y*c.size+s.to.x]]) {
     const low=t.x===s.from.x,edgeX=t.x+(low?0:1),y=t.y+.5;
-    r.platform=null;const land=r.project(edgeX,y,.5);r.platform=bridgePlatform(r,t);const ramp=r.project(edgeX,y,.5),center=r.project(t.x+.5,y);r.platform=null;
+    // A road or track meets the ground at the bank; a highway meets its own viaduct.
+    r.platform=s.route==='highway'?(x,y)=>r.meshZ(x,y)+VIADUCT_HEIGHT:null;const land=r.project(edgeX,y,.5);r.platform=bridgePlatform(r,t);const ramp=r.project(edgeX,y,.5),center=r.project(t.x+.5,y);r.platform=null;
     out.push({land,ramp,picked:r.pick(center.x,center.y),expected:{x:t.x,y:t.y}});
    }
   }

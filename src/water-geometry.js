@@ -68,7 +68,8 @@ export function waterGeometry(r,t) {
   const prior=entry.tiles.get(t);
   if(level===null || prior?.level===level && prior.sourceBed===bed)return prior;
  }
- if(t.lot){entry.tiles.set(t,null);return null;}
+ // A graded site replaces its ground; a pier over water keeps the water.
+ if(t.lot && t.terrain!=='water'){entry.tiles.set(t,null);return null;}
  const neighbors=[];
  if(level===null)for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++) {
   const x=t.x+dx,y=t.y+dy;

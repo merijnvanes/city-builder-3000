@@ -1,6 +1,9 @@
 import {chromium} from '@playwright/test';
 import assert from 'node:assert/strict';
 import {mkdir} from 'node:fs/promises';
+// Elevated decks are scene items: where a bridge and a building overlap, the
+// nearer footprint wins the pixels and the pick, and deck traffic shows only
+// where the deck itself is visible.
 const browser=await chromium.launch({channel:'chrome',headless:true});
 try {
  const page=await browser.newPage({viewport:{width:1000,height:800}}),errors=[];
@@ -14,8 +17,8 @@ try {
  const result=await page.evaluate(async()=>{
   const {assignLot}=await import('/src/sim/lots.js');
   const {preloadCivicSprites,civicSpriteKey,civicSpriteSpec}=await import('/src/building-art.js');
-  const {bridgePlatform}=await import('/src/bridge-art.js');
-  const {beginBridgeTraffic,compositeBridgeTraffic,drawBridgeSolid}=await import('/src/bridge-scene.js');
+  const {surfacePlatform}=await import('/src/deck-geometry.js');
+  const {beginDeckTraffic,compositeDeckTraffic}=await import('/src/deck-scene.js');
   const {drawVehicle}=await import('/src/street-art.js');
   // Compare opaque materials independently of cast-shadow atlas warmup.
   Object.defineProperty(civic.renderer,'shadowScene',{configurable:true,get:()=>null,set:()=>{}});
@@ -40,10 +43,10 @@ try {
     r.paint(c);
     const items=r.items;
     const pixels=()=>r.base.getImageData(0,0,r.canvas.width,r.canvas.height).data;
-    r.items=items.filter(i=>i.kind==='bridge');r.paint(c);const bridge=pixels(),bridgePicks=r.pickables.filter(p=>p.bridge).reverse();
+    r.items=items.filter(i=>i.kind==='deck');r.paint(c);const bridge=pixels(),bridgePicks=r.pickables.filter(p=>p.deck).reverse();
     r.items=items.filter(i=>i.kind==='lot');r.paint(c);const building=pixels();
     r.items=items;r.paint(c);const actual=pixels(),hc=r.orient(house.x+size/2,house.y+size/2);
-    const visibility=r.bridgeTrafficMask.getContext('2d').getImageData(0,0,r.canvas.width,r.canvas.height).data;
+    const visibility=r.deckTrafficMask.getContext('2d').getImageData(0,0,r.canvas.width,r.canvas.height).data;
     for(let y=2;y<r.h-2;y+=2)for(let x=2;x<r.w-2;x+=2) {
      const i=(y*r.w+x)*4;
      if(![i,i-4,i+4,i-r.w*4,i+r.w*4].every(j=>bridge[j+3]===255 && building[j+3]===255))continue;
@@ -58,16 +61,16 @@ try {
      if(front)bridgeWins++;else buildingWins++;
     }
     // Test deck visibility separately from intentional building occlusion.
-    r.items=items.filter(i=>i.kind==='bridge');r.paint(c);
-    const pooled=r.bridgeSprites[0].canvas;r.paint(c);
-    if(r.bridgeSprites[0].canvas!==pooled)throw Error('Bridge paint allocated a new canvas for an unchanged view');
-    const ctx=r.ctx,traffic=beginBridgeTraffic(r),t=c.tiles[s.from.y*24+s.from.x+(axis==='x'?2:48)];
-    r.ctx=traffic;r.platform=bridgePlatform(r,t);drawVehicle(r,t.x+.5,t.y+.5,axis==='y',false,'#ff00ff');r.platform=null;r.ctx=ctx;
-    ctx.clearRect(0,0,r.w,r.h);compositeBridgeTraffic(r);
+    r.items=items.filter(i=>i.kind==='deck');r.paint(c);
+    const pooled=r.deckSprites[0].canvas;r.paint(c);
+    if(r.deckSprites[0].canvas!==pooled)throw Error('Deck paint allocated a new canvas for an unchanged view');
+    const ctx=r.ctx,traffic=beginDeckTraffic(r),t=c.tiles[s.from.y*24+s.from.x+(axis==='x'?2:48)];
+    r.ctx=traffic;r.platform=surfacePlatform(r,t);drawVehicle(r,t.x+.5,t.y+.5,axis==='y',false,'#ff00ff');r.platform=null;r.ctx=ctx;
+    ctx.clearRect(0,0,r.w,r.h);compositeDeckTraffic(r);
     const car=ctx.getImageData(0,0,r.canvas.width,r.canvas.height).data;
     if(car.some((v,i)=>i%4===3 && v>128))cars++;
     if(length===3 && axis==='x' && size===1 && rotation===0) {
-     r.platform=bridgePlatform(r,t);const p=r.project(t.x+.5,t.y+.32,.5);r.platform=null;
+     r.platform=surfacePlatform(r,t);const p=r.project(t.x+.5,t.y+.32,.5);r.platform=null;
      const sample=()=>Array.from(r.base.getImageData(Math.round(p.x),Math.round(p.y),1,1).data);
      const day=sample();r.overlay='traffic';r.paint(c);const heat=sample();
      if(heat[0]<heat[1]+20)throw Error('Traffic overlay does not color the elevated deck');
@@ -79,26 +82,40 @@ try {
    }
    r.items=undefined;r.itemRevision=-1;r.render(c,1000);
   }
-  // A higher foreground hill must hide a lower ramp, including its pick.
+  // A viaduct directly in front of a tower covers the tower's base; the
+  // tower directly behind a viaduct never paints over the deck.
   const r=civic.renderer;
-  civic.agent.newCity({size:16,starter:false,layout:'plains',hills:0,seed:12});const c=civic.city;c.speed=0;
-  for(const t of c.tiles)Object.assign(t,{terrain:'grass',type:'empty',elev:1,trees:0});
-  const s={kind:'bridge',route:'road',from:{x:2,y:3},to:{x:7,y:3},elevation:1,length:4};c.transportStructures=[s];
-  for(let x=2;x<=7;x++)Object.assign(c.tiles[3*c.size+x],{type:'road',structure:s});
-  c.revision++;r.rotation=0;r.focusOn(3,4,2);r.buildCorners(c);
-  r.platform=bridgePlatform(r,c.tiles[3*c.size+2]);const behind=r.project(2.5,3.5);r.platform=null;
-  for(const [x,y] of [[3,4],[4,4],[3,5],[4,5]])r.corners[y*(c.size+1)+x]=42;
-  r.paint(c);const pick=r.pickObject(behind.x,behind.y);
-  if(pick.x!==3 || pick.y!==4)throw Error(`Foreground hill reveals bridge: ${JSON.stringify(pick)}`);
-  const canvas=document.createElement('canvas');canvas.width=r.canvas.width;canvas.height=r.canvas.height;
-  const base=canvas.getContext('2d');base.fillStyle='#ff00ff';base.fillRect(0,0,canvas.width,canvas.height);
-  const proxy=Object.assign(Object.create(r),{base,bridgeSprites:[],bridgeSpriteIndex:0,pickables:[]});
-  drawBridgeSolid(proxy,c.tiles[3*c.size+2],c);
-  if(base.getImageData(Math.round(behind.x),Math.round(behind.y),1,1).data[3]>1)throw Error('A hill cutout reveals a rear solid through the bridge');
-  return {bridgeWins,buildingWins,cars};
+  civic.agent.newCity({size:24,starter:false,layout:'plains',hills:0,seed:12});const c=civic.city;c.speed=0;
+  for(const t of c.tiles)Object.assign(t,{terrain:'grass',type:'empty',elev:0,trees:0});
+  for(let y=4;y<=18;y++)c.tiles[y*24+10].type='highway';
+  Object.assign(c.tiles[9*24+10],{type:'watertower',powered:true});c.tiles[9*24+10].type='empty';
+  Object.assign(c.tiles[10*24+11],{type:'watertower',powered:true});assignLot(c,{x:11,y:10,w:1,h:1},1,.4);
+  await preloadCivicSprites({types:['watertower'],owner:r});
+  let deckWins=0;
+  for(let rotation=0;rotation<4;rotation++) {
+   r.rotation=rotation;r.focusOn(10,10,2.5);c.revision++;r.paint(c);
+   const items=r.items,pixels=()=>r.base.getImageData(0,0,r.canvas.width,r.canvas.height).data;
+   r.items=items.filter(i=>i.kind==='deck');r.paint(c);const deck=pixels();
+   r.items=items.filter(i=>i.kind==='lot');r.paint(c);const tower=pixels();
+   r.items=items;r.paint(c);const actual=pixels();
+   const tc=r.orient(11.5,10.5);
+   for(let y=2;y<r.h-2;y+=2)for(let x=2;x<r.w-2;x+=2) {
+    const i=(y*r.w+x)*4;
+    if(![i,i-4,i+4,i-r.w*4,i+r.w*4].every(j=>deck[j+3]===255 && tower[j+3]===255))continue;
+    const tile=r.pickables.filter(p=>p.deck).reverse().find(p=>x>=p.x && x<p.x+p.w && y>=p.y && y<p.y+p.h && p.canvas.getContext('2d').getImageData(Math.floor((x+.5-p.x)*r.dpr),Math.floor((y+.5-p.y)*r.dpr),1,1).data[3]>24);
+    if(!tile)continue;
+    const dc=r.orient(tile.t.x+.5,tile.t.y+.5),front=dc.x-.5>=tc.x+.5 || dc.y-.5>=tc.y+.5;
+    const expected=front?deck:tower;
+    if([0,1,2,3].some(k=>Math.abs(actual[i+k]-expected[i+k])>3))throw Error(`Viaduct overlap wrong in view ${rotation} at ${x},${y} front=${front}`);
+    if(front)deckWins++;
+   }
+   r.items=undefined;r.itemRevision=-1;
+  }
+  return {bridgeWins,buildingWins,cars,deckWins};
  });
  assert.ok(result.bridgeWins>50 && result.buildingWins>50,JSON.stringify(result));
  assert.equal(result.cars,72,JSON.stringify(result));
+ assert.ok(result.deckWins>20,JSON.stringify(result));
  await mkdir('artifacts',{recursive:true});await page.screenshot({path:'artifacts/bridge-depth.png'});
- assert.deepEqual(errors,[]);console.log('Bridge/building overlap pixels, picking and visible traffic pass for both axes, three styles and four views.',result);
+ assert.deepEqual(errors,[]);console.log('Deck/building overlap pixels, picking and visible traffic pass for both axes, three styles and four views.',result);
 }finally{await browser.close();}

@@ -1065,9 +1065,12 @@ export function mountUI(actions) {
     if (!tool) return;
     const b = BUILDINGS[id];
     const cost = ZONE_TYPES.has(id) ? ZONE_COST[id][_selectedDensity] : tool.cost;
-    const gesture = PATH_TOOLS.has(id) || b?.path ? 'Drag to draw a route.' : RECT_TOOLS.has(id) || b?.rect ? 'Drag to mark an area.' : 'Click to place.';
+    const gesture = id === 'onramp' ? 'Click the tile to place.' : PATH_TOOLS.has(id) || b?.path ? 'Drag to draw a route.' : RECT_TOOLS.has(id) || b?.rect ? 'Drag to mark an area.' : 'Click to place.';
     activeTitle.textContent = `${tool.label} · ${cost ? fmtMoney(cost) : 'Free'}${PATH_TOOLS.has(id) || RECT_TOOLS.has(id) || b?.path || b?.rect ? '/tile' : ''}`;
-    activeDescription.textContent = `${gesture}${b?.w > 1 && !b.path && !b.rect ? ` Needs a clear ${b.w}×${b.h} site.` : ''} Esc to cancel.`;
+    const siting = id === 'onramp'
+      ? ' Put it between a highway and a road: highway on one side, road on the opposite side. Cars climb it from the road onto the deck.'
+      : id === 'highway' ? ' Highways ride above the city; add an on-ramp where a road should join.' : b?.w > 1 && !b.path && !b.rect ? ` Needs a clear ${b.w}×${b.h} site.` : '';
+    activeDescription.textContent = `${gesture}${siting} Esc to cancel.`;
     const size = b && b.w > 1 ? ` (${b.w}×${b.h})` : "";
     const crews = _lastStats?.crews, units = _lastStats?.units;
     hintLine.textContent = id === "inspect"
@@ -1338,7 +1341,7 @@ export function mountUI(actions) {
     "Zone land (residential, commercial, industrial) next to roads. Lots develop when they have road access within three tiles, power, and for medium or high density, water. Demand (the R C I bars) decides how fast they grow; jobs attract residents, residents attract shops, and industry follows the workforce.",
     "Power flows from plants through power lines, zoned tiles and buildings, and hops across a single road. Water comes from pumps (best next to water) or towers through pipes; every pipe serves six tiles around it. Plants and pumps have limited capacity.",
     "Police, fire, health and education coverage depends on distance and department funding in the Budget. Garbage needs landfills, an incinerator or a recycling center. Parks, trees and water raise land value; industry, pollution, crime and traffic lower it.",
-    "Airports and seaports are zones too. Draw at least 3x5 for an airport (from 1930) or 2x6 for a seaport, give the block power, water and a road, and the Sims build the terminal once the city's commerce and industry need outside trade. A seaport only works on a shoreline, and pays best on a seacoast.",
+    "Airports and seaports are zones too. An airport (from 1930) needs a straight run of five tiles for its runway and room for a terminal; a seaport needs a little dry land and may reach into the water along the shore. Give the zone power, water and a road, and the Sims build the runway or quay first, then fill the rest with hangars, piers and yards as the city's commerce and industry need outside trade. A seaport only works on a shoreline, and pays best on a seacoast.",
     "Roads, rails, power lines and pipes that reach the map edge connect you to a neighbor: trade lifts demand, and lines or pipes let you buy or sell power and water. A seaport counts as a connection to every neighbor.",
     "Population milestones unlock rewards such as the Mayor's House and City Hall. Petitioners bring money-making business deals with strings attached, and neighboring mayors bring power, water and garbage contracts on terms that change from offer to offer. Turn one down and the petitioner may never come back. Open Budget to check yearly figures. January autosaves while play continues.",
   ]);

@@ -59,7 +59,7 @@ export function generateAdvisors(city, s) {
   const port = ["airport", "seaport"].map((k) => [k, d[k] ?? 0]).sort((a, b) => b[1] - a[1])[0];
   if (s.abandonedLots > 5) say("planning", "bad", `${s.abandonedLots} buildings stand abandoned. Check power, water, road access and demand.`);
   else if (top[1] > 50) say("planning", "warning", `Strong ${top[0]} demand. Zone more ${top[0]} land near roads.`);
-  else if (port[1] > 70) say("planning", "warning", `Trade has outgrown what the city can move. Zone ${port[0] === "airport" ? "an airport, 3x5 tiles at least" : "a seaport on a shoreline, 2x6 tiles at least"}.`);
+  else if (port[1] > 70) say("planning", "warning", `Trade has outgrown what the city can move. Zone ${port[0] === "airport" ? "an airport with room for a five-tile runway" : "a seaport along a shoreline"}.`);
   else if (d.residential < -30) say("planning", "warning", "People are leaving. Cut residential taxes, add jobs and improve services.");
   else if (d.commercial < -30 || d.industrial < -30) say("planning", "warning", "Businesses see no customers. Residential growth drives commerce and industry.");
   else say("planning", "good", "Zoning is balanced. Mix densities as land value rises.");

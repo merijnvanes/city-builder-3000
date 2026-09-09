@@ -77,18 +77,21 @@ The city-renderer test also checks exact wall colors after the terrain and tool
 grid pass, using a 3x3 lot and eight side or diagonal neighbor layouts in every
 rotation. Cast shadows are disabled for that color check.
 
-Foundations also participate in solid occlusion. Before a building is drawn,
-its pad and walls clear earlier solids from the transparent object layer,
-revealing the shaded ground cache underneath. The foundation and its building
-therefore hide rear objects together. Overlapping footprints are ordered by
-their separating world axis; a large lot's front corner alone cannot order
-trees beside its far half. This follows the same need to interleave terrain and
+A foundation is part of its building's scene item. The pad and walls are
+painted into the object layer immediately before the architecture, so the site
+and its building hide rear objects together, and the buried terrain beneath is
+plain ground that the pad covers. The same holds for every raised thing: bridge
+and highway decks, ramps and tunnel mouths are items too, never ground. See
+`src/scene-items.js` for the rule. Overlapping footprints are ordered by their
+separating world axis; a large lot's front corner alone cannot order trees
+beside its far half. This follows the same need to interleave terrain and
 objects described in Unity's [individual tile rendering mode](https://docs.unity.cn/Manual/Tilemap-Isometric-RenderModes.html).
-Picking follows the same foundation polygons, so erased rear artwork cannot
-be selected through a retaining wall. Natural trees use their foliage atlas
-alpha for picking, including when their shaded draw comes from the scene cache.
-Visible foreground trees therefore select their own tile. The scene regression checks actual rear
-trees and cached buildings, plus all four diagonal corners in each view.
+Picking follows the same foundation polygons, so rear artwork cannot be
+selected through a retaining wall. Natural trees use their foliage atlas alpha
+for picking, including when their shaded draw comes from the scene cache.
+Visible foreground trees therefore select their own tile. The scene regression
+checks actual rear trees and cached buildings, plus all four diagonal corners
+in each view.
 
 ## Validation
 

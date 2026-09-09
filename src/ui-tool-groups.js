@@ -6,7 +6,7 @@ export const TOOL_GROUPS = [
     { id: 'terrain', label: 'Terrain', tools: ['raise', 'lower', 'level', 'makeland', 'makewater', 'tree'] },
     { id: 'demolition', label: 'Demolition', tools: ['bulldoze'] },
   ] },
-  { id: 'transport', label: 'Transport', art: 'transport', tools: ['road', 'highway', 'rail', 'railstation', 'subway', 'substation', 'bus'] },
+  { id: 'transport', label: 'Transport', art: 'transport', tools: ['road', 'highway', 'onramp', 'rail', 'railstation', 'subway', 'substation', 'bus'] },
   { id: 'utilities', label: 'Utilities', art: 'power', sections: [
     { id: 'electricity', label: 'Electricity', tools: ['coal', 'oil', 'gas', 'nuclear', 'wind', 'solar', 'microwave', 'fusion', 'powerline'] },
     { id: 'water', label: 'Water', tools: ['waterpump', 'watertower', 'treatment', 'desalination', 'pipe'] },

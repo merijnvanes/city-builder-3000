@@ -6,7 +6,9 @@ import {waterSurface,bedElevation} from './sim/surface-water.js';
 // A developed site owns its grade. Roads and open ground meet its perimeter
 // instead of averaging a dip underneath the slab. At terraced lots, the lower
 // pad owns the shared vertex and the higher pad supplies the retaining wall.
-// Water remains level and shores retain a wall down to that waterline.
+// Water remains level and shores retain a wall down to that waterline. A pier
+// built over water is not graded: the water keeps its bed and its surface.
+const graded=t=>!!t.lot && t.terrain!=='water';
 function vertexHeight(city,x,y,gradedOnly) {
   let pad=Infinity,water=Infinity,sum=0,count=0;
   for(const [dx,dy] of [[-1,-1],[0,-1],[-1,0],[0,0]]) {
@@ -14,7 +16,7 @@ function vertexHeight(city,x,y,gradedOnly) {
     if(tx<0 || ty<0 || tx>=city.size || ty>=city.size)continue;
     const t=city.tiles[ty*city.size+tx];
     sum+=(t.terrain==='water'?bedElevation(t):(t.elev || 0))*ELEV_PX;count++;
-    if(t.lot) {
+    if(graded(t)) {
       const anchor=city.tiles[t.lot.y*city.size+t.lot.x];
       if(Number.isFinite(anchor?.elev))pad=Math.min(pad,anchor.elev*ELEV_PX);
     }
@@ -50,8 +52,15 @@ export function foundationEdges(r,t,cell=null) {
   return edges;
 }
 
+const PAD_COLOR={sand:'#b7b487',rock:'#615a53'};
+
+// The pad and its retaining skirt, painted where the building's scene item
+// begins so that both hide whatever stands behind the site. Returns the
+// screen polygons for picking. A site over water has no pad: the pier
+// artwork stands on the water itself.
 export function drawLotFoundation(r,t,cell=null) {
-  const old=r.platform,polygons=[];
+  if(t.terrain==='water')return [];
+  const old=r.platform,polygons=[],tone=color=>r.groundTone?r.groundTone(color):color;
   try {
     r.platform=0;
     // Keep the complete skirt, but paint rear faces first. At a lowered
@@ -59,30 +68,14 @@ export function drawLotFoundation(r,t,cell=null) {
     const edges=foundationEdges(r,t,cell).sort((a,b)=>Number(a.facing)-Number(b.facing));
     for(const {a,b,top,shade} of edges) {
       const points=[r.project(a[0],a[1],top),r.project(b[0],b[1],top),r.project(...b),r.project(...a)];
-      r.poly(points,shade);polygons.push(points);
+      r.poly(points,tone(shade));polygons.push(points);
     }
     r.platform=t.elev*ELEV_PX;
     const {x,y,w,h}=cell?{x:cell.x,y:cell.y,w:1,h:1}:t.lot;
     const pad=[[x,y],[x+w,y],[x+w,y+h],[x,y+h]].map(([x,y])=>r.project(x,y));
-    r.poly(pad,t.terrain==='sand'?'#b7b487':t.terrain==='rock'?'#615a53':'#7c914b');polygons.push(pad);
+    r.poly(pad,tone(PAD_COLOR[t.terrain] || '#7c914b'));polygons.push(pad);
     return polygons;
   } finally {r.platform=old;}
-}
-
-// The ground cache already contains the shaded foundation. Remove earlier
-// solids through its footprint so that cache can hide trees behind the pad
-// and retaining walls, just as the building sprite hides them above grade.
-export function occludeLotFoundation(r,t) {
-  r.base.save();
-  try {
-    r.base.globalAlpha=1;
-    r.base.globalCompositeOperation='destination-out';
-    const polygons=drawLotFoundation(r,t);
-    if(r.pickables) {
-      const points=polygons.flat(),x=Math.min(...points.map(p=>p.x)),y=Math.min(...points.map(p=>p.y));
-      r.pickables.push({t,polygons,x,y,w:Math.max(...points.map(p=>p.x))-x,h:Math.max(...points.map(p=>p.y))-y});
-    }
-  } finally {r.base.restore();}
 }
 
 export function hitFoundation(polygons,x,y) {

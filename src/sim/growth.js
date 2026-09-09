@@ -4,13 +4,14 @@
 // in when there are jobs, shops open when there are customers, industry
 // follows the workforce and outside trade. Taxes, services and pollution
 // shift each curve.
-import { ZONE_TYPES, PORT_TYPES } from "./catalog.js";
+import { ZONE_TYPES } from "./catalog.js";
 import { isAnchor, findLot, assignLot, clearLot } from "./lots.js";
 import { WORKFORCE_SHARE, MAX_TRIP } from "./traffic.js";
 import { pickIndustry, convertIndustry, industryOf } from "./industry.js";
 import { pickCommerce, convertCommerce, commerceOf } from "./commerce.js";
 import { yearOf } from "./metrics.js";
-import { findPortLot, portDemand, portReady } from "./ports.js";
+import { portDemand } from "./ports.js";
+import { portComponents, portModules, portReady, buildPortCore, growPort } from "./port-layout.js";
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
@@ -215,34 +216,35 @@ export function updateGrowth(city, demand, rng) {
   return { built: built + ports.built, upgraded, declined, abandoned: abandoned + ports.abandoned, retooled };
 }
 
-// A terminal is not built a storey at a time: it goes up whole or not at all,
-// and its scale is the block the mayor zoned for it. "They will only develop
-// as your city grows and requires outside sources for commerce and industry."
-const PORT_BUILD_RATE = 0.15;
+// A port opens with its core, a runway and terminal or a freight shed, and
+// then fills its zone one module a month while trade keeps growing. "They
+// will only develop as your city grows and requires outside sources for
+// commerce and industry." The whole zone opens, closes and empties together.
+const PORT_OPEN_RATE = 0.15;
+const PORT_FILL_RATE = 0.35;
 
 function updatePorts(city, demand, rng) {
   let built = 0, abandoned = 0;
-  for (const t of city.tiles) {
-    if (!isAnchor(t) || !PORT_TYPES.has(t.type)) continue;
-    t.age = (t.age || 0) + 1;
+  for (const component of portComponents(city).list) {
+    const d = demand[component.type] ?? 0;
     // "They require power, water, and a road nearby" - all three, always.
-    const ok = portReady(t);
-    if (t.abandoned) {
-      if (ok && demand[t.type] > 0 && rng() < 0.25) { t.abandoned = false; t.level = 1; t.age = 0; built++; }
-      else if (t.age > 36 && rng() < 0.3) clearLot(city, t, { keepZone: true });
-    } else if (!ok && rng() < 0.2) {
-      t.abandoned = true; t.age = 0; abandoned++;
+    const ok = portReady(city, component);
+    const modules = portModules(component);
+    for (const anchor of modules) anchor.age = (anchor.age || 0) + 1;
+    if (!modules.length) {
+      if (d > 0 && ok && rng() < Math.min(0.6, (d / 100) * PORT_OPEN_RATE) && buildPortCore(city, component, rng)) built++;
+      continue;
     }
-  }
-  for (const t of city.tiles) {
-    if (!PORT_TYPES.has(t.type) || t.lot) continue;
-    const d = demand[t.type] ?? 0;
-    if (d <= 0 || !portReady(t)) continue;
-    if (rng() >= Math.min(0.6, (d / 100) * PORT_BUILD_RATE)) continue;
-    const lot = findPortLot(city, t);
-    if (!lot) continue;
-    assignLot(city, lot, 1, rng());
-    built++;
+    if (modules.every((anchor) => anchor.abandoned)) {
+      if (ok && d > 0 && rng() < 0.25) { for (const anchor of modules) { anchor.abandoned = false; anchor.level = 1; anchor.age = 0; } built++; }
+      else if (modules.every((anchor) => anchor.age > 36) && rng() < 0.3) for (const anchor of modules) clearLot(city, anchor, { keepZone: true });
+      continue;
+    }
+    if (!ok) {
+      if (rng() < 0.2) { for (const anchor of modules) { anchor.abandoned = true; anchor.age = 0; } abandoned++; }
+      continue;
+    }
+    if (d > 0 && rng() < Math.min(0.6, (d / 100) * PORT_FILL_RATE) && growPort(city, component, rng)) built++;
   }
   return { built, abandoned };
 }

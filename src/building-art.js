@@ -8,8 +8,9 @@ import { drawStadium } from "./civic-art.js";
 import { drawPolice, drawFire, drawHospital, drawSchool, drawJail } from "./civic-services-art.js";
 import { drawCollegeCampus, drawLibrary, drawMuseum } from "./civic-culture-art.js";
 import { drawLandfill, drawIncinerator, drawRecycling, drawWasteEnergy } from "./civic-sanitation-art.js";
-import { drawIndustrialYard, drawPort, drawMarina } from "./industrial-art.js";
+import { drawIndustrialYard, drawMarina } from "./industrial-art.js";
 import { drawPocketPark, drawGardenPark } from "./park-art.js";
+import { drawPortPart, partHeight } from "./port-art.js";
 // Original procedural architecture for every lot. A recipe draws into the
 // lot rectangle using fractions of its width/depth, so the same recipe fits
 // 1×1, 2×2 and 3×3 lots. Heights are in renderer z units (≈ pixels at zoom 1).
@@ -23,13 +24,14 @@ export function heightOf(t) {
   if (!lot) return 0;
   const sprite = civicSpriteSpec(t);
   if (sprite) return sprite.height;
+  if (t.part) return partHeight(t.part);
   const level = t.level || 1;
   if (t.type === "residential") return t.density === 1 ? 10 + level * 3 : t.density === 2 ? 18 + level * 6 : 30 + level * 18;
   if (t.type === "commercial") return t.density === 1 ? 10 + level * 2 : t.density === 2 ? 20 + level * 7 : 40 + level * 24;
   if (t.type === "industrial") return t.density === 1 ? 12 : t.density === 2 ? 18 : 26;
   return { coal: 46, oil: 34, gas: 30, nuclear: 60, wind: 42, solar: 6, microwave: 45, fusion: 40, waterpump: 10, watertower: 47, treatment: 14, desalination: 20,
     police: 38, fire: 44, jail: 30, hospital: 37, school: 33, college: 52, library: 25, museum: 36, landfill: 8, incinerator: 46, wasteenergy: 51, recycling: 20,
-    park: 14, largepark: 16, zoo: 14, bus: 9, railstation: 16, airport: 18, seaport: 16, substation: 8,
+    park: 14, largepark: 16, zoo: 14, bus: 9, railstation: 16, substation: 8,
     mayorhouse: 24, cityhall: 46, courthouse: 27, stadium: 30, statue: 25, prison: 20, casino: 36, toxicdump: 10, armybase: 14,
     marina: 14, university: 34, medcenter: 40, gigamall: 20,
     clocktower: 61, operahouse: 38, observatory: 34, cathedral: 60, aquarium: 22 }[t.type] || 12;
@@ -625,17 +627,9 @@ const RECIPES = {
     for (const a of [0.15, 0.5, 0.85]) d.line(a, 0.62, 1.5, a, 0.62, 9, "#8e8f80", 1);
     d.flat(0.08, 0.58, 0.84, 0.32, 9, "#7c8a83");
   },
-  airport(d, t, n) {
-    d.flat(0.01, 0.01, 0.98, 0.98, 0.2, "#8f9a86");
-    d.flat(0.06, 0.12, 0.88, 0.16, 0.4, "#6d7370"); d.flat(0.08, 0.19, 0.84, 0.02, 0.6, "#e6e2c8");
-    for (let a = 0.1; a < 0.9; a += 0.1) d.flat(a, 0.18, 0.04, 0.04, 0.6, "#e6e2c8");
-    d.flat(0.06, 0.34, 0.5, 0.12, 0.4, "#767b76");
-    d.box(0.1, 0.56, 0.5, 0.26, 12, "#c9ccc2"); d.windows(0.1, 0.56, 0.5, 0.26, 12, t.x + t.y, true); d.flat(0.08, 0.54, 0.54, 0.3, 12.1, "#7f8a83");
-    d.box(0.7, 0.6, 0.12, 0.12, 20, "#b9bdb5"); d.box(0.68, 0.58, 0.16, 0.16, 5, "#6f8f8a", 20);
-    d.box(0.64, 0.34, 0.3, 0.16, 10, "#a7aba2"); d.roof(0.64, 0.34, 0.3, 0.16, 10, 4, "#7e8479");
-    d.box(0.3, 0.36, 0.14, 0.05, 3, "#e8e8e0"); d.box(0.36, 0.33, 0.03, 0.11, 2, "#e8e8e0", 2); d.box(0.28, 0.375, 0.03, 0.03, 4, "#e8e8e0", 3);
-  },
-  seaport: drawPort,
+  // Port modules; the part on the lot chooses the piece. See port-art.js.
+  airport: drawPortPart,
+  seaport: drawPortPart,
   mayorhouse(d, t, n) {
     d.flat(0.03, 0.03, 0.94, 0.94, 0.2, "#6f8f48");
     d.box(0.16, 0.16, 0.56, 0.5, 16, "#e6dcc4"); d.windows(0.16, 0.16, 0.56, 0.5, 16, t.x + t.y); d.roof(0.13, 0.13, 0.62, 0.56, 16, 8, "#6b4a3c");

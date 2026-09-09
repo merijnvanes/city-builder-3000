@@ -243,7 +243,9 @@ export function civicSpriteStats() {
   return { entries: entries.size, decodedBytes: bytes, maxDecodedBytes: MAX_DECODED_BYTES, loads, speculativeLoads, prefetchQueued: queue.length };
 }
 
-export function civicSpriteKey(t) { return zoneArtKey(t) || t.type; }
+// A zone lot is keyed by its state, a port module by its part, anything else
+// by its building type.
+export function civicSpriteKey(t) { return zoneArtKey(t) || (t.part ? `${t.type}-${t.part}` : t.type); }
 
 // Drawing, culling and shadow proxy heights must agree on eligibility.
 export function civicSpriteSpec(t) {
