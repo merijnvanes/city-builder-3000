@@ -2,12 +2,12 @@ import "./minimap.css";
 import { mapPoint, worldPoint, visibleMapPolygon } from './minimap-geometry.js';
 
 const colors = {
-  road: "#647b75",
+  road: "#8393aa",
   highway: "#4f5d63",
   rail: "#5a5a4c",
-  residential: "#73936d",
-  commercial: "#6192a0",
-  industrial: "#b59864",
+  residential: "#81b46a",
+  commercial: "#648fc3",
+  industrial: "#d5b767",
   park: "#466f53",
   largepark: "#466f53",
   zoo: "#4f7a55",
@@ -18,21 +18,38 @@ const utilityColor = "#a47965";
 const UTILITIES = new Set(["coal", "oil", "gas", "nuclear", "wind", "solar", "waterpump", "watertower", "treatment"]);
 
 export function createMinimap(renderer) {
-  const panel = document.createElement("section");
+  const panel = document.createElement("div");
   panel.className = "district-map";
-  panel.innerHTML = '<canvas width="160" height="160" role="img" aria-label="City overview. Click to move the camera."></canvas>';
+  panel.innerHTML = '<canvas width="480" height="480" tabindex="0" role="img" aria-label="City overview. Click or drag to move the camera. Arrow keys pan the view."></canvas>';
   document.querySelector("#navigator").prepend(panel);
   const canvas = panel.querySelector("canvas"), ctx = canvas.getContext("2d");
+  canvas.title = 'Click or drag to move around your city';
   const terrain = document.createElement('canvas'); terrain.width = terrain.height = 160;
   const map = terrain.getContext('2d');
   let city, mapCity, mapRevision, lastKey = "";
-  canvas.addEventListener("pointerdown", (event) => {
+  function moveCamera(event) {
     if (!city) return;
     const rect = canvas.getBoundingClientRect();
     const world = worldPoint((event.clientX - rect.left) / rect.width * 160, (event.clientY - rect.top) / rect.height * 160, city.size);
     if (!world) return;
     const p = renderer.project(world.x, world.y);
     renderer.pan(renderer.cx - p.x, renderer.cy - p.y);
+  }
+  canvas.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0) return;
+    event.preventDefault();
+    canvas.focus({ preventScroll: true });
+    canvas.setPointerCapture(event.pointerId);
+    moveCamera(event);
+  });
+  canvas.addEventListener('pointermove', event => {
+    if (canvas.hasPointerCapture(event.pointerId)) moveCamera(event);
+  });
+  canvas.addEventListener('keydown', event => {
+    const delta = { ArrowLeft: [40, 0], ArrowRight: [-40, 0], ArrowUp: [0, 40], ArrowDown: [0, -40] }[event.key];
+    if (!delta) return;
+    event.preventDefault(); event.stopPropagation();
+    renderer.pan(...delta);
   });
   return {
     update(nextCity) {
@@ -55,11 +72,19 @@ export function createMinimap(renderer) {
       }
         mapCity = city; mapRevision = city.revision;
       }
+      ctx.setTransform(3, 0, 0, 3, 0, 0);
       ctx.clearRect(0, 0, 160, 160);
+      ctx.beginPath();
+      ctx.moveTo(80, 15); ctx.lineTo(145, 80); ctx.lineTo(80, 145); ctx.lineTo(15, 80);
+      ctx.closePath();
+      ctx.fillStyle = '#879ac0'; ctx.fill();
+      ctx.strokeStyle = '#f5f7ff'; ctx.lineWidth = 2;
       ctx.save();
-      ctx.setTransform(0.4, 0.4, -0.4, 0.4, 80, 16);
+      ctx.transform(0.4, 0.4, -0.4, 0.4, 80, 16);
+      ctx.imageSmoothingEnabled = false;
       ctx.drawImage(terrain, 0, 0);
       ctx.restore();
+      ctx.stroke();
       ctx.save();
       ctx.beginPath();
       ctx.moveTo(80, 16); ctx.lineTo(144, 80); ctx.lineTo(80, 144); ctx.lineTo(16, 80);
@@ -75,8 +100,9 @@ export function createMinimap(renderer) {
       ctx.lineWidth = 1.5;
       ctx.stroke();
       ctx.restore();
-      ctx.fillStyle = '#e8e2ce'; ctx.font = '600 9px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      for (const [label, x, y] of [['N', 80, 7], ['E', 153, 80], ['S', 80, 153], ['W', 7, 80], ['NE', 119, 39], ['SE', 121, 121], ['SW', 39, 121], ['NW', 39, 39]]) ctx.fillText(label, x, y);
+      ctx.fillStyle = '#4b628e'; ctx.font = '700 7px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      const compass = [['N', 80, 7]];
+      for (const [label, x, y] of compass) ctx.fillText(label, x, y);
     },
   };
 }

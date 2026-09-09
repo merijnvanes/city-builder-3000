@@ -133,14 +133,15 @@ try {
   await page.setViewportSize({ width: 390, height: 844 }); await page.waitForTimeout(150);
   await page.getByTitle("Home view [H]", { exact: true }).click(); await page.waitForTimeout(200);
   await page.locator('.city-menu summary').click();
-  for (const name of ["Open budget", "Save city", "Load city", "New city", "Toggle tools"]) {
+  for (const name of ["Open budget", "Save city", "Load city", "New city"]) {
     const box = await page.getByRole("button", { name, exact: true }).boundingBox();
     assert.ok(box && box.x >= 0 && box.x + box.width <= 390, `${name} reachable on mobile`);
   }
   await page.locator('.city-menu summary').click();
-  await page.getByRole("button", { name: "Toggle tools", exact: true }).click();
   assert.ok(await page.locator("#toolbar").isVisible());
-  await page.getByRole("button", { name: "Toggle tools", exact: true }).click();
+  await page.getByRole('button', { name: 'Zones', exact: true }).click();
+  assert.ok(await page.locator('#flyout').isVisible(), 'The mobile rail opens a tool palette');
+  await page.getByRole('button', { name: 'Close tool palette', exact: true }).click();
   await page.screenshot({ path: "artifacts/mobile.png" });
 
   // New city flow.

@@ -1,2 +1,4 @@
-.district-map { width: 112px; padding: 0 2px; pointer-events: auto; }
-.district-map canvas { display: block; width: 100%; height: auto; cursor: crosshair; touch-action: none; }
+.district-map { position: absolute; z-index: 1; bottom: var(--map-bottom); right: var(--map-right); width: var(--map-size); pointer-events: none !important; }
+.district-map canvas { display: block; width: 100%; height: auto; cursor: crosshair; touch-action: none; pointer-events: auto; border-radius: 12px; }
+.district-map canvas:focus-visible { outline: 2px solid #6c82b5; outline-offset: -5px; }
+@media (max-width: 520px), (max-height: 550px) { .district-map { top: 2px; bottom: auto; right: 0; width: 100%; } }

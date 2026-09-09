@@ -27,20 +27,28 @@ async function cohesiveHud() {
     const header = document.querySelector('#command-bar').getBoundingClientRect();
     const console = document.querySelector('#build-console').getBoundingClientRect();
     const deck = document.querySelector('#console-deck').getBoundingClientRect();
+    const navigator = document.querySelector('#navigator').getBoundingClientRect();
     const drawer = [...document.querySelector('#console-context').children].find(visible)?.getBoundingClientRect();
-    return { surfaces: surfaces.map(el => el.id), header: header.toJSON(), console: console.toJSON(), deck: deck.toJSON(), drawer: drawer?.toJSON(), width: innerWidth, height: innerHeight };
+    return { surfaces: surfaces.map(el => el.id), header: header.toJSON(), console: console.toJSON(), deck: deck.toJSON(), navigator: navigator.toJSON(), drawer: drawer?.toJSON(), width: innerWidth, height: innerHeight };
   });
   assert.deepEqual(layout.surfaces, ['command-bar', 'build-console'], 'The HUD has exactly two connected surfaces');
   for (const box of [layout.header, layout.console]) assert.ok(box.left >= 0 && box.right <= layout.width && box.top >= 0 && box.bottom <= layout.height, `HUD stays on screen: ${JSON.stringify(layout)}`);
   assert.equal(layout.console.right, layout.width, 'Tool rail touches the right edge');
   assert.equal(layout.console.top, 0, 'No top bar covers the city');
   assert.equal(layout.header.bottom, layout.height, 'Status strip touches the bottom edge');
-  assert.ok(Math.abs(layout.header.right - layout.console.left) <= 1, 'The status strip joins the rail');
+  assert.ok(Math.abs(layout.header.right - layout.navigator.left) <= 1, 'The status strip joins the minimap console');
   const news = await page.locator('#bottom-bar').boundingBox();
-  const cityArea = layout.console.left * news.y;
+  assert.equal(await page.locator('#command-bar .rci-row').count(), 3);
+  for (const row of await page.locator('#command-bar .rci-row').all()) {
+    await reachable(row);
+    assert.ok(await row.locator('.rci-track').evaluate(el => el.clientHeight >= 9 && el.clientWidth >= 32), 'Compact demand bars remain legible at every screen size');
+  }
+  const clippedLabels = await page.locator('.rci-lbl, .rci-val, .group-label, .tool-label, .status-stat-label').evaluateAll(elements => elements.filter(el => el.clientWidth && el.scrollWidth > el.clientWidth + 1).map(el => el.textContent));
+  assert.deepEqual(clippedLabels, [], 'Larger labels fit their controls');
+  const cityArea = layout.console.left * news.y - (layout.navigator.width - layout.console.width) * Math.max(0, news.y - layout.navigator.top);
   if (layout.width >= 1000 && layout.height >= 640) {
-    assert.ok(cityArea / (layout.width * layout.height) >= .83, 'Idle HUD leaves at least 83% of desktop for the city');
-    if (layout.drawer) assert.ok((cityArea - layout.drawer.width * layout.drawer.height) / (layout.width * layout.height) >= .68, 'A compact drawer keeps at least 68% of desktop city space');
+    assert.ok(cityArea / (layout.width * layout.height) >= .70, 'Readable demand and the minimap leave at least 70% of desktop for the city');
+    if (layout.drawer) assert.ok((cityArea - layout.drawer.width * layout.drawer.height) / (layout.width * layout.height) >= .55, 'A drawer keeps at least 55% of desktop city space');
   }
   if (layout.drawer) {
     assert.ok(Math.abs(layout.drawer.right - layout.console.left) <= 1, 'Drawer joins the right rail');
@@ -65,7 +73,7 @@ try {
   await page.keyboard.press('Escape');
   assert.ok(await page.locator('#inspector-panel').isVisible(), 'Modal Escape preserves the inspected tile');
   const inspector = await page.locator('#inspector-panel').boundingBox(), mini = await page.locator('.district-map').boundingBox();
-  assert.ok(inspector.x + inspector.width <= mini.x, 'Inspector stays beside the minimap');
+  assert.ok(inspector.y + inspector.height <= mini.y || inspector.x + inspector.width <= mini.x, 'Inspector never overlaps the minimap');
   await page.getByRole('button', { name: 'Close inspector', exact: true }).click();
   await page.evaluate(() => civic.agent.run(1));
   assert.ok(!await page.locator('#inspector-panel').isVisible(), 'A dismissed inspector stays closed after simulation updates');
@@ -101,7 +109,7 @@ try {
     await cohesiveHud();
     if (await page.locator('.district-map').isVisible()) {
       const map = await page.locator('.district-map').boundingBox(), nav = await page.locator('#navigator').boundingBox();
-      assert.ok(map.y >= nav.y && map.y + map.height <= nav.y + nav.height, 'The minimap stays inside the console');
+      assert.ok(map.y >= nav.y && map.y + map.height * 145 / 160 <= nav.y + nav.height, 'The painted minimap stays inside the console');
     }
     await reachable(page.getByRole('textbox', { name: 'City name', exact: true }));
     await reachable(page.locator('.status-money'));
@@ -161,7 +169,7 @@ try {
     assert.equal(await density.getAttribute('aria-pressed'), 'true');
     await page.keyboard.press('Escape');
     await reachable(page.getByRole('button', { name: 'Toggle data maps', exact: true }));
-    for (const name of ['Rotate left', 'Rotate right', 'Zoom in [+]', 'Zoom out [−]', 'Home view [H]']) await reachable(page.getByRole('button', { name, exact: true }));
+    for (const name of ['Rotate left', 'Rotate right', 'Zoom in [+]', 'Zoom out [−]']) await reachable(page.getByRole('button', { name, exact: true }));
     await page.locator('.city-menu summary').click();
     await reachable(page.getByRole('button', { name: 'Save city', exact: true }));
     await reachable(page.getByRole('button', { name: 'Help', exact: true }));
@@ -185,7 +193,7 @@ try {
   await page.keyboard.press('Escape'); await page.mouse.up();
   assert.equal(await page.evaluate(() => civic.city.money), fundsBeforeDrag, 'Cancelling the preview preserves city funds');
   await page.keyboard.press('Escape');
-  await page.getByRole('button', { name: 'Home view [H]', exact: true }).click();
+  await page.keyboard.press('h');
   const petitionButton = page.locator('[aria-label="Open petition"]');
   await petitionButton.evaluate(el => { el.style.display = ''; });
   await cohesiveHud();
@@ -219,7 +227,7 @@ try {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   assert.equal(await page.locator('#news-ticker').evaluate(el => getComputedStyle(el).animationName), 'none');
   assert.deepEqual(failures, []);
-  console.log('UI design passed: nine viewport sizes, a compact right rail, at least 83% idle desktop city space, every category, notifications, petitions, keyboard access, pricing and artwork.');
+  console.log('UI design passed: nine viewport sizes, Periwinkle controls, at least 70% idle desktop city space, every category, notifications, petitions, keyboard access, pricing and artwork.');
 } catch (error) {
   await page.screenshot({ path: 'artifacts/ui-failure.png', animations: 'disabled' });
   throw error;

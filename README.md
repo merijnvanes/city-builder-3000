@@ -31,15 +31,25 @@ Gameplay fidelity and remaining verified gaps are tracked in [PARITY.md](PARITY.
 
 ## Game interface
 
-The interface follows SimCity 3000's layout: a narrow right tool rail joins a thin
-news and status strip along the bottom. Building palettes, inspection and data maps
-open as compact panels to the left of the rail. The city has no top bar over it.
-Small screens use an icon rail; scroll it to reach more categories. Opening a
-palette focuses its first available tool; closing it returns focus to its category.
+Periwinkle 3000 uses a sculpted lavender rail with illustrated tool buttons. It
+flows into a large diamond minimap at the bottom right and a thin news and status
+strip. Building palettes, inspection and data maps open beside the rail. The city
+has no top bar over it. Scroll the rail to reach more categories. Opening a palette
+focuses its first available tool; closing it returns focus to its category.
+
+Click or drag the minimap to move the camera. Its orientation stays fixed, and its
+outline shows the visible area. The focused map also accepts arrow keys. The map
+stays visible, including while a construction palette is open. On phones and short
+windows it fits within the rail. Zoom buttons stack to the left, with rotation
+controls below the map. The layers icon opens data maps above-right of the map,
+within the shortened curved housing that joins the rail.
 
 `pnpm test:ui` checks unobstructed controls and complete card highlights across nine
-desktop and mobile sizes. Desktop checks reserve at least 83% of the screen for the
-city while idle and 68% with a panel open. Notices and petitions are covered too.
+desktop and mobile sizes. With the enlarged minimap, desktop checks reserve at
+least 70% of the screen for the city while idle and 55% with a panel open. The
+bottom console shows stacked Residential, Commercial and Industrial demand bars beside the time controls,
+with Cash, Population and Happiness in the status strip. Tests
+also cover map rendering and navigation, notices, petitions, and compact layouts.
 
 ## Building artwork
 

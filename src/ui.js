@@ -4,6 +4,7 @@ import { createPortrait } from "./portrait.js";
 import { LOAN_STEP, LOAN_MAX, LOAN_YEARS, MAX_LOANS } from "./sim/economy.js";
 import { toolPreview } from './ui-tool-preview.js';
 import { citySignal, demandSignal, placeServices, inspectNote } from './ui-signals.js';
+import { categoryArt, navigationArt, mountNavigatorFrame } from './ui-chrome.js';
 
 // ── SVG Icons ─────────────────────────────────────────────────────────────────
 const ICONS = {
@@ -265,15 +266,15 @@ export function mountUI(actions) {
   const moneyDisplay = mMoney;
   const dateDisplay = mDate;
   const fundsWrap = el('div', 'funds-wrap');
-  fundsWrap.append(el('span', 'status-stat-label', 'Treasury'), mMoney);
+  fundsWrap.append(el('span', 'status-stat-label', 'Cash'), mMoney);
   statusFunds.appendChild(fundsWrap);
   const statusSmall = el("div", "status-small");
   const popWrap = el("span", "status-stat");
-  popWrap.appendChild(el("span", "status-stat-label", "Residents"));
+  popWrap.appendChild(el("span", "status-stat-label", "Population"));
   const mPop = el("span", "status-stat-val", "--");
   popWrap.appendChild(mPop);
   const happyWrap = el("span", "status-stat");
-  happyWrap.appendChild(el("span", "status-stat-label", "City mood"));
+  happyWrap.appendChild(el("span", "status-stat-label", "Happiness"));
   const mHappy = el("span", "status-stat-val happy", "--");
   happyWrap.appendChild(mHappy);
   const moodTrack=el('span','mood-track');
@@ -305,13 +306,13 @@ export function mountUI(actions) {
     rciSection.appendChild(row);
     return { fill, val };
   }
-  const rciR = rciRow("r", "Homes");
-  const rciC = rciRow("c", "Shops");
-  const rciI = rciRow("i", "Work");
+  const rciR = rciRow("r", "Residential");
+  const rciC = rciRow("c", "Commercial");
+  const rciI = rciRow("i", "Industrial");
   statusPanel.appendChild(rciSection);
   rciSection.setAttribute('aria-label', 'Demand for residential, commercial and industrial zones');
-  rciSection.prepend(el('span', 'demand-label', 'Room to grow'));
-  for (const [row, label] of [...rciSection.querySelectorAll('.rci-row')].map((row, i) => [row, ['Residential', 'Commercial', 'Industrial'][i]])) row.title = label;
+  rciSection.prepend(el('span', 'demand-label', 'Zone demand'));
+  for (const row of rciSection.querySelectorAll('.rci-row')) row.title = 'Left of centre: oversupply. Right of centre: room to grow.';
 
   // Speed controls
   const speedGroup = el("div");
@@ -429,7 +430,6 @@ export function mountUI(actions) {
   const toolBtns = {}; // id -> button element
   const groupEls = {}; // groupId -> { header, body, el }
 
-  const groupIcons = { zone: "residential", transport: "road", power: "power", water: "water", civic: "police", sanitation: "landfill", landscape: "park", landmark: "commercial", special: "school", emergency: "fire" };
   groups.forEach((g) => {
     const groupEl = el("div", "tool-group");
     groupEl.dataset.group=g.id;
@@ -439,7 +439,7 @@ export function mountUI(actions) {
     header.setAttribute("aria-expanded", "false");
     header.setAttribute('aria-controls', 'flyout');
     const icon = el("span", "group-icon");
-    icon.innerHTML = ICONS[groupIcons[g.id]] || iconFor(g.id, g.label);
+    icon.innerHTML = categoryArt(g.id);
     header.appendChild(icon);
     header.appendChild(el("span", "group-label", g.label));
     header.appendChild(el("span", "group-arrow", "▸"));
@@ -517,7 +517,7 @@ export function mountUI(actions) {
     b.title = `Bulldoze\nDemolish tiles\nCost: ${fmtMoney(t.cost)}${t.shortcut ? ` [${t.shortcut.toUpperCase()}]` : ""}`;
     b.setAttribute("aria-label", "Bulldoze");
     const iconWrap = el("span", "group-icon");
-    iconWrap.innerHTML = ICONS["bulldoze"] || "";
+    iconWrap.innerHTML = categoryArt('bulldoze');
     b.appendChild(iconWrap);
     b.appendChild(el("span", "group-label", "Bulldoze"));
     b.addEventListener("click", () => { closeFlyout(); actions.selectTool("bulldoze"); });
@@ -544,7 +544,7 @@ export function mountUI(actions) {
     flyoutTitle.textContent = g.label;
     flyoutBody.innerHTML = "";
     flyoutBody.appendChild(g.body);
-    paletteDetail.textContent = 'Choose a building. Hover or focus a card for details.';
+    paletteDetail.textContent = 'Choose a tool, then click or drag in your city.';
     flyout.querySelectorAll('.tool-art').forEach(image => { image.src = image.dataset.src; });
     flyout.classList.add("open");
     flyoutBody.scrollTop = 0; flyoutBody.scrollLeft = 0;
@@ -638,23 +638,25 @@ export function mountUI(actions) {
   zoomGroup.style.cssText = "margin-left:2px; flex-shrink:0";
   const zInBtn = btn("nav-btn", "+", "Zoom in [+]", () => actions.zoom?.(1));
   const zOutBtn = btn("nav-btn", "−", "Zoom out [−]", () => actions.zoom?.(-1));
-  const homeBtn = btn("nav-btn", "⌂", "Home view [H]", () => actions.home?.());
+  zoomGroup.classList.add('nav-zoom');
   zoomGroup.appendChild(zInBtn);
   zoomGroup.appendChild(zOutBtn);
-  zoomGroup.appendChild(homeBtn);
 
   // ── Navigator (lower-right, above bottom bar) ──────────────────────────────
   const navigator = el("div");
   navigator.id = "navigator";
+  mountNavigatorFrame(navigator);
+  navigator.setAttribute('aria-label', 'City overview and camera controls');
   consoleDeck.append(topBar, navigator);
-  navigator.appendChild(rciSection);
-  const overlayToggle = btn('btn map-toggle', 'Data maps', 'Toggle data maps', () => {
+  commandBar.appendChild(rciSection);
+  const overlayToggle = btn('btn nav-btn map-toggle', '', 'Toggle data maps', () => {
     closeFlyout();
     if (inspPanel.classList.contains('visible')) closeInspector(false);
     const open = overlaySection.classList.toggle('open');
     overlayToggle.setAttribute('aria-expanded', String(open));
     if (open) overlayGrid.querySelector('.active')?.focus({ preventScroll: true });
   });
+  overlayToggle.innerHTML = navigationArt('layers');
   overlayToggle.setAttribute('aria-expanded', 'false');
   overlayToggle.setAttribute('aria-controls', 'overlay-section');
   navigator.appendChild(overlayToggle);
@@ -675,8 +677,12 @@ export function mountUI(actions) {
   });
 
   const navTop = el("div", "nav-row");
-  navTop.appendChild(btn("nav-btn", "↺", "Rotate left", () => actions.rotate?.(-1)));
-  navTop.appendChild(btn("nav-btn", "↻", "Rotate right", () => actions.rotate?.(1)));
+  navTop.classList.add('nav-rotation');
+  for (const [direction, step] of [['left', -1], ['right', 1]]) {
+    const rotate = btn('nav-btn', '', `Rotate ${direction}`, () => actions.rotate?.(step));
+    rotate.innerHTML = navigationArt(direction);
+    navTop.appendChild(rotate);
+  }
   navigator.appendChild(navTop);
   navigator.appendChild(zoomGroup);
 
@@ -1354,6 +1360,7 @@ export function mountUI(actions) {
     "Population milestones unlock rewards such as the Mayor's House and City Hall. Petitioners bring money-making business deals with strings attached, and neighboring mayors bring power, water and garbage contracts on terms that change from offer to offer. Turn one down and the petitioner may never come back. Open Budget to check yearly figures. January autosaves while play continues.",
   ]);
   helpSection("Navigation", [
+    ["Minimap", "Click or drag to travel. The layers button opens data maps."],
     ["WASD / ↑↓←→", "Pan the map"],
     ["Scroll", "Zoom in / out"],
     ["Right drag", "Pan the map"],
