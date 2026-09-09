@@ -34,8 +34,16 @@ Gameplay fidelity and remaining verified gaps are tracked in [PARITY.md](PARITY.
 Periwinkle 3000 uses a sculpted lavender rail with illustrated tool buttons. It
 flows into a large diamond minimap at the bottom right and a thin news and status
 strip. Building palettes, inspection and data maps open beside the rail. The city
-has no top bar over it. Scroll the rail to reach more categories. Opening a palette
-focuses its first available tool; closing it returns focus to its category.
+has no top bar over it. The rail groups tools into Land, Transport, Utilities,
+Buildings and Emergency. Land includes demolition; Utilities has electricity,
+water and waste tabs. Buildings contains zones, services, parks, landmarks and
+rewards. Opening a palette focuses its selected category tab or first tool;
+closing it returns focus to the rail.
+
+City management opens the mayor's office hub for finance, reports, advisors,
+policies, neighbour contracts and petitions. Its detail screens return to the
+hub with **Back to city management**. The dark disk button above map layers opens
+the game menu for saves, new cities, sound, day/night and help.
 
 Click or drag the minimap to move the camera. Its orientation stays fixed, and its
 outline shows the camera footprint on the map plane. A gold dot marks the

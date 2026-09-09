@@ -550,3 +550,64 @@ dialog .panel-close { color: #e3e9fb; }
   #console-context { max-height: calc(100dvh - var(--status-height) - var(--news-height) - 56px); }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* Department keys, index tabs and the mayor's office share the enamel finish. */
+[data-group="land"] .group-header { --key-top: #c4e4b5; --key-bottom: #a5c691; }
+[data-group="utilities"] .group-header { --key-top: #e0e8bc; --key-bottom: #b5cfcc; }
+[data-group="buildings"] .group-header { --key-top: #f1dfbd; --key-bottom: #d9bc9d; }
+.management-button { --key-top: #d6d4f2; --key-bottom: #b4b2d8; margin-top: 10px; flex-shrink: 0; }
+.management-button .group-label { font-size: 11px; }
+#flyout { border: 1px solid #8293bd; border-right: 0; border-radius: 24px 0 0 24px; background: linear-gradient(115deg, #f5f4ff, #dbe1f4); }
+#flyout .flyout-title { font-size: 20px; color: #344467; background: linear-gradient(#f8f8ff, #c9d2ed); border-bottom: 1px solid #9caacd; box-shadow: inset 0 3px #fff8; letter-spacing: -.3px; }
+#flyout .flyout-title::before { width: 9px; height: 9px; background: #8b99c6; border: 1px solid #5f729d; box-shadow: inset 0 1px #fff9; }
+#flyout .flyout-body { padding: 0; scroll-padding-top: 90px; }
+.palette-tabs { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; gap: 4px; padding: 10px 10px 0; background: #d6dff2; border-bottom: 1px solid #94a4c5; }
+.palette-tab { flex: 1 1 auto; padding: 7px 10px; color: #465879; background: linear-gradient(#e7ecfa, #bdcbe5); border: 1px solid #97a7c8; border-bottom: 0; border-radius: 11px 11px 0 0; box-shadow: inset 0 1px #fff; font-size: 12px; font-weight: 800; white-space: nowrap; }
+.palette-tab[aria-selected="true"] { color: #293e64; background: #f6f5e9; box-shadow: inset 0 3px #e9c66e; }
+.palette-page { padding: 10px; }
+.palette-page[hidden] { display: none; }
+.palette-empty { display: none; padding: 12px 4px; color: #526080; font-size: 13px; }
+.tool-grid:not(:has(.tool-btn:not([style*="display: none"]))) + .palette-empty { display: block; }
+.management-button.has-petition { box-shadow: inset 0 0 0 2px #f5d77b, 0 0 0 1px #aa8845; }
+.management-card:disabled { opacity: 1; cursor: default; background: #dce3f2; }
+.management-card:disabled:hover { transform: none; border-color: #9caccb; }
+#flyout .tool-grid { gap: 7px; }
+#flyout .tool-grid .tool-btn { border-radius: 14px 10px 14px 10px; background: linear-gradient(115deg, #fffdf4, #e8ebf4); border: 1px solid #a3b1ca; box-shadow: inset 0 1px #fff, 0 2px 1px #899cc329; min-height: 66px; }
+#flyout .tool-grid .tool-btn:hover { background: #fffbea; border-color: #768fb8; }
+#flyout .tool-grid .tool-btn.active { background: #eef0d5; border-color: #7f9466; box-shadow: inset 0 0 0 2px #fff1b8; }
+#flyout .tool-visual { border-radius: 10px; background: radial-gradient(ellipse at 50% 75%, #b5c8aa88, #c9d7e633 70%); }
+#flyout .palette-detail { background: #d5dff0; border-top: 1px solid #9eafcc; font-size: 12px; }
+#navigator .city-menu { position: absolute; z-index: 3; right: calc(var(--map-right) + var(--map-size) * .2 - 15px); bottom: calc(var(--map-bottom) + var(--map-size) * .8 + 23px); }
+#navigator .city-menu summary { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 6px; border-radius: 50%; border: 1px solid #273756; background: linear-gradient(#52678d, #273b60); color: #fff5d7; box-shadow: inset 0 1px #a3b5d4, 0 2px 3px #20304d66; }
+#navigator .city-menu summary::after { display: none; }
+#navigator .city-menu summary svg { width: 20px; height: 20px; }
+#navigator .city-menu[open] summary { background: #263859; outline: 2px solid #eed398; }
+#navigator .city-menu-body { right: calc(var(--rail-width) + 8px); bottom: calc(var(--status-height) + var(--news-height) + 8px); max-height: calc(100dvh - var(--status-height) - var(--news-height) - 24px); width: 218px; padding: 10px; border: 1px solid #91a1c2; border-radius: 18px; background: #e3e8f8; color: #344364; box-shadow: 0 6px 24px #24375355, inset 0 1px #fff; }
+#navigator .city-menu-body .btn { justify-content: flex-start; font-size: 13px; border-radius: 10px; color: #344364; }
+.management-hub, .budget-dialog, dialog[aria-label="City Report"], dialog[aria-label="Advisors"] { color-scheme: light; --text: #344364; --text-dim: #526080; --text-bright: #273657; --beige: #4b6091; --res: #467b40; --com: #286c95; --ind: #956826; --text-pos: #36754a; --text-neg: #a44352; --well: #bec9e1; --panel: linear-gradient(130deg, #f3f2ff, #d7dff3); --panel-head: #d3dcf1; --edge: 1px solid #96a6c56b; border: 1px solid #8b9ec3; border-radius: 25px; box-shadow: inset 0 3px #fff9, 0 20px 70px #172a5055; }
+.management-hub { width: min(760px, calc(100vw - 24px)); }
+.management-hub .modal-header > .btn { width: 32px; min-width: 32px; height: 32px; min-height: 32px; padding: 0; border-radius: 50%; border: 1px solid #98a9c9; background: linear-gradient(#f7f8ff, #c4d1eb); font-size: 22px; box-shadow: inset 0 1px #fff; }
+.management-hub .modal-header, .budget-dialog .modal-header, dialog[aria-label="City Report"] .modal-header, dialog[aria-label="Advisors"] .modal-header { background: linear-gradient(#f0f0ff, #c3d0ed); box-shadow: inset 0 3px #fff8; }
+.hub-eyebrow { color: #66779b; font-weight: 800; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 5px; }
+.hub-intro { color: #526080; margin-bottom: 18px; max-width: 54ch; }
+.management-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.management-card { display: flex; align-items: center; gap: 13px; min-width: 0; padding: 15px; text-align: left; border: 1px solid #9caccb; border-radius: 18px 13px 18px 13px; background: linear-gradient(125deg, #fffdf1, #e0e6f6); box-shadow: inset 0 2px #fff, 0 3px 2px #8395b82b; color: #344364; }
+.management-card:hover { background: #fff9e7; border-color: #7188b1; transform: translateY(-1px); }
+.management-art { width: 68px; flex: 0 0 68px; }
+.management-art svg { display: block; width: 100%; }
+.management-card strong { display: block; font-size: 15px; line-height: 1.25; margin-bottom: 5px; }
+.management-card small { display: block; color: #576889; font-size: 12px; line-height: 1.4; }
+.budget-dialog .budget-tabs { flex-wrap: wrap; background: #d6dff2; }
+.budget-dialog .budget-tab { background: linear-gradient(#f4f6ff, #c7d3ec); border: 1px solid #97a7c8; border-radius: 11px; font-size: 12px; color: #465879; }
+.budget-dialog .budget-tab[aria-selected="true"] { background: #fff3ce; color: #33466b; border-color: #b4a271; }
+.budget-dialog .chrome-input, .budget-dialog .chrome-select { background: #f6f8ff; color: #344364; }
+dialog[aria-label="City Report"] .city-signal-card { background: #33496b; color: #e4e8f6; --text-dim: #bbc7df; --text-bright: #f5f6ff; }
+@media (max-width: 520px), (max-height: 550px) {
+  #navigator .city-menu { right: 4px; bottom: 8px; }
+  #navigator .map-toggle { grid-area: 3 / 1; justify-self: center; }
+  #navigator .city-menu summary { width: 28px; height: 28px; padding: 5px; }
+  #flyout .tool-grid .tool-btn { min-height: 56px; }
+  .palette-tab { padding: 7px; font-size: 11px; }
+  .management-grid { grid-template-columns: 1fr; }
+  .management-card { padding: 11px; }
+}

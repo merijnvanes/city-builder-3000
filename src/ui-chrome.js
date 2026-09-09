@@ -19,6 +19,7 @@ export function categoryArt(id) {
 }
 
 const NAV_ICONS = {
+  game: '<path d="M5 3h12l3 3v15H4V3h1Zm2 0v7h10V3M8 21v-7h8v7"/><path d="M13 5v3"/>',
   layers: '<path d="m3 8 9-5 9 5-9 5-9-5Zm0 5 9 5 9-5M3 18l9 5 9-5"/>',
   left: '<path d="M5 10a7 7 0 1 1 1 8M5 4v6h6"/>',
   right: '<path d="M19 10a7 7 0 1 0-1 8m1-14v6h-6"/>',

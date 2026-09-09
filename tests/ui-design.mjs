@@ -1,3 +1,4 @@
+import { openManagement, openCategory } from './ui-navigation.mjs';
 import { chromium } from '@playwright/test';
 import assert from 'node:assert/strict';
 import { mkdir } from 'node:fs/promises';
@@ -69,7 +70,7 @@ try {
   await page.locator('#notif.show').waitFor({ state: 'hidden' });
   await page.screenshot({ path: 'artifacts/ui-desktop.png', animations: 'disabled' });
   await page.mouse.click(720, 500);
-  await page.getByRole('button', { name: 'Open budget', exact: true }).click();
+  await openManagement(page, 'Open budget');
   await page.keyboard.press('Escape');
   assert.ok(await page.locator('#inspector-panel').isVisible(), 'Modal Escape preserves the inspected tile');
   const inspector = await page.locator('#inspector-panel').boundingBox(), mini = await page.locator('.district-map').boundingBox();
@@ -79,17 +80,18 @@ try {
   assert.ok(!await page.locator('#inspector-panel').isVisible(), 'A dismissed inspector stays closed after simulation updates');
   await page.getByRole('button', { name: 'Toggle data maps', exact: true }).click();
   await page.locator('[data-overlay="pollution"]').click();
-  await page.getByRole('button', { name: 'Open budget', exact: true }).click();
+  await openManagement(page, 'Open budget');
   await page.keyboard.press('Escape');
   assert.ok(await page.locator('#overlay-section').isVisible(), 'Modal Escape preserves the data palette');
   await page.getByRole('button', { name: 'Close data maps', exact: true }).click();
-  assert.equal(await page.locator('.map-toggle').textContent(), 'Pollution');
+  assert.equal(await page.locator('.map-toggle').getAttribute('title'), 'Pollution overlay active');
+  assert.equal(await page.locator('.map-toggle svg').count(), 1);
   assert.ok(await page.locator('.map-toggle').evaluate(el => el.classList.contains('active')));
   await page.getByRole('button', { name: 'Toggle data maps', exact: true }).click();
   await page.locator('[data-overlay="none"]').click();
   await page.getByRole('button', { name: 'Close data maps', exact: true }).click();
 
-  await page.getByRole('button', { name: 'Civic', exact: true }).click();
+  await openCategory(page, 'Civic');
   await page.mouse.click(720, 450);
   assert.ok(await page.locator('#inspector-panel').isVisible(), 'Inspecting a tile replaces the open construction palette');
   assert.ok(!await page.locator('#flyout').isVisible());
@@ -113,7 +115,7 @@ try {
     }
     await reachable(page.getByRole('textbox', { name: 'City name', exact: true }));
     await reachable(page.locator('.status-money'));
-    for (const name of ['Open budget', 'City report', 'Advisors']) await reachable(page.getByRole('button', { name, exact: true }));
+    await reachable(page.getByRole('button', { name: 'City management', exact: true }));
     await reachable(page.locator('.status-date'));
     if (await page.locator('.clock-state').isVisible()) await reachable(page.locator('.clock-state'));
     const groups = await page.locator('#dock-scroll .group-header[aria-controls="flyout"]:visible').evaluateAll(headers => headers.map(header => header.getAttribute('aria-label')));
@@ -122,7 +124,7 @@ try {
       const trigger = page.getByRole('button', { name: group, exact: true });
       await reachable(trigger); await trigger.click();
       await cohesiveHud();
-      assert.ok(await page.evaluate(() => document.activeElement.matches('#flyout .tool-btn')), 'Opening a palette focuses its first available tool');
+      assert.ok(await page.evaluate(() => document.activeElement.matches('#flyout .tool-btn, #flyout [role="tab"]')), 'Opening a palette focuses its first tool or selected category tab');
       await page.keyboard.press('Tab');
       assert.ok(await page.evaluate(() => document.activeElement.closest('#flyout')), 'Forward Tab stays in the newly opened palette');
       if (width === 844 && group === 'Civic') {
@@ -160,7 +162,7 @@ try {
       await close.click();
       assert.ok(await trigger.evaluate(el => el === document.activeElement), 'Closing a palette restores focus');
     }
-    await page.getByRole('button', { name: 'Zones', exact: true }).click();
+    await openCategory(page, 'Zones');
     await page.locator('[data-tool="residential"]').click();
     const density = page.getByRole('button', { name: 'Density 3', exact: true });
     await reachable(density); await density.click();
@@ -195,25 +197,24 @@ try {
   await page.keyboard.press('Escape');
   await page.keyboard.press('h');
   const petitionButton = page.locator('[aria-label="Open petition"]');
-  await petitionButton.evaluate(el => { el.style.display = ''; });
-  await cohesiveHud();
+  await page.getByRole('button', { name: 'City management', exact: true }).click();
   await reachable(petitionButton);
   for (const name of ['Open budget', 'City report', 'Advisors']) await reachable(page.getByRole('button', { name, exact: true }));
-  const petitionBox = await petitionButton.boundingBox(), commandBox = await page.locator('#build-console').boundingBox();
-  assert.ok(petitionBox.x >= commandBox.x && petitionBox.x + petitionBox.width <= commandBox.x + commandBox.width, 'Petitions stay inside the tool rail');
-  await petitionButton.evaluate(el => { el.style.display = 'none'; });
+  const petitionBox = await petitionButton.boundingBox(), hubBox = await page.locator('.management-hub').boundingBox();
+  assert.ok(petitionBox.x >= hubBox.x && petitionBox.x + petitionBox.width <= hubBox.x + hubBox.width, 'Petitions stay inside the management hub');
+  await page.keyboard.press('Escape');
 
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.locator('.city-menu summary').focus();
   await page.keyboard.press('Space');
   assert.ok(await page.locator('.city-menu').evaluate(el => el.open), 'Space opens the city menu');
   await page.keyboard.press('Escape');
-  await page.getByRole('button', { name: 'Civic', exact: true }).click();
+  await openCategory(page, 'Civic');
   await page.waitForFunction(() => [...document.querySelectorAll('#flyout img')].every(i => i.complete && i.naturalWidth > 0));
   await page.locator('#flyout img').evaluateAll(images=>Promise.all(images.map(image=>image.decode())));
   await page.screenshot({ path: 'artifacts/ui-palette.png', animations: 'disabled' });
   await page.keyboard.press('Escape');
-  await page.getByRole('button', { name: 'Open budget', exact: true }).click();
+  await openManagement(page, 'Open budget');
   await page.getByRole('tab', { name: 'Overview', exact: true }).focus();
   await page.keyboard.press('ArrowRight');
   assert.equal(await page.getByRole('tab', { name: 'Taxes & services', exact: true }).getAttribute('aria-selected'), 'true');

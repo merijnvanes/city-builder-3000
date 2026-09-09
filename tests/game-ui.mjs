@@ -1,3 +1,4 @@
+import { openManagement, openCategory } from './ui-navigation.mjs';
 import {chromium} from '@playwright/test';
 import assert from 'node:assert/strict';
 const browser=await chromium.launch({channel:'chrome',headless:true});
@@ -15,7 +16,7 @@ try {
     assert.ok(await row.getAttribute('aria-valuetext'));
   }
   assert.equal(await page.evaluate(()=>typeof civic.agent.state().metrics.happiness),'number');
-  await page.getByRole('button',{name:'City report',exact:true}).click();
+  await openManagement(page, 'City report');
   const report=page.getByRole('dialog',{name:'City Report',exact:true});
   assert.equal(await report.locator('.city-history').evaluate(el=>el.open),false);
   for(const card of await report.locator('.city-signal-card[data-tone]').all()) {
@@ -37,7 +38,7 @@ try {
   await page.locator('.inspection-notes summary').click();
   await page.getByRole('button',{name:'Close inspector',exact:true}).click();
   await page.setViewportSize({width:390,height:844});
-  await page.getByRole('button',{name:'City report',exact:true}).click();
+  await openManagement(page, 'City report');
   await page.screenshot({path:'artifacts/game-report-mobile.png'});
   await page.keyboard.press('Escape');
   await page.evaluate(()=>{civic.city.news=['A serious fire needs attention.','A new park opens.'];civic.agent.run(1);});

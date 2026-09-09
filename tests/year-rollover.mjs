@@ -20,6 +20,7 @@ try {
     return snapshot;
   });
   assert.deepEqual(state, { dialogs: 0, speed: 'true', autosave: 12 });
+  await page.getByRole('button', { name: 'City management', exact: true }).click();
   await page.getByRole('button', { name: 'Open budget', exact: true }).click();
   assert.ok(await page.getByRole('dialog', { name: 'Budget', exact: true }).isVisible());
   assert.ok(await page.getByText('Last Year', { exact: true }).isVisible());

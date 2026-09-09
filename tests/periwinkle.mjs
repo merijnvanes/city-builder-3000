@@ -1,3 +1,4 @@
+import { openManagement, openCategory } from './ui-navigation.mjs';
 import {chromium} from '@playwright/test';
 import assert from 'node:assert/strict';
 import {mkdir} from 'node:fs/promises';
@@ -97,7 +98,7 @@ try {
     await unobstructed(page.getByRole('textbox', {name: 'City name', exact: true}));
     await unobstructed(page.locator('.status-money'));
     await page.screenshot({path: `artifacts/periwinkle-map-${width}.png`});
-    await page.getByRole('button', {name: 'Zones', exact: true}).click();
+    await openCategory(page, 'Zones');
     assert.equal(await canvas.isVisible(), true, 'Opening a construction palette keeps the map visible');
     await unobstructed(page.locator('[data-tool="residential"]'));
     await page.keyboard.press('Escape');
@@ -108,7 +109,7 @@ try {
   }
   await page.setViewportSize({width: 1440, height: 1000});
   assert.equal(await canvas.isVisible(), true, 'The overview remains visible on desktop');
-  await page.getByRole('button', {name: 'Open budget', exact: true}).click();
+  await openManagement(page, 'Open budget');
   await page.screenshot({path: 'artifacts/periwinkle-budget.png'});
   assert.deepEqual(errors, []);
   console.log('Periwinkle: live map, high-density rendering, click/drag/keyboard navigation, compact map controls and HUD focus passed.');

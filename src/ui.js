@@ -2,6 +2,9 @@ import { TOOLS, BUILDINGS, ORDINANCES, DISASTERS, FUNDED_DEPARTMENTS, SPECIAL_TY
 import { ZONE_COST } from './sim/catalog.js';
 import { createPortrait } from "./portrait.js";
 import { LOAN_STEP, LOAN_MAX, LOAN_YEARS, MAX_LOANS } from "./sim/economy.js";
+import { TOOL_GROUPS } from './ui-tool-groups.js';
+import { createTabs } from './ui-tabs.js';
+import { createManagementHub } from './ui-management.js';
 import { toolPreview } from './ui-tool-preview.js';
 import { citySignal, demandSignal, placeServices, inspectNote } from './ui-signals.js';
 import { categoryArt, navigationArt, mountNavigatorFrame } from './ui-chrome.js';
@@ -37,20 +40,6 @@ for (const [id, path] of Object.entries({
   makewater: 'M2 14q4-3 8 0t8 0M2 18q4-3 8 0t8 0M10 1C4 7 7 10 10 10s6-3 0-9Z',
   dispatch: 'M2 6h10v9H2ZM12 9h4l2 3v3h-6M5 15v2M15 15v2M5 3h4',
 })) ICONS[id] = `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"><path d="${path}"/></svg>`;
-
-// ── Tool group definitions ───────────────────────────────────────────────────
-const GROUP_DEFS = [
-  { id: "zone",      label: "Zones",     tools: ["residential", "commercial", "industrial", "airport", "seaport"], hasDensity: true },
-  { id: "transport", label: "Transport", tools: ["road", "highway", "rail", "railstation", "subway", "substation", "bus"] },
-  { id: "power",     label: "Power",     tools: ["coal", "oil", "gas", "nuclear", "wind", "solar", "powerline"] },
-  { id: "water",     label: "Water",     tools: ["waterpump", "watertower", "treatment", "pipe"] },
-  { id: "civic",     label: "Civic",     tools: ["police", "fire", "hospital", "school", "college", "library", "museum"] },
-  { id: "sanitation", label: "Sanitation", tools: ["landfill", "incinerator", "recycling"] },
-  { id: "landscape", label: "Parks & Land", tools: ["park", "largepark", "zoo", "tree", "makewater", "makeland", "raise", "lower", "level"] },
-  { id: "landmark",  label: "Landmarks", tools: ["clocktower", "operahouse", "observatory", "cathedral", "aquarium"] },
-  { id: "special",   label: "Rewards & Deals", tools: SPECIAL_TYPES },
-  { id: "emergency", label: "Emergency", tools: ["dispatch", "patrol"] },
-];
 
 // Icons fall back to a lettered badge so every catalog entry gets a button.
 function iconFor(id, label) {
@@ -162,7 +151,7 @@ export function mountUI(actions) {
   const toolMap = Object.fromEntries(TOOLS.map((t) => [t.id, t]));
 
   // Resolve groups — filter to only tools actually in TOOLS export
-  const groups = GROUP_DEFS.map((g) => ({
+  const groups = TOOL_GROUPS.map((g) => ({
     ...g,
     tools: g.tools.filter((id) => toolMap[id]),
   })).filter((g) => g.tools.length > 0);
@@ -186,8 +175,6 @@ export function mountUI(actions) {
   const managementPanel = el("div");
   managementPanel.id = "management-panel";
   commandBar.appendChild(managementPanel);
-  const topBar = el("div");
-  topBar.id = "top-bar";
 
   // Logo
   const logoMark = el("button");
@@ -207,24 +194,23 @@ export function mountUI(actions) {
     actions.renameCity?.(cityName.value.trim() || "New Riverton");
   });
 
-  // Top menu buttons
-  const topMenuBtns = el("div");
-  topMenuBtns.id = "top-menu-btns";
-  topBar.appendChild(topMenuBtns);
-
-  const budgetDlgBtn = btn("btn", "Budget", "Open budget", () => budgetDialog.showModal());
-  topMenuBtns.appendChild(budgetDlgBtn);
-  const reportDlgBtn = btn("btn", "Report", "City report", () => { buildReport(); reportDialog.showModal(); });
-  topMenuBtns.appendChild(reportDlgBtn);
-  const advisorBtn = btn("btn", "Advisors", "Advisors", () => { buildAdvisors(); advisorDialog.showModal(); });
-  topMenuBtns.appendChild(advisorBtn);
+  // City management hub
+  const hub = createManagementHub([
+    { label: 'Budget & finance', accessibleLabel: 'Open budget', art: 'special', description: 'Cash flow, taxes, funding and the yearly ledger.', open: () => { selectBudgetPage(0); budgetDialog.showModal(); } },
+    { label: 'City reports', accessibleLabel: 'City report', art: 'zone', description: 'Population, happiness and the health of your city.', open: () => { buildReport(); reportDialog.showModal(); } },
+    { label: 'Advisors', art: 'civic', description: 'Hear what your departments need next.', open: () => { buildAdvisors(); advisorDialog.showModal(); } },
+    { label: 'Neighbours & contracts', art: 'transport', description: 'Connections and power, water and waste agreements.', open: () => { selectBudgetPage(4); budgetDialog.showModal(); } },
+    { label: 'Policies & ordinances', art: 'landmark', description: 'Set the rules that shape daily life.', open: () => { selectBudgetPage(3); budgetDialog.showModal(); } },
+  ]);
+  app.appendChild(hub.dialog);
   const cityMenu = el('details', 'city-menu');
-  const menuSummary = el('summary', 'btn', 'City');
+  const menuSummary = el('summary', 'btn');
+  menuSummary.innerHTML = navigationArt('game');
+  menuSummary.title = 'Game menu · saves, settings and help';
   menuSummary.setAttribute('aria-label', 'City menu');
   cityMenu.appendChild(menuSummary);
   const menuBody = el('div', 'city-menu-body');
   cityMenu.appendChild(menuBody);
-  topMenuBtns.appendChild(cityMenu);
   menuBody.appendChild(btn("btn", "Save city", "Save city", () => actions.save?.()));
   menuBody.appendChild(btn("btn", "Load city", "Load city", () => actions.load?.()));
   menuBody.appendChild(btn("btn", "Saves & files", "Save slots and files", () => { buildFiles(); filesDialog.showModal(); }));
@@ -439,14 +425,19 @@ export function mountUI(actions) {
     header.setAttribute("aria-expanded", "false");
     header.setAttribute('aria-controls', 'flyout');
     const icon = el("span", "group-icon");
-    icon.innerHTML = categoryArt(g.id);
+    icon.innerHTML = categoryArt(g.art);
     header.appendChild(icon);
     header.appendChild(el("span", "group-label", g.label));
     header.appendChild(el("span", "group-arrow", "▸"));
     groupEl.appendChild(header);
 
     const body = el("div", "group-body");
-    const grid = el("div", "tool-grid");
+    const sections = (g.sections || [{ id: g.id, label: g.label, tools: g.tools }]).map(section => {
+      const panel = el('div', 'palette-page');
+      const grid = el('div', 'tool-grid'); panel.appendChild(grid);
+      if (section.id === 'rewards') panel.appendChild(el('p', 'palette-empty', 'Grow your population to unlock rewards. Business offers arrive through petitions.'));
+      return { ...section, panel, grid };
+    });
 
     g.tools.forEach((toolId) => {
       const t = toolMap[toolId];
@@ -471,11 +462,12 @@ export function mountUI(actions) {
       b.addEventListener("click", () => {
         actions.selectTool(toolId); closeFlyout(true);
       });
-      grid.appendChild(b);
+      sections.find(section => section.tools.includes(toolId)).grid.appendChild(b);
       toolBtns[toolId] = b;
     });
 
-    body.appendChild(grid);
+    const tabs = g.sections ? createTabs(g.id, `${g.label} categories`, sections) : null;
+    body.appendChild(tabs ? tabs.root : sections[0].panel);
 
     // Density strip for zone group
     if (g.hasDensity) {
@@ -506,24 +498,14 @@ export function mountUI(actions) {
     dockScroll.appendChild(groupEl);
 
     header.addEventListener("click", () => toggleGroup(g.id));
-    groupEls[g.id] = { el: groupEl, header, body, label: g.label };
+    groupEls[g.id] = { el: groupEl, header, body, label: g.label, tabs };
   });
 
-  // Bulldoze standalone
-  if (toolMap["bulldoze"]) {
-    const t = toolMap["bulldoze"];
-    const b = el("button", "group-header bulldoze-btn");
-    b.dataset.tool = "bulldoze";
-    b.title = `Bulldoze\nDemolish tiles\nCost: ${fmtMoney(t.cost)}${t.shortcut ? ` [${t.shortcut.toUpperCase()}]` : ""}`;
-    b.setAttribute("aria-label", "Bulldoze");
-    const iconWrap = el("span", "group-icon");
-    iconWrap.innerHTML = categoryArt('bulldoze');
-    b.appendChild(iconWrap);
-    b.appendChild(el("span", "group-label", "Bulldoze"));
-    b.addEventListener("click", () => { closeFlyout(); actions.selectTool("bulldoze"); });
-    dockScroll.appendChild(b);
-    toolBtns["bulldoze"] = b;
-  }
+  const managementButton = btn('group-header management-button', '', 'City management', () => {
+    closeFlyout(); hub.dialog.showModal();
+  });
+  managementButton.innerHTML = `<span class="group-icon">${categoryArt('civic')}</span><span class="group-label">City management</span>`;
+  dockScroll.appendChild(managementButton);
 
   function toggleGroup(id) {
     if (openGroupId === id) { closeFlyout(); return; }
@@ -548,7 +530,7 @@ export function mountUI(actions) {
     flyout.querySelectorAll('.tool-art').forEach(image => { image.src = image.dataset.src; });
     flyout.classList.add("open");
     flyoutBody.scrollTop = 0; flyoutBody.scrollLeft = 0;
-    [...flyout.querySelectorAll('.tool-btn')].find(button => button.style.display !== 'none')?.focus({ preventScroll: true });
+    (g.tabs ? flyout.querySelector('[role="tab"][aria-selected="true"]') : [...flyout.querySelectorAll('.tool-btn')].find(button => button.style.display !== 'none'))?.focus({ preventScroll: true });
   }
 
   // Keep the group of the active tool marked even when the flyout is closed.
@@ -647,7 +629,7 @@ export function mountUI(actions) {
   navigator.id = "navigator";
   mountNavigatorFrame(navigator);
   navigator.setAttribute('aria-label', 'City overview and camera controls');
-  consoleDeck.append(topBar, navigator);
+  consoleDeck.appendChild(navigator);
   commandBar.appendChild(rciSection);
   const overlayToggle = btn('btn nav-btn map-toggle', '', 'Toggle data maps', () => {
     closeFlyout();
@@ -660,6 +642,7 @@ export function mountUI(actions) {
   overlayToggle.setAttribute('aria-expanded', 'false');
   overlayToggle.setAttribute('aria-controls', 'overlay-section');
   navigator.appendChild(overlayToggle);
+  navigator.appendChild(cityMenu);
   overlaySection.appendChild(btn('panel-close', '×', 'Close data maps', () => {
     overlaySection.classList.remove('open'); overlayToggle.setAttribute('aria-expanded', 'false');
     overlayToggle.focus();
@@ -1315,10 +1298,10 @@ export function mountUI(actions) {
   petFooter.appendChild(petAccept);
   petitionDialog.appendChild(petFooter);
   let shownPetition = "";
-  const petitionBtn = btn("btn", "Petition", "Open petition", () => { if (petitionDialog.dataset.id) petitionDialog.showModal(); });
-  petitionBtn.style.display = "none";
-  petitionBtn.classList.add("btn-danger");
-  topMenuBtns.insertBefore(petitionBtn, topMenuBtns.children[4]);
+  const petitionBtn = btn('management-card', '', 'Open petition', () => { if (petitionDialog.dataset.id) { hub.dialog.close(); petitionDialog.showModal(); } });
+  petitionBtn.innerHTML = `<span class="management-art">${categoryArt('special')}</span><span><strong>Petitions & offers</strong><small>No offers waiting. Mayors and businesses will contact you here.</small></span>`;
+  petitionBtn.disabled = true;
+  hub.grid.appendChild(petitionBtn);
 
   // ── Help dialog ────────────────────────────────────────────────────────────
   const helpDialog = document.createElement("dialog");
@@ -1461,6 +1444,10 @@ export function mountUI(actions) {
     if (e.target === confirmDialog) confirmDialog.close();
   });
 
+  for (const dialog of [budgetDialog, reportDialog, advisorDialog]) {
+    dialog.querySelector('.modal-footer').prepend(btn('btn', '← City management', 'Back to city management', () => { dialog.close(); hub.dialog.showModal(); }));
+  }
+
   // ── RCI helper ─────────────────────────────────────────────────────────────
   function updateRci(bar, demand) {
     bar.val.parentElement.setAttribute('aria-valuenow', String(Math.max(-100, Math.min(100, demand || 0))));
@@ -1568,16 +1555,12 @@ export function mountUI(actions) {
 
       // Rewards and deals: only unlocked, unbuilt specials show in the dock.
       if (stats.available) {
-        let any = false;
         for (const type of SPECIAL_TYPES) {
           const b = toolBtns[type];
           if (!b) continue;
           const show = !!stats.available[type];
           b.style.display = show ? "" : "none";
-          any = any || show;
         }
-        const g = groupEls.special;
-        if (g) g.el.style.display = any ? "" : "none";
       }
       // Technology: hide buildings the era has not invented yet.
       if (stats.tech) {
@@ -1590,7 +1573,9 @@ export function mountUI(actions) {
       // Petitions: announce once, pause, and keep a button while open.
       const p = stats.petition;
       if (p) {
-        petitionBtn.style.display = "";
+        petitionBtn.disabled = false;
+        petitionBtn.querySelector('small').textContent = p.title;
+        managementButton.classList.add('has-petition');
         petitionDialog.dataset.id = p.id;
         petTitle.textContent = p.title;
         petText.textContent = p.body;
@@ -1603,7 +1588,9 @@ export function mountUI(actions) {
           petitionDialog.showModal();
         }
       } else {
-        petitionBtn.style.display = "none";
+        petitionBtn.disabled = true;
+        petitionBtn.querySelector('small').textContent = 'No offers waiting. Mayors and businesses will contact you here.';
+        managementButton.classList.remove('has-petition');
         delete petitionDialog.dataset.id;
       }
 
@@ -1730,7 +1717,7 @@ export function mountUI(actions) {
     setOverlay(id) {
       overlayToggle.classList.toggle('active', id !== 'none');
       const label = [...overlayGrid.children].find(b => b.dataset.overlay === id)?.textContent || id;
-      overlayToggle.textContent = id === 'none' ? 'Data maps' : label;
+      overlayToggle.title = id === 'none' ? 'Data maps' : `${label} overlay active`;
       overlayToggle.setAttribute('aria-description', id === 'none' ? 'City view' : `${label} overlay active`);
       overlayGrid.querySelectorAll(".overlay-btn").forEach((b) => {
         b.classList.toggle("active", b.dataset.overlay === id); b.setAttribute('aria-pressed', String(b.dataset.overlay === id));

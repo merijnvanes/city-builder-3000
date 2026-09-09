@@ -1,3 +1,4 @@
+import { openManagement, openCategory } from './ui-navigation.mjs';
 // Browser gameplay checks with Playwright. Run `pnpm dev --port 4173` first.
 import { chromium } from "@playwright/test";
 import assert from "node:assert/strict";
@@ -34,7 +35,7 @@ try {
   assert.ok((await cameraX()) < beforePan - 25, 'held arrow pans continuously');
   const stopped = await cameraX(); await page.waitForTimeout(80);
   assert.equal(await cameraX(), stopped, 'camera stops on release');
-  await page.getByTitle('Home view [H]', { exact: true }).click();
+  await page.keyboard.press('h');
   await page.evaluate(() => civic.renderer.zoomAt(Math.log(0.5 / civic.renderer.zoom)));
 
   // Pick an empty grass tile in view.
@@ -60,13 +61,15 @@ try {
 
   // Save, bulldoze, load.
   await menuAction('Save city');
+  await page.getByRole('button', { name: 'Land', exact: true }).click();
+  await page.getByRole('tab', { name: 'Demolition', exact: true }).click();
   await page.locator('[data-tool="bulldoze"]').click(); await page.mouse.click(p.x, p.y);
   assert.equal((await tile(target.x, target.y)).type, "empty");
   await menuAction('Load city');
   assert.equal((await tile(target.x, target.y)).type, "road", "Load restores the road");
 
   // Budget: independent taxes, loans.
-  await page.getByRole("button", { name: "Open budget", exact: true }).click();
+  await openManagement(page, 'Open budget');
   await page.getByRole('tab', { name: 'Taxes & services', exact: true }).click();
   const tax = page.getByRole("slider", { name: "Residential tax rate", exact: true });
   await tax.fill("12"); await tax.dispatchEvent("input");
@@ -80,16 +83,16 @@ try {
   assert.equal(await page.evaluate(() => civic.city.debt), 15000, "ten annual payments of 15%");
   assert.equal(await money(), beforeLoan + 10000);
   assert.equal(await page.getByRole("button", { name: /Repay/ }).count(), 0, "no early repayment");
-  await page.getByRole("button", { name: "Open budget", exact: true }).click();
+  await openManagement(page, 'Open budget');
   await page.getByRole('tab', { name: 'Policies', exact: true }).click();
   await page.getByRole("button", { name: "Toggle Clean Air Act", exact: true }).click();
   assert.equal(await page.evaluate(() => civic.city.ordinances.cleanAir), true, "ordinance toggles");
   await page.keyboard.press("Escape");
 
   // Dialogs.
-  await page.getByRole("button", { name: "City report", exact: true }).click();
+  await openManagement(page, 'City report');
   assert.ok(await page.getByRole("dialog", { name: "City Report", exact: true }).isVisible()); await page.keyboard.press("Escape");
-  await page.getByRole("button", { name: "Advisors", exact: true }).click();
+  await openManagement(page, 'Advisors');
   assert.ok(await page.getByRole("dialog", { name: "Advisors", exact: true }).isVisible()); await page.keyboard.press("Escape");
   await menuAction('Disasters');
   await page.locator('[data-disaster="fire"]').click();
@@ -105,7 +108,7 @@ try {
 
   // Footprint placement: a police station on a 3x3 grass site.
   await page.evaluate(() => civic.renderer.zoomAt(Math.log(0.5 / civic.renderer.zoom)));
-  await page.getByRole("button", { name: "Civic", exact: true }).click();
+  await openCategory(page, 'Civic');
   await page.locator('[data-tool="police"]').click();
   const site = await page.evaluate(() => civic.city.tiles.find((t) => {
     const c = civic.city, ok = (x, y) => { const n = c.tiles[y * c.size + x]; return n && n.terrain === "grass" && n.type === "empty" && n.elev === t.elev; };
@@ -131,15 +134,15 @@ try {
 
   // Mobile layout.
   await page.setViewportSize({ width: 390, height: 844 }); await page.waitForTimeout(150);
-  await page.getByTitle("Home view [H]", { exact: true }).click(); await page.waitForTimeout(200);
+  await page.keyboard.press('h'); await page.waitForTimeout(200);
   await page.locator('.city-menu summary').click();
-  for (const name of ["Open budget", "Save city", "Load city", "New city"]) {
+  for (const name of ["Save city", "Load city", "New city"]) {
     const box = await page.getByRole("button", { name, exact: true }).boundingBox();
     assert.ok(box && box.x >= 0 && box.x + box.width <= 390, `${name} reachable on mobile`);
   }
   await page.locator('.city-menu summary').click();
   assert.ok(await page.locator("#toolbar").isVisible());
-  await page.getByRole('button', { name: 'Zones', exact: true }).click();
+  await openCategory(page, 'Zones');
   assert.ok(await page.locator('#flyout').isVisible(), 'The mobile rail opens a tool palette');
   await page.getByRole('button', { name: 'Close tool palette', exact: true }).click();
   await page.screenshot({ path: "artifacts/mobile.png" });
