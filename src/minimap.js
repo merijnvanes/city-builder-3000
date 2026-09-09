@@ -1,5 +1,5 @@
 import "./minimap.css";
-import { mapPoint, worldPoint, visibleMapPolygon } from './minimap-geometry.js';
+import { mapPoint, worldPoint, visibleMapPolygon, cameraMarker } from './minimap-geometry.js';
 
 const colors = {
   road: "#8393aa",
@@ -23,7 +23,7 @@ export function createMinimap(renderer) {
   panel.innerHTML = '<canvas width="480" height="480" tabindex="0" role="img" aria-label="City overview. Click or drag to move the camera. Arrow keys pan the view."></canvas>';
   document.querySelector("#navigator").prepend(panel);
   const canvas = panel.querySelector("canvas"), ctx = canvas.getContext("2d");
-  canvas.title = 'Click or drag to move around your city';
+  canvas.title = 'Click or drag to move around your city. The gold dot marks the camera side; its line points into the view.';
   const terrain = document.createElement('canvas'); terrain.width = terrain.height = 160;
   const map = terrain.getContext('2d');
   let city, mapCity, mapRevision, lastKey = "";
@@ -100,6 +100,20 @@ export function createMinimap(renderer) {
       ctx.lineWidth = 1.5;
       ctx.stroke();
       ctx.restore();
+      const marker = cameraMarker(view, city.size);
+      if (marker) {
+        ctx.save();
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(marker.x, marker.y);
+        ctx.lineTo(marker.x + marker.dx * 10, marker.y + marker.dy * 10);
+        ctx.strokeStyle = '#344364'; ctx.lineWidth = 4; ctx.stroke();
+        ctx.strokeStyle = '#ffe5a0'; ctx.lineWidth = 2; ctx.stroke();
+        ctx.beginPath(); ctx.arc(marker.x, marker.y, 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffe5a0'; ctx.fill();
+        ctx.strokeStyle = '#344364'; ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.restore();
+      }
       ctx.fillStyle = '#4b628e'; ctx.font = '700 7px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       const compass = [['N', 80, 7]];
       for (const [label, x, y] of compass) ctx.fillText(label, x, y);

@@ -38,7 +38,8 @@ has no top bar over it. Scroll the rail to reach more categories. Opening a pale
 focuses its first available tool; closing it returns focus to its category.
 
 Click or drag the minimap to move the camera. Its orientation stays fixed, and its
-outline shows the visible area. The focused map also accepts arrow keys. The map
+outline shows the visible area. A gold dot marks the camera-facing edge, with a
+short line pointing into the view. It follows camera rotation. The focused map also accepts arrow keys. The map
 stays visible, including while a construction palette is open. On phones and short
 windows it fits within the rail. Zoom buttons stack to the left, with rotation
 controls below the map. The layers icon opens data maps above-right of the map,

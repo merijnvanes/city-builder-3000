@@ -1,12 +1,34 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mapPoint, worldPoint, visibleMapPolygon } from '../src/minimap-geometry.js';
+import { mapPoint, worldPoint, visibleMapPolygon, cameraMarker } from '../src/minimap-geometry.js';
 
 test('minimap corners point up, right, down and left', () => {
   assert.deepEqual(mapPoint(0, 0, 64), { x: 80, y: 16 });
   assert.deepEqual(mapPoint(64, 0, 64), { x: 144, y: 80 });
   assert.deepEqual(mapPoint(64, 64, 64), { x: 80, y: 144 });
   assert.deepEqual(mapPoint(0, 64, 64), { x: 16, y: 80 });
+});
+
+test('camera marker follows the near edge through all four rotations', () => {
+  let view = [{x:16,y:16}, {x:48,y:16}, {x:48,y:48}, {x:16,y:48}];
+  const middle = mapPoint(32, 32, 64);
+  for (let rotation = 0; rotation < 4; rotation++) {
+    const marker = cameraMarker(view, 64);
+    const near = mapPoint((view[2].x + view[3].x) / 2, (view[2].y + view[3].y) / 2, 64);
+    assert.ok(Math.hypot(marker.x - near.x, marker.y - near.y) < 1e-9);
+    const length = Math.hypot(middle.x - near.x, middle.y - near.y);
+    assert.ok(Math.abs(marker.dx - (middle.x - near.x) / length) < 1e-9);
+    assert.ok(Math.abs(marker.dy - (middle.y - near.y) / length) < 1e-9);
+    view = view.map(p => ({x:p.y, y:64-p.x}));
+  }
+});
+
+test('camera marker stays on a clipped outline and disappears off-map', () => {
+  const view = [{x:-20,y:-20}, {x:100,y:-20}, {x:100,y:100}, {x:-20,y:100}];
+  const marker = cameraMarker(view, 64), expected = mapPoint(32, 64, 64);
+  assert.equal(marker.x, expected.x); assert.equal(marker.y, expected.y);
+  assert.equal(cameraMarker(view.map(p => ({x:p.x+200,y:p.y})), 64), null);
+  assert.equal(cameraMarker(Array(4).fill({x:32,y:32}), 64), null);
 });
 
 test('click mapping round trips across map sizes and ignores the margins', () => {
