@@ -35,7 +35,7 @@ function update(){
   }
 }
 try{
-  const response=await fetch('./assets/civic/catalog.json');if(!response.ok)throw new Error('Asset catalog could not be loaded.');catalog=await response.json();
+  const response=await fetch('./civic-catalog.json');if(!response.ok)throw new Error('Asset catalog could not be loaded.');catalog=await response.json();
   for(const other of ['civic','power','water','parks','transport','rewards','deals','landmarks','residential','commercial','industrial'].filter(value=>value!==family)){
     const link=document.createElement('a');link.href=`?family=${other}`;link.textContent=`View ${other} collection →`;link.style.cssText='color:var(--accent);margin-right:12px';document.querySelector('nav').prepend(link);
   }

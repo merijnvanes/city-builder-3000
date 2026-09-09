@@ -1,5 +1,9 @@
 @import './ui-dialogs.css';
-@font-face { font-family: 'Nunito Sans'; src: url('../public/fonts/nunito-sans-latin.woff2') format('woff2'); font-style: normal; font-weight: 200 1000; font-display: swap; }
+/* The face lives beside the stylesheet, not in public/. Everything in public/ is
+   copied to the build root as-is, so a font kept there shipped twice: once
+   unhashed as a copy nothing loads, and once with a content hash as the file
+   this rule actually pulls. Only hashed files can be cached forever. */
+@font-face { font-family: 'Nunito Sans'; src: url('./fonts/nunito-sans-latin.woff2') format('woff2'); font-style: normal; font-weight: 200 1000; font-display: swap; }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {

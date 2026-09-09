@@ -33,7 +33,7 @@ with tempfile.TemporaryDirectory() as scratch:
     run = lambda: subprocess.run([sys.executable, str(tool / 'package.py')], capture_output=True, text=True)
     result = run()
     assert result.returncode == 0, result.stderr
-    catalog_path = root / 'public/assets/civic/catalog.json'
+    catalog_path = root / 'public/civic-catalog.json'
     original = catalog_path.read_bytes()
     spec = json.loads(original)['airport']
     assert spec['footprint'] == {'w': 6, 'h': 5} and 'tiles' not in spec

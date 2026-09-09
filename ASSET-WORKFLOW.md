@@ -152,7 +152,11 @@ Do not preview into the complete-bake directory and then package incomplete
 metadata. Never package concurrently with renders writing that same directory.
 Use the full twelve-frame per-type command in the source README for release.
 Incremental packaging needs the existing complete exported catalog, which is
-tracked; full packaging needs a full bake of all registered families. Update these commands when generalizing
+tracked at `public/civic-catalog.json`; full packaging needs a full bake of all
+registered families. The catalog sits at the build root rather than beside the
+sprites because everything under `assets/` is cached for a year on the strength
+of the content hash in its name, and the catalog keeps one name (see
+`public/_headers`). Update these commands when generalizing
 beyond civic assets, and keep the documented workflow executable.
 
 ## Working alongside simulation development

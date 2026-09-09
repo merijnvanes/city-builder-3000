@@ -17,6 +17,23 @@ pnpm build         # outputs to dist/
 
 `dist/` is a self-contained static site. Drop it on any static host.
 
+`public/_headers` travels with it and is read from the build root by Cloudflare Pages and by
+Netlify. Any other host needs the same two rules expressed its own way, and they are not
+optional. Everything under `/assets` carries a content hash in its name, from Vite for the code
+and from `tools/civic_art/package.py` for the artwork, so its URL changes whenever its bytes do
+and it is cached for a year. The HTML keeps a fixed URL and names those hashed files, so it is
+revalidated on every load. Cache the HTML instead and a returning player gets a page pointing at
+a bundle that was deleted three deploys ago.
+
+No path may match two rules that set the same header. Cloudflare Pages appends the second value
+rather than replacing the first, so narrowing `/assets/*` for one file would send both policies
+at once and a browser that honours `immutable` would keep it for a year anyway. Anything that
+cannot be cached forever lives outside `/assets`: that is why the artwork catalogue the gallery
+page reads is `public/civic-catalog.json` at the build root and not under the sprites it
+describes. `tests/deploy-headers.test.js` checks every file in a finished build against these
+rules, including that no two of them overlap, so run `pnpm build` before `pnpm test` to
+exercise it.
+
 ## Tests
 
 ```bash

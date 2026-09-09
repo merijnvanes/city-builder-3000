@@ -1,0 +1,47 @@
+# Response headers for the deployed site. Cloudflare Pages and Netlify both read
+# this file from the root of the build output; everything in public/ is copied
+# there, so this lands as dist/_headers. Any other host needs the same rules
+# expressed its own way.
+#
+# The split below is the whole point. Every file under /assets carries a content
+# hash in its name, put there by Vite for the code and by
+# tools/civic_art/package.py for the artwork, so its URL changes whenever its
+# bytes do and a browser can keep it forever. The pages have fixed URLs and name
+# those hashed files, so they must be checked on every load. Cache a page and a
+# returning player gets an index pointing at a bundle that no longer exists.
+#
+# No path may match two rules that both set the same header. Cloudflare Pages
+# appends the second value rather than replacing the first, so an attempt to
+# narrow /assets/* for one file would send both policies at once and browsers
+# that honour `immutable` would keep the file for a year regardless. Anything
+# that cannot be cached forever therefore lives outside /assets, and
+# tests/deploy-headers.test.js checks that no rules overlap.
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# max-age=0 with must-revalidate still allows a conditional request, so an
+# unchanged page comes back as a 304 rather than a fresh megabyte.
+/
+  Cache-Control: public, max-age=0, must-revalidate
+
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Cloudflare Pages serves pages at their clean URL and matches these rules
+# against the path the browser asked for, so both spellings need the rule.
+/civic-gallery
+  Cache-Control: public, max-age=0, must-revalidate
+
+/civic-gallery.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+# The artwork catalogue the gallery page reads. One fixed name, rewritten in
+# place whenever art is baked.
+/civic-catalog.json
+  Cache-Control: public, max-age=0, must-revalidate
+
+# The font's licence. It has no hash in its name, so it gets a day rather than a
+# year; the font itself is a hashed build asset covered above.
+/fonts/*
+  Cache-Control: public, max-age=86400
