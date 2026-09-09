@@ -43,7 +43,7 @@ function scoped(r, lot, dim, powered = true) {
   const tone = (c) => (k !== 1 ? shadeHex(c, k) : c);
   return {
     w, h, x, y,
-    visible: (side) => [["south", "east"], ["east", "north"], ["north", "west"], ["west", "south"]][r.rotation || 0].includes(side),
+    visible: (side) => [["southwest", "southeast"], ["southeast", "northeast"], ["northeast", "northwest"], ["northwest", "southwest"]][r.rotation || 0].includes(side),
     // Keep each solid and its surface details together as the camera rotates.
     parts: (parts) => parts.map(([a, b, draw]) => {
       const p = r.orient(...s(a, b));
@@ -62,12 +62,12 @@ function scoped(r, lot, dim, powered = true) {
     fins: (a, b, fw, fd, hh, z, c, width = 0.8) => {
       const ax = x + a * w, ay = y + b * h, ww = fw * w, dd = fd * h;
       for (const face of r.faces(ax, ay, ww, dd, hh, z)) {
-        const alongX = face.name === "north" || face.name === "south";
+        const alongX = face.name === "northeast" || face.name === "southwest";
         const length = alongX ? ww : dd, count = Math.max(1, Math.floor(length * 6));
         for (let i = 0; i < count; i++) {
           const offset = (i + 0.5) * length / count;
-          const px = alongX ? ax + offset : face.name === "east" ? ax + ww : ax;
-          const py = alongX ? face.name === "south" ? ay + dd : ay : ay + offset;
+          const px = alongX ? ax + offset : face.name === "southeast" ? ax + ww : ax;
+          const py = alongX ? face.name === "southwest" ? ay + dd : ay : ay + offset;
           r.line(r.project(px, py, z + 1), r.project(px, py, z + hh), tone(c), width);
         }
       }

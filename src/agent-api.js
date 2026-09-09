@@ -234,6 +234,8 @@ export function createAgentAPI({ getCity, actions, renderer, ui, undo }) {
           "build(tool, x1, y1, x2, y2) drags from the first corner to the second, exactly like the mouse.",
           "Bridges and tunnels return requiresConfirmation and quote without building. Repeat with {confirmStructures:true,maxCost:quote} as the sixth argument to accept.",
           "Rectangle tools fill the box. Path tools draw a Manhattan L. Everything else places one footprint centred on x2,y2.",
+          "World corners: north=(0,0), east=(size,0), south=(size,size), west=(0,size). Default camera has north at the top. Camera rotation never changes world directions.",
+          "Border sides: northeast=y:0, southeast=x:size-1, southwest=y:size-1, northwest=x:0. Use these full side names for deals and connectNeighbor.",
           "Border builds return connectionOffers. connections() lists offers; connectNeighbor(x,y,side,route) explicitly pays to establish one.",
           "region() is bounded; overview() and field() cost the same on any map size.",
           "Read objects() for exact building identity; the region grid only shows the group.",

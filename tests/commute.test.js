@@ -22,7 +22,7 @@ const put = (c, x, y, tool, o) => { c.money = 50_000_000; return place(c, x, y, 
 // A map with no water anywhere near the corridor these tests build in.
 const plains = () => createCity({ seed: 12, starter: false, layout: "plains", hills: 0, startYear: 2000, size: 64 });
 
-// One long street west to east: a works at the west end, power and water all
+// One long street northwest to southeast: a works at the northwest end, power and water all
 // along it, and a block of housing wherever the test asks for one.
 function corridor(homeX, { road = [2, 60] } = {}) {
   const c = plains();
@@ -129,7 +129,7 @@ describe("a longer trip is a worse address", () => {
     for (let x = 8; x <= 16; x++) put(c, x, 30, "road");
     for (let x = 28; x <= 36; x++) put(c, x, 30, "road");
     if (long) {
-      // North, across, and back down: the same two ends, twice as far.
+    // Northeast, across, and back down: the same two ends, twice as far.
       for (let y = 24; y <= 30; y++) { put(c, 16, y, "road"); put(c, 28, y, "road"); }
       for (let x = 16; x <= 28; x++) put(c, x, 24, "road");
     } else {

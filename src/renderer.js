@@ -255,16 +255,16 @@ export class CityRenderer {
   faces(x, y, w, d, h, z = 0) {
     const p = (a, b, c) => this.project(a, b, c);
     const all = {
-      south: [p(x, y + d, z + h), p(x + w, y + d, z + h), p(x + w, y + d, z), p(x, y + d, z)],
-      east: [p(x + w, y, z + h), p(x + w, y + d, z + h), p(x + w, y + d, z), p(x + w, y, z)],
-      north: [p(x, y, z + h), p(x + w, y, z + h), p(x + w, y, z), p(x, y, z)],
-      west: [p(x, y, z + h), p(x, y + d, z + h), p(x, y + d, z), p(x, y, z)],
+      southwest: [p(x, y + d, z + h), p(x + w, y + d, z + h), p(x + w, y + d, z), p(x, y + d, z)],
+      southeast: [p(x + w, y, z + h), p(x + w, y + d, z + h), p(x + w, y + d, z), p(x + w, y, z)],
+      northeast: [p(x, y, z + h), p(x + w, y, z + h), p(x + w, y, z), p(x, y, z)],
+      northwest: [p(x, y, z + h), p(x, y + d, z + h), p(x, y + d, z), p(x, y, z)],
     };
-    return [["south", "east"], ["east", "north"], ["north", "west"], ["west", "south"]][this.rotation || 0].map((name) => ({ name, points: all[name] }));
+    return [["southwest", "southeast"], ["southeast", "northeast"], ["northeast", "northwest"], ["northwest", "southwest"]][this.rotation || 0].map((name) => ({ name, points: all[name] }));
   }
   box(x, y, w, d, h, color, z = 0) {
     for (const face of this.faces(x, y, w, d, h, z)) {
-      const normal={east:[1,0],west:[-1,0],north:[0,-1],south:[0,1]}[face.name],exposure=faceLight(...normal);
+      const normal={southeast:[1,0],northwest:[-1,0],northeast:[0,-1],southwest:[0,1]}[face.name],exposure=faceLight(...normal);
       const top = Math.min(...face.points.map(p => p.y)), bottom = Math.max(...face.points.map(p => p.y));
       const light = this.base.createLinearGradient(0, top, 0, Math.max(top + 1, bottom));
       light.addColorStop(0, shade(color, exposure));
@@ -315,12 +315,12 @@ export class CityRenderer {
     const sill = Math.min(3, floorHeight * 0.35), paneHeight = Math.min(3.3, floorHeight * 0.5);
     const rows = Math.max(1, Math.floor((h - sill - paneHeight) / floorHeight) + 1);
     for (const face of faces) {
-      const alongX = face.name === "south" || face.name === "north", length = alongX ? w : d, cols = Math.max(1, Math.min(7, Math.floor(length * 7)));
+      const alongX = face.name === "southwest" || face.name === "northeast", length = alongX ? w : d, cols = Math.max(1, Math.min(7, Math.floor(length * 7)));
       for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
           const z = base + sill + row * floorHeight, offset = 0.055 + col * (length - 0.1) / cols, span = ((length - 0.12) / cols) * 0.66;
-          const a = alongX ? x + offset : face.name === "east" ? x + w + 0.002 : x - 0.002;
-          const b = alongX ? (face.name === "south" ? y + d + 0.002 : y - 0.002) : y + offset;
+          const a = alongX ? x + offset : face.name === "southeast" ? x + w + 0.002 : x - 0.002;
+          const b = alongX ? (face.name === "southwest" ? y + d + 0.002 : y - 0.002) : y + offset;
           const on = this.night && lit && random(seed + row, col) > 0.35;
           const reflect = row / Math.max(1, rows - 1);
           const color = on ? (random(seed, row, col) > 0.6 ? "#ffe5aa" : "#d8b97c") : glass ? shade("#85b2c1", (0.48 + reflect * 0.5 + random(seed, col) * 0.12) * (this.night ? 0.42 : 1)) : this.night ? "#223039" : "#3d5359";
@@ -332,7 +332,7 @@ export class CityRenderer {
   }
 
   // ── Ground ────────────────────────────────────────────────────
-  // Slope lighting: faces toward the north-west light are brighter.
+  // Slope lighting: faces toward the northern key light are brighter.
   slopeShade(x, y) {
     const c = this.corners;
     if (!c) return 1;
@@ -612,9 +612,9 @@ export class CityRenderer {
         const t = city.tiles[i];
         const hw = t.type === "highway";
         if ((t.type !== "road" && !hw) || random(t.x, t.y, 9) > (hw ? 0.3 : 0.18) + (t.traffic || 0) * 0.008) continue;
-        const east = t.x + 1 < city.size && carriesRoute(city.tiles[i + 1], hw ? "highway" : "road") && surfaceStep(t,city.tiles[i+1]), south = carriesRoute(city.tiles[i + city.size], hw ? "highway" : "road") && surfaceStep(t,city.tiles[i+city.size]);
-        if (!east && !south) continue;
-        const vertical = south && (!east || i % 2 === 0), f = (time * (hw ? 0.0003 : 0.00016) + random(t.x, t.y)) % 1, back = i % 3 === 0;
+        const southeast = t.x + 1 < city.size && carriesRoute(city.tiles[i + 1], hw ? "highway" : "road") && surfaceStep(t,city.tiles[i+1]), southwest = carriesRoute(city.tiles[i + city.size], hw ? "highway" : "road") && surfaceStep(t,city.tiles[i+city.size]);
+        if (!southeast && !southwest) continue;
+        const vertical = southwest && (!southeast || i % 2 === 0), f = (time * (hw ? 0.0003 : 0.00016) + random(t.x, t.y)) % 1, back = i % 3 === 0;
         this.platform=bridgePlatform(this,t);
         const a = back ? 1 - f : f, p = this.project(t.x + (vertical ? (back ? 0.68 : 0.32) : a), t.y + (vertical ? a : back ? 0.68 : 0.32), 2.1);
         if (p.x < -20 || p.x > this.w + 20 || p.y < -20 || p.y > this.h + 20) {this.platform=null;continue;}
@@ -664,10 +664,18 @@ export class CityRenderer {
     compositeBridgeTraffic(this);
     for (const plane of aircraft) drawAirplane(this, plane.p, plane.heading, time);
 
+    // Cardinal directions belong to corners and follow the world through rotation.
+    ctx.font = '700 14px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for (const [label, x, y] of [['N', -1, -1], ['E', city.size + 1, -1], ['S', city.size + 1, city.size + 1], ['W', -1, city.size + 1]]) {
+      const p = this.project(x, y, 0);
+      ctx.lineWidth = 4; ctx.strokeStyle = '#101820cc'; ctx.strokeText(label, p.x, p.y);
+      ctx.fillStyle = label === 'N' ? '#f4d58a' : '#e8f0d8'; ctx.fillText(label, p.x, p.y);
+    }
+
     // Neighbour names along the map edges.
     if (city._connections && this.zoom > 0.4) {
       const n = city.size;
-      const spots = { north: [n / 2, -1.5], south: [n / 2, n + 1.5], west: [-1.5, n / 2], east: [n + 1.5, n / 2] };
+      const spots = { northeast: [n / 2, -1.5], southwest: [n / 2, n + 1.5], northwest: [-1.5, n / 2], southeast: [n + 1.5, n / 2] };
       ctx.font = `700 ${Math.max(10, 12 * this.zoom)}px system-ui, sans-serif`;
       ctx.textAlign = "center"; ctx.textBaseline = "middle";
       for (const [side, [x, y]] of Object.entries(spots)) {
@@ -676,7 +684,7 @@ export class CityRenderer {
         const p = this.project(x, y, 0);
         if (p.x < 0 || p.x > this.w || p.y < 0 || p.y > this.h) continue;
         const links = [c.road ? "road" : "", c.rail ? "rail" : "", c.power ? "power" : "", c.water ? "water" : ""].filter(Boolean).join(" · ");
-        const label = `${c.name}${links ? " — " + links : ""}`;
+        const label = `${side.toUpperCase()} · ${c.name}${links ? " — " + links : ""}`;
         ctx.lineWidth = 3; ctx.strokeStyle = "#101820cc"; ctx.strokeText(label, p.x, p.y);
         ctx.fillStyle = links ? "#e8f0d8" : "#b8c4b0"; ctx.fillText(label, p.x, p.y);
       }

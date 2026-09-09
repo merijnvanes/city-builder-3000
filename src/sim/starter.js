@@ -89,7 +89,7 @@ export function buildStarterTown(city) {
 
   const size = city.size;
   const span = 28;
-  // Site the town on the driest 29×29 window, preferring the west-centre.
+  // Site the town on the driest 29×29 window, preferring the northwest-centre.
   const prefX = Math.round(size * 0.12), prefY = Math.round(size * 0.2);
   let ox = prefX, oy = prefY, bestScore = Infinity;
   for (let cy = 3; cy + span < size - 3; cy += 2) {
@@ -152,7 +152,7 @@ export function buildStarterTown(city) {
   }
 
   // Zones: commercial core, residential towers beside it, medium ring,
-  // low-density edge, industry along the west and north-east edges.
+  // low-density edge, industry along the northwest and southeast edges.
   const plan = (i, j) => {
     if (i === 3 && j === 3) return ["commercial", 3];
     if ((i === 3 && (j === 2 || j === 4)) || (j === 3 && (i === 2 || i === 4))) return ["commercial", 2];
@@ -203,7 +203,7 @@ export function buildStarterTown(city) {
   }
 
   // Pumps on the nearest shore to downtown; a land route carries pipe and
-  // power line back to the grid; pipes run under three east-west streets.
+  // power line back to the grid; pipes run under three southeast-northwest streets.
   const cx = ox + span / 2, cy = oy + span / 2;
   let shore = null, best = Infinity;
   for (const t of city.tiles) {

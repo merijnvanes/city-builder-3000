@@ -298,7 +298,7 @@ describe("a terminal is a connection to every neighbour", () => {
   // garbage travels by "road, highway, rail, or seaport connection".
   test("no port, no garbage deal on a landlocked map", () => {
     const c = plains();
-    for (const side of ["north", "east", "south", "west"]) {
+    for (const side of ["northeast", "southeast", "southwest", "northwest"]) {
       assert.equal(dealAvailable(detectConnections(c), "garbage", side), false, side);
     }
   });
@@ -311,7 +311,7 @@ describe("a terminal is a connection to every neighbour", () => {
     develop(c, "seaport");
     refresh(c);
     assert.equal(standingPorts(c).seaport, 1);
-    for (const side of ["north", "east", "south", "west"]) {
+    for (const side of ["northeast", "southeast", "southwest", "northwest"]) {
       assert.equal(dealAvailable(detectConnections(c), "garbage", side), true, side);
     }
   });
@@ -322,7 +322,7 @@ describe("a terminal is a connection to every neighbour", () => {
     develop(c, "seaport");
     refresh(c);
     assert.equal(standingPorts(c).seaport, 0);
-    assert.equal(dealAvailable(detectConnections(c), "garbage", "north"), false);
+    assert.equal(dealAvailable(detectConnections(c), "garbage", "northeast"), false);
   });
 });
 

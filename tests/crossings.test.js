@@ -78,8 +78,8 @@ test('border highway crossings keep highway access to external jobs',()=>{
     const c=town();
     for(let x=0;x<=20;x++) put(c,x,20,'highway');
     put(c,20,21,'road'); put(c,20,20,'onramp'); lot(c,20,22,'residential');
-    put(c,0,20,lower); connectNeighbor(c,{x:0,y:20,side:'west',route:'highway'}); refresh(c);
-    assert.ok(c._connections.west.road>0); assert.ok(at(c,20,22).commute>0);
+    put(c,0,20,lower); connectNeighbor(c,{x:0,y:20,side:'northwest',route:'highway'}); refresh(c);
+    assert.ok(c._connections.northwest.road>0); assert.ok(at(c,20,22).commute>0);
   }
 });
 test('destroyed crossings leave loadable saves',async()=>{

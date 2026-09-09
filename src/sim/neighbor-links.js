@@ -2,13 +2,13 @@ import { allowsDirection } from './structures.js';
 import { carriesRoute } from './catalog.js';
 
 export const CONNECTION_FEES = { road:500, rail:750, highway:1000 };
-export const EDGE_DIRECTIONS = { north:[0,-1], east:[1,0], south:[0,1], west:[-1,0] };
+export const EDGE_DIRECTIONS = { northeast:[0,-1], southeast:[1,0], southwest:[0,1], northwest:[-1,0] };
 export function edgeSides(size,x,y) {
-  return Object.keys(EDGE_DIRECTIONS).filter(side=>side==='north'?y===0:side==='south'?y===size-1:side==='west'?x===0:x===size-1);
+  return Object.keys(EDGE_DIRECTIONS).filter(side=>side==='northeast'?y===0:side==='southwest'?y===size-1:side==='northwest'?x===0:x===size-1);
 }
 const key = link => `${link.x},${link.y},${link.side},${link.route}`;
 function onEdge(size,x,y,side) {
-  return side==='north'?y===0:side==='south'?y===size-1:side==='west'?x===0:side==='east'?x===size-1:false;
+  return side==='northeast'?y===0:side==='southwest'?y===size-1:side==='northwest'?x===0:side==='southeast'?x===size-1:false;
 }
 export function validLink(city,link) {
   return !!link && Number.isSafeInteger(link.x) && Number.isSafeInteger(link.y) && link.x>=0 && link.y>=0 && link.x<city.size && link.y<city.size &&
@@ -56,6 +56,6 @@ export function parseConnections(city,raw) {
 }
 
 export function outwardConnection(city,t,dx,dy,route) {
-  const side=dx===1?'east':dx===-1?'west':dy===1?'south':'north';
+  const side=dx===1?'southeast':dx===-1?'northwest':dy===1?'southwest':'northeast';
   return linked(city,t.x,t.y,side,route);
 }

@@ -33,17 +33,17 @@ export function cross(d, x, y, size, z, color) {
 
 export function clockFaces(d, x, y, w, h, z) {
   // Four vertical clock faces; unlike a roof decal these survive rotation.
-  for (const [side, fy] of [['north', y - 0.002], ['south', y + h + 0.002]]) {
+  for (const [side, fy] of [['northeast', y - 0.002], ['southwest', y + h + 0.002]]) {
     if (!d.visible(side)) continue;
     d.box(x + w * 0.25, fy, w * 0.5, 0.002, 6, CIVIC.trim, z);
-    const faceY = fy + (side === 'south' ? 0.002 : -0.001);
+    const faceY = fy + (side === 'southwest' ? 0.002 : -0.001);
     d.line(x + w * 0.5, faceY, z + 3, x + w * 0.5, faceY, z + 5, CIVIC.slate, 0.8);
     d.line(x + w * 0.5, faceY, z + 3, x + w * 0.7, faceY, z + 3, CIVIC.slate, 0.8);
   }
-  for (const [side, fx] of [['west', x - 0.002], ['east', x + w + 0.002]]) {
+  for (const [side, fx] of [['northwest', x - 0.002], ['southeast', x + w + 0.002]]) {
     if (!d.visible(side)) continue;
     d.box(fx, y + h * 0.25, 0.002, h * 0.5, 6, CIVIC.trim, z);
-    const faceX = fx + (side === 'east' ? 0.002 : -0.001);
+    const faceX = fx + (side === 'southeast' ? 0.002 : -0.001);
     d.line(faceX, y + h * 0.5, z + 3, faceX, y + h * 0.5, z + 5, CIVIC.slate, 0.8);
     d.line(faceX, y + h * 0.5, z + 3, faceX, y + h * 0.7, z + 3, CIVIC.slate, 0.8);
   }

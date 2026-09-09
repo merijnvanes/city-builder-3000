@@ -15,12 +15,12 @@ try {
  const p=await page.evaluate(()=>civic.renderer.project(.5,20.5));
  await page.mouse.click(p.x,p.y);await page.getByRole('dialog',{name:'Connect to neighboring county?'}).waitFor();
  await page.getByRole('button',{name:'Keep dead end'}).click();
- assert.equal(await page.evaluate(()=>civic.city._connections.west.road),0);
+ assert.equal(await page.evaluate(()=>civic.city._connections.northwest.road),0);
  await page.mouse.click(p.x,p.y);await page.getByRole('button',{name:'Connect · $500',exact:true}).click();
- await page.waitForFunction(()=>civic.city._connections.west.road===1);
+ await page.waitForFunction(()=>civic.city._connections.northwest.road===1);
  const connected=await page.evaluate(()=>({money:civic.city.money,links:civic.agent.connections().established}));
  assert.equal(connected.money,built.money-500);assert.equal(connected.links.length,1);
- await page.evaluate(()=>civic.agent.undo());assert.equal(await page.evaluate(()=>civic.city._connections.west.road),0);
- const api=await page.evaluate(()=>civic.agent.connectNeighbor(0,20,'west','road'));assert.ok(api.ok);
+ await page.evaluate(()=>civic.agent.undo());assert.equal(await page.evaluate(()=>civic.city._connections.northwest.road),0);
+ const api=await page.evaluate(()=>civic.agent.connectNeighbor(0,20,'northwest','road'));assert.ok(api.ok);
  assert.deepEqual(errors,[]);console.log('County connection UI: decline, accept, fee, undo and explicit API purchase passed.');
 }finally{await browser.close();}

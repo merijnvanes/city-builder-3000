@@ -8,7 +8,7 @@ import { linked } from './neighbor-links.js';
 import { ROAD_TYPES } from "./catalog.js";
 import { standingPorts } from "./ports.js";
 
-export const SIDES = ["north", "east", "south", "west"];
+export const SIDES = ["northeast", "southeast", "southwest", "northwest"];
 const NAMES = ["Ashford", "Brightwater", "Cedar Falls", "Dunmore", "Eastbrook", "Fairhaven", "Glenrock", "Harborview", "Ironvale", "Juniper", "Kingsport", "Lakemont", "Millbridge", "Northgate", "Oakridge", "Pinehurst"];
 
 // What a neighbour will do for you, and what it costs.
@@ -94,15 +94,15 @@ function edgeTiles(city, side) {
   const { size, tiles } = city;
   const out = [];
   for (let i = 0; i < size; i++) {
-    if (side === "north") out.push(tiles[i]);
-    else if (side === "south") out.push(tiles[(size - 1) * size + i]);
-    else if (side === "west") out.push(tiles[i * size]);
+    if (side === "northeast") out.push(tiles[i]);
+    else if (side === "southwest") out.push(tiles[(size - 1) * size + i]);
+    else if (side === "northwest") out.push(tiles[i * size]);
     else out.push(tiles[i * size + size - 1]);
   }
   return out;
 }
 
-// { north: { name, road, rail, power, water, roadTiles: [...] }, ... }
+// { northeast: { name, road, rail, power, water, roadTiles: [...] }, ... }
 //
 // "Seaports and airports are considered connections to all neighbors", and
 // garbage may travel by "road, highway, rail, or seaport connection". So a

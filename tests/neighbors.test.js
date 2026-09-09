@@ -25,7 +25,7 @@ const sign = (c, resource, side, kind) => {
   return r;
 };
 
-// Powered, watered district with a road running to the west edge.
+// Powered, watered district with a road running to the northwest edge.
 function district(c) {
   for (let x = 0; x <= 30; x++) put(c, x, 20, "road");
   for (let y = 14; y <= 26; y++) put(c, 16, y, "road");
@@ -46,13 +46,13 @@ describe("connections", () => {
     put(c, 0, 10, "road"); put(c, 63, 10, "rail"); put(c, 10, 0, "powerline"); put(c, 10, 63, "pipe");
     refresh(c);
     const n = detectConnections(c);
-    assert.equal(n.west.road, 1); assert.equal(n.east.rail, 1); assert.equal(n.north.power, 1); assert.equal(n.south.water, 1);
-    assert.equal(n.north.road, 0);
-    assert.ok(n.north.name && n.north.name !== n.east.name);
+    assert.equal(n.northwest.road, 1); assert.equal(n.southeast.rail, 1); assert.equal(n.northeast.power, 1); assert.equal(n.southwest.water, 1);
+    assert.equal(n.northeast.road, 0);
+    assert.ok(n.northeast.name && n.northeast.name !== n.southeast.name);
     const s = getStats(c);
     assert.equal(s.neighbors.length, 4);
-    assert.equal(s.neighbors.find((x) => x.side === "north").deals.power, true);
-    assert.equal(s.neighbors.find((x) => x.side === "north").deals.water, false);
+    assert.equal(s.neighbors.find((x) => x.side === "northeast").deals.power, true);
+    assert.equal(s.neighbors.find((x) => x.side === "northeast").deals.water, false);
   });
   test("a road to the edge adds outside jobs and trade demand", () => {
     const c = district(plains());
@@ -76,11 +76,11 @@ describe("connections", () => {
 describe("deals", () => {
   test("buying power supplies the deficit, and only up to the contracted cap", () => {
     const c = district(plains());
-    assert.equal(sign(c, "power", "north", "buy").ok, false);
+    assert.equal(sign(c, "power", "northeast", "buy").ok, false);
     for (let y = 0; y <= 14; y++) put(c, 4, y, "powerline");
     refresh(c);
     const before = getStats(c).utilities.power;
-    assert.equal(sign(c, "power", "north", "buy").ok, true);
+    assert.equal(sign(c, "power", "northeast", "buy").ok, true);
     const s = getStats(c);
     // The town already generates enough, so there is no deficit to cover.
     const deficit = Math.max(0, before.demand - before.supply);
@@ -91,7 +91,7 @@ describe("deals", () => {
   });
 
   test("a city short of power buys what it is short of, and pays for it", () => {
-    // A consumer wired to the north edge with no plant of its own.
+    // A consumer wired to the northeast edge with no plant of its own.
     const c = plains();
     put(c, 20, 10, "police");
     for (let i = -1; i <= 3; i++) put(c, 20 + i, 13, "road");
@@ -101,7 +101,7 @@ describe("deals", () => {
     assert.equal(before.supply, 0);
     assert.ok(before.demand > 0, "the station should be asking for power");
 
-    sign(c, "power", "north", "buy");
+    sign(c, "power", "northeast", "buy");
     const s = getStats(c);
     assert.equal(s.utilities.power.supply, before.demand, "the neighbour covers exactly the deficit");
     assert.equal(s.utilities.power.deal.amount, before.demand);
@@ -117,7 +117,7 @@ describe("deals", () => {
     for (let y = 0; y <= 20; y++) put(c, 3, y, "powerline");
     for (let x = 3; x <= 45; x++) put(c, x, 19, "powerline");
     refresh(c);
-    sign(c, "power", "north", "buy");
+    sign(c, "power", "northeast", "buy");
     const s = getStats(c);
     assert.ok(s.utilities.power.deal.amount <= DEALS.power.buy.cap);
   });
@@ -126,7 +126,7 @@ describe("deals", () => {
     const c = district(plains());
     for (let y = 0; y <= 14; y++) put(c, 4, y, "powerline");
     refresh(c);
-    assert.equal(sign(c, "power", "north", "sell").ok, true);
+    assert.equal(sign(c, "power", "northeast", "sell").ok, true);
     const s = getStats(c);
     assert.equal(s.budget.income.neighbors, Math.round(DEALS.power.sell.cap * DEALS.power.sell.rate));
     assert.equal(s.deals.power.met, true);
@@ -136,7 +136,7 @@ describe("deals", () => {
     const c = district(plains());
     for (let y = 0; y <= 14; y++) put(c, 4, y, "powerline");
     refresh(c);
-    sign(c, "power", "north", "sell");
+    sign(c, "power", "northeast", "sell");
     const before = c.money;
     put(c, 4, 0, "bulldoze"); refresh(c);
     tick(c);
@@ -149,7 +149,7 @@ describe("deals", () => {
     const c = district(plains());
     for (let y = 0; y <= 14; y++) put(c, 4, y, "powerline");
     refresh(c);
-    sign(c, "power", "north", "buy");
+    sign(c, "power", "northeast", "buy");
     const penalty = cancelPenalty(DEALS.power.buy);
     assert.ok(penalty > 0);
     const before = c.money;
@@ -162,7 +162,7 @@ describe("deals", () => {
     const c = district(plains());
     for (let y = 0; y <= 14; y++) put(c, 4, y, "powerline");
     refresh(c);
-    sign(c, "power", "north", "buy");
+    sign(c, "power", "northeast", "buy");
     c.money = 1;
     const result = setPolicy(c, "cancelDeal", "power");
     assert.equal(result.ok, false);
@@ -172,7 +172,7 @@ describe("deals", () => {
 
   test("exporting garbage takes what the tips cannot, and bills for it", () => {
     const c = district(plains());
-    assert.equal(sign(c, "garbage", "west", "sell").ok, true);
+    assert.equal(sign(c, "garbage", "northwest", "sell").ok, true);
     const s = getStats(c);
     assert.equal(s.garbageCapacity >= DEALS.garbage.sell.cap, true);
     // Nothing to export yet, so only the standing charge.
@@ -181,7 +181,7 @@ describe("deals", () => {
 
   test("importing garbage pays, and adds to what the city must dispose of", () => {
     const c = district(plains());
-    sign(c, "garbage", "west", "buy");
+    sign(c, "garbage", "northwest", "buy");
     const s = getStats(c);
     assert.equal(s.budget.income.neighbors, Math.round(DEALS.garbage.buy.cap * DEALS.garbage.buy.rate));
     assert.ok(s.garbageProduced >= DEALS.garbage.buy.cap);
@@ -193,7 +193,7 @@ describe("deals", () => {
 describe("transport buildings", () => {
   test("rail carries commuters between stations", () => {
     const c = plains();
-    // Homes on the west, jobs on the east, linked only by rail between two stations.
+    // Homes on the northwest, jobs on the southeast, linked only by rail between two stations.
     for (let x = 2; x <= 8; x++) put(c, x, 20, "road");
     for (let x = 41; x <= 46; x++) put(c, x, 20, "road");
     assert.equal(put(c, 9, 19, "railstation").ok, true);
@@ -216,7 +216,7 @@ describe("transport buildings", () => {
   test("highways carry commuters further and faster than streets", () => {
     const build = (kind, ramps = true) => {
       const c = plains();
-      // Homes at the west end, jobs 45 tiles east: too far for streets, fine by highway.
+      // Homes at the northwest end, jobs 45 tiles southeast: too far for streets, fine by highway.
       for (let x = 2; x <= 8; x++) put(c, x, 20, "road");
       for (let x = 9; x <= 46; x++) put(c, x, 20, kind);
       for (let x = 47; x <= 52; x++) put(c, x, 20, "road");
@@ -280,9 +280,9 @@ describe("transport buildings", () => {
     // but garbage travels by "road, highway, rail, or seaport connection".
     const c = plains();
     c.money = 5_000_000;
-    assert.equal(dealAvailable(detectConnections(c), "garbage", "north"), false);
+    assert.equal(dealAvailable(detectConnections(c), "garbage", "northeast"), false);
     for (let x = 0; x <= 10; x++) put(c, x, 20, "rail");
-    assert.equal(dealAvailable(detectConnections(c), "garbage", "west"), true, "rail counts too");
-    assert.equal(dealAvailable(detectConnections(c), "garbage", "north"), false, "but only on its own side");
+    assert.equal(dealAvailable(detectConnections(c), "garbage", "northwest"), true, "rail counts too");
+    assert.equal(dealAvailable(detectConnections(c), "garbage", "northeast"), false, "but only on its own side");
   });
 });

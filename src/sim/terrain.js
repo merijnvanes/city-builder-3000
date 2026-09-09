@@ -71,7 +71,7 @@ export function generateTerrain(size, seed, layout, hills = 1) {
   const trees = new Uint8Array(size * size);
 
   const riverPath = () => {
-    // Winding river running north to south, kept away from the west edge
+    // Winding river running northeast to southwest, kept away from the northwest edge
     // so the starter town has room.
     const base = size * (0.62 + rng() * 0.16);
     const amp = size * (0.05 + rng() * 0.06);
@@ -84,7 +84,7 @@ export function generateTerrain(size, seed, layout, hills = 1) {
     }
   };
   const coastline = () => {
-    // Ocean along the east edge with a rippled shoreline and a bay.
+    // Ocean along the southeast edge with a rippled shoreline and a bay.
     const inset = size * (0.18 + rng() * 0.1);
     for (let y = 0; y < size; y++) {
       const edge = size - inset + (noise(0, y, 10, seed + 5) - 0.5) * size * 0.16 + Math.sin(y * 0.2) * 1.5;

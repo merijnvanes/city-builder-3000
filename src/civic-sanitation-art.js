@@ -44,7 +44,7 @@ export function drawIncinerator(d, t) {
     [0.37, 0.4, () => {
       hall(d, t, 0.09, 0.16, 0.53, 0.46, 19, '#c68d67', '#785b50');
       d.roof(0.07, 0.14, 0.57, 0.5, 20.5, 7, '#985c45');
-      if (d.visible('south')) for (const x of [0.16, 0.34, 0.52]) {
+      if (d.visible('southwest')) for (const x of [0.16, 0.34, 0.52]) {
         d.box(x, 0.617, 0.065, 0.008, 8, '#443e36', 2);
         d.box(x + 0.015, 0.627, 0.035, 0.008, 3, '#e5a350', 3);
       }

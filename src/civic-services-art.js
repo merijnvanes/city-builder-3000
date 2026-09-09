@@ -38,7 +38,7 @@ export function drawFire(d, t) {
     [0.6, 0.22, () => { hall(d, t, 0.33, 0.09, 0.56, 0.22, 15, '#d89b70', '#ad493c'); }],
     ...[0.1, 0.38, 0.66].map(x => [x + 0.12, 0.48, () => {
       hall(d, t, x, 0.35, 0.24, 0.25, 13, '#ba5944', '#c34f3b');
-      if (d.visible('south')) {
+      if (d.visible('southwest')) {
         d.box(x + 0.025, 0.596, 0.19, 0.008, 9, '#394e59', 0.5);
         for (let z = 2; z < 9; z += 2) d.line(x + 0.035, 0.606, z, x + 0.205, 0.606, z, '#93a8ad', 0.6);
         d.box(x + 0.02, 0.603, 0.2, 0.025, 1.5, C.trim, 10);
@@ -58,7 +58,7 @@ export function drawHospital(d, t) {
       d.bands(0.28, 0.17, 0.44, 0.38, 20, 35, 8, '#78b9bc');
       cross(d, 0.36, 0.22, 0.28, 36.7, '#ffede0');
       // A red cross on each long facade reinforces the rooftop emblem.
-      for (const [side, y] of [['north', 0.168], ['south', 0.552]]) {
+      for (const [side, y] of [['northeast', 0.168], ['southwest', 0.552]]) {
         if (!d.visible(side)) continue;
         d.box(0.465, y, 0.07, 0.004, 10, '#d9504b', 22);
         d.box(0.41, y, 0.18, 0.004, 3.5, '#d9504b', 25.2);
@@ -89,7 +89,7 @@ export function drawSchool(d, t) {
     }],
     [0.5, 0.49, () => {
       d.box(0.4, 0.45, 0.2, 0.08, 9, '#f1d292');
-      if (d.visible('south')) d.box(0.45, 0.531, 0.1, 0.004, 7, '#3c737f');
+      if (d.visible('southwest')) d.box(0.45, 0.531, 0.1, 0.004, 7, '#3c737f');
       d.roof(0.38, 0.45, 0.24, 0.1, 9, 3, '#437f8c');
     }],
     [0.39, 0.82, () => {

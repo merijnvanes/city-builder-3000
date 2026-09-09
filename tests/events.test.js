@@ -202,7 +202,7 @@ describe("a neighbouring mayor comes to the door", () => {
 
   test("the mayor cannot go shopping for one", () => {
     const c = wired();
-    assert.equal(setPolicy(c, "deal", { resource: "power", side: "north", kind: "sell" }).ok, false);
+    assert.equal(setPolicy(c, "deal", { resource: "power", side: "northeast", kind: "sell" }).ok, false);
     assert.equal(c.deals.power, undefined);
   });
 

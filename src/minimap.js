@@ -76,7 +76,7 @@ export function createMinimap(renderer) {
       ctx.stroke();
       ctx.restore();
       ctx.fillStyle = '#e8e2ce'; ctx.font = '600 9px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      for (const [label, x, y] of [['N', 119, 39], ['E', 121, 121], ['S', 39, 121], ['W', 39, 39]]) ctx.fillText(label, x, y);
+      for (const [label, x, y] of [['N', 80, 7], ['E', 153, 80], ['S', 80, 153], ['W', 7, 80], ['NE', 119, 39], ['SE', 121, 121], ['SW', 39, 121], ['NW', 39, 39]]) ctx.fillText(label, x, y);
     },
   };
 }

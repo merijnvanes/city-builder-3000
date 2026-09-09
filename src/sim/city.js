@@ -2,7 +2,7 @@ import { restoreStructures } from './structures.js';
 import { bedElevation, waterSurface, waterVolume, MIN_WATER_DEPTH, WATER_EPSILON } from './surface-water.js';
 import { parseConnections } from './neighbor-links.js';
 import { effectState, parseEffects } from "./effects-state.js";
-// City state: tile schema, creation, save format (version 6).
+// City state: tile schema, creation, save format (version 7).
 import { generateTerrain, LAYOUTS, MAX_ELEVATION, MIN_ELEVATION } from "./terrain.js";
 import { BUILDINGS, ZONE_TYPES, PORT_TYPES, ZONED_TYPES, ROAD_TYPES, FUNDED_DEPARTMENTS, powerlineSite } from "./catalog.js";
 import { tileAt } from "./grid.js";
@@ -18,7 +18,7 @@ import { MAX_LOANS, LOAN_MAX, LOAN_YEARS } from "./economy.js";
 // Nothing holds more trash than the largest landfill tile.
 const MAX_FILL = Math.max(...Object.values(BUILDINGS).map((b) => b.hold || 0));
 
-export const SAVE_VERSION = 6;
+export const SAVE_VERSION = 7;
 export const DEFAULT_SIZE = 64;
 export const MAX_SIZE = 128;
 export const START_MONEY = 50000;
@@ -206,6 +206,14 @@ export function deserialize(raw) {
   let d;
   try { d = JSON.parse(raw); } catch { throw new Error("Save file is corrupt."); }
   if (!d || typeof d !== "object") throw new Error("Save file is corrupt.");
+  if (d.version === 6) {
+    const sides = { north: 'northeast', east: 'southeast', south: 'southwest', west: 'northwest' };
+    const migrate = value => value && ({ ...value, side: Object.hasOwn(sides, value.side) ? sides[value.side] : value.side });
+    if (Array.isArray(d.transportConnections)) d.transportConnections = d.transportConnections.map(migrate);
+    if (d.deals && typeof d.deals === 'object') d.deals = Object.fromEntries(Object.entries(d.deals).map(([key, deal]) => [key, migrate(deal)]));
+    if (Array.isArray(d.petitions)) d.petitions = d.petitions.map(p => p?.deal ? { ...p, deal: migrate(p.deal) } : p);
+    d.version = SAVE_VERSION;
+  }
   if (d.version !== SAVE_VERSION) throw new Error("This save is from an older version and cannot be loaded.");
   const size = d.size;
   if (!Number.isInteger(size) || size < 16 || size > MAX_SIZE) throw new Error("Invalid save: bad size.");
@@ -331,7 +339,7 @@ export function deserialize(raw) {
     // A contract keeps the price it was signed at, so the terms travel with
     // it. They are money, so a save cannot be trusted to set them freely.
     deals: Object.fromEntries(Object.entries(d.deals || {})
-      .filter(([k, v]) => ["power", "water", "garbage"].includes(k) && v && ["north", "east", "south", "west"].includes(v.side) && ["buy", "sell"].includes(v.kind))
+      .filter(([k, v]) => ["power", "water", "garbage"].includes(k) && v && ["northeast", "southeast", "southwest", "northwest"].includes(v.side) && ["buy", "sell"].includes(v.kind))
       .map(([k, v]) => {
         const base = DEALS[k][v.kind];
         const within = (x, lo, hi) => (Number.isFinite(x) && x >= lo && x <= hi ? x : null);

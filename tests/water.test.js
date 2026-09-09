@@ -116,7 +116,7 @@ describe("pipes", () => {
     const c = createCity({ seed: 5, starter: false, layout: "river" });
     c.money = 500000;
     const shore = shoreTile(c, false);
-    // A pump with power, feeding a main that runs south.
+    // A pump with power, feeding a main that runs southwest.
     place(c, shore.x, shore.y, "waterpump");
     place(c, shore.x, shore.y, "powerline");
     place(c, shore.x, shore.y - 1, "powerline");

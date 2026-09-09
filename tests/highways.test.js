@@ -12,7 +12,7 @@ const at = (c, x, y) => c.tiles[y * c.size + x];
 const plains = () => createCity({ seed: 5, starter: false, layout: "plains", startYear: 2000 });
 const put = (c, x, y, tool, o) => { c.money = 5_000_000; return place(c, x, y, tool, o); };
 
-// Homes in the west, jobs in the east, joined only by the given corridor.
+// Homes in the northwest, jobs in the southeast, joined only by the given corridor.
 function corridor(ramps) {
   const c = plains();
   for (let x = 2; x <= 8; x++) put(c, x, 20, "road");
