@@ -1,5 +1,2 @@
-.district-map { width: 100%; padding: 4px; pointer-events: auto; }
-.district-map-label { display: flex; justify-content: space-between; color: var(--text-dim); font-size: 8px; letter-spacing: 1.2px; margin-bottom: 4px; }
-.district-map-label span { color: var(--beige); }
+.district-map { width: 112px; padding: 0 2px; pointer-events: auto; }
 .district-map canvas { display: block; width: 100%; height: auto; cursor: crosshair; touch-action: none; }
-@media (max-width: 1100px), (max-height: 700px) { .district-map { display: none; } }

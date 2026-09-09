@@ -166,10 +166,25 @@ export function mountUI(actions) {
     tools: g.tools.filter((id) => toolMap[id]),
   })).filter((g) => g.tools.length > 0);
 
+  // Two HUD surfaces: city command bar and expandable construction console.
+  const commandBar = el('header');
+  commandBar.id = 'command-bar';
+  commandBar.setAttribute('aria-label', 'City command bar');
+  app.appendChild(commandBar);
+  const buildConsole = el('section');
+  buildConsole.id = 'build-console';
+  buildConsole.setAttribute('aria-label', 'City building console');
+  const consoleContext = el('div');
+  consoleContext.id = 'console-context';
+  const consoleDeck = el('div');
+  consoleDeck.id = 'console-deck';
+  buildConsole.append(consoleContext, consoleDeck);
+  app.appendChild(buildConsole);
+
   // ── Top bar ────────────────────────────────────────────────────────────────
   const managementPanel = el("div");
   managementPanel.id = "management-panel";
-  app.appendChild(managementPanel);
+  commandBar.appendChild(managementPanel);
   const topBar = el("div");
   topBar.id = "top-bar";
   managementPanel.appendChild(topBar);
@@ -182,7 +197,7 @@ export function mountUI(actions) {
   logoMark.title = "Center view";
   logoMark.addEventListener("click", () => actions.home?.());
 
-  // City name (editable) lives in the toolbar status panel below.
+  // City name remains editable in the command bar.
   const cityName = document.createElement("input");
   cityName.id = "city-name";
   cityName.type = "text";
@@ -230,28 +245,36 @@ export function mountUI(actions) {
   const mobileDockBtn = btn("btn mobile-build", "Build city", "Toggle tools", () => {
     cityMenu.open = false;
     overlaySection.classList.remove('open'); overlayToggle.setAttribute('aria-expanded', 'false');
+    if (openGroupId) {
+      closeFlyout(true); toolbar.classList.add('mobile-open'); mobileDockBtn.setAttribute('aria-expanded', 'true');
+      return;
+    }
     const open = toolbar.classList.toggle("mobile-open");
     mobileDockBtn.setAttribute("aria-expanded", String(open));
+    if (open && inspPanel.classList.contains('visible')) closeInspector(false);
+    if (open) dockScroll.querySelector('.group-header')?.focus();
     if (!open) closeFlyout();
   });
   mobileDockBtn.setAttribute("aria-expanded", "false");
-  app.appendChild(mobileDockBtn);
+  consoleDeck.appendChild(mobileDockBtn);
   menuSummary.addEventListener('click', () => {
     closeFlyout(); toolbar.classList.remove('mobile-open'); mobileDockBtn.setAttribute('aria-expanded', 'false');
   });
 
-  // ── Left toolbar: status panel, tool groups, data maps ─────────────────────
+  // ── Construction deck ─────────────────────────────────────────────────────
   const toolbar = el("div");
   toolbar.id = "toolbar";
-  app.appendChild(toolbar);
+  consoleDeck.appendChild(toolbar);
 
   // Status panel: name, date, funds, population, approval, demand, speed.
   const statusPanel = el("div");
   statusPanel.id = "status-panel";
-  app.appendChild(statusPanel);
-  const statusName = el("div", "status-row");
+  commandBar.prepend(statusPanel);
+  const statusName = el("div", "status-row city-identity");
   statusName.appendChild(logoMark);
-  statusName.appendChild(cityName);
+  const cityIdentity = el('div', 'city-identity-text');
+  cityIdentity.append(el('span', 'city-eyebrow', 'A city in your hands'), cityName);
+  statusName.appendChild(cityIdentity);
   const mDate = el("span", "status-date", "--");
   statusPanel.appendChild(statusName);
 
@@ -347,14 +370,28 @@ export function mountUI(actions) {
   // Scrollable body
   const dockScroll = el("div");
   dockScroll.id = "dock-scroll";
-  toolbar.appendChild(dockScroll);
+  const dockRail = el('div');
+  dockRail.id = 'dock-rail';
+  const scrollCategories = direction => dockScroll.scrollBy({ left: direction * dockScroll.clientWidth * .7, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+  const previousCategories = btn('dock-page', '‹', 'Previous building categories', () => scrollCategories(-1));
+  const nextCategories = btn('dock-page', '›', 'More building categories', () => scrollCategories(1));
+  dockRail.append(previousCategories, dockScroll, nextCategories);
+  toolbar.appendChild(dockRail);
+  function updateCategoryScroll() {
+    dockRail.classList.toggle('scrollable', dockScroll.scrollWidth > dockRail.clientWidth + 1);
+    previousCategories.disabled = dockScroll.scrollLeft < 1;
+    nextCategories.disabled = dockScroll.scrollLeft + dockScroll.clientWidth >= dockScroll.scrollWidth - 1;
+  }
+  dockScroll.addEventListener('scroll', updateCategoryScroll, { passive: true });
+  const categoryResize = new ResizeObserver(updateCategoryScroll);
+  categoryResize.observe(dockScroll);
 
-  // Flyout: the open group's tools, beside the toolbar.
+  // Palettes expand the console above its category rail.
   const flyout = el("div");
   flyout.id = "flyout";
   flyout.setAttribute("role", "region");
   flyout.setAttribute("aria-label", "Tool palette");
-  app.appendChild(flyout);
+  consoleContext.appendChild(flyout);
   const flyoutTitle = el("div", "flyout-title", "");
   const flyoutBody = el("div", "flyout-body");
   flyout.appendChild(flyoutTitle);
@@ -372,7 +409,7 @@ export function mountUI(actions) {
     if (restoreFocus) trigger?.focus({ preventScroll: true });
   }
 
-  // Inspector panel (inside scroll)
+  // Inspection shares the same console drawer as construction.
   const inspPanel = el("div");
   inspPanel.id = "inspector-panel";
   inspPanel.setAttribute("aria-live", "polite");
@@ -386,12 +423,16 @@ export function mountUI(actions) {
   }
   inspHeading.appendChild(btn('panel-close', '×', 'Close inspector', () => closeInspector()));
   const inspPortrait = el("canvas", "insp-portrait");
-  inspPanel.appendChild(inspPortrait);
+  const inspOverview = el('div', 'insp-overview');
+  inspPanel.appendChild(inspOverview);
+  inspOverview.appendChild(inspPortrait);
   const lotCard = createPortrait(inspPortrait);
   const inspTitle = el("div", "insp-title", "--");
-  inspPanel.appendChild(inspTitle);
+  inspOverview.appendChild(inspTitle);
   const inspDesc = el("div", "insp-desc", "");
-  inspPanel.appendChild(inspDesc);
+  inspOverview.appendChild(inspDesc);
+  const inspFacts = el('div', 'insp-facts');
+  inspOverview.appendChild(inspFacts);
   const inspDetails = el("div");
   inspDetails.className = 'insp-signals';
   inspPanel.appendChild(inspDetails);
@@ -400,7 +441,7 @@ export function mountUI(actions) {
   const inspNotes=el('div');inspMore.appendChild(inspNotes);inspPanel.appendChild(inspMore);
   inspMore.addEventListener('toggle',()=>{if(!inspMore.open)inspPanel.scrollTop=0;});
   let inspectedPlace='';
-  app.appendChild(inspPanel);
+  consoleContext.appendChild(inspPanel);
 
   const activeTool = el('section', 'active-tool');
   activeTool.setAttribute('aria-label', 'Selected construction tool');
@@ -411,7 +452,7 @@ export function mountUI(actions) {
     actions.selectTool('inspect');
     (matchMedia('(max-width: 800px)').matches ? mobileDockBtn : inspectBtn).focus();
   }));
-  app.appendChild(activeTool);
+  consoleContext.appendChild(activeTool);
 
   // Tool groups
   const toolBtns = {}; // id -> button element
@@ -420,6 +461,7 @@ export function mountUI(actions) {
   const groupIcons = { zone: "residential", transport: "road", power: "power", water: "water", civic: "police", sanitation: "landfill", landscape: "park", landmark: "commercial", special: "school", emergency: "fire" };
   groups.forEach((g) => {
     const groupEl = el("div", "tool-group");
+    categoryResize.observe(groupEl);
     groupEl.dataset.group=g.id;
     const header = el("button", "group-header");
     header.setAttribute("aria-label", g.label);
@@ -519,10 +561,11 @@ export function mountUI(actions) {
     expandGroup(id);
   }
 
-  // Open a group's flyout beside its button.
+  // Open a group's tools in the console drawer.
   function expandGroup(id) {
     const g = groupEls[id];
     if (!g) return;
+    if (inspPanel.classList.contains('visible')) closeInspector(false);
     overlaySection.classList.remove('open'); overlayToggle.setAttribute('aria-expanded', 'false');
     closeFlyout();
     openGroupId = id;
@@ -535,6 +578,8 @@ export function mountUI(actions) {
     paletteDetail.textContent = 'Choose a building. Hover or focus a card for details.';
     flyout.querySelectorAll('.tool-art').forEach(image => { image.src = image.dataset.src; });
     flyout.classList.add("open");
+    flyoutBody.scrollTop = 0; flyoutBody.scrollLeft = 0;
+    [...flyout.querySelectorAll('.tool-btn')].find(button => button.style.display !== 'none')?.focus({ preventScroll: true });
   }
 
   // Keep the group of the active tool marked even when the flyout is closed.
@@ -550,11 +595,11 @@ export function mountUI(actions) {
   // Overlay section (pinned at bottom of dock)
   const overlaySection = el("div");
   overlaySection.id = "overlay-section";
-  const overlayLbl = el("div", "overlay-section-label", "Map Overlay");
+  const overlayLbl = el("div", "overlay-section-label", "See your city differently");
   overlaySection.appendChild(overlayLbl);
   const overlayGrid = el("div", "overlay-grid");
   overlaySection.appendChild(overlayGrid);
-  app.appendChild(overlaySection);
+  consoleContext.appendChild(overlaySection);
 
   [
     { id: "none",      label: "City view" },
@@ -582,7 +627,7 @@ export function mountUI(actions) {
   // ── Bottom bar: hint, news ticker, zoom ───────────────────────────────────
   const bottomBar = el("div");
   bottomBar.id = "bottom-bar";
-  app.appendChild(bottomBar);
+  buildConsole.appendChild(bottomBar);
 
   const newsWrap = el("div");
   newsWrap.id = "news-wrap";
@@ -605,11 +650,13 @@ export function mountUI(actions) {
   newsWrap.appendChild(newsTickerWrap);
   bottomBar.appendChild(newsWrap);
   const newsDialog=el('dialog');newsDialog.setAttribute('aria-label','City news');
+  let lastNotice = '';
   const newsHeader=el('div','modal-header');newsHeader.append(el('span','modal-title','City news'),btn('btn btn-icon','×','Close news',()=>newsDialog.close()));
   const newsBody=el('div','modal-body');
   function buildNews() {
     newsBody.replaceChildren();
     const list=el('ul','city-news');
+    if (lastNotice && !(_lastStats?.news || []).includes(lastNotice)) list.appendChild(el('li', '', lastNotice));
     for(const message of [...(_lastStats?.news || [])].reverse()) list.appendChild(el('li','',message));
     if(!list.children.length)list.appendChild(el('li','','A new chapter is waiting to be written.'));
     newsBody.appendChild(list);
@@ -630,12 +677,13 @@ export function mountUI(actions) {
   // ── Navigator (lower-right, above bottom bar) ──────────────────────────────
   const navigator = el("div");
   navigator.id = "navigator";
-  app.appendChild(navigator);
+  consoleDeck.appendChild(navigator);
   const overlayToggle = btn('btn map-toggle', 'Data maps', 'Toggle data maps', () => {
     closeFlyout(); toolbar.classList.remove('mobile-open'); mobileDockBtn.setAttribute('aria-expanded', 'false');
     if (inspPanel.classList.contains('visible')) closeInspector(false);
     const open = overlaySection.classList.toggle('open');
     overlayToggle.setAttribute('aria-expanded', String(open));
+    if (open) overlayGrid.querySelector('.active')?.focus({ preventScroll: true });
   });
   overlayToggle.setAttribute('aria-expanded', 'false');
   overlayToggle.setAttribute('aria-controls', 'overlay-section');
@@ -665,7 +713,7 @@ export function mountUI(actions) {
   // ── Build preview ──────────────────────────────────────────────────────────
   const buildPreview = el("div");
   buildPreview.id = "build-preview";
-  app.appendChild(buildPreview);
+  activeTool.insertBefore(buildPreview, activeDescription);
   const bpInner = el("div", "build-preview-inner");
   const bpCount = el("span", "preview-count", "");
   const bpCost  = el("span", "preview-cost", "");
@@ -715,15 +763,27 @@ export function mountUI(actions) {
   tipBox.appendChild(tipText);
   const tipClose = btn("btn btn-sm", "Got it", "Dismiss tip", () => tipBox.classList.remove("show"));
   tipBox.appendChild(tipClose);
-  app.appendChild(tipBox);
+  commandBar.appendChild(tipBox);
 
   // ── Notification ──────────────────────────────────────────────────────────
   const notif = el("div");
   notif.id = "notif";
   notif.setAttribute("role", "status");
-  app.appendChild(notif);
+  bottomBar.appendChild(notif);
+  // Size drawers from the rendered HUD, including wrapped labels.
+  function fitConsole() {
+    const inset = innerHeight - buildConsole.getBoundingClientRect().bottom;
+    const frame = getComputedStyle(buildConsole);
+    const borders = parseFloat(frame.borderTopWidth) + parseFloat(frame.borderBottomWidth);
+    buildConsole.style.setProperty('--command-space', `${commandBar.getBoundingClientRect().bottom}px`);
+    buildConsole.style.setProperty('--console-fixed-space', `${consoleDeck.offsetHeight + bottomBar.offsetHeight + inset + borders}px`);
+  }
+  const hudResize = new ResizeObserver(fitConsole);
+  for (const surface of [commandBar, consoleDeck, bottomBar]) hudResize.observe(surface);
+  window.addEventListener('resize', fitConsole);
   let notifTimer = null;
   function showNotice(message) {
+    lastNotice = message;
     notif.textContent = message;
     notif.classList.add("show");
     if (notifTimer) clearTimeout(notifTimer);
@@ -1619,6 +1679,11 @@ export function mountUI(actions) {
     },
 
     setTool(id) {
+      const wasBrowsing = openGroupId || toolbar.classList.contains('mobile-open');
+      closeFlyout(true);
+      toolbar.classList.remove('mobile-open'); mobileDockBtn.setAttribute('aria-expanded', 'false');
+      overlaySection.classList.remove('open'); overlayToggle.setAttribute('aria-expanded', 'false');
+      if (wasBrowsing && matchMedia('(max-width: 800px)').matches) mobileDockBtn.focus();
       // Update all tool buttons
       Object.entries(toolBtns).forEach(([tid, b]) => {
         b.classList.toggle("active", tid === id); b.setAttribute('aria-pressed', String(tid === id));
@@ -1653,6 +1718,8 @@ export function mountUI(actions) {
         inspPanel.classList.remove("visible");
         return;
       }
+      closeFlyout();
+      toolbar.classList.remove('mobile-open'); mobileDockBtn.setAttribute('aria-expanded', 'false');
       overlaySection.classList.remove('open'); overlayToggle.setAttribute('aria-expanded', 'false');
       inspPanel.classList.add("visible");
       inspPortrait.classList.toggle("visible", !!info.anchor);
@@ -1660,6 +1727,7 @@ export function mountUI(actions) {
       inspTitle.textContent = info.title || "--";
       inspDesc.textContent  = (info.description || "").replace(/ \([^)]*lot, stage[^)]*\)/,'');
       inspDetails.innerHTML = "";
+      inspFacts.replaceChildren();
       const place=`${info.x},${info.y}`;
       if (inspectedPlace!==place) { inspMore.open=false;inspPanel.scrollTop=0; }
       inspectedPlace=place;
@@ -1685,7 +1753,7 @@ export function mountUI(actions) {
             const note=inspectNote(detail);
             if(note.kind==='signal') {const card=el('div','city-signal-card');renderSignal(card,note.key,note.value);inspDetails.appendChild(card);}
             else if(note.kind==='urgent') inspDetails.prepend(el('div','place-alert',note.text));
-            else (note.kind==='primary'?inspDetails:inspNotes).appendChild(el('div','insp-detail',note.text));
+            else (note.kind==='primary'?inspFacts:inspNotes).appendChild(el('div','insp-detail',note.text));
           }
         }
       }

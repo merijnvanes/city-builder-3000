@@ -20,7 +20,7 @@ const UTILITIES = new Set(["coal", "oil", "gas", "nuclear", "wind", "solar", "wa
 export function createMinimap(renderer) {
   const panel = document.createElement("section");
   panel.className = "district-map";
-  panel.innerHTML = '<div class="district-map-label">REGION OVERVIEW <span>↗</span></div><canvas width="160" height="160" role="img" aria-label="City overview. Click to move the camera."></canvas>';
+  panel.innerHTML = '<canvas width="160" height="160" role="img" aria-label="City overview. Click to move the camera."></canvas>';
   document.querySelector("#navigator").prepend(panel);
   const canvas = panel.querySelector("canvas"), ctx = canvas.getContext("2d");
   const terrain = document.createElement('canvas'); terrain.width = terrain.height = 160;

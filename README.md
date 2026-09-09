@@ -29,6 +29,21 @@ With Chrome installed, run `pnpm dev --port 4173` in one terminal and `pnpm test
 
 Gameplay fidelity and remaining verified gaps are tracked in [PARITY.md](PARITY.md).
 
+## Game interface
+
+The HUD has two connected surfaces. The top command bar holds city status, demand,
+management and time. The bottom console joins building categories, camera controls,
+the minimap and city news; building palettes, inspection and data maps expand within
+that console. Drawer height follows the rendered controls so the map stays visible.
+On small screens, **Build city** opens the category rail. Arrow buttons reveal more
+categories. Opening a palette moves keyboard focus to its first available tool;
+closing it returns focus to its category. Compact screens show one palette at a
+time, with **Build city** returning to the category rail.
+
+`pnpm test:ui` checks both surfaces, attached drawers, unobstructed controls and card
+highlights across nine desktop and mobile sizes. The checks reserve at least a
+fifth of the screen for the city and cover transient notices and petitions.
+
 ## Building artwork
 
 The civic collection establishes the visual standard for the remaining buildings.
