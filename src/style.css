@@ -153,6 +153,15 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 #notif { display: none; position: absolute; inset: 0; padding: 0 16px; line-height: calc(var(--wire-height) - 1px); color: var(--beige); background: #20383d; border-radius: inherit; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; pointer-events: none; }
 #notif.show { display: block; }
 
+/* A newer build is downloaded and waiting. Not a dialog: nothing is wrong, and
+   the city in progress matters more than the new version does. It sits at the
+   top left, clear of the rail on the right and the status strip along the
+   bottom, both of which are above it in the stack. */
+/* display:flex outranks the browser's own rule for [hidden], so hiding it has
+   to be said here or "Later" does nothing. */
+#update-bar[hidden] { display: none; }
+#update-bar { position: fixed; z-index: 31; left: 18px; top: 18px; display: flex; align-items: center; gap: 10px; max-width: calc(100vw - 36px); padding: 10px 12px 10px 18px; color: var(--text-bright); background: var(--panel); border: var(--edge); border-radius: 999px; box-shadow: var(--shadow), 0 12px 40px #041b2860; font-size: 13px; pointer-events: auto; }
+
 /* Welcome */
 /* The crash dialog is exempt. It has to be visible over anything, including a
    title screen that never got the chance to close. */

@@ -1,69 +1,8 @@
-// The built site, served the way the host will serve it.
-//
-// A Content-Security-Policy is the kind of thing that reads correctly and then
-// blanks the page in production, because nothing in development ever applies it.
-// This serves dist/ through the rules in public/_headers, plays the game
-// through them, and fails on the first violation.
-//
-// Run `pnpm build` first. No dev server is needed; this starts its own.
 import { chromium } from "@playwright/test";
 import assert from "node:assert/strict";
-import { createServer } from "node:http";
-import { readFileSync, existsSync, statSync } from "node:fs";
-import { join, extname, normalize } from "node:path";
-import { fileURLToPath } from "node:url";
+import { startPreview } from "./preview-server.mjs";
 
-const root = fileURLToPath(new URL("..", import.meta.url));
-const dist = join(root, "dist");
-if (!existsSync(join(dist, "index.html"))) throw new Error("No build to serve. Run `pnpm build` first.");
-
-// ── the host, in miniature ────────────────────────────────────────────────
-const rules = [];
-for (const line of readFileSync(join(dist, "_headers"), "utf8").split("\n")) {
-  if (!line.trim() || line.trim().startsWith("#")) continue;
-  if (/^\s/.test(line)) {
-    const [name, ...rest] = line.trim().split(":");
-    rules.at(-1).headers.push([name.trim(), rest.join(":").trim()]);
-  } else rules.push({ path: line.trim(), headers: [] });
-}
-const matches = (rule, path) => (rule.path.endsWith("*") ? path.startsWith(rule.path.slice(0, -1)) : rule.path === path);
-
-const TYPES = {
-  ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8",
-  ".css": "text/css; charset=utf-8", ".json": "application/json; charset=utf-8",
-  ".webp": "image/webp", ".woff2": "font/woff2", ".txt": "text/plain; charset=utf-8",
-};
-
-const server = createServer((request, response) => {
-  const path = decodeURIComponent(new URL(request.url, "http://localhost").pathname);
-  // Cloudflare Pages redirects a .html URL to its clean form before it matches
-  // any header rule, so the headers a visitor actually receives are the ones
-  // matching the extensionless path. Modelling the redirect is what makes the
-  // check below mean anything.
-  if (path.endsWith(".html") && path !== "/index.html") {
-    response.writeHead(308, { Location: path.slice(0, -5) }).end();
-    return;
-  }
-  if (path === "/index.html") { response.writeHead(308, { Location: "/" }).end(); return; }
-  const candidates = path.endsWith("/") ? [join(path, "index.html")] : [path, `${path}.html`];
-  const file = candidates.map((name) => join(dist, normalize(name).replace(/^(\.\.[/\\])+/, "")))
-    .find((full) => full.startsWith(dist) && existsSync(full) && statSync(full).isFile());
-  if (!file) { response.writeHead(404).end("not found"); return; }
-
-  for (const rule of rules) {
-    if (!matches(rule, path)) continue;
-    // Duplicate header names append, the way the host does it.
-    for (const [name, value] of rule.headers) {
-      const existing = response.getHeader(name);
-      response.setHeader(name, existing ? `${existing}, ${value}` : value);
-    }
-  }
-  response.setHeader("Content-Type", TYPES[extname(file)] || "application/octet-stream");
-  response.writeHead(200).end(readFileSync(file));
-});
-
-await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
-const origin = `http://127.0.0.1:${server.address().port}`;
+const { server, origin } = await startPreview();
 
 // ── the game, under those headers ─────────────────────────────────────────
 const browser = await chromium.launch({ channel: "chrome", headless: true });

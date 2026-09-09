@@ -639,6 +639,20 @@ export function mountUI(actions) {
   rescueDialog.append(rescueHeader, rescueBody, rescueFooter);
   app.appendChild(rescueDialog);
 
+  // ── A newer version is ready ──────────────────────────────────────────────
+  // The new code is downloaded and waiting. Taking it means reloading, which
+  // ends the session, so the player decides when. Never a modal: nothing is
+  // wrong, and a city in progress is more important than a fresh build.
+  const updateBar = el("div");
+  updateBar.id = "update-bar";
+  updateBar.hidden = true;
+  updateBar.setAttribute("role", "status");
+  const updateText = el("span", "", "A new version of the game is ready.");
+  const updateNow = btn("btn btn-sm btn-teal", "Reload now", "Reload to the new version", () => {});
+  const updateLater = btn("btn btn-sm", "Later", "Keep playing this version", () => { updateBar.hidden = true; });
+  updateBar.append(updateText, updateNow, updateLater);
+  app.appendChild(updateBar);
+
   // ── The game stopped ──────────────────────────────────────────────────────
   // A crash ends the render loop and freezes the picture. This says so, and
   // gets the city out of the page before the player reloads it away.
@@ -1543,6 +1557,16 @@ export function mountUI(actions) {
 
   // ── Public API ─────────────────────────────────────────────────────────────
   return {
+    offerUpdate(accept) {
+      updateNow.onclick = async () => {
+        // The city is saved before the page goes. Say so, and do not let a
+        // second click start it twice.
+        updateNow.disabled = true;
+        updateText.textContent = "Saving your city, then reloading…";
+        await accept();
+      };
+      updateBar.hidden = false;
+    },
     showCrash({ message, source, text, stored }) {
       crashText = text;
       crashWhere.textContent = source ? `${message} (${source})` : message;

@@ -53,6 +53,27 @@ if any of those appears.
 pnpm test:deploy   # build, check the headers, then play the built site through them
 ```
 
+A service worker (`public/sw.js`) gives offline play and keeps artwork through a cleared HTTP
+cache. It splits on whether a URL can ever mean something different: everything under `/assets`
+is content-hashed and answered from the cache without asking the network, and everything else
+goes to the network first and falls back to the cache only when there is none.
+
+Two caches, for two lifetimes. The shell — the document and the bundle, stylesheet and font it
+names — is written as a set, by a page that has actually run that build, and is never evicted.
+Writing them together is the point: a document cached without its bundle is a blank screen
+offline, and a document cached by a worker that is still waiting names a bundle nobody has
+fetched. The artwork cache is capped and evicted oldest-first, and its name carries no version,
+because a hashed sprite is correct forever and throwing 90 MB away on a worker update would save
+nothing. There is no generated precache list; the page reports the URLs the browser actually
+fetched for it.
+
+A build that arrives mid-session **waits**. Calling `skipWaiting()` on install would swap the
+code under a running game, so a notice offers the update, the city is autosaved, and the reload
+happens only when the player takes it. A build that was already waiting when the page opened is
+the other case: the page has just loaded over the network and is running it already, so it is
+activated without a word. `tests/offline.mjs` plays with the network switched off, fills the
+artwork cache past its limit, and walks three deploys arriving around a session.
+
 That last step is the one that matters. A Content-Security-Policy reads correctly and then
 blanks the page in production, because nothing in development ever applies it.
 `tests/deploy-preview.mjs` serves `dist/` through the rules in `public/_headers`, plays the
@@ -214,6 +235,7 @@ budget, welcome and mobile screenshots in `artifacts/`.
 - `src/agent-api.js` — the `civic.agent` command surface, an adapter over the same paths the mouse drives
 - `src/save-store.js` — where saved cities live: IndexedDB, with a localStorage fallback and a refusal that reports itself
 - `src/crash-guard.js` — the uncaught error and rejected promise handler behind the "The game stopped" dialog
+- `src/service-worker-client.js`, `public/sw.js` — offline play, and a new build that waits to be accepted
 - `src/main.js` — game loop, saves, wiring
 
 City Builder 3000 is an original work. No copyrighted assets are used.

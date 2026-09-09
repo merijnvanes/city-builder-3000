@@ -141,7 +141,10 @@ describe("deploy headers", () => {
     // worker-src falls back to script-src when it is absent, so leaving it out
     // would quietly permit same-origin workers under a policy claiming to be
     // shut. Nothing here runs off the main thread.
-    for (const shut of ["media-src", "worker-src", "object-src", "frame-ancestors", "base-uri", "form-action"]) {
+    // Spelled out rather than left to fall back to script-src, which happens to
+    // hold the same value and would make this look deliberate by accident.
+    assert.equal(csp["worker-src"], "'self'", "the service worker, and nothing else off the main thread");
+    for (const shut of ["media-src", "object-src", "frame-ancestors", "base-uri", "form-action"]) {
       assert.equal(csp[shut], "'none'", shut);
     }
     assert.doesNotMatch(policy, /unsafe-/, "the policy needs no escape hatch");

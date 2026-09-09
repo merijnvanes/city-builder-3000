@@ -27,11 +27,11 @@
 #
 # connect-src covers the gallery reading /civic-catalog.json. img-src allows
 # data: for the empty inline favicons. media-src is none because the soundtrack
-# is generated with the Web Audio API rather than loaded, and worker-src is none
-# because nothing here runs off the main thread. worker-src would otherwise fall
-# back to script-src and be allowed by default.
+# is generated with the Web Audio API rather than loaded. worker-src is 'self'
+# for the service worker and nothing else; left out it would fall back to
+# script-src, which is the same value by accident rather than on purpose.
 /*
-  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; media-src 'none'; worker-src 'none'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; media-src 'none'; worker-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'
   X-Content-Type-Options: nosniff
   Referrer-Policy: no-referrer
   Cross-Origin-Opener-Policy: same-origin
@@ -67,6 +67,11 @@
   Cache-Control: public, max-age=0, must-revalidate
 
 /civic-gallery.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+# The service worker decides what every later request is answered with, so a
+# cached copy of it would outlive the deploy that replaced it.
+/sw.js
   Cache-Control: public, max-age=0, must-revalidate
 
 # The font's licence. It has no hash in its name, so it gets a day rather than a

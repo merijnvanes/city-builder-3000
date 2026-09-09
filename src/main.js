@@ -12,6 +12,7 @@ import { SCENARIOS, startScenario, updateScenario } from "./scenarios.js";
 import { createAgentAPI } from "./agent-api.js";
 import { saveStore, AUTOSAVE_SLOT, RESCUE_SLOT, slotLabel } from "./save-store.js";
 import { installCrashGuard } from "./crash-guard.js";
+import { registerServiceWorker } from "./service-worker-client.js";
 
 const MONTH_MS = 2500;
 
@@ -434,6 +435,21 @@ document.addEventListener("visibilitychange", () => {
   if (document.hidden) void autosave({ urgent: true });
 });
 window.addEventListener("pagehide", () => { void autosave({ urgent: true }); });
+
+// Offline play, and artwork that survives a cleared browser cache. Only in a
+// built site: a worker left registered by a dev server outlives the session and
+// answers with yesterday's code.
+if (import.meta.env?.PROD) {
+  registerServiceWorker({
+    // Taking the update reloads the page, which ends the session. The city goes
+    // to the autosave first and the reload waits for the write to commit: this
+    // is a deliberate reload, so there is no reason to gamble on pagehide.
+    onUpdateReady: (accept) => ui?.offerUpdate?.(async () => {
+      await autosave({ urgent: true });
+      accept();
+    }),
+  });
+}
 
 
 function frame(now) {
