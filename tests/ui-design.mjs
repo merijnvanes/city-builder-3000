@@ -60,12 +60,23 @@ try {
     await reachable(page.locator('.clock-state'));
     if (mobile) await reachable(page.getByRole('button', { name: 'Toggle tools', exact: true }));
     if (mobile) await page.getByRole('button', { name: 'Toggle tools', exact: true }).click();
-    for (const group of ['Zones', 'Civic', 'Parks & Land', 'Power']) {
+    for (const group of ['Zones', 'Transport', 'Civic', 'Parks & Land', 'Power']) {
       const trigger = page.getByRole('button', { name: group, exact: true });
       await reachable(trigger); await trigger.click();
       const cards = page.locator('#flyout .tool-btn:visible');
       assert.ok(await cards.count() > 0);
-      for (const card of await cards.all()) await reachable(card);
+      for (const card of await cards.all()) {
+        await reachable(card);
+        await card.hover();
+        const unclipped=await card.evaluate(el=>{
+          const card=el.getBoundingClientRect(),clip=el.closest('.flyout-body').getBoundingClientRect();
+          return {ok:card.top>=clip.top-.5 && card.bottom<=clip.bottom+.5 && card.left>=clip.left-.5 && card.right<=clip.right+.5,card:card.toJSON(),clip:clip.toJSON()};
+        });
+        assert.ok(unclipped.ok,`Hover must keep the complete card inside the palette scroll area: ${JSON.stringify(unclipped)}`);
+        await page.keyboard.press('Tab');
+        await card.focus();
+        assert.equal(await card.evaluate(el=>getComputedStyle(el).outlineOffset),'-3px','Keyboard highlight stays inside the card');
+      }
       const close = page.getByRole('button', { name: 'Close tool palette', exact: true });
       await reachable(close);
       await close.click();

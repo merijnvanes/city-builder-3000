@@ -167,9 +167,12 @@ export function mountUI(actions) {
   })).filter((g) => g.tools.length > 0);
 
   // ── Top bar ────────────────────────────────────────────────────────────────
+  const managementPanel = el("div");
+  managementPanel.id = "management-panel";
+  app.appendChild(managementPanel);
   const topBar = el("div");
   topBar.id = "top-bar";
-  app.appendChild(topBar);
+  managementPanel.appendChild(topBar);
 
   // Logo
   const logoMark = el("button");
@@ -327,7 +330,7 @@ export function mountUI(actions) {
     speedRow.appendChild(b);
   });
   speedGroup.appendChild(speedRow);
-  app.appendChild(speedGroup);
+  managementPanel.appendChild(speedGroup);
 
   // Top tools (inspect + undo)
   const dockTopTools = el("div");
@@ -523,6 +526,7 @@ export function mountUI(actions) {
     overlaySection.classList.remove('open'); overlayToggle.setAttribute('aria-expanded', 'false');
     closeFlyout();
     openGroupId = id;
+    flyout.dataset.group = id;
     g.header.classList.add("open");
     g.header.setAttribute("aria-expanded", "true");
     flyoutTitle.textContent = g.label;

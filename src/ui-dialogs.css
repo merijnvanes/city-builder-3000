@@ -1,4 +1,4 @@
-dialog { margin: auto; width: min(640px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); padding: 0; color: var(--text); background: linear-gradient(145deg,#2a4151,#182c3c); border: var(--edge); border-radius: 20px; box-shadow: 0 8px 0 #0a1b2a55, 0 24px 90px #041b2880; pointer-events: auto; }
+dialog { margin: auto; width: min(640px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); padding: 0; color: var(--text); background: var(--panel); border: var(--edge); border-radius: var(--radius); box-shadow: var(--shadow), 0 24px 90px #041b2880; pointer-events: auto; }
 dialog[open] { animation: panel-in 180ms ease-out; }
 dialog::backdrop { background: #0b2229a8; backdrop-filter: blur(5px); }
 .modal-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 20px 24px; border-bottom: var(--edge); color: var(--text-bright); font-size: 20px; }
