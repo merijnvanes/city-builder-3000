@@ -49,6 +49,8 @@ export const settleTraffic = (level, measured) =>
 // Fallback share for callers without a demographic pyramid. The live value
 // comes from the city's age structure; see population.js.
 export const WORKFORCE_SHARE = 0.4;
+// Local job allowance per road/highway exit, introduced in 282e690.
+// That commit records no rationale for 400 or source in SimCity 3000.
 export const EXTERNAL_JOBS_PER_ROAD = 400;
 const TRAFFIC_PER_POINT = 6; // commuters per traffic point on a road tile
 const RAIL_PER_POINT = 20;   // trains carry more per tile
@@ -175,7 +177,13 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
       if (entry >= 0) addJobs(entry, t, cap);
     }
   }
-  // Jobs in neighbouring cities at connected road exits.
+  // Current limitation: only road/highway exits receive outside job targets.
+  // Rail carries local commuters and supports neighbour trade/garbage deals,
+  // but has no outside job target here. Commit 282e690 introduced this split
+  // without a recorded design reason; its fidelity to SimCity 3000 is unverified.
+  // The original Unlimited manual, "Making Connections", describes road,
+  // highway and rail connections for trade; it does not establish this jobs rule:
+  // https://manualmachine.com/gamespc/simcity3000unlimited/1118664-user-manual/
   let externalJobs = 0;
   const outside = { filled: 0 };
   const externalNodes=[];
