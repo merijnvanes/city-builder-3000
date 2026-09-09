@@ -23,15 +23,22 @@
 // document names belongs here.
 const SHELL_KINDS = new Set(["script", "link", "css"]);
 
-function shellUrls(performance, origin) {
-  if (!performance?.getEntriesByType) return [];
-  return performance.getEntriesByType("resource")
-    .filter((entry) => SHELL_KINDS.has(entry.initiatorType))
-    .map((entry) => entry.name)
-    .filter((name) => {
-      if (!origin || !name.startsWith(origin)) return false;
-      try { return new URL(name).pathname.startsWith("/assets/"); } catch { return false; }
-    });
+function shellUrls(performance, origin, page) {
+  const found = new Set();
+  const keep = (name) => {
+    if (typeof name !== "string" || !origin || !name.startsWith(origin)) return;
+    found.add(name);
+  };
+  // What the document names, including the fixed-name loading screen. Missing
+  // that one leaves an offline page showing unstyled text while it waits.
+  for (const link of page?.querySelectorAll?.("link[rel~=stylesheet][href], script[src]") || []) {
+    keep(link.href || link.src);
+  }
+  // And what those pulled in turn, which is how the font gets here.
+  for (const entry of performance?.getEntriesByType?.("resource") || []) {
+    if (SHELL_KINDS.has(entry.initiatorType)) keep(entry.name);
+  }
+  return [...found];
 }
 
 // How long to wait for a worker that was asked to step in. If controllerchange
@@ -63,7 +70,7 @@ export function registerServiceWorker({
   // that shares this registration. A failure here stays here.
   const offerShell = () => {
     try {
-      const urls = shellUrls(timing, where?.origin);
+      const urls = shellUrls(timing, where?.origin, page);
       if (urls.length && container.controller) {
         container.controller.postMessage({ type: "CACHE_SHELL", document: where.href, urls });
       }

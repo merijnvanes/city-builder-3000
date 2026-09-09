@@ -74,6 +74,15 @@
 /sw.js
   Cache-Control: public, max-age=0, must-revalidate
 
+# The loading screen's stylesheet and the script that notices a bundle which
+# never arrives. Both are linked from index.html so they are in effect before the
+# bundle has run, and both keep fixed names, like the page that names them.
+/boot.css
+  Cache-Control: public, max-age=0, must-revalidate
+
+/boot.js
+  Cache-Control: public, max-age=0, must-revalidate
+
 # The font's licence. It has no hash in its name, so it gets a day rather than a
 # year; the font itself is a hashed build asset covered above.
 /fonts/*

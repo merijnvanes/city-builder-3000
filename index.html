@@ -5,12 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>City Builder 3000</title>
   <link rel="icon" href="data:,">
+  <!-- In effect before the bundle has run, which is the wait they cover. The
+       script notices a bundle that never arrives; the crash guard inside the
+       bundle cannot, because it is inside the bundle. -->
+  <link rel="stylesheet" href="./boot.css">
+  <script src="./boot.js"></script>
 </head>
 <body>
   <div id="viewport">
     <canvas id="city-canvas"></canvas>
   </div>
   <div id="app"></div>
+  <!-- Removed by main.js once the first frame is on screen. Static markup, so
+       it is painted with the page rather than waiting for the megabyte of
+       artwork coordinates the game needs before it can draw anything. -->
+  <div id="booting" role="status">
+    <b>CITY BUILDER <span>3000</span></b>
+    <i></i>
+    <small>Laying out the streets…</small>
+  </div>
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>

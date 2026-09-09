@@ -53,6 +53,25 @@ if any of those appears.
 pnpm test:deploy   # build, check the headers, then play the built site through them
 ```
 
+The page shows a loading screen from the moment it is parsed. The game cannot draw until the
+bundle has run and a city has been laid out, which on a slow connection is about four seconds of
+window that used to be blank. The markup is static in `index.html`; its stylesheet
+(`public/boot.css`) and `public/boot.js` are linked separately so both are in effect before the
+bundle has run, and `main.js` removes the screen on the first rendered frame.
+
+`boot.js` exists for the one failure the crash guard cannot reach: a bundle that never runs
+cannot report itself from inside the bundle. It notices a script or stylesheet that failed to
+download, and gives up after 25 seconds, so the screen stops claiming progress instead of
+saying "Laying out the streets…" indefinitely. `tests/boot.mjs` measures the covered gap on a
+throttled connection, fails if the screen stops earning its place, and aborts the bundle to
+check that a game which never starts says so.
+
+The sprite manifest, the largest module in the bundle, is generated as a string handed to
+`JSON.parse` rather than as an object literal: a purpose-built parser that knows the shape of
+what it is reading beats parsing a megabyte as possible code. Importing it goes from about 10 ms
+to about 7 ms, and the source file halves. See `write_manifest()` in
+`tools/civic_art/package.py`.
+
 A service worker (`public/sw.js`) gives offline play and keeps artwork through a cleared HTTP
 cache. It splits on whether a URL can ever mean something different: everything under `/assets`
 is content-hashed and answered from the cache without asking the network, and everything else

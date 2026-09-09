@@ -7,6 +7,27 @@ import { belongsToFamily, FAMILY_COUNTS, EXPECTED_VARIANTS } from './art-familie
 import { BUILDINGS } from '../src/sim/catalog.js';
 import { PORT_PARTS, partSpec } from '../src/sim/port-layout.js';
 
+// The manifest is generated as a string handed to JSON.parse rather than as an
+// object literal, because the engine has to get through a megabyte of it before
+// the first frame can be drawn. That form is easy to break by hand: a quote or a
+// backslash in a filename ends the string early and takes the rest of the module
+// with it. See write_manifest() in tools/civic_art/package.py.
+test('the manifest is a JSON payload the browser can parse quickly, and it parses', () => {
+  const source = readFileSync(new URL('../src/civic-sprite-manifest.js', import.meta.url), 'utf8');
+  assert.match(source, /export const CIVIC_SPRITES = JSON\.parse\('/, 'generated as a JSON string, not an object literal');
+  assert.equal(source.split('\n').filter(Boolean).length, 3, 'one comment pair and one statement, on one line');
+  assert.ok(Object.keys(CIVIC_SPRITES).length > 100, 'and it parsed back into the whole catalogue');
+
+  // Nothing in a filename may end the string early. Two of these are legal in
+  // JSON and fatal in JavaScript, which is the pair a hand-written escape
+  // usually misses.
+  for (const [type, spec] of Object.entries(CIVIC_SPRITES)) {
+    for (const [key, frame] of Object.entries(spec.frames)) {
+      assert.doesNotMatch(frame.file, /['\\\u2028\u2029]/, `${type} ${key}: ${frame.file}`);
+    }
+  }
+});
+
 test('every authored building family ships all four angles and three lighting states', () => {
   const expected = Object.entries(BUILDINGS).filter(([, s]) => Object.keys(FAMILY_COUNTS).some(f => belongsToFamily(s, f))).map(([type]) => type).sort();
   const zones=expectedZoneEntries();

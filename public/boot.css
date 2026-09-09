@@ -1,0 +1,55 @@
+/* What the player looks at while the game is arriving.
+ *
+ * A stylesheet of its own, linked from index.html, because it has to be in
+ * effect before the bundle has run. The game's own stylesheet is injected by
+ * that bundle in development, which is exactly the wait this screen exists to
+ * cover, and an inline <style> would need the site's policy loosened for every
+ * page. It is a few hundred bytes and it is the first thing on screen.
+ */
+#booting {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: #eef2ff;
+  background: linear-gradient(160deg, #17303f, #12242f 60%, #0e1c25);
+  font: 400 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+  text-align: center;
+}
+#booting b {
+  font-size: clamp(26px, 5vw, 40px);
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+#booting b span { color: #ffd98a; }
+#booting i {
+  display: block;
+  width: 132px;
+  height: 3px;
+  overflow: hidden;
+  background: #ffffff1f;
+  border-radius: 2px;
+}
+#booting i::after {
+  content: "";
+  display: block;
+  width: 40%;
+  height: 100%;
+  background: #ffd98a;
+  border-radius: 2px;
+  animation: booting-sweep 1.1s ease-in-out infinite;
+}
+#booting small { color: #9fb2c8; max-width: 46ch; }
+/* The game never started. boot.js says so; this stops it looking like progress. */
+#booting[data-failed] small { color: #ffb4a2; }
+@keyframes booting-sweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(330%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  #booting i::after { animation: none; width: 100%; }
+}

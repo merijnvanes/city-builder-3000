@@ -68,9 +68,12 @@ try {
   await collect();
   assert.deepEqual(violations, [], "playing the game violates nothing");
 
-  // An immutable asset really is immutable, and it carries the policy too.
-  const stylesheet = await page.evaluate(() => document.querySelector("link[rel=stylesheet]")?.href || null);
-  assert.ok(stylesheet, "the page has an external stylesheet");
+  // An immutable asset really is immutable, and it carries the policy too. The
+  // hashed one: the page also links boot.css, which keeps a fixed name.
+  const stylesheet = await page.evaluate(() =>
+    [...document.querySelectorAll("link[rel=stylesheet]")].map((link) => link.href)
+      .find((href) => new URL(href).pathname.startsWith("/assets/")) || null);
+  assert.ok(stylesheet, "the page has a hashed stylesheet");
   const asset = await page.request.get(stylesheet);
   const assetHeaders = checkSecurity(asset, "a hashed asset");
   assert.match(assetHeaders["cache-control"], /immutable/, "hashed assets are kept");

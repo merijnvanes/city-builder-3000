@@ -16,6 +16,18 @@ import { registerServiceWorker } from "./service-worker-client.js";
 
 const MONTH_MS = 2500;
 
+// The loading screen in index.html goes when there is a city behind it, not when
+// the script starts running: the first render is the moment the wait is actually
+// over. It is declared up here because the crash handler below also calls it,
+// and a crash during boot would otherwise reach a variable that does not exist
+// yet and leave the screen sitting over the message explaining itself.
+let painted = false;
+function firstPaint() {
+  if (painted) return;
+  painted = true;
+  document.getElementById("booting")?.remove();
+}
+
 // The four fields the save dialog prints. They travel with the city so listing
 // the slots never has to parse a megabyte of stored JSON back out.
 const metaOf = (c) => ({ name: c.name, population: c.population, money: c.money, month: c.month, startYear: c.startYear });
@@ -35,6 +47,9 @@ installCrashGuard({
     // Every step here stands alone. Whatever broke may be the thing this
     // handler is about to touch, and the parts that still work should run.
     try { setSpeed(0); } catch { /* the clock is the least of it */ }
+    // A crash during boot must not leave the loading screen sitting over the
+    // message explaining it.
+    try { firstPaint(); } catch { /* nothing to remove */ }
     let text = null;
     try { text = sim.serialize(city); } catch { /* the city itself may be what broke */ }
     const stored = text ? rescue(text) : Promise.resolve({ ok: false });
@@ -461,7 +476,7 @@ function frame(now) {
   // so the exposure has to be bounded while the tab is still open rather than
   // patched at the moment it closes.
   if (!document.hidden && now - lastAutosaveAt > AUTOSAVE_EVERY_MS) void autosave();
-  if (!document.hidden) { input.update(delta); renderer.render(city, animationTime); minimap.update(city); }
+  if (!document.hidden) { input.update(delta); renderer.render(city, animationTime); minimap.update(city); firstPaint(); }
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);

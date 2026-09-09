@@ -81,16 +81,16 @@ self.addEventListener("message", (event) => {
 async function cacheShell(document, urls) {
   if (typeof document !== "string" || !Array.isArray(urls)) return;
   const wanted = [];
-  // Only this origin, only the document the page is on, and only hashed files
-  // under /assets. The list comes from the page, so it is treated as a request
-  // rather than an instruction.
-  for (const raw of [document, ...urls].slice(0, 40)) {
+  // Only this origin, and only a handful. The list comes from the page, so it is
+  // treated as a request rather than an instruction. It is deliberately not
+  // restricted to /assets: the loading screen's stylesheet and script keep fixed
+  // names, and an offline page without them is unstyled text.
+  for (const raw of [document, ...urls].slice(0, 20)) {
     if (typeof raw !== "string") continue;
     let url;
     try { url = new URL(raw, self.location.origin); } catch { continue; }
     if (url.origin !== self.location.origin) continue;
-    if (raw !== document && !isAsset(url)) continue;
-    wanted.push(url.href);
+    if (!wanted.includes(url.href)) wanted.push(url.href);
   }
   if (!wanted.includes(new URL(document, self.location.origin).href)) return;
 
