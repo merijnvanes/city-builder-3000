@@ -42,8 +42,9 @@ export function computeDemand(city, m) {
   const ord = city.ordinances || {};
   const pop = m.population, jobs = m.jobs;
   const trade = m.tradeConnections || 0;
-  const externalJobs = 350 + (m.externalJobs || 0);
-  const wantedPop = (jobs + externalJobs) / (m.workforceShare || WORKFORCE_SHARE);
+  // Keep initial housing demand before local employers develop. This allowance
+  // affects demand only; it supplies no jobs and is independent of neighbours.
+  const wantedPop = (jobs + 350) / (m.workforceShare || WORKFORCE_SHARE);
   let res = (wantedPop - pop) / Math.max(900, pop * 0.5) * 100;
   res -= (taxes.residential - 7) * 4;
   res += (m.happiness - 50) * 0.5;

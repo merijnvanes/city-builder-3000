@@ -1,5 +1,5 @@
 import { connectionOffers } from '../src/sim/neighbor-links.js';
-// Neighbour connections, deals, external jobs and passenger rail. Port zones
+// Neighbour connections, deals and passenger rail. Port zones
 // have their own file: tests/ports.test.js.
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
@@ -54,7 +54,7 @@ describe("connections", () => {
     assert.equal(s.neighbors.find((x) => x.side === "northeast").deals.power, true);
     assert.equal(s.neighbors.find((x) => x.side === "northeast").deals.water, false);
   });
-  test("a road to the edge adds outside jobs and trade demand", () => {
+  test("a road to the edge adds trade demand without supplying jobs", () => {
     const c = district(plains());
     for (const t of c.tiles) if (t.type === "residential" && !t.lot) { const lot = findLot(c, t); if (lot) assignLot(c, lot, 3, 0.5); }
     refresh(c);
@@ -63,9 +63,9 @@ describe("connections", () => {
     put(cut, 0, 20, "bulldoze"); refresh(cut);
     tick(c); tick(cut);
     const a = getStats(c), b = getStats(cut);
-    assert.ok(a.externalJobs > 0);
-    assert.equal(b.externalJobs, 0);
-    assert.ok(a.unemployment < b.unemployment, `${a.unemployment} < ${b.unemployment}`);
+    assert.equal(a.unemployment, b.unemployment);
+    assert.equal(c._traffic.employed, cut._traffic.employed);
+    assert.equal(c._traffic.jobs, cut._traffic.jobs);
     assert.ok(a.tradeConnections === 1 && b.tradeConnections === 0);
     // Trade raises the wanted job count: with equal existing jobs, demand is at least as high.
     const da = computeDemand(c, computeMetrics(c)), db = computeDemand(cut, computeMetrics(cut));

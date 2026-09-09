@@ -107,7 +107,7 @@ function edgeTiles(city, side) {
 // "Seaports and airports are considered connections to all neighbors", and
 // garbage may travel by "road, highway, rail, or seaport connection". So a
 // working terminal opens the same doors a road to the border does, on every
-// side at once. It carries no roadTiles: outbound commuters still need a real
+// side at once. It carries no roadTiles: visiting customers still need a real
 // road, and a neighbour deal metered at the connection point needs a wire.
 export function detectConnections(city) {
   const result = {};

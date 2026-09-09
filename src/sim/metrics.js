@@ -81,7 +81,7 @@ export function computeMetrics(city) {
   const per = (v) => (population ? v / population : 0);
   const people = readPopulation(city, population);
   const jobs = jobsCommercial + jobsIndustrial + specialJobs;
-  const traffic = city._traffic || { unemployment: 0, traffic: 0, congestion: 0, workers: 0, employed: 0, externalJobs: 0 };
+  const traffic = city._traffic || { unemployment: 0, traffic: 0, congestion: 0, workers: 0, employed: 0 };
   const connections = city._connections || {};
   // "Seaports and airports are considered connections to all neighbors", so a
   // working terminal is worth as much outside trade as a road to the border.
@@ -121,7 +121,7 @@ export function computeMetrics(city) {
 
   return {
     population, jobs, jobsCommercial, jobsIndustrial, specialJobs, demandBonus,
-    tradeConnections, externalJobs: traffic.externalJobs || 0, connections, ports,
+    tradeConnections, connections, ports,
     workers: traffic.workers, employed: traffic.employed, unemployment: traffic.unemployment,
     traffic: traffic.traffic, congestion: traffic.congestion, range: traffic.range ?? null,
     // "If you place bus stops and Sims don't seem to use them, they may be too

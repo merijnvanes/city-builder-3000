@@ -2,8 +2,7 @@ import { surfaceStep, isPortal, providesAccess } from './structures.js';
 // Commuting. Each residential lot sends its workers along the transport
 // network to the nearest open jobs (cheapest path, up to MAX_TRIP tiles of
 // street). Roads carry cars; highways and rail move people twice as fast;
-// rail is entered through stations; roads that reach the map edge lead to
-// jobs in the neighbouring city. Every tile on the way carries the trip,
+// rail is entered through stations. Every tile on the way carries the trip,
 // which becomes its traffic level. Trips are assigned twice: the second
 // pass routes around the jams the first pass produced.
 //
@@ -49,9 +48,6 @@ export const settleTraffic = (level, measured) =>
 // Fallback share for callers without a demographic pyramid. The live value
 // comes from the city's age structure; see population.js.
 export const WORKFORCE_SHARE = 0.4;
-// Local job allowance per road/highway exit, introduced in 282e690.
-// That commit records no rationale for 400 or source in SimCity 3000.
-export const EXTERNAL_JOBS_PER_ROAD = 400;
 const TRAFFIC_PER_POINT = 6; // commuters per traffic point on a road tile
 const RAIL_PER_POINT = 20;   // trains carry more per tile
 const HIGHWAY_PER_POINT = 18;
@@ -177,25 +173,8 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
       if (entry >= 0) addJobs(entry, t, cap);
     }
   }
-  // Current limitation: only road/highway exits receive outside job targets.
-  // Rail carries local commuters and supports neighbour trade/garbage deals,
-  // but has no outside job target here. Commit 282e690 introduced this split
-  // without a recorded design reason; its fidelity to SimCity 3000 is unverified.
-  // The original Unlimited manual, "Making Connections", describes road,
-  // highway and rail connections for trade; it does not establish this jobs rule:
-  // https://manualmachine.com/gamespc/simcity3000unlimited/1118664-user-manual/
-  let externalJobs = 0;
-  const outside = { filled: 0 };
-  const externalNodes=[];
-  for (const side of Object.values(city._connections || {})) {
-    for (const link of side.roadLinks || []) {
-      const i=link.y*size+link.x;
-      const entry=link.route==="road" && crossings && kind[UNDER+i]===ROAD ? UNDER+i : i;
-      addJobs(entry,outside,EXTERNAL_JOBS_PER_ROAD);
-      externalNodes.push(entry);
-      externalJobs+=EXTERNAL_JOBS_PER_ROAD;
-    }
-  }
+  // Employment stays within this city. Neighbour connections support trade;
+  // cross-border jobs are outside the current simulation scope.
 
   const parent = new Int32Array(nodes).fill(-1);
   const dist = new Int32Array(nodes).fill(-1);
@@ -311,7 +290,7 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
   const assign = (jam, maxCost = MAX_COST) => {
     const load = new Float64Array(nodes);
     for (const j of jobList) { j.open = j.cap; j.anchor.filled = 0; }
-    let employed = 0, commuters = 0;
+    let employed = 0;
     for (const home of homes) {
       let remaining = home.workers;
       for (const b of buckets) b.length = 0;
@@ -331,7 +310,6 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
               const take = Math.min(remaining, j.open);
               j.open -= take; j.anchor.filled += take;
               remaining -= take; employed += take;
-              if (j.anchor === outside) commuters += take;
               for (let k = i; k >= 0; k = parent[k]) load[k] += take;
             }
           }
@@ -352,7 +330,7 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
       for (const i of touched) { dist[i] = -1; parent[i] = -1; settled[i] = 0; }
       touched.length = 0;
     }
-    return { load, employed, commuters };
+    return { load, employed };
   };
 
   const ord = city.ordinances || {};
@@ -387,7 +365,7 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
       if (trafficOf(i, first.load) >= 80) { jam[i] = 1; jams++; }
     }
   }
-  const { load, employed, commuters } = jams ? assign(jam, maxCost) : first;
+  const { load, employed } = jams ? assign(jam, maxCost) : first;
 
   let sum = 0, roads = 0, congested = 0, railRiders = 0, subwayRiders = 0;
   for (let i = N; i < N * 2; i++) if (kind[i] === TUNNEL) subwayRiders += load[i];
@@ -434,7 +412,12 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
   const homeAt = [...new Set(homes.map((h) => h.entry))];
   // "Inter-city connections help your Commercial sector as well, by opening up
   // the borders so new customers can visit and shop."
-  homeAt.push(...externalNodes);
+  for (const side of Object.values(city._connections || {})) {
+    for (const link of side.roadLinks || []) {
+      const i=link.y*size+link.x;
+      homeAt.push(link.route==="road" && crossings && kind[UNDER+i]===ROAD ? UNDER+i : i);
+    }
+  }
   const spread = (sources) => {
     const out = new Int32Array(N).fill(-1);
     if (!sources.length) return out;
@@ -464,7 +447,7 @@ export function updateTraffic(city, workforceShare = WORKFORCE_SHARE) {
   const unemployment = workers > 0 ? Math.round(100 * (1 - employed / workers)) : 0;
   return {
     range,
-    workers, employed, jobs: jobsTotal, unemployment, externalJobs, commuters,
+    workers, employed, jobs: jobsTotal, unemployment,
     railRiders: Math.round(railRiders), subwayRiders: Math.round(subwayRiders),
     traffic: roads ? Math.round(sum / roads) : 0,
     congestion: roads ? Math.round(100 * congested / roads) : 0,

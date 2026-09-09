@@ -73,13 +73,14 @@ test('a ramp can join both decks from beside a viaduct',()=>{
   const c=town(); put(c,20,20,'road'); put(c,20,20,'highway');
   assert.equal(evaluate(c,20,21,'onramp').ok,true);
 });
-test('border highway crossings keep highway access to external jobs',()=>{
+test('border highway crossings connect for trade without supplying jobs',()=>{
   for(const lower of ['road','rail']) {
     const c=town();
     for(let x=0;x<=20;x++) put(c,x,20,'highway');
     put(c,20,21,'road'); put(c,20,20,'onramp'); lot(c,20,22,'residential');
     put(c,0,20,lower); connectNeighbor(c,{x:0,y:20,side:'northwest',route:'highway'}); refresh(c);
-    assert.ok(c._connections.northwest.road>0); assert.ok(at(c,20,22).commute>0);
+    assert.ok(c._connections.northwest.road>0); assert.equal(at(c,20,22).commute,0);
+    assert.equal(c._traffic.employed,0);
   }
 });
 test('destroyed crossings leave loadable saves',async()=>{

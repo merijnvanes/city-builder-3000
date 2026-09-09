@@ -56,12 +56,12 @@ test('border-parallel strokes do not prompt for every tile, and existing endpoin
  const approach=applyConstruction(c,planConstruction(c,{x:5,y:20},{x:0,y:20},'road'));
  assert.equal(approach.connectionOffers.length,1);assert.equal(approach.connectionOffers[0].side,'northwest');
 });
-test('two purchased crossing layers supply separate jobs and lower-road customers',()=>{
+test('two purchased crossing layers preserve lower-road customers without adding jobs',()=>{
  const c=town();place(c,0,20,'road');place(c,0,20,'highway');
  connectNeighbor(c,{x:0,y:20,side:'northwest',route:'road'});
  place(c,1,21,'commercial');refresh(c);assert.ok(at(c,1,21).reach>=0,'customers enter on the purchased lower road');
- const one=c._traffic.externalJobs;
+ const jobs=c._traffic.jobs,employed=c._traffic.employed;
  connectNeighbor(c,{x:0,y:20,side:'northwest',route:'highway'});
- assert.equal(c._connections.northwest.road,2);assert.equal(c._traffic.externalJobs,one*2);
+ assert.equal(c._connections.northwest.road,2);assert.equal(c._traffic.jobs,jobs);assert.equal(c._traffic.employed,employed);
  assert.equal(c._connections.northwest.roadLinks.length,2);
 });
