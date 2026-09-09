@@ -30,19 +30,24 @@ export function navigationArt(id) {
 
 export function mountNavigatorFrame(navigator) {
   navigator.innerHTML = '<svg class="navigator-frame" aria-hidden="true"><defs><linearGradient id="navigator-enamel" gradientUnits="userSpaceOnUse"><stop stop-color="#eef0ff"/><stop offset=".45" stop-color="#dce0f6"/><stop offset="1" stop-color="#adb6de"/></linearGradient></defs><path fill="url(#navigator-enamel)"/><path fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="3"/><path fill="none" stroke="#a2add5" stroke-opacity=".4" stroke-width="4"/></svg>';
-  new ResizeObserver(() => {
+  const observer = new ResizeObserver(() => {
     const w = navigator.clientWidth, h = navigator.clientHeight;
-    const rail = document.querySelector('#build-console').clientWidth;
+    const console = document.querySelector('#build-console');
+    const rail = console.clientWidth, height = console.clientHeight;
+    const shoulder = height - h;
+    const radius = parseFloat(getComputedStyle(document.querySelector('#console-deck')).borderTopLeftRadius);
     const x = w - rail;
     const footer = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--status-height')) + parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--news-height'));
     const join = Math.max(0, h - footer);
     const svg = navigator.querySelector('svg');
-    svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    svg.setAttribute('viewBox', `0 0 ${w} ${height}`);
     const gradient = svg.querySelector('linearGradient');
     gradient.setAttribute('x1', x); gradient.setAttribute('x2', w);
     const paths = svg.querySelectorAll(':scope > path');
-    const edge = (inset) => `M${x + inset} 0C${x + inset} ${join * .16} ${x * .88 + inset} ${join * .22} ${x * .68 + inset} ${join * .36}L${x * .3 + inset} ${join * .63}Q${inset} ${join * .83} ${inset} ${join}`;
-    paths[0].setAttribute('d', `${edge(0)}V${h}H${w}V0Z`);
+    const edge = (inset) => `M${x + inset + radius} 0Q${x + inset} 0 ${x + inset} ${radius}V${shoulder}C${x + inset} ${shoulder + join * .16} ${x * .88 + inset} ${shoulder + join * .22} ${x * .68 + inset} ${shoulder + join * .36}L${x * .3 + inset} ${shoulder + join * .63}Q${inset} ${shoulder + join * .83} ${inset} ${shoulder + join}`;
+    paths[0].setAttribute('d', `${edge(0)}V${height}H${w}V0Z`);
     for (const [i, inset] of [[1, 5], [2, 10]]) paths[i].setAttribute('d', edge(inset));
-  }).observe(navigator);
+  });
+  observer.observe(navigator);
+  observer.observe(document.querySelector('#console-deck'));
 }
