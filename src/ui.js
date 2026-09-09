@@ -3,6 +3,7 @@ import { ZONE_COST } from './sim/catalog.js';
 import { createPortrait } from "./portrait.js";
 import { LOAN_STEP, LOAN_MAX, LOAN_YEARS, MAX_LOANS } from "./sim/economy.js";
 import { toolPreview } from './ui-tool-preview.js';
+import { citySignal, demandSignal, placeServices, inspectNote } from './ui-signals.js';
 
 // ── SVG Icons ─────────────────────────────────────────────────────────────────
 const ICONS = {
@@ -57,6 +58,22 @@ function iconFor(id, label) {
   if (alias && ICONS[alias]) return ICONS[alias];
   const letter = (label || id).charAt(0).toUpperCase();
   return `<svg viewBox="0 0 20 20" fill="currentColor"><rect x="3" y="3" width="14" height="14" rx="3" opacity=".35"/><text x="10" y="14.5" text-anchor="middle" font-size="11" font-weight="700" fill="currentColor">${letter}</text></svg>`;
+}
+
+function renderSignal(parent, key, value) {
+  const signal=citySignal(key,value);
+  parent.replaceChildren();
+  parent.dataset.tone=signal.tone;
+  const icon=el('span','signal-icon');icon.innerHTML=iconFor(signal.icon);icon.setAttribute('aria-hidden','true');
+  const text=el('div','signal-copy');
+  text.append(el('span','signal-label',signal.label),el('strong','signal-word',signal.word));
+  const track=el('div','signal-track');
+  track.setAttribute('role','meter');track.setAttribute('aria-label',signal.label);
+  track.setAttribute('aria-valuemin','0');track.setAttribute('aria-valuemax','100');
+  track.setAttribute('aria-valuenow',String(signal.level));track.setAttribute('aria-valuetext',signal.word);
+  const fill=el('span');fill.style.width=`${signal.level}%`;track.appendChild(fill);
+  parent.append(icon,text);
+  if (!signal.neutral) parent.appendChild(track);
 }
 
 const PATH_TOOLS = new Set(["road", "rail", "highway", "powerline", "pipe", "subway"]);
@@ -248,9 +265,12 @@ export function mountUI(actions) {
   const mPop = el("span", "status-stat-val", "--");
   popWrap.appendChild(mPop);
   const happyWrap = el("span", "status-stat");
-  happyWrap.appendChild(el("span", "status-stat-label", "Approval"));
+  happyWrap.appendChild(el("span", "status-stat-label", "City mood"));
   const mHappy = el("span", "status-stat-val happy", "--");
   happyWrap.appendChild(mHappy);
+  const moodTrack=el('span','mood-track');
+  moodTrack.appendChild(el('span','mood-fill'));
+  happyWrap.appendChild(moodTrack);
   statusSmall.appendChild(popWrap);
   statusSmall.appendChild(happyWrap);
   statusFunds.appendChild(statusSmall);
@@ -277,12 +297,12 @@ export function mountUI(actions) {
     rciSection.appendChild(row);
     return { fill, val };
   }
-  const rciR = rciRow("r", "R");
-  const rciC = rciRow("c", "C");
-  const rciI = rciRow("i", "I");
+  const rciR = rciRow("r", "Homes");
+  const rciC = rciRow("c", "Shops");
+  const rciI = rciRow("i", "Work");
   statusPanel.appendChild(rciSection);
   rciSection.setAttribute('aria-label', 'Demand for residential, commercial and industrial zones');
-  rciSection.prepend(el('span', 'demand-label', 'Demand'));
+  rciSection.prepend(el('span', 'demand-label', 'Room to grow'));
   for (const [row, label] of [...rciSection.querySelectorAll('.rci-row')].map((row, i) => [row, ['Residential', 'Commercial', 'Industrial'][i]])) row.title = label;
 
   // Speed controls
@@ -353,13 +373,15 @@ export function mountUI(actions) {
   const inspPanel = el("div");
   inspPanel.id = "inspector-panel";
   inspPanel.setAttribute("aria-live", "polite");
+  const inspHeading=el('div','insp-heading');
   const inspHeaderLbl = el("div", "insp-header-label", "Inspect");
-  inspPanel.appendChild(inspHeaderLbl);
+  inspHeading.appendChild(inspHeaderLbl);
+  inspPanel.appendChild(inspHeading);
   function closeInspector(restoreFocus = true) {
     actions.clearSelection?.(); inspPanel.classList.remove('visible');
     if (restoreFocus) (matchMedia('(max-width: 800px)').matches ? mobileDockBtn : inspectBtn).focus();
   }
-  inspPanel.appendChild(btn('panel-close', '×', 'Close inspector', () => closeInspector()));
+  inspHeading.appendChild(btn('panel-close', '×', 'Close inspector', () => closeInspector()));
   const inspPortrait = el("canvas", "insp-portrait");
   inspPanel.appendChild(inspPortrait);
   const lotCard = createPortrait(inspPortrait);
@@ -368,7 +390,13 @@ export function mountUI(actions) {
   const inspDesc = el("div", "insp-desc", "");
   inspPanel.appendChild(inspDesc);
   const inspDetails = el("div");
+  inspDetails.className = 'insp-signals';
   inspPanel.appendChild(inspDetails);
+  const inspMore=el('details','inspection-notes');
+  inspMore.appendChild(el('summary','','More about this place'));
+  const inspNotes=el('div');inspMore.appendChild(inspNotes);inspPanel.appendChild(inspMore);
+  inspMore.addEventListener('toggle',()=>{if(!inspMore.open)inspPanel.scrollTop=0;});
+  let inspectedPlace='';
   app.appendChild(inspPanel);
 
   const activeTool = el('section', 'active-tool');
@@ -389,6 +417,7 @@ export function mountUI(actions) {
   const groupIcons = { zone: "residential", transport: "road", power: "power", water: "water", civic: "police", sanitation: "landfill", landscape: "park", landmark: "commercial", special: "school", emergency: "fire" };
   groups.forEach((g) => {
     const groupEl = el("div", "tool-group");
+    groupEl.dataset.group=g.id;
     const header = el("button", "group-header");
     header.setAttribute("aria-label", g.label);
     header.setAttribute("aria-expanded", "false");
@@ -443,6 +472,9 @@ export function mountUI(actions) {
       const densBtns = el("div", "density-btns");
       [1, 2, 3].forEach((d) => {
         const db = el("button", d === 1 ? "density-btn active" : "density-btn", ['Low', 'Medium', 'High'][d - 1]);
+        const skyline=el('span','density-skyline');skyline.setAttribute('aria-hidden','true');
+        for(const height of [d*3,d*4+2,d*3+2]) { const tower=el('i');tower.style.height=`${height}px`;skyline.appendChild(tower); }
+        db.prepend(skyline);
         db.dataset.density = String(d);
         db.setAttribute("aria-label", `Density ${d}`);
         db.addEventListener("click", () => {
@@ -560,13 +592,26 @@ export function mountUI(actions) {
   newsTickerWrap.id = "news-ticker-wrap";
   newsTickerWrap.appendChild(el("span", "news-label", "NEWS"));
   const newsScroll = el("div", "news-scroll");
-  const newsTicker = el("div");
+  const newsTicker = el("button");
   newsTicker.id = "news-ticker";
-  newsTicker.textContent = "Welcome to City Builder 3000.   ·   Build roads first, then zone residential areas nearby.   ·   Add power and water to help your city grow.   ·   Welcome to City Builder 3000.   ·   Build roads first, then zone residential areas nearby.   ·   Add power and water to help your city grow.";
+  newsTicker.setAttribute('aria-label','Read city news');
+  newsTicker.textContent = "Your next great neighbourhood starts with a road.";
   newsScroll.appendChild(newsTicker);
   newsTickerWrap.appendChild(newsScroll);
   newsWrap.appendChild(newsTickerWrap);
   bottomBar.appendChild(newsWrap);
+  const newsDialog=el('dialog');newsDialog.setAttribute('aria-label','City news');
+  const newsHeader=el('div','modal-header');newsHeader.append(el('span','modal-title','City news'),btn('btn btn-icon','×','Close news',()=>newsDialog.close()));
+  const newsBody=el('div','modal-body');
+  function buildNews() {
+    newsBody.replaceChildren();
+    const list=el('ul','city-news');
+    for(const message of [...(_lastStats?.news || [])].reverse()) list.appendChild(el('li','',message));
+    if(!list.children.length)list.appendChild(el('li','','A new chapter is waiting to be written.'));
+    newsBody.appendChild(list);
+  }
+  newsTicker.addEventListener('click',()=>{buildNews();newsDialog.showModal();});
+  newsDialog.append(newsHeader,newsBody);app.appendChild(newsDialog);
 
   // Zoom buttons (right of bottom bar)
   const zoomGroup = el("div", "nav-row");
@@ -639,10 +684,12 @@ export function mountUI(actions) {
   const titleLogo = el("div", "title-logo");
   titleLogo.innerHTML = 'CITY BUILDER <span>3000</span>';
   titleCard.appendChild(titleLogo);
-  titleCard.appendChild(el('h1', 'title-headline', 'A city worth calling home.'));
-  titleCard.appendChild(el("p", "title-tagline", "From the first quiet street to a skyline full of life. Your city starts with you."));
+  const headline=el('h1','title-headline');
+  headline.innerHTML='A little land.<br><span>Endless possibility.</span>';
+  titleCard.appendChild(headline);
+  titleCard.appendChild(el("p", "title-tagline", "A little land. A wild idea. A whole world waiting to come alive."));
   const titleBtns = el("div", "title-buttons");
-  titleBtns.appendChild(btn("btn btn-teal title-btn", "Build a new city  ↗", "Start a new city", () => { leaveTitle(); confirmDialog.showModal(); }));
+  titleBtns.appendChild(btn("btn btn-teal title-btn", "Let’s build something  ↗", "Start a new city", () => { leaveTitle(); confirmDialog.showModal(); }));
   titleBtns.appendChild(btn("btn title-btn", "Load City", "Load a saved city", () => { leaveTitle(); buildFiles(); filesDialog.showModal(); }));
   titleBtns.appendChild(btn("btn title-btn", "Explore New Riverton", "Explore the sample town", () => { leaveTitle(); actions.explore?.(); }));
   titleCard.appendChild(titleBtns);
@@ -652,7 +699,7 @@ export function mountUI(actions) {
     if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   });
-  titleCard.appendChild(el("p", "title-foot", "BUILD SOMETHING THAT LIVES."));
+  titleCard.appendChild(el("p", "title-foot", "Every great city starts with a little imagination."));
   titleScreen.appendChild(titleCard);
   app.appendChild(titleScreen);
 
@@ -965,40 +1012,26 @@ export function mountUI(actions) {
   const repBody = el("div", "modal-body");
   reportDialog.appendChild(repBody);
 
-  const repGraphWrap = el("div", "modal-section");
-  repGraphWrap.appendChild(el("div", "modal-section-title", "History (last 20 years)"));
+  const repGraphWrap = el("details", "modal-section city-history");
+  repGraphWrap.appendChild(el("summary", "modal-section-title", "Watch your city change"));
   const repGraphEl = el("div", "graph-grid");
   repGraphWrap.appendChild(repGraphEl);
-  repBody.appendChild(repGraphWrap);
 
   const repStatsSection = el("div", "modal-section");
-  repStatsSection.appendChild(el("div", "modal-section-title", "City Statistics"));
-  const repStatGrid = el("div", "stat-grid");
+  repStatsSection.appendChild(el("div", "modal-section-title", "The pulse of the place"));
+  const repStatGrid = el("div", "city-signal-grid");
   const repStats = {};
   [
-    ["population", "Population"],
-    ["jobs", "Jobs"],
-    ["unemployment", "Unemployment"],
-    ["happiness", "Approval"],
-    ["lifeExpectancy", "Life expectancy"],
-    ["eq", "Education quotient"],
-    ["workforceShare", "Workforce"],
-    ["pollution", "Pollution"],
-    ["crime", "Crime"],
-    ["traffic", "Traffic"],
-    ["garbage", "Garbage"],
-    ["waterPollution", "Water pollution"],
-    ["landValue", "Land value"],
-  ].forEach(([k, label]) => {
-    const item = el("div", "stat-item");
-    item.appendChild(el("span", "stat-item-label", label));
-    const v = el("span", "stat-item-val", "--");
-    item.appendChild(v);
+    'population','jobs','unemployment','happiness','lifeExpectancy','eq',
+    'workforceShare','pollution','crime','traffic','garbage','waterPollution','landValue',
+  ].forEach(k => {
+    const item = el("div", "city-signal-card");
     repStatGrid.appendChild(item);
-    repStats[k] = v;
+    repStats[k] = item;
   });
   repStatsSection.appendChild(repStatGrid);
   repBody.appendChild(repStatsSection);
+  repBody.appendChild(repGraphWrap);
 
   const repFooter = el("div", "modal-footer");
   repFooter.appendChild(btn("btn btn-teal", "Close", null, () => reportDialog.close()));
@@ -1042,30 +1075,10 @@ export function mountUI(actions) {
       ? REPORT_GRAPHS.map(([key, label, color, fmt]) => `<div class="graph-card"><div class="graph-title">${label}</div>${buildHistoryGraph(history, key, color, fmt)}</div>`).join("")
       : "<p style='color:var(--text-dim);font-size:.85rem'>Not enough history yet. Run the simulation for a couple of months.</p>";
 
-    const fmt = (k, v) => {
-      if (v == null) return "--";
-      if (["population", "jobs"].includes(k)) return fmtPop(v);
-      if (k === "lifeExpectancy") return `${v} yrs`;
-      if (k === "eq") return String(Math.round(v));
-      if (k === "workforceShare") return `${Math.round(v * 100)}%`;
-      return fmtPct(v);
-    };
-    Object.entries(repStats).forEach(([k, el]) => {
-      el.textContent = fmt(k, s[k]);
-      el.className = "stat-item-val";
-      if (k === "pollution" || k === "crime" || k === "garbage" || k === "traffic" || k === "waterPollution") {
-        if (s[k] > 70) el.classList.add("neg");
-        else if (s[k] > 40) el.classList.add("warn");
-      } else if (k === "happiness") {
-        if (s[k] < 30) el.classList.add("neg");
-        else if (s[k] < 60) el.classList.add("warn");
-      } else if (k === "lifeExpectancy") {
-        if (s[k] < 50) el.classList.add("neg");
-        else if (s[k] < 65) el.classList.add("warn");
-      } else if (k === "eq") {
-        if (s[k] < 45) el.classList.add("neg");
-        else if (s[k] < 65) el.classList.add("warn");
-      }
+    Object.entries(repStats).forEach(([key, card]) => {
+      if (key==='population' || key==='jobs') {
+        card.replaceChildren(el('span','signal-label',key==='population'?'People call this home':'Places to work'),el('strong','signal-total',fmtPop(s[key])));
+      } else renderSignal(card,key,s[key]);
     });
   }
 
@@ -1185,10 +1198,10 @@ export function mountUI(actions) {
   const refreshSiren = (s) => {
     const siren = s?.siren;
     if (!siren) return;
-    const trust = Math.round(siren.trust * 100);
+    const trust = siren.trust >= .75 ? 'Most residents' : siren.trust >= .4 ? 'Some residents' : 'Few residents';
     sirenMsg.textContent = siren.sounding
-      ? `The siren is sounding. ${trust}% of Sims are taking cover, so a disaster now will do much less damage.`
-      : `Sims indoors take far less harm, but a false alarm costs you their trust. ${trust}% would heed the next warning.`;
+      ? `The siren is sounding. ${trust} are taking cover.`
+      : `${trust} would heed a warning. Shelter protects them; false alarms cost their trust.`;
     sirenBtn.disabled = !!siren.sounding;
   };
   disasterDialog.appendChild(disBody);
@@ -1422,7 +1435,8 @@ export function mountUI(actions) {
   function updateRci(bar, demand) {
     bar.val.parentElement.setAttribute('aria-valuenow', String(Math.max(-100, Math.min(100, demand || 0))));
     if (demand == null) { bar.val.textContent = "--"; bar.fill.style.width = "0%"; return; }
-    bar.val.textContent = `${Math.round(demand)}`;
+    bar.val.textContent = demandSignal(demand);
+    bar.val.parentElement.setAttribute('aria-valuetext',demandSignal(demand));
     const abs = Math.abs(demand);
     const pct = (abs / 100) * 50; // 50% = half of track = full demand
     bar.fill.className = demand >= 0 ? "rci-fill pos" : "rci-fill neg";
@@ -1440,7 +1454,10 @@ export function mountUI(actions) {
       // Top metrics
       mPop.textContent    = fmtPop(stats.population);
       const funds = stats.money ?? city.money;
-      mHappy.textContent  = stats.happiness != null ? fmtPct(stats.happiness) : "--";
+      const mood=citySignal('happiness',stats.happiness);
+      mHappy.textContent=mood.word;
+      happyWrap.dataset.tone=mood.tone;
+      moodTrack.firstChild.style.width=`${mood.level}%`;
 
       moneyDisplay.textContent = fmtMoney(funds);
       moneyDisplay.className   = "status-money" + (funds < 0 ? " neg" : "");
@@ -1575,10 +1592,10 @@ export function mountUI(actions) {
 
       // News ticker
       if (Array.isArray(stats.news) && stats.news.length) {
-        const text = stats.news.join("   ·   ");
-        // Double the text for seamless marquee loop
-        newsTicker.textContent = `${text}   ·   ${text}`;
+        newsTicker.textContent = stats.news.at(-1);
+        newsTicker.title = stats.news.at(-1);
       }
+      if(newsDialog.open)buildNews();
     },
 
     notify(message) {
@@ -1637,10 +1654,40 @@ export function mountUI(actions) {
       inspPortrait.classList.toggle("visible", !!info.anchor);
       if (info.anchor) lotCard.draw(info.anchor, info.night, info.rotation);
       inspTitle.textContent = info.title || "--";
-      inspDesc.textContent  = info.description || "";
+      inspDesc.textContent  = (info.description || "").replace(/ \([^)]*lot, stage[^)]*\)/,'');
       inspDetails.innerHTML = "";
+      const place=`${info.x},${info.y}`;
+      if (inspectedPlace!==place) { inspMore.open=false;inspPanel.scrollTop=0; }
+      inspectedPlace=place;
+      inspNotes.replaceChildren();
+      const tile=info.tile;
+      if (tile) {
+        const services=el('div','place-services');
+        for(const {label,icon,ready} of placeServices(info.anchor || tile)) {
+          const badge=el('span',`service-badge ${ready?'ready':'missing'}`);
+          badge.innerHTML=iconFor(icon);badge.appendChild(el('span','',`${label} ${ready?'✓':'!'}`));
+          badge.setAttribute('role','img');
+          badge.setAttribute('aria-label',`${label}: ${ready?'connected':'missing'}`);services.appendChild(badge);
+        }
+        inspDetails.appendChild(services);
+        if (tile.fire || info.anchor?.abandoned) inspDetails.appendChild(el('div','place-alert',tile.fire?'On fire! Send a fire crew.':'Abandoned. Help this place come back to life.'));
+      }
       if (Array.isArray(info.details)) {
-        info.details.forEach((d) => inspDetails.appendChild(el("div", "insp-detail", d)));
+        for(const detail of info.details) {
+          if (/^(Land value|Pollution|Crime|Power:|ON FIRE)/.test(detail) && tile) continue;
+          const score=detail.match(/^(Flammability|Traffic): (\d+)\/100/);
+          if (score) { const card=el('div','city-signal-card');renderSignal(card,score[1].toLowerCase(),Number(score[2]));inspNotes.appendChild(card); }
+          else {
+            const note=inspectNote(detail);
+            if(note.kind==='signal') {const card=el('div','city-signal-card');renderSignal(card,note.key,note.value);inspDetails.appendChild(card);}
+            else if(note.kind==='urgent') inspDetails.prepend(el('div','place-alert',note.text));
+            else (note.kind==='primary'?inspDetails:inspNotes).appendChild(el('div','insp-detail',note.text));
+          }
+        }
+      }
+      if(tile)for(const key of ['landValue','pollution','crime']) {
+        if(key!=='landValue' && !tile[key])continue;
+        const card=el('div','city-signal-card');renderSignal(card,key,tile[key]);inspDetails.appendChild(card);
       }
     },
 

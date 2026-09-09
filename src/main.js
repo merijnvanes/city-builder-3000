@@ -38,7 +38,7 @@ lookAtCity();
 
 function refreshSelection() {
   if (!selection || tool !== "inspect") return;
-  ui?.setSelection({ ...sim.inspectTile(city, selection.x, selection.y), night: renderer.night, rotation: renderer.rotation });
+  ui?.setSelection({ ...sim.inspectTile(city, selection.x, selection.y), tile: city.tiles[selection.y * city.size + selection.x], night: renderer.night, rotation: renderer.rotation });
 }
 
 function refresh() {

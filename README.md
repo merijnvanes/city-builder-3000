@@ -109,6 +109,19 @@ placement instructions and zone density. On phones, use **Build city** to open
 the dock. **Data maps** opens coverage and city-condition overlays beside the
 camera controls.
 
+The city summary keeps money and population in numbers. Mood and demand use
+plain words and colour bars. **Report** shows the city's health through visual
+signals; open **Watch your city change** for history. Inspect a place to see its
+service connections and urgent problems, then expand **More about this place**
+for details. The agent API keeps exact simulation values. Signal bands live in
+`src/ui-signals.js`; they only affect presentation. Longer quality bars indicate
+better conditions. Neutral traits, such as age mix and local appeal, use words.
+Demand bars still distinguish growth from oversupply. Click or tap the news
+strip to read the full city news log.
+
+The interface bundles [Nunito Sans](https://github.com/google/fonts/tree/main/ofl/nunitosans)
+under the SIL Open Font License, included in `public/fonts/OFL.txt`.
+
 **City menu** contains saving, loading, new cities, sound, day/night and help.
 Budget opens with a financial overview; its tabs separate taxes and service
 funding, the ledger, policies and neighbor deals. The interface respects the

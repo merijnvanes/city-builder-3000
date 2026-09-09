@@ -95,6 +95,7 @@ try {
   await page.keyboard.press('Escape');
   await page.getByRole('button', { name: 'Civic', exact: true }).click();
   await page.waitForFunction(() => [...document.querySelectorAll('#flyout img')].every(i => i.complete && i.naturalWidth > 0));
+  await page.locator('#flyout img').evaluateAll(images=>Promise.all(images.map(image=>image.decode())));
   await page.screenshot({ path: 'artifacts/ui-palette.png', animations: 'disabled' });
   await page.keyboard.press('Escape');
   await page.getByRole('button', { name: 'Open budget', exact: true }).click();
