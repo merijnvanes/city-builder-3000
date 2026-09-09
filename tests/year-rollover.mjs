@@ -10,11 +10,13 @@ try {
   await page.evaluate(() => { civic.city.month = 11; civic.city.settings.yearEndBudget = true; });
   await page.getByRole('button', { name: 'Very fast [3]', exact: true }).click();
   await page.waitForFunction(() => civic.city.month >= 13);
-  const state = await page.evaluate(() => {
+  // The January autosave lands in IndexedDB, and writing it is asynchronous.
+  await page.waitForFunction(async () => (await civic.saveStore.read(0)).ok);
+  const state = await page.evaluate(async () => {
     const snapshot = {
       dialogs: document.querySelectorAll('dialog[open]').length,
       speed: document.querySelector('[data-speed="3"]').getAttribute('aria-pressed'),
-      autosave: JSON.parse(localStorage.getItem('city-builder-3000-save-v3-autosave')).month,
+      autosave: JSON.parse((await civic.saveStore.read(0)).text).month,
     };
     document.querySelector('[data-speed="0"]').click();
     return snapshot;

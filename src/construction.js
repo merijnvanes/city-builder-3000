@@ -227,8 +227,15 @@ export function createUndoManager(limit = 20) {
     },
     undo(city) {
       if (!stack.length) return false;
+      // The revision counter has to keep climbing across an undo. Restoring the
+      // snapshot brings its older, lower number back with it, and counting up
+      // from there returns a number the city already had at a different state.
+      // Anything comparing revisions for sameness — the metrics cache, the
+      // autosave's "nothing has changed" check — would then be told a city it
+      // has never seen is one it already handled.
+      const seen = city.revision ?? 0;
       restore(city, stack.pop());
-      city.revision = (city.revision ?? 0) + 1;
+      city.revision = Math.max(seen, city.revision ?? 0) + 1;
       return true;
     },
     clear() { stack.length = 0; },

@@ -66,7 +66,9 @@ try {
   await page.locator('[data-tool="bulldoze"]').click(); await page.mouse.click(p.x, p.y);
   assert.equal((await tile(target.x, target.y)).type, "empty");
   await menuAction('Load city');
-  assert.equal((await tile(target.x, target.y)).type, "road", "Load restores the road");
+  // Reading a city back is asynchronous now that saves live in IndexedDB.
+  await page.waitForFunction(({ x, y }) => civic.city.tiles[y * civic.city.size + x].type === "road", target)
+    .catch(() => { throw new Error("Load restores the road"); });
 
   // Budget: independent taxes, loans.
   await openManagement(page, 'Open budget');
@@ -159,7 +161,8 @@ try {
   assert.equal(await money(), 25000);
   assert.equal(await page.evaluate(() => civic.city.layout), "coast");
   await menuAction('Load city');
-  assert.ok(await page.evaluate(() => civic.city.population > 0));
+  await page.waitForFunction(() => civic.city.population > 0)
+    .catch(() => { throw new Error("Load brings the saved city back"); });
   assert.deepEqual(errors, [], "No runtime errors");
   console.log("Browser passed: preview/cancel/commit/undo, save/load, taxes, loans, ordinances, dialogs, disasters, overlays, rotation, footprints, simulation, night, mobile, new city.");
 } finally { await browser.close(); }

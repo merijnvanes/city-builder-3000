@@ -157,6 +157,30 @@ describe("undo", () => {
     assert.ok(c.revision > revision);
     assert.equal(undo.undo(c), false);
   });
+  test("the revision counter keeps climbing across an undo", () => {
+    // Undo restores a snapshot, and the snapshot carries the lower revision it
+    // was taken at. Counting up from there hands back a number the city already
+    // wore at a different state, and everything that compares revisions for
+    // sameness is then told a city it has never seen is one it has handled: the
+    // metrics cache serves stale figures, and the autosave decides there is
+    // nothing to write and leaves the undone road on disk.
+    const c = blank();
+    const undo = createUndoManager(5);
+    const seen = new Set([c.revision]);
+
+    for (let i = 0; i < 4; i++) {
+      undo.record(c);
+      applyConstruction(c, planConstruction(c, { x: 5, y: 5 + i * 2 }, { x: 12, y: 5 + i * 2 }, "road"));
+      assert.ok(!seen.has(c.revision), `building gave revision ${c.revision}, which the city already had`);
+      seen.add(c.revision);
+
+      const before = c.revision;
+      assert.equal(undo.undo(c), true);
+      assert.ok(c.revision > before, `undo left revision ${c.revision}, not above ${before}`);
+      assert.ok(!seen.has(c.revision), `undo gave revision ${c.revision}, which the city already had`);
+      seen.add(c.revision);
+    }
+  });
   test("keeps only the latest snapshots", () => {
     const c = blank();
     const undo = createUndoManager(2);

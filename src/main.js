@@ -27,6 +27,41 @@ let unreadableSlot = null;
 
 // One place that writes a city and says what happened. Every caller reports the
 // failure: a save that quietly did not happen is how a long game disappears.
+// The autosave stands between a closed tab and a lost afternoon. It runs every
+// January, once a minute while the city is being played, and again when the
+// page is put away. The minute matters most: closing a desktop tab kills the
+// page before an IndexedDB write can commit, so the honest guarantee is not
+// "nothing is lost" but "no more than the last minute of it".
+//
+// `city.revision` counts every change the simulation makes and only ever climbs,
+// so a city that has not moved is never written twice. The city as it arrived —
+// at boot, or from a load, or as a new city — counts as already stored. A
+// player who opens the game, looks at a new city and leaves must not have their
+// autosave replaced by the empty map they were looking at.
+const AUTOSAVE_EVERY_MS = 60_000;
+// A floor under the automatic triggers, so a fast clock cannot turn a big city
+// into a write every few seconds. Putting the page away ignores it.
+const AUTOSAVE_FLOOR_MS = 5_000;
+let savedRevision = -1, lastAutosaveAt = -Infinity, autosaving = false, autosaveQueued = false;
+
+async function autosave({ urgent = false } = {}) {
+  if (!urgent && performance.now() - lastAutosaveAt < AUTOSAVE_FLOOR_MS) return { ok: true, skipped: true };
+  // A save already writing holds the city as it was when it started. An urgent
+  // request arriving behind it has newer changes, so it waits its turn rather
+  // than being dropped: the page going away is exactly when that matters.
+  if (autosaving) { autosaveQueued = autosaveQueued || urgent; return { ok: true, queued: urgent }; }
+  if (city.revision === savedRevision) return { ok: true, skipped: true };
+  autosaving = true;
+  const revision = city.revision;
+  let result;
+  try {
+    result = await storeCity(AUTOSAVE_SLOT, { quiet: true });
+    if (result.ok) { savedRevision = revision; lastAutosaveAt = performance.now(); }
+  } finally { autosaving = false; }
+  if (autosaveQueued) { autosaveQueued = false; return autosave({ urgent: true }); }
+  return result;
+}
+
 async function storeCity(slot, { quiet = false, force = false } = {}) {
   if (loading) return { ok: false, message: "A city is being loaded." };
   if (slot === unreadableSlot && !force) return { ok: false, message: `${slotLabel(slot)} holds a city this version could not read. Download it first, or save over it from the save dialog.` };
@@ -90,6 +125,10 @@ function restore() {
   input?.cancel();
   undo.clear();
   setSpeed(0);
+  // A city that has just arrived is a city nobody has played yet. It counts as
+  // stored until something changes it, so looking at a new map and leaving does
+  // not replace the autosave with it.
+  savedRevision = city.revision;
   renderer.size = city.size;
   renderer.dirty = true;
   selection = null;
@@ -231,7 +270,7 @@ function stepMonth() {
   if (result.disaster) { ui.notify(result.disaster); audio.effect(/fire|riot/i.test(result.disaster) ? "siren" : "disaster"); }
   if (goal) { ui.notify(goal); audio.effect("cash"); }
   // Autosave every January.
-  if (city.month % 12 === 0) void storeCity(AUTOSAVE_SLOT, { quiet: true });
+  if (city.month % 12 === 0) void autosave();
   return [result.disaster, goal].filter(Boolean);
 }
 
@@ -325,13 +364,30 @@ const minimap = createMinimap(renderer);
 refresh(); choose("inspect"); setDensity(1); setSpeed(0);
 tipIndex = TIPS.length; // the starter town needs no walkthrough
 if (!new URLSearchParams(location.search).has("play")) ui.showTitle();
-document.addEventListener("visibilitychange", () => { lastTick = performance.now(); previousTime = lastTick; });
+// The city as the page booted counts as already saved, so switching away from
+// an untouched tab never overwrites the autosave with the sample town.
+savedRevision = city.revision;
+
+// Putting the page away is the last certain moment to write. `visibilitychange`
+// is the one to trust: on a phone it fires as the tab goes to the background,
+// while the page is still running and IndexedDB can still commit. `pagehide`
+// covers closing a desktop tab, where the write may or may not finish; it is a
+// second chance, not the plan.
+document.addEventListener("visibilitychange", () => {
+  lastTick = performance.now(); previousTime = lastTick;
+  if (document.hidden) void autosave({ urgent: true });
+});
+window.addEventListener("pagehide", () => { void autosave({ urgent: true }); });
 
 function frame(now) {
   const delta = Math.min(100, now - previousTime);
   previousTime = now;
   if (speed) animationTime += delta * speed;
   if (speed && !document.hidden && now - lastTick > MONTH_MS / speed) { stepMonth(); lastTick = now; }
+  // Closing a desktop tab kills the page before an IndexedDB write can commit,
+  // so the exposure has to be bounded while the tab is still open rather than
+  // patched at the moment it closes.
+  if (!document.hidden && now - lastAutosaveAt > AUTOSAVE_EVERY_MS) void autosave();
   if (!document.hidden) { input.update(delta); renderer.render(city, animationTime); minimap.update(city); }
   requestAnimationFrame(frame);
 }
