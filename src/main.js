@@ -10,13 +10,69 @@ import { attachInput } from "./input.js";
 import { CityAudio } from "./audio.js";
 import { SCENARIOS, startScenario, updateScenario } from "./scenarios.js";
 import { createAgentAPI } from "./agent-api.js";
-import { saveStore, AUTOSAVE_SLOT, slotLabel } from "./save-store.js";
+import { saveStore, AUTOSAVE_SLOT, RESCUE_SLOT, slotLabel } from "./save-store.js";
+import { installCrashGuard } from "./crash-guard.js";
 
 const MONTH_MS = 2500;
 
 // The four fields the save dialog prints. They travel with the city so listing
 // the slots never has to parse a megabyte of stored JSON back out.
 const metaOf = (c) => ({ name: c.name, population: c.population, money: c.money, month: c.month, startYear: c.startYear });
+
+// A throw inside frame() ends the render loop, because the loop reschedules
+// itself on its last line. The city is still in memory at that moment, so it is
+// written to a slot of its own and offered back as a file before the player
+// reloads the page and loses it.
+//
+// The guard goes up before anything else runs. A failure while the interface is
+// still being built is the one the player can make least sense of, and it is
+// also the one that would otherwise reach nobody, so it gets a plain message
+// with no game behind it.
+installCrashGuard({
+  target: window,
+  report: ({ message, stack, source }) => {
+    // Every step here stands alone. Whatever broke may be the thing this
+    // handler is about to touch, and the parts that still work should run.
+    try { setSpeed(0); } catch { /* the clock is the least of it */ }
+    let text = null;
+    try { text = sim.serialize(city); } catch { /* the city itself may be what broke */ }
+    const stored = text ? rescue(text) : Promise.resolve({ ok: false });
+    try {
+      if (ui?.showCrash) { ui.showCrash({ message, stack, source, text, stored }); return; }
+    } catch { /* fall through to the plain message */ }
+    bareCrashNotice(message, source, text);
+  },
+});
+
+// Keep the first rescued city. A second crash, or a crash in another tab, must
+// not overwrite one the player has not collected yet; the newer city is still
+// in the dialog to download.
+async function rescue(text) {
+  try {
+    if ((await saveStore.read(RESCUE_SLOT)).ok) return { ok: true, kept: true };
+    return await saveStore.write(RESCUE_SLOT, text, (() => { try { return metaOf(city); } catch { return null; } })());
+  } catch { return { ok: false }; }
+}
+
+// The interface never got built, or it is what broke. This owes the player two
+// things: what happened, and their city.
+function bareCrashNotice(message, source, text) {
+  try {
+    const notice = document.createElement("div");
+    notice.id = "boot-failure";
+    notice.setAttribute("role", "alert");
+    notice.append(Object.assign(document.createElement("h1"), { textContent: "The game stopped" }));
+    notice.append(Object.assign(document.createElement("p"), { textContent: source ? `${message} (${source})` : message }));
+    if (text) {
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(new Blob([text], { type: "application/json" }));
+      link.download = "city-rescued.json";
+      link.textContent = "Download this city";
+      notice.append(link);
+    }
+    document.body.appendChild(notice);
+  } catch { /* there is nothing left to tell the player with */ }
+}
 
 // Set while a city is being read back, so nothing writes over the slot the
 // player is in the middle of loading from.
@@ -378,6 +434,7 @@ document.addEventListener("visibilitychange", () => {
   if (document.hidden) void autosave({ urgent: true });
 });
 window.addEventListener("pagehide", () => { void autosave({ urgent: true }); });
+
 
 function frame(now) {
   const delta = Math.min(100, now - previousTime);

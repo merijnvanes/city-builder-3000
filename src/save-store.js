@@ -18,10 +18,14 @@ const DB_NAME = "city-builder-3000";
 const DB_VERSION = 1;
 const STORE = "cities";
 
-// Slot 0 is the automatic save. Slots 1..3 are the player's.
+// Slot 0 is the automatic save. Slots 1..3 are the player's. The rescue slot is
+// written only when the game crashes, and appears in the save dialog only while
+// it holds something.
 export const SLOT_COUNT = 3;
 export const AUTOSAVE_SLOT = 0;
+export const RESCUE_SLOT = "rescue";
 export const ALL_SLOTS = [AUTOSAVE_SLOT, ...Array.from({ length: SLOT_COUNT }, (_, i) => i + 1)];
+const STORED_SLOTS = [...ALL_SLOTS, RESCUE_SLOT];
 
 // The keys the pre-IndexedDB builds wrote. Slot 1 was the bare key, so the
 // mapping cannot be derived and is spelled out.
@@ -32,7 +36,8 @@ const legacyKey = (slot) =>
 const localTextKey = (slot) => `${LEGACY_PREFIX}-${slot}`;
 const localMetaKey = (slot) => `${LEGACY_PREFIX}-${slot}-meta`;
 
-export const slotLabel = (slot) => (slot === AUTOSAVE_SLOT ? "Autosave" : `Slot ${slot}`);
+export const slotLabel = (slot) =>
+  slot === RESCUE_SLOT ? "Rescued city" : slot === AUTOSAVE_SLOT ? "Autosave" : `Slot ${slot}`;
 
 // The four fields the save dialog shows. Reading them back out of a stored city
 // is only needed for saves written before summaries existed; a live save hands
@@ -119,7 +124,7 @@ function localBackend(ls) {
     },
     get: async (slot) => read(slot),
     remove: async (slot) => { ls.removeItem(localTextKey(slot)); ls.removeItem(localMetaKey(slot)); },
-    all: async () => ALL_SLOTS.map(read).filter(Boolean),
+    all: async () => STORED_SLOTS.map(read).filter(Boolean),
   };
 }
 
@@ -174,8 +179,11 @@ export function createSaveStore({
     // worth collecting only when moving to a different store. To the fallback
     // itself they are already home.
     const sources = backend.mode === "indexeddb" ? [legacyKey, localTextKey] : [legacyKey];
-    for (const slot of ALL_SLOTS) {
-      for (const key of sources.map((name) => name(slot))) {
+    for (const slot of STORED_SLOTS) {
+      // The rescue slot never existed under the original key names, and
+      // legacyKey has no sensible answer for a slot that is not a number.
+      const names = slot === RESCUE_SLOT ? sources.filter((name) => name === localTextKey) : sources;
+      for (const key of names.map((name) => name(slot))) {
         let text = null;
         try { text = ls.getItem(key); } catch { return; }
         if (text == null) continue;
@@ -260,7 +268,10 @@ export function createSaveStore({
       let records = [];
       try { records = await backend.all(); } catch { records = []; }
       const bySlot = new Map(records.map((r) => [r.slot, r]));
-      return ALL_SLOTS.map((slot) => {
+      // The rescue slot is not one of the player's. It is listed only when a
+      // crash has put a city there for them to collect.
+      const slots = bySlot.has(RESCUE_SLOT) ? [RESCUE_SLOT, ...ALL_SLOTS] : ALL_SLOTS;
+      return slots.map((slot) => {
         const record = bySlot.get(slot);
         if (!record) return { slot, label: slotLabel(slot), empty: true };
         const meta = named(record.meta) || summarize(record.text);

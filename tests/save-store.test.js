@@ -227,6 +227,31 @@ describe("save store", () => {
     assert.deepEqual(Object.keys(ls.map).filter((k) => k.includes("save")), [], "nothing is left behind in localStorage");
   });
 
+  test("a city rescued from a crash comes along to IndexedDB too", async () => {
+    // A crash in a private window writes the rescued city through the fallback.
+    // If the move only looked at the numbered slots it would stay there, hidden
+    // behind an IndexedDB backend that does not know about it.
+    const ls = fakeStorage();
+    const fallback = createSaveStore({ indexedDB: undefined, localStorage: ls, storage: undefined });
+    await fallback.write("rescue", city("Rescued From A Crash"), { name: "Rescued From A Crash", population: 40, money: 2, month: 3, startYear: 1900 });
+
+    const store = createSaveStore({ indexedDB: memoryIndexedDB(), localStorage: ls, storage: undefined });
+    assert.equal(await store.mode(), "indexeddb");
+    assert.equal(JSON.parse((await store.read("rescue")).text).name, "Rescued From A Crash");
+    assert.deepEqual(Object.keys(ls.map).filter((k) => k.includes("save")), [], "and nothing is left behind");
+  });
+
+  test("the rescue slot is listed only once it holds something", async () => {
+    const store = createSaveStore({ indexedDB: memoryIndexedDB(), localStorage: fakeStorage(), storage: undefined });
+    assert.deepEqual((await store.list()).map((s) => s.slot), [0, 1, 2, 3], "no rescue slot in an ordinary game");
+
+    await store.write("rescue", city("Salvage"), { name: "Salvage", population: 1, money: 1, month: 0, startYear: 1900 });
+    const listed = await store.list();
+    assert.deepEqual(listed.map((s) => s.slot), ["rescue", 0, 1, 2, 3], "and it comes first when it does");
+    assert.equal(listed[0].label, "Rescued city");
+    assert.equal(listed[0].name, "Salvage");
+  });
+
   test("a full localStorage still shows the cities already in it", async () => {
     // Demoting a full localStorage to no storage at all would hide the saves
     // the player has to reach in order to free the space.

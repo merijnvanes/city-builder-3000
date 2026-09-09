@@ -118,6 +118,7 @@ entry. Nothing ever returns the whole tile array.
 - **Data maps** for power, water, land value, pollution, crime, traffic, transit and service coverage; a report with eight history graphs; seven advisors with portraits; a news ticker.
 - **Scenarios**: open play, grow to 20,000, Boomtown, rescue a failing town, clear the air of a factory town, rebuild after a quake. Start years from 1900 gate technology.
 - **Saves**: three browser slots, an autosave every January, plus export and import as a file. Cities are stored in IndexedDB, not localStorage: a developed 128×128 city is about 1.1 MB of JSON, which UTF-16 localStorage would double against a ~5 MB origin quota. The game asks for persistent storage on the first save, carries cities over from the older localStorage keys on first run, and reports every failed write instead of losing the city silently.
+- **When it breaks**: `frame()` reschedules itself on its last line, so a throw inside the render loop ends it and freezes the picture with no explanation. An uncaught error or rejected promise now stops the clock, writes the city to a rescue slot, and opens a dialog that names the error and offers the city as a file. Only the first crash is shown; the rest are counted. Artwork that fails to decode is not treated as a crash.
 - **Save format**: `SAVE_VERSION` in `src/sim/city.js` names the current format, and `MIGRATIONS` beside it is the ordered list of steps that carries an older save to it, one version at a time. Raising the version means appending a step, never editing the earlier ones. `OLDEST_SUPPORTED_SAVE` is the first version with a step. A save that is too old, too new, or unreadable is offered back to the player as a file download rather than discarded. `tests/save-migration.test.js` checks the chain has no gaps by walking a live city back to every supported version and loading it again.
 
 ## Controls
@@ -171,6 +172,7 @@ budget, welcome and mobile screenshots in `artifacts/`.
 - `src/ui.js`, `src/style.css` — the interface
 - `src/agent-api.js` — the `civic.agent` command surface, an adapter over the same paths the mouse drives
 - `src/save-store.js` — where saved cities live: IndexedDB, with a localStorage fallback and a refusal that reports itself
+- `src/crash-guard.js` — the uncaught error and rejected promise handler behind the "The game stopped" dialog
 - `src/main.js` — game loop, saves, wiring
 
 City Builder 3000 is an original work. No copyrighted assets are used.

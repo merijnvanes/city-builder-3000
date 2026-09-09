@@ -639,6 +639,29 @@ export function mountUI(actions) {
   rescueDialog.append(rescueHeader, rescueBody, rescueFooter);
   app.appendChild(rescueDialog);
 
+  // ── The game stopped ──────────────────────────────────────────────────────
+  // A crash ends the render loop and freezes the picture. This says so, and
+  // gets the city out of the page before the player reloads it away.
+  const crashDialog = el("dialog");
+  crashDialog.setAttribute("aria-label", "The game stopped");
+  const crashHeader = el("div", "modal-header");
+  crashHeader.append(el("span", "modal-title", "The game stopped"));
+  const crashBody = el("div", "modal-body");
+  const crashLead = el("p", "", "Something went wrong and the city is paused. Your city is still here. Download it, then reload the page and load it back.");
+  const crashWhere = el("p", "crash-detail");
+  const crashSaved = el("p", "crash-detail", "Saving a copy…");
+  crashBody.append(crashLead, crashWhere, crashSaved);
+  const crashFooter = el("div", "modal-footer");
+  let crashText = null;
+  const crashDownload = btn("btn btn-teal", "Download this city", "Download the city as a file", () => { actions.downloadRescue?.(crashText); });
+  const crashReload = btn("btn", "Reload the game", "Reload the page", () => location.reload());
+  crashFooter.append(crashDownload, crashReload);
+  // Escape must not dismiss this one. The render loop is dead behind it, and
+  // these two buttons are the only way out of the page with the city in hand.
+  crashDialog.addEventListener("cancel", (event) => event.preventDefault());
+  crashDialog.append(crashHeader, crashBody, crashFooter);
+  app.appendChild(crashDialog);
+
   // Zoom buttons (right of bottom bar)
   const zoomGroup = el("div", "nav-row");
   zoomGroup.style.cssText = "margin-left:2px; flex-shrink:0";
@@ -1527,6 +1550,33 @@ export function mountUI(actions) {
 
   // ── Public API ─────────────────────────────────────────────────────────────
   return {
+    showCrash({ message, source, text, stored }) {
+      crashText = text;
+      crashWhere.textContent = source ? `${message} (${source})` : message;
+      crashDownload.disabled = !text;
+      // Reloading while the copy is still being written can abort it. The
+      // button opens once the write has settled, one way or the other.
+      crashReload.disabled = true;
+      if (!text) {
+        crashSaved.textContent = "This city could not be packed up, so there is nothing to download. Reload to start again.";
+        crashReload.disabled = false;
+      } else {
+        crashSaved.textContent = "Saving a copy…";
+        Promise.resolve(stored).then(
+          (result) => { crashSaved.textContent = result?.kept
+            ? "An earlier rescued city is already stored, so this one was left out of the way. Download it before you reload."
+            : result?.ok
+              ? "A copy is stored as Rescued city. It is in the save dialog after you reload."
+              : "A copy could not be stored, so download the file before you reload."; },
+          () => { crashSaved.textContent = "A copy could not be stored, so download the file before you reload."; },
+        ).finally(() => { crashReload.disabled = false; });
+      }
+      // Everything else on screen belongs to a game that is no longer running,
+      // including the title screen, whose styling hides the rest of the app.
+      leaveTitle();
+      for (const open of app.querySelectorAll("dialog[open]")) if (open !== crashDialog) open.close();
+      if (!crashDialog.open) crashDialog.showModal();
+    },
     offerRescue(text, reason) {
       rescueText = text;
       rescueReason.textContent = reason;
