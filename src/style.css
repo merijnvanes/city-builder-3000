@@ -426,9 +426,17 @@ dialog .panel-close { color: #e3e9fb; }
 .status-stat-label { font-size: 12px; }
 .status-money, .status-stat-val { font-size: 16px; }
 .status-stat-val.happy, .status-date, .clock-state { font-size: 12px; }
-.group-label { font-size: 12px; line-height: 1.15; white-space: normal; }
-.group-header { height: 59px; }
-.bulldoze-btn { flex-basis: 59px; }
+/* The department keys divide the rail between them. They stretch or compress
+   to whatever room is left, down to a readable floor and up to a chunky
+   ceiling; below the floor the rail scrolls as before. Each key is a size
+   container, so its artwork and its name follow the height it ends up with. */
+:root { --key-height: 59px; --key-min: 38px; --key-max: 74px; }
+#dock-scroll { flex: 1; }
+#dock-scroll > * { flex: 1 1 var(--key-height); min-height: var(--key-min); max-height: var(--key-max); container-type: size; }
+.tool-group > .group-header { height: 100%; }
+.group-header .group-icon { flex: 1 1 auto; height: auto; min-height: 0; }
+.group-label { flex: 0 0 auto; font-size: clamp(8px, 21cqh, 12px); line-height: 1.15; white-space: normal; }
+.bulldoze-btn { flex-basis: var(--key-height); }
 #top-menu-btns > .btn, .city-menu summary { font-size: 12px; min-height: 32px; }
 .tool-label, .active-tool-description, .insp-desc, .inspection-notes summary { font-size: 13px; }
 .tool-price, .palette-detail, .density-btn { font-size: 12px; }
@@ -454,9 +462,8 @@ dialog .panel-close { color: #e3e9fb; }
 }
 @media (max-width: 800px), (max-height: 550px) {
   :root { --news-height: 110px; }
-  .group-label { font-size: 10px; }
-  .group-header { height: 54px; }
-  .bulldoze-btn { flex-basis: 54px; }
+  .group-label { font-size: clamp(7px, 20cqh, 10px); }
+  :root { --key-height: 54px; --key-min: 34px; --key-max: 64px; }
   #top-menu-btns > .btn, .city-menu summary { font-size: 10px; }
   .map-toggle { font-size: 10px; }
   #command-bar { gap: 8px; }
@@ -555,9 +562,10 @@ dialog .panel-close { color: #e3e9fb; }
 [data-group="land"] .group-header { --key-top: #c4e4b5; --key-bottom: #a5c691; }
 [data-group="utilities"] .group-header { --key-top: #e0e8bc; --key-bottom: #b5cfcc; }
 [data-group="buildings"] .group-header { --key-top: #f1dfbd; --key-bottom: #d9bc9d; }
-.management-button { --key-top: #d6d4f2; --key-bottom: #b4b2d8; margin-top: 10px; flex-shrink: 0; }
+.management-button { --key-top: #d6d4f2; --key-bottom: #b4b2d8; }
+.management-group { margin-top: 10px; }
 #dock-scroll > [data-group="emergency"] { margin-top: 10px; }
-.management-button .group-label { font-size: 11px; }
+.management-button .group-label { font-size: clamp(7px, 19cqh, 11px); }
 #flyout { border: 1px solid #8293bd; border-right: 0; border-radius: 24px 0 0 24px; background: linear-gradient(115deg, #f5f4ff, #dbe1f4); }
 #flyout .flyout-title { font-size: 20px; color: #344467; background: linear-gradient(#f8f8ff, #c9d2ed); border-bottom: 1px solid #9caacd; box-shadow: inset 0 3px #fff8; letter-spacing: -.3px; }
 #flyout .flyout-title::before { width: 9px; height: 9px; background: #8b99c6; border: 1px solid #5f729d; box-shadow: inset 0 1px #fff9; }

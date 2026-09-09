@@ -505,7 +505,11 @@ export function mountUI(actions) {
     closeFlyout(); hub.dialog.showModal();
   });
   managementButton.innerHTML = `<span class="group-icon">${categoryArt('civic')}</span><span class="group-label">City management</span>`;
-  dockScroll.appendChild(managementButton);
+  // The mayor's key sits in the same wrapper as a department key, so the rail
+  // divides its height between all seven the same way.
+  const managementGroup = el('div', 'tool-group management-group');
+  managementGroup.appendChild(managementButton);
+  dockScroll.appendChild(managementGroup);
 
   function toggleGroup(id) {
     if (openGroupId === id) { closeFlyout(); return; }
