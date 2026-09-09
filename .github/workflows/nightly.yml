@@ -1,0 +1,143 @@
+# Everything that needs a real browser.
+#
+# These suites drive Chrome against a running site: gameplay, the interface at
+# nine window sizes, Canvas pixel checks for every building family and camera
+# angle, the deployed headers and policy, offline play, and the boot screen.
+# They take a long time and they answer a different question from the unit
+# tests — how the game looks and behaves — which is worth knowing every night
+# rather than on every commit.
+#
+# Each suite runs even if an earlier one failed. A nightly that stops at the
+# first failure hides everything behind it until tomorrow.
+#
+# Three suites are deliberately not here, because they already fail on main and
+# a nightly that is red on its first run tells nobody anything:
+#
+#   test:working-set    expects 50 gameplay building types; there are now 65.
+#   test:transport      expects 9 transport layouts; the port modules added in
+#                       e4b4382 brought the catalogue to 20.
+#   test:art-production  wants a built site served under /nested/ on port 4217,
+#                       which no script sets up.
+#
+# The first two are numbers somebody has to look at rather than raise blindly:
+# that is what the assertion is for. Add each suite back here as it is fixed.
+name: Nightly
+
+on:
+  schedule:
+    # Early morning UTC, so a failure is waiting rather than interrupting.
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: nightly-${{ github.workflow }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.8.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # The suites ask for the `chrome` channel rather than bundled Chromium,
+      # so that is what has to be here.
+      - name: Install Chrome
+        run: pnpm exec playwright install --with-deps chrome
+
+      # Builds first, then starts its own server over dist/ applying
+      # public/_headers. It runs before anything else needs the port.
+      - name: Deployed site, headers, policy, offline and boot
+        run: pnpm test:deploy
+
+      # The remaining suites expect a dev server on 4173. --strictPort so it
+      # fails loudly rather than quietly binding 4174 and leaving every suite
+      # talking to nothing.
+      - name: Start the dev server
+        run: |
+          pnpm dev --port 4173 --strictPort > /tmp/vite.log 2>&1 &
+          echo "VITE_PID=$!" >> "$GITHUB_ENV"
+          for _ in $(seq 1 60); do
+            if ! kill -0 $! 2>/dev/null; then echo "the dev server exited"; cat /tmp/vite.log; exit 1; fi
+            curl -sf -o /dev/null http://127.0.0.1:4173 && exit 0
+            sleep 1
+          done
+          echo "the dev server never answered"; cat /tmp/vite.log; exit 1
+
+      - name: Gameplay
+        if: ${{ !cancelled() }}
+        run: pnpm test:browser
+
+      - name: Interface
+        if: ${{ !cancelled() }}
+        run: pnpm test:ui
+
+      - name: Scene and geometry
+        if: ${{ !cancelled() }}
+        run: |
+          pnpm test:coastlines
+          pnpm test:shadows
+          pnpm test:foundations
+          pnpm test:bridges
+          pnpm test:powerlines
+          pnpm test:construction-art
+          pnpm test:directions
+          pnpm test:rotation
+
+      - name: Rendering
+        if: ${{ !cancelled() }}
+        run: |
+          pnpm test:architecture
+          pnpm test:visuals
+          pnpm test:starter-art
+
+      - name: Building families
+        if: ${{ !cancelled() }}
+        run: |
+          pnpm test:civic
+          pnpm test:power
+          pnpm test:water
+          pnpm test:parks
+          pnpm test:rewards
+          pnpm test:deals
+          pnpm test:landmarks
+
+      - name: Zones
+        if: ${{ !cancelled() }}
+        run: |
+          pnpm test:residential
+          pnpm test:commercial
+          pnpm test:industrial
+
+      - name: Renderer benchmark
+        if: ${{ !cancelled() }}
+        run: pnpm test:performance
+
+      - name: Stop the dev server
+        if: always()
+        run: kill "$VITE_PID" 2>/dev/null || true
+
+      # Screenshots, galleries and the benchmark figures, which are most of what
+      # a failure needs looking at.
+      - name: Keep what the runs produced
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifacts
+          path: artifacts/
+          retention-days: 7
+          if-no-files-found: ignore

@@ -53,6 +53,27 @@ if any of those appears.
 pnpm test:deploy   # build, check the headers, then play the built site through them
 ```
 
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every push and pull request: install, `pnpm build`, a check
+that the build produced a deployable site, then `pnpm test`. The build comes first because
+`tests/deploy-headers.test.js` inspects a finished build and skips itself when there is none.
+
+`.github/workflows/nightly.yml` runs the suites that need a real browser: `pnpm test:deploy`
+first, since it serves its own copy of `dist/`, then gameplay, the interface at nine window
+sizes, the scene and geometry checks, the rendering and building-family galleries, the zones,
+and the renderer benchmark against a dev server on 4173. Each step runs even if an earlier one
+failed, so one break does not hide the rest for a day, and `artifacts/` is uploaded either way.
+It runs at 03:00 UTC and on demand. GitHub disables a scheduled workflow after 60 days without
+repository activity; run it from the Actions tab to wake it up.
+
+Three browser suites are left out of nightly, named with their reasons at the top of the
+workflow, because they already fail: `test:working-set` and `test:transport` assert counts that
+the game has since grown past (50 building types against 65, 9 transport layouts against 20
+after the port modules), and `test:art-production` wants a built site served under `/nested/` on
+port 4217 that no script starts. Those numbers are meant to be looked at rather than raised
+blindly, so they are still failing on purpose. Add each suite back to nightly as it is fixed.
+
 The page shows a loading screen from the moment it is parsed. The game cannot draw until the
 bundle has run and a city has been laid out, which on a slow connection is about four seconds of
 window that used to be blank. The markup is static in `index.html`; its stylesheet

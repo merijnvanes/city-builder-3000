@@ -1,0 +1,75 @@
+# Every push. Fast enough to wait for, so it holds the things that must never be
+# wrong and can be decided without a browser: the simulation, the art contract,
+# and a build that produces a deployable site.
+#
+# The Chrome suites are not here. They need a browser and a server and take
+# minutes, and they answer a different question — how the game looks and
+# behaves — which is worth knowing every night rather than every commit. See
+# nightly.yml.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  # A push to a branch with an open pull request triggers this workflow twice,
+  # under two different refs. head_ref names the branch in the pull-request case,
+  # so both land in one group and the duplicate is cancelled.
+  #
+  # Runs on the default branch are left alone: each merge is a distinct thing to
+  # know about, and cancelling the previous one loses that answer.
+  group: ci-${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          # Pinned, not floating on 11.x: an install is not the place to find out
+          # a patch release changed its mind about something.
+          version: 11.8.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      # pnpm-workspace.yaml allows esbuild's postinstall, which pnpm 11 would
+      # otherwise refuse to run and fail the install over.
+      - run: pnpm install --frozen-lockfile
+
+      # Before the tests, not after: tests/deploy-headers.test.js checks every
+      # file in a finished build against public/_headers, and skips itself when
+      # there is no build to look at.
+      - name: Build
+        run: pnpm build
+
+      - name: Check the build produced a deployable site
+        run: |
+          test -f dist/index.html || { echo "no index.html in dist"; exit 1; }
+          test -f dist/_headers || { echo "no _headers in dist: the deploy would have no cache or security policy"; exit 1; }
+          test -f dist/sw.js || { echo "no sw.js in dist"; exit 1; }
+          test -f dist/boot.css || { echo "no boot.css in dist: the loading screen would be unstyled"; exit 1; }
+
+      - name: Test
+        run: pnpm test
+
+      # No browser, half a second, and it guards the sprite manifest the whole
+      # game reads. It belongs where a pull request can see it fail.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: python -m pip install "pillow==11.3.0"
+
+      - name: Art contract
+        run: pnpm test:art-contract
