@@ -678,6 +678,12 @@ export class CityRenderer {
       const spots = { northeast: [n / 2, -1.5], southwest: [n / 2, n + 1.5], northwest: [-1.5, n / 2], southeast: [n + 1.5, n / 2] };
       ctx.font = `700 ${Math.max(10, 12 * this.zoom)}px system-ui, sans-serif`;
       ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      const iconSize = Math.max(10, 12 * this.zoom), iconGap = iconSize * 0.45;
+      const connectionIcons = {
+        transport: new Path2D('M4 2L2 14M12 2L14 14M8 2V4M8 7V9M8 12V14'),
+        power: new Path2D('M9 1L3 9H7L6 15L13 6H9Z'),
+        water: new Path2D('M8 1C6 4 3 7 3 10A5 5 0 0 0 13 10C13 7 10 4 8 1Z'),
+      };
       for (const [side, [x, y]] of Object.entries(spots)) {
         const c = city._connections[side];
         if (!c) continue;
@@ -685,8 +691,25 @@ export class CityRenderer {
         if (p.x < 0 || p.x > this.w || p.y < 0 || p.y > this.h) continue;
         const connected = c.road || c.rail || c.power || c.water;
         const label = c.name;
-        ctx.lineWidth = 3; ctx.strokeStyle = "#101820cc"; ctx.strokeText(label, p.x, p.y);
-        ctx.fillStyle = connected ? "#e8f0d8" : "#b8c4b0"; ctx.fillText(label, p.x, p.y);
+        // Show active connection categories, with one transport icon for road/rail.
+        // Keep the whole label centred and use the name's colour and terrain halo.
+        const icons = [c.road || c.rail ? 'transport' : null, c.power ? 'power' : null, c.water ? 'water' : null].filter(Boolean);
+        const textWidth = ctx.measureText(label).width;
+        const labelX = p.x - icons.length * (iconSize + iconGap) / 2;
+        ctx.lineWidth = 3; ctx.strokeStyle = "#101820cc"; ctx.strokeText(label, labelX, p.y);
+        const color = connected ? "#e8f0d8" : "#b8c4b0";
+        ctx.fillStyle = color; ctx.fillText(label, labelX, p.y);
+        for (const [index, key] of icons.entries()) {
+          ctx.save();
+          ctx.translate(labelX + textWidth / 2 + iconGap + index * (iconSize + iconGap), p.y - iconSize / 2);
+          ctx.scale(iconSize / 16, iconSize / 16);
+          ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+          ctx.strokeStyle = '#101820cc'; ctx.lineWidth = 1.6 + 3 * 16 / iconSize;
+          ctx.stroke(connectionIcons[key]);
+          ctx.strokeStyle = color; ctx.lineWidth = 1.6;
+          ctx.stroke(connectionIcons[key]);
+          ctx.restore();
+        }
       }
     }
 
