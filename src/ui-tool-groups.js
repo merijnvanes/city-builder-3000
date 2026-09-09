@@ -1,6 +1,7 @@
 import { SPECIAL_TYPES } from './sim.js';
 
 export const TOOL_GROUPS = [
+  { id: 'zone', label: 'Zones', art: 'zone', hasDensity: true, tools: ['residential', 'commercial', 'industrial', 'airport', 'seaport'] },
   { id: 'land', label: 'Land', art: 'landscape', sections: [
     { id: 'terrain', label: 'Terrain', tools: ['raise', 'lower', 'level', 'makeland', 'makewater', 'tree'] },
     { id: 'demolition', label: 'Demolition', tools: ['bulldoze'] },
@@ -11,8 +12,7 @@ export const TOOL_GROUPS = [
     { id: 'water', label: 'Water', tools: ['waterpump', 'watertower', 'treatment', 'desalination', 'pipe'] },
     { id: 'waste', label: 'Waste', tools: ['landfill', 'incinerator', 'recycling', 'wasteenergy'] },
   ] },
-  { id: 'buildings', label: 'Buildings', art: 'zone', hasDensity: true, sections: [
-    { id: 'zones', label: 'Zones', tools: ['residential', 'commercial', 'industrial', 'airport', 'seaport'] },
+  { id: 'buildings', label: 'Buildings', art: 'civic', sections: [
     { id: 'services', label: 'Services', tools: ['police', 'fire', 'hospital', 'school', 'college', 'library', 'museum', 'jail'] },
     { id: 'parks', label: 'Parks', tools: ['park', 'largepark', 'zoo'] },
     { id: 'landmarks', label: 'Landmarks', tools: ['clocktower', 'operahouse', 'observatory', 'cathedral', 'aquarium'] },

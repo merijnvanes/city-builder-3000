@@ -5,7 +5,7 @@ export async function openManagement(page, name) {
 
 export async function openCategory(page, name) {
   const route = {
-    Zones: ['Buildings', 'Zones'], Civic: ['Buildings', 'Services'],
+    Civic: ['Buildings', 'Services'],
     Power: ['Utilities', 'Electricity'], Water: ['Utilities', 'Water'],
     Sanitation: ['Utilities', 'Waste'], 'Parks & Land': ['Buildings', 'Parks'],
     Landmarks: ['Buildings', 'Landmarks'], 'Rewards & Deals': ['Buildings', 'Rewards & deals'],

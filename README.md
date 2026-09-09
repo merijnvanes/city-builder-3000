@@ -34,9 +34,9 @@ Gameplay fidelity and remaining verified gaps are tracked in [PARITY.md](PARITY.
 Periwinkle 3000 uses a sculpted lavender rail with illustrated tool buttons. It
 flows into a large diamond minimap at the bottom right and a thin news and status
 strip. Building palettes, inspection and data maps open beside the rail. The city
-has no top bar over it. The rail groups tools into Land, Transport, Utilities,
-Buildings and Emergency. Land includes demolition; Utilities has electricity,
-water and waste tabs. Buildings contains zones, services, parks, landmarks and
+has no top bar over it. The rail groups tools into Zones, Land, Transport,
+Utilities, Buildings and Emergency. Land includes demolition; Utilities has electricity,
+water and waste tabs. Buildings contains services, parks, landmarks and
 rewards. Opening a palette focuses its selected category tab or first tool;
 closing it returns focus to the rail.
 
