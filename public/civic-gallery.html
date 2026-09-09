@@ -3,124 +3,13 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Civic Collection · City Builder 3000</title>
-<style>
-:root{color-scheme:dark;--bg:#182d31;--panel:#20373a;--ink:#eee8d5;--muted:#a6b9b4;--accent:#d4b477}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,sans-serif}header,main{max-width:1440px;margin:auto;padding:40px 40px 0}header{padding-top:56px}.eyebrow{font:600 11px/1.4 system-ui;letter-spacing:.24em;text-transform:uppercase;color:var(--accent)}h1{font:400 clamp(36px,5vw,64px)/1.1 Georgia,serif;margin:16px 0}header p{max-width:700px;margin:0;color:var(--muted);font-size:16px}nav{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:26px 0 4px}.segmented{display:flex;gap:3px;border:1px solid #47605f;border-radius:8px;padding:3px}button{border:0;border-radius:5px;background:transparent;color:var(--muted);font:inherit;padding:8px 14px;cursor:pointer}button[aria-pressed=true],button:hover{background:#3e5552;color:var(--ink)}button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.rotate{margin-left:auto;border:1px solid #47605f}#collection{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;padding-bottom:48px}.card{margin:0;background:var(--panel);border:1px solid #ffffff0c;border-radius:12px;overflow:hidden}.stage{height:280px;position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 75%,#41605244,transparent 65%)}.stage img{position:absolute;max-width:none;image-rendering:auto}.card figcaption{padding:0 24px 23px}.index{font-size:10px;letter-spacing:.15em;color:var(--accent)}h2{font:400 23px/1.25 Georgia,serif;margin:6px 0}.description{font-size:12px;line-height:1.6;color:var(--muted);margin:0}.detail #collection{grid-template-columns:repeat(2,minmax(0,1fr))}.detail .stage{height:410px}.note{font-size:12px;color:var(--muted);margin:0 0 30px}#error{color:#e8a392}footer{padding:0 40px 40px;max-width:1440px;margin:auto;color:var(--muted);font-size:12px}@media(max-width:950px){#collection{grid-template-columns:repeat(2,minmax(0,1fr))}header,main{padding-left:20px;padding-right:20px}.detail #collection{grid-template-columns:1fr}}@media(max-width:600px){#collection{grid-template-columns:1fr}.rotate{margin-left:0}header{padding-top:32px}.stage{height:260px}}
-</style>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="./civic-gallery.css">
 </head>
 <body>
 <header><div class="eyebrow">City Builder 3000 · Asset Collection 01</div><h1>A city with character.</h1><p>Twelve civic places, each with a purpose and a personality. Crafted miniature architecture, warm materials, and buildings that tell their own stories.</p>
 <nav aria-label="Preview controls"><div class="segmented" aria-label="Lighting"><button data-state="day" aria-pressed="true">Daylight</button><button data-state="night" aria-pressed="false">After dark</button><button data-state="unpowered" aria-pressed="false">Power off</button></div><div class="segmented" aria-label="Scale"><button data-detail="false" aria-pressed="true">Game size</button><button data-detail="true" aria-pressed="false">Close up</button></div><button class="rotate" id="rotate">Rotate view ↻ <span id="angle">1 / 4</span></button></nav></header>
 <main><p class="note">These are the actual transparent game sprites. No 3D rendering runs in this page or in the game.</p><p id="error" role="alert"></p><div id="collection"></div></main>
 <footer>Original architecture · Four camera angles · Three lighting states · Shared, compressed browser assets</footer>
-<script type="module">
-const requestedFamily=new URLSearchParams(location.search).get('family');
-const family=['civic','power','water','parks','transport','rewards','deals','landmarks','residential','commercial','industrial'].includes(requestedFamily)?requestedFamily:'civic';
-let catalog,state='day',rotation=0,detail=false,density=0,level=0;
-const cards=[];
-function update(){
-  document.body.classList.toggle('detail',detail);
-  document.querySelectorAll('[data-state]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.state===state));
-  document.querySelectorAll('[data-detail]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.detail===String(detail)));
-  document.querySelector('#angle').textContent=`${rotation+1} / 4`;
-  for(const {type,variant,stage,img,figure} of cards){
-    const zone=catalog[type].zone;
-    figure.hidden=!!zone && ((density && zone.density!==density)||(level && zone.level!==level));
-    if(figure.hidden)continue;
-    const spec=catalog[type],f=spec.frames[`${state}-${rotation}${variant?`-v${variant}`:''}`];if(!f)continue;
-    const zoom=Math.min(detail?2.6:1,(stage.clientWidth-36)/(f.width/spec.scale),(stage.clientHeight-30)/(f.height/spec.scale));
-    img.src=`./assets/civic/${f.file}`;
-    img.style.width=`${f.width/spec.scale*zoom}px`;
-    img.style.left=`${stage.clientWidth/2-f.anchor[0]/spec.scale*zoom}px`;
-    img.style.top=`${(stage.clientHeight-f.height/spec.scale*zoom)/2}px`;
-  }
-}
-try{
-  const response=await fetch('./civic-catalog.json');if(!response.ok)throw new Error('Asset catalog could not be loaded.');catalog=await response.json();
-  for(const other of ['civic','power','water','parks','transport','rewards','deals','landmarks','residential','commercial','industrial'].filter(value=>value!==family)){
-    const link=document.createElement('a');link.href=`?family=${other}`;link.textContent=`View ${other} collection →`;link.style.cssText='color:var(--accent);margin-right:12px';document.querySelector('nav').prepend(link);
-  }
-  if(family==='power'){
-    document.title='Power Collection · City Builder 3000';
-    document.querySelector('.eyebrow').textContent='City Builder 3000 · Asset Collection 02';
-    document.querySelector('h1').textContent='The power behind the city.';
-    document.querySelector('header p').textContent='Eight distinct ways to power a city, from brick coal works to a futuristic fusion campus. Original miniature architecture and recognizable generating equipment.';
-  }
-  if(family==='water'){
-    document.title='Water Collection · City Builder 3000';
-    document.querySelector('.eyebrow').textContent='City Builder 3000 · Asset Collection 03';
-    document.querySelector('h1').textContent='Water for a growing city.';
-    document.querySelector('header p').textContent='Four purposeful water works: freshwater pumps, elevated storage, membrane filtration, and open treatment basins. Crafted in brick, concrete, and teal metalwork.';
-  }
-  if(['residential','commercial','industrial'].includes(family)){
-    for(const [label,max] of [['Density',3],['Stage',4]]){
-      const select=document.createElement('select');select.setAttribute('aria-label',label);select.style.cssText='padding:9px;background:#20373a;color:#eee8d5;border:1px solid #47605f;border-radius:5px';
-      select.add(new Option(`All ${label.toLowerCase()} levels`,'0'));
-      for(let i=1;i<=max;i++)select.add(new Option(`${label} ${i}`,String(i)));
-      select.onchange=()=>{if(label==='Density')density=Number(select.value);else level=Number(select.value);update();};
-      document.querySelector('nav').append(select);
-    }
-  }
-  if(family==='industrial'){
-    document.title='Industrial Architecture · City Builder 3000';
-    document.querySelector('.eyebrow').textContent='CITY BUILDER 3000 · WORKING LANDSCAPES';
-    document.querySelector('h1').textContent='Fields, workshops and works.';
-    document.querySelector('header p').textContent='Planted fields, barnyards, rooflit warehouses and tank-and-stack factories. Every industrial density, growth stage and supported lot size has its own authored architecture.';
-  }
-  if(family==='commercial'){
-    document.title='Commercial Architecture · City Builder 3000';
-    document.querySelector('.eyebrow').textContent='CITY BUILDER 3000 · BUSINESS DISTRICTS';
-    document.querySelector('h1').textContent='From corner shop to skyline.';
-    document.querySelector('header p').textContent='Markets, diners, offices, hotels and signature towers. Every commercial density, growth stage and supported lot size has its own authored architecture.';
-  }
-  if(family==='residential'){
-    document.title='Residential Architecture · City Builder 3000';
-    document.querySelector('.eyebrow').textContent='City Builder 3000 · Neighborhood Collection';
-    document.querySelector('h1').textContent='A place to call home.';
-    document.querySelector('header p').textContent='Cottages, verandas, brownstones, courtyard apartments, balconies and towers. Every density, growth stage and supported lot size has its own authored architecture.';
-  }
-  if(family==='landmarks'){
-    document.title='Landmarks · City Builder 3000';
-    document.querySelector('.eyebrow').textContent='City Builder 3000 · Asset Collection 08';
-    document.querySelector('h1').textContent='The places people remember.';
-    document.querySelector('header p').textContent='A clock above the square, music beneath a copper dome, stone spires, a telescope open to the sky, and a hall shaped by waves. Five landmarks for a distinctive skyline.';
-  }
-  if(family==='deals'){
-    document.title='Business Deals · City Builder 3000';
-    document.querySelector('.eyebrow').textContent='City Builder 3000 · Asset Collection 07';
-    document.querySelector('h1').textContent='Big sites. Bigger decisions.';
-    document.querySelector('header p').textContent='A secure prison, a stepped casino, contained waste storage, a barracks campus and a glass-roofed shopping hall. Five business offers with distinct architectural identities.';
-  }
-  if(family==='rewards'){
-    document.title='Rewards Collection · City Builder 3000';
-    document.querySelector('.eyebrow').textContent='City Builder 3000 · Asset Collection 06';
-    document.querySelector('h1').textContent='Places a city earns.';
-    document.querySelector('header p').textContent='A mayor’s home, public monuments, places of learning and research, and destinations for sport and sailing. Eight rewards for a growing city.';
-  }
-  if(family==='transport'){
-    document.title='Transport Collection · City Builder 3000';
-    document.querySelector('.eyebrow').textContent='City Builder 3000 · Asset Collection 05';
-    document.querySelector('h1').textContent='A city on the move.';
-    document.querySelector('header p').textContent='Sheltered bus stops, subway stairs, a railway hall, and the pieces an airport or seaport zone fills with: runways, terminals, hangars, quays, piers and cargo yards. Purposeful routes for passengers and freight.';
-  }
-  if(family==='parks'){
-    document.title='Parks Collection · City Builder 3000';
-    document.querySelector('.eyebrow').textContent='City Builder 3000 · Asset Collection 04';
-    document.querySelector('h1').textContent='Room to breathe and explore.';
-    document.querySelector('header p').textContent='Three neighborhood gardens, a landscaped park with a bandstand, and a zoo full of distinctive habitats. Places to rest, gather, and discover.';
-  }
-  for(const [type,spec] of Object.entries(catalog).filter(([,spec])=>spec.family===family))
-  for(const [variant,layout] of (spec.variants || [{label:spec.label,description:spec.description}]).entries()){
-    const label=spec.variants?`${spec.label} · ${layout.label}`:layout.label,description=layout.description;
-    const figure=document.createElement('figure');figure.className='card';
-    const stage=document.createElement('div');stage.className='stage';
-    const img=document.createElement('img');img.alt=label;img.decoding='async';stage.append(img);
-    const caption=document.createElement('figcaption');caption.innerHTML=`<span class="index">${String(cards.length+1).padStart(2,'0')} / ${family.toUpperCase()}</span><h2>${label}</h2><p class="description">${description}</p>`;
-    figure.append(stage,caption);document.querySelector('#collection').append(figure);cards.push({type,variant,stage,img,figure});
-  }
-  document.querySelectorAll('[data-state]').forEach(b=>b.onclick=()=>{state=b.dataset.state;update()});
-  document.querySelectorAll('[data-detail]').forEach(b=>b.onclick=()=>{detail=b.dataset.detail==='true';update()});
-  document.querySelector('#rotate').onclick=()=>{rotation=(rotation+1)%4;update()};
-  new ResizeObserver(update).observe(document.querySelector('#collection'));update();
-}catch(error){document.querySelector('#error').textContent=error.message;}
-</script>
+<script type="module" src="./civic-gallery.js"></script>
 </body></html>

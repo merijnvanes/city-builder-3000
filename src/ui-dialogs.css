@@ -43,6 +43,19 @@ dialog::backdrop { background: #0b2229a8; backdrop-filter: blur(5px); }
 .graph-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .graph-card { padding: 12px; border: var(--edge); border-radius: 10px; background: #d2e3c908; }
 .graph-title { font-size: 11px; color: var(--text-dim); margin-bottom: 8px; }
+/* The report before there is anything to plot. A class rather than a style
+   attribute, so the page needs no 'unsafe-inline' in its style policy. */
+.graph-empty { color: var(--text-dim); font-size: .85rem; }
+
+/* The quiet paragraphs inside dialogs. These were seven copies of the same
+   inline style string set through style.cssText, which parses CSS from a string
+   at runtime and is the sort of thing a strict style policy is entitled to
+   refuse. Naming them once is both safer and shorter. */
+.dialog-note { font-size: .85rem; color: var(--text-dim); line-height: 1.55; }
+.dialog-note.spaced { margin: 0 0 8px; }
+.dialog-note.neighbor-hint { line-height: 1.5; margin: 0 0 6px; }
+.dialog-lead { font-size: .9rem; color: var(--text); line-height: 1.6; }
+.field-note { font-size: .8rem; color: var(--text-dim); margin-top: 4px; }
 .history-graph { display: block; width: 100%; height: 100px; }
 .help-grid { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 8px 14px; }
 .help-key { padding: 3px 8px; border: var(--edge); border-radius: 6px; background: #d2e3c90a; text-align: center; font-size: 11px; }

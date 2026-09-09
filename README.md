@@ -34,6 +34,30 @@ describes. `tests/deploy-headers.test.js` checks every file in a finished build 
 rules, including that no two of them overlap, so run `pnpm build` before `pnpm test` to
 exercise it.
 
+The same file carries the security headers, applied to every path. The policy is
+`default-src 'none'` with `'self'` opened only for script, style, images, the font and
+`connect-src`, and `media-src`, `worker-src`, `object-src`, `frame-ancestors`, `base-uri` and
+`form-action` all `'none'`. `worker-src` is spelled out because it otherwise falls back to
+`script-src` and would be permitted by a policy that reads as shut. Alongside it: `nosniff`,
+`no-referrer`, same-origin COOP and CORP, HSTS for a year with `includeSubDomains` (which
+commits every subdomain of whatever domain this is served from to HTTPS), and a
+Permissions-Policy denying the named features — an omitted feature keeps its own default rather
+than being denied.
+
+The game loads nothing from anywhere else and never calls out, so nothing needs
+`'unsafe-inline'`: neither page carries an inline script or stylesheet, no element carries a
+style attribute, and no script builds CSS from a string through `style.cssText`. The tests fail
+if any of those appears.
+
+```bash
+pnpm test:deploy   # build, check the headers, then play the built site through them
+```
+
+That last step is the one that matters. A Content-Security-Policy reads correctly and then
+blanks the page in production, because nothing in development ever applies it.
+`tests/deploy-preview.mjs` serves `dist/` through the rules in `public/_headers`, plays the
+game and opens the gallery under them, and fails on the first violation.
+
 ## Tests
 
 ```bash

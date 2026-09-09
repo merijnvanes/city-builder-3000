@@ -663,8 +663,7 @@ export function mountUI(actions) {
   app.appendChild(crashDialog);
 
   // Zoom buttons (right of bottom bar)
-  const zoomGroup = el("div", "nav-row");
-  zoomGroup.style.cssText = "margin-left:2px; flex-shrink:0";
+  const zoomGroup = el("div", "nav-row zoom-group");
   const zInBtn = btn("nav-btn", "+", "Zoom in [+]", () => actions.zoom?.(1));
   const zOutBtn = btn("nav-btn", "−", "Zoom out [−]", () => actions.zoom?.(-1));
   zoomGroup.classList.add('nav-zoom');
@@ -941,8 +940,7 @@ export function mountUI(actions) {
         budgetDialog.close();
       }));
   }
-  const loanNote = el("div");
-  loanNote.style.cssText = "font-size:.8rem;color:var(--text-dim);margin-top:4px";
+  const loanNote = el("div", "field-note");
   loanNote.textContent = `Ten years of annual payments, ${MAX_LOANS} loans at a time. A loan cannot be paid off early.`;
   budSummary.appendChild(loanRow);
   loanRow.before(el('div', 'loan-heading', 'Fund your next project'));
@@ -972,8 +970,7 @@ export function mountUI(actions) {
   // Neighbor deals
   const neighborSection = el("div", "modal-section");
   neighborSection.appendChild(el("div", "modal-section-title", "Neighbor Deals"));
-  const neighborHint = el("p");
-  neighborHint.style.cssText = "font-size:.85rem;color:var(--text-dim);line-height:1.5;margin:0 0 6px";
+  const neighborHint = el("p", "dialog-note neighbor-hint");
   neighborHint.textContent = "Run transport, a power line or a pipe to the map edge and accept its county connection fee. Click an unconnected endpoint with its matching tool to reconsider. Transport connections bring trade; utility connections enable power and water deals. Once one is up, a neighboring mayor will call on you with terms whenever your city has a surplus or a shortfall — deals are signed in the Petition window, not here.";
   neighborSection.appendChild(neighborHint);
   const neighborList = el("div");
@@ -1135,7 +1132,7 @@ export function mountUI(actions) {
     const history = s.history || [];
     repGraphEl.innerHTML = history.length >= 2
       ? REPORT_GRAPHS.map(([key, label, color, fmt]) => `<div class="graph-card"><div class="graph-title">${label}</div>${buildHistoryGraph(history, key, color, fmt)}</div>`).join("")
-      : "<p style='color:var(--text-dim);font-size:.85rem'>Not enough history yet. Run the simulation for a couple of months.</p>";
+      : "<p class='graph-empty'>Not enough history yet. Run the simulation for a couple of months.</p>";
 
     Object.entries(repStats).forEach(([key, card]) => {
       if (key==='population' || key==='jobs') {
@@ -1228,8 +1225,7 @@ export function mountUI(actions) {
   disasterDialog.appendChild(disHdr);
 
   const disBody = el("div", "modal-body");
-  const disMsg = el("p");
-  disMsg.style.cssText = "font-size:.85rem;color:var(--text-dim);line-height:1.55";
+  const disMsg = el("p", "dialog-note");
   disMsg.textContent = "Trigger a disaster on your city. Funded fire stations contain fires; damaged roads cut off neighborhoods.";
   disBody.appendChild(disMsg);
   const disRow = el("div", "slider-row");
@@ -1249,8 +1245,7 @@ export function mountUI(actions) {
   // strikes, the damage from the disaster will be much less... you should not
   // abuse the privilege."
   disBody.appendChild(el("div", "modal-section-title", "Early Warning Siren"));
-  const sirenMsg = el("p");
-  sirenMsg.style.cssText = "font-size:.85rem;color:var(--text-dim);line-height:1.55";
+  const sirenMsg = el("p", "dialog-note");
   disBody.appendChild(sirenMsg);
   const sirenBtn = btn("btn btn-sm", "Sound the siren", "Warn the city of imminent danger", () => {
     actions.setPolicy?.("siren", true);
@@ -1372,8 +1367,7 @@ export function mountUI(actions) {
   petHdr.appendChild(petTitle);
   petitionDialog.appendChild(petHdr);
   const petBody = el("div", "modal-body");
-  const petText = el("p");
-  petText.style.cssText = "font-size:.9rem;color:var(--text);line-height:1.6";
+  const petText = el("p", "dialog-lead");
   petBody.appendChild(petText);
   petitionDialog.appendChild(petBody);
   const petFooter = el("div", "modal-footer");
@@ -1476,8 +1470,7 @@ export function mountUI(actions) {
   confirmDialog.appendChild(cfmHdr);
 
   const cfmBody = el("div", "modal-body");
-  const cfmMsg = el("p");
-  cfmMsg.style.cssText = "font-size:.85rem;color:var(--text-dim);line-height:1.55;margin:0 0 8px";
+  const cfmMsg = el("p", "dialog-note spaced");
   cfmMsg.textContent = "Starting a new city discards the current one unless you saved it.";
   cfmBody.appendChild(cfmMsg);
 

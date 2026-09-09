@@ -133,6 +133,7 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 #inspector-panel { display: none; padding: 18px; overflow: auto; }
 .insp-portrait.visible { display: block; }
 .nav-row { display: flex; gap: 3px; }
+.zoom-group { margin-left: 2px; flex-shrink: 0; }
 #overlay-section.open { display: block; animation: panel-in 180ms ease-out; }
 
 /* City wire and construction guidance */

@@ -103,9 +103,67 @@ describe("deploy headers", () => {
     // to narrow a policy is to move the file, not to add a second rule.
     const paths = [...filesUnder(dist).map(urlOf), "/", "/civic-gallery"];
     for (const path of paths) {
-      const claiming = rules.filter((rule) => matches(rule, path) && rule.headers["cache-control"]);
-      assert.ok(claiming.length <= 1,
-        `${path} is claimed by ${claiming.map((rule) => rule.path).join(" and ")}, whose values would both be sent`);
+      const seen = new Map();
+      for (const rule of rules.filter((rule) => matches(rule, path))) {
+        for (const name of Object.keys(rule.headers)) seen.set(name, [...(seen.get(name) || []), rule.path]);
+      }
+      for (const [name, claiming] of seen) {
+        assert.equal(claiming.length, 1,
+          `${path} gets ${name} from ${claiming.join(" and ")}, and both values would be sent`);
+      }
+    }
+  });
+
+  test("every response carries the security headers", () => {
+    // One rule for every path, so nothing served can be framed, sniffed, or
+    // allowed to reach out to somewhere the game never talks to. Checked on
+    // each kind of path the site answers on, not just the front page.
+    for (const path of ["/", "/index.html", "/civic-gallery", "/assets/index-abcd1234.js", "/civic-catalog.json", "/fonts/OFL.txt"]) {
+      const headers = headersFor(rules, path);
+      assert.equal(headers["x-content-type-options"], "nosniff", path);
+      assert.equal(headers["referrer-policy"], "no-referrer", path);
+      assert.equal(headers["cross-origin-opener-policy"], "same-origin", path);
+      assert.equal(headers["cross-origin-resource-policy"], "same-origin", path);
+      assert.match(headers["strict-transport-security"], /max-age=\d{7,}/, path);
+      assert.match(headers["permissions-policy"], /geolocation=\(\), gyroscope=\(\)/, path);
+      assert.ok(headers["content-security-policy"], `${path} has no policy`);
+    }
+
+    const policy = headersFor(rules, "/")["content-security-policy"];
+    const csp = Object.fromEntries(policy.split(";")
+      .map((part) => part.trim().split(/\s+/)).map(([name, ...values]) => [name, values.join(" ")]));
+    assert.equal(csp["default-src"], "'none'", "everything is denied before anything is allowed");
+    assert.equal(csp["script-src"], "'self'", "no inline script, no third-party script");
+    assert.equal(csp["style-src"], "'self'", "no inline style either");
+    assert.equal(csp["img-src"], "'self' data:", "same-origin sprites, plus the empty inline favicon");
+    assert.equal(csp["font-src"], "'self'");
+    assert.equal(csp["connect-src"], "'self'", "the game never calls out");
+    // worker-src falls back to script-src when it is absent, so leaving it out
+    // would quietly permit same-origin workers under a policy claiming to be
+    // shut. Nothing here runs off the main thread.
+    for (const shut of ["media-src", "worker-src", "object-src", "frame-ancestors", "base-uri", "form-action"]) {
+      assert.equal(csp[shut], "'none'", shut);
+    }
+    assert.doesNotMatch(policy, /unsafe-/, "the policy needs no escape hatch");
+  });
+
+  test("no page carries inline script or style for the policy to have to allow", { skip: needsBuild }, () => {
+    for (const page of filesUnder(dist).filter((file) => file.endsWith(".html"))) {
+      const html = readFileSync(page, "utf8");
+      assert.doesNotMatch(html, /<style[\s>]/i, `${urlOf(page)} has an inline stylesheet`);
+      assert.doesNotMatch(html, /<script(?![^>]*\bsrc=)[^>]*>/i, `${urlOf(page)} has an inline script`);
+      assert.doesNotMatch(html, /\sstyle="/i, `${urlOf(page)} has a style attribute`);
+      assert.doesNotMatch(html, /\son[a-z]+=/i, `${urlOf(page)} has an inline event handler`);
+    }
+  });
+
+  test("no script builds CSS out of a string at runtime", { skip: needsBuild }, () => {
+    // style.cssText parses CSS from a string, which a strict style policy is
+    // entitled to refuse and which browsers disagree about. Individual property
+    // setters and classes are not in doubt, and there is no reason to be.
+    for (const script of filesUnder(dist).filter((file) => file.endsWith(".js"))) {
+      assert.doesNotMatch(readFileSync(script, "utf8"), /\.cssText\s*=/,
+        `${urlOf(script)} sets style.cssText; use a class instead`);
     }
   });
 
