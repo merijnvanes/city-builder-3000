@@ -236,7 +236,7 @@ export function createAgentAPI({ getCity, actions, renderer, ui, undo }) {
           "Rectangle tools fill the box. Path tools draw a Manhattan L. Everything else places one footprint centred on x2,y2.",
           "World corners: north=(0,0), east=(size,0), south=(size,size), west=(0,size). Default camera has north at the top. Camera rotation never changes world directions.",
           "Border sides: northeast=y:0, southeast=x:size-1, southwest=y:size-1, northwest=x:0. Use these full side names for deals and connectNeighbor.",
-          "Border builds return connectionOffers. connections() lists offers; connectNeighbor(x,y,side,route) explicitly pays to establish one.",
+          "Border builds return connectionOffers. connections() lists offers; connectNeighbor(x,y,side,route) explicitly pays to establish one. Routes: road, rail, highway, powerline, pipe.",
           "region() is bounded; overview() and field() cost the same on any map size.",
           "Read objects() for exact building identity; the region grid only shows the group.",
         ],

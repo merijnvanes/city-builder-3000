@@ -927,7 +927,7 @@ export function mountUI(actions) {
   neighborSection.appendChild(el("div", "modal-section-title", "Neighbor Deals"));
   const neighborHint = el("p");
   neighborHint.style.cssText = "font-size:.85rem;color:var(--text-dim);line-height:1.5;margin:0 0 6px";
-  neighborHint.textContent = "Run a road or rail to the map edge and accept the county connection fee. Click a dead end with its transport tool to reconsider. Power lines and pipes connect at the edge. Connections bring trade. Once one is up, a neighboring mayor will call on you with terms whenever your city has a surplus or a shortfall — deals are signed in the Petition window, not here.";
+  neighborHint.textContent = "Run transport, a power line or a pipe to the map edge and accept its county connection fee. Click an unconnected endpoint with its matching tool to reconsider. Transport connections bring trade; utility connections enable power and water deals. Once one is up, a neighboring mayor will call on you with terms whenever your city has a surplus or a shortfall — deals are signed in the Petition window, not here.";
   neighborSection.appendChild(neighborHint);
   const neighborList = el("div");
   neighborSection.appendChild(neighborList);

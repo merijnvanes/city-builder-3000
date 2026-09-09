@@ -1,7 +1,7 @@
 // Rewards, business deals and petitions.
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
-import { createCity, tick, getStats, place, refresh, setPolicy, serialize, deserialize, BUILDINGS } from "../src/sim/index.js";
+import { createCity, tick, getStats, place, refresh, setPolicy, serialize, deserialize, BUILDINGS, connectNeighbor } from "../src/sim/index.js";
 import { updateEvents, respondPetition, openPetition, NEVER_AGAIN } from "../src/sim/events.js";
 import { DEALS } from "../src/sim/neighbors.js";
 import { lcg } from "../src/sim/terrain.js";
@@ -131,6 +131,7 @@ describe("a neighbouring mayor comes to the door", () => {
     const c = createCity({ seed: 7, layout: "plains", starter: false, hills: 0 });
     c.money = 5_000_000;
     for (let y = 0; y <= 12; y++) place(c, 20, y, "powerline");
+    connectNeighbor(c,{x:20,y:0,side:'northeast',route:'powerline'});
     refresh(c);
     return c;
   };

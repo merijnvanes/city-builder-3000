@@ -1,5 +1,5 @@
 import { constructionDialog } from './construction-dialog.js';
-import { quoteConnection } from './sim/neighbor-links.js';
+import { quoteConnection, CONNECTION_TYPES } from './sim/neighbor-links.js';
 import "./style.css";
 import * as sim from "./sim.js";
 import { mountUI } from "./ui.js";
@@ -158,7 +158,7 @@ function offerConnections(offers, owner=city) {
   const [link,...rest]=offers,quote=quoteConnection(city,link);
   if(!quote.ok || quote.noop) return offerConnections(rest,owner);
   constructionDialog({title:'Connect to neighboring county?',
-    message:`Connect to ${city._connections[link.side].name} for $${quote.cost.toLocaleString()}?`,
+    message:`Connect ${CONNECTION_TYPES[link.route].label.toLowerCase()} to ${city._connections[link.side].name} for $${quote.cost.toLocaleString()}?`,
     acceptLabel:`Connect · $${quote.cost.toLocaleString()}`,cancelLabel:'Keep dead end',
     accept:()=>{if(owner===city) connectNeighbor(link);offerConnections(rest,owner);},
     cancel:()=>offerConnections(rest,owner)});

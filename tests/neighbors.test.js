@@ -14,7 +14,7 @@ const at = (c, x, y) => c.tiles[y * c.size + x];
 // District fixtures explicitly purchase any transport endpoint they build.
 const put = (c, x, y, tool, o) => {
   const result=place(c,x,y,tool,{...o,deferRefresh:true});
-  if(result.ok && ['road','rail','highway'].includes(tool)) for(const link of connectionOffers(c,[{x,y}])) connectNeighbor(c,link);
+  if(result.ok) for(const link of connectionOffers(c,[{x,y}])) connectNeighbor(c,link);
   return result;
 };
 // Contracts now arrive as offers from a neighbouring mayor; these tests are

@@ -1,5 +1,5 @@
 import { bridgeQuote, installStructure } from './sim/structures.js';
-import { connectionOffers, EDGE_DIRECTIONS } from './sim/neighbor-links.js';
+import { connectionOffers, EDGE_DIRECTIONS, CONNECTION_TYPES } from './sim/neighbor-links.js';
 // construction.js — plan, apply and undo player construction. Pure JS.
 //
 // planConstruction prices a drag (rectangle, path or single footprint)
@@ -134,7 +134,7 @@ export function planConstruction(city, start, end, tool, options = {}) {
 
 export function planConnectionOffers(city,plan) {
   const route=BUILDINGS[plan.tool]?.bores || plan.tool;
-  if(!["road","rail","highway"].includes(route)) return [];
+  if(!Object.hasOwn(CONNECTION_TYPES,route)) return [];
   const endpoints=plan.tunnel ? [plan.tunnel.from,plan.tunnel.to] : plan.endpoints || plan.tiles || [];
   return connectionOffers(city,endpoints).filter(link=>link.route===route && endpoints.some(p=>{
     const [dx,dy]=EDGE_DIRECTIONS[link.side];

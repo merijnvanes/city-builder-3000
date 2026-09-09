@@ -120,8 +120,8 @@ export function detectConnections(city) {
         if(!info.roadTiles.includes(t)) info.roadTiles.push(t);
       }
       if (linked(city,t.x,t.y,side,"rail")) info.rail++;
-      if (t.powerline) { info.power++; info.powerTiles.push(t); }
-      if (t.pipe) { info.water++; info.pipeTiles.push(t); }
+      if (linked(city,t.x,t.y,side,"powerline")) { info.power++; info.powerTiles.push(t); }
+      if (linked(city,t.x,t.y,side,"pipe")) { info.water++; info.pipeTiles.push(t); }
     }
     info.port = ports.seaport;
     result[side] = info;

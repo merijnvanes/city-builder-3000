@@ -4,8 +4,42 @@ import {createCity,place,connectNeighbor,refresh,serialize,deserialize} from '..
 import {connectionOffers,quoteConnection,CONNECTION_FEES} from '../src/sim/neighbor-links.js';
 import {planConstruction,applyConstruction,createUndoManager} from '../src/construction.js';
 import {streetConnections} from '../src/street-art.js';
+import {dealAvailable} from '../src/sim/neighbors.js';
 const town=()=>createCity({starter:false,layout:'plains',hills:0,seed:12,startYear:2000});
 const at=(c,x,y)=>c.tiles[y*c.size+x];
+for(const [route,resource,flag] of [['powerline','power','powerline'],['pipe','water','pipe']]) {
+ test(`${route} requires payment, survives saves and undo, and is lost when removed`,()=>{
+  const c=town();
+  const build=applyConstruction(c,planConstruction(c,{x:0,y:20},{x:5,y:20},route));
+  assert.ok(build.ok);assert.equal(build.connectionOffers.length,1);
+  const link=build.connectionOffers[0];
+  assert.equal(link.cost,CONNECTION_FEES[route]);
+  assert.equal(dealAvailable(c._connections,resource,'northwest'),false);
+  assert.equal(deserialize(serialize(c))._connections.northwest[resource],0);
+  c.money=link.cost-1;const short=c.money;
+  assert.equal(connectNeighbor(c,link).ok,false);assert.equal(c.money,short);
+  c.money=10000;const undo=createUndoManager();undo.record(c);
+  assert.ok(connectNeighbor(c,link).ok);assert.equal(c.money,10000-link.cost);
+  assert.equal(dealAvailable(c._connections,resource,'northwest'),true);
+  assert.ok(connectNeighbor(c,link).noop);assert.equal(c.money,10000-link.cost);
+  const saved=deserialize(serialize(c));assert.equal(saved._connections.northwest[resource],1);
+  undo.undo(c);assert.equal(c._connections.northwest[resource],0);assert.equal(c.money,10000);
+  at(saved,0,20)[flag]=false;refresh(saved);
+  assert.equal(saved._connections.northwest[resource],0);
+  assert.equal(connectNeighbor(saved,link).ok,false);
+ });
+}
+test('utility layers require separate purchases and legacy saves retain automatic links once',()=>{
+ const c=town();place(c,0,20,'powerline');place(c,0,20,'pipe');
+ assert.equal(connectionOffers(c,[at(c,0,20)]).length,2);
+ connectNeighbor(c,{x:0,y:20,side:'northwest',route:'powerline'});
+ assert.equal(c._connections.northwest.power,1);assert.equal(c._connections.northwest.water,0);
+ const raw=JSON.parse(serialize(c));raw.version=7;raw.transportConnections=[];
+ const legacy=deserialize(JSON.stringify(raw));
+ assert.equal(legacy._connections.northwest.power,1);assert.equal(legacy._connections.northwest.water,1);
+ const saved=JSON.parse(serialize(legacy));assert.equal(saved.version,8);assert.equal(saved.transportConnections.length,2);
+ assert.equal(deserialize(JSON.stringify(saved)).transportConnections.length,2);
+});
 test('an unpurchased border road remains a dead end and quotes do not mutate the city',()=>{
  const c=town(),before=c.money;
  const result=applyConstruction(c,planConstruction(c,{x:0,y:20},{x:5,y:20},'road'));
