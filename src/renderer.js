@@ -684,7 +684,7 @@ export class CityRenderer {
         const p = this.project(x, y, 0);
         if (p.x < 0 || p.x > this.w || p.y < 0 || p.y > this.h) continue;
         const links = [c.road ? "road" : "", c.rail ? "rail" : "", c.power ? "power" : "", c.water ? "water" : ""].filter(Boolean).join(" · ");
-        const label = `${side.toUpperCase()} · ${c.name}${links ? " — " + links : ""}`;
+        const label = `${c.name}${links ? " — " + links : ""}`;
         ctx.lineWidth = 3; ctx.strokeStyle = "#101820cc"; ctx.strokeText(label, p.x, p.y);
         ctx.fillStyle = links ? "#e8f0d8" : "#b8c4b0"; ctx.fillText(label, p.x, p.y);
       }

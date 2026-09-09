@@ -942,7 +942,7 @@ export function mountUI(actions) {
     for (const n of stats.neighbors || []) {
       const row = el("div", "neighbor-row");
       const links = [n.road ? "road" : null, n.rail ? "rail" : null, n.power ? "power line" : null, n.water ? "pipe" : null].filter(Boolean);
-      row.appendChild(el("div", "neighbor-name", `${n.side.charAt(0).toUpperCase() + n.side.slice(1)}: ${n.name}` + (links.length ? ` — connected by ${links.join(", ")}` : " — not connected")));
+      row.appendChild(el("div", "neighbor-name", n.name + (links.length ? ` — connected by ${links.join(", ")}` : " — not connected")));
       const acts = el("div", "neighbor-actions");
       for (const r of Object.keys(resources)) {
         const active = stats.deals?.[r];
