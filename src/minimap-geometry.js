@@ -1,3 +1,15 @@
+import { TILE_W, TILE_H } from './render-scale.js';
+
+// The overview tracks the continuous camera footprint on the map plane.
+// Tile picking snaps to integer coordinates and terrain, which makes it jitter.
+export function minimapView(renderer) {
+  return [[0, 0], [renderer.w, 0], [renderer.w, renderer.h], [0, renderer.h]].map(([sx, sy]) => {
+    const dx = (sx - renderer.cx - renderer.panX) / (TILE_W * renderer.zoom);
+    const dy = (sy - renderer.cy - renderer.panY) / (TILE_H * renderer.zoom) + renderer.size;
+    return renderer.unorient((dx + dy) / 2, (dy - dx) / 2);
+  });
+}
+
 // Fixed world orientation, with room around the diamond for compass labels.
 export function mapPoint(x, y, size) {
   return { x: 80 + (x - y) * 64 / size, y: 16 + (x + y) * 64 / size };
@@ -32,7 +44,15 @@ export function visibleMapPolygon(points, size) {
 export function cameraMarker(view, size) {
   const polygon = visibleMapPolygon(view, size);
   if (polygon.length < 3) return null;
-  const center = polygon.reduce((sum, p) => ({ x: sum.x + p.x / polygon.length, y: sum.y + p.y / polygon.length }), { x: 0, y: 0 });
+  // An area centroid stays continuous as clipping adds or removes vertices.
+  let area = 0, cx = 0, cy = 0;
+  polygon.forEach((a, i) => {
+    const b = polygon[(i + 1) % polygon.length];
+    const weight = a.x * b.y - b.x * a.y;
+    area += weight; cx += (a.x + b.x) * weight; cy += (a.y + b.y) * weight;
+  });
+  if (Math.abs(area) < 1e-9) return null;
+  const center = { x: cx / (3 * area), y: cy / (3 * area) };
   const direction = { x: view[2].x + view[3].x - view[0].x - view[1].x, y: view[2].y + view[3].y - view[0].y - view[1].y };
   const cross = (a, b) => a.x * b.y - a.y * b.x;
   let distance = Infinity;
@@ -47,9 +67,5 @@ export function cameraMarker(view, size) {
     if (t > 0 && u >= -1e-9 && u <= 1 + 1e-9) distance = Math.min(distance, t);
   });
   if (!Number.isFinite(distance)) return null;
-  const point = mapPoint(center.x + direction.x * distance, center.y + direction.y * distance, size);
-  const middle = mapPoint(center.x, center.y, size);
-  const length = Math.hypot(middle.x - point.x, middle.y - point.y);
-  if (length < 1e-9) return null;
-  return { ...point, dx: (middle.x - point.x) / length, dy: (middle.y - point.y) / length };
+  return mapPoint(center.x + direction.x * distance, center.y + direction.y * distance, size);
 }
