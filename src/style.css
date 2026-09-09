@@ -350,6 +350,10 @@ dialog .panel-close { color: #e3e9fb; }
 .chrome-select option { background: #2b3b5e; }
 .btn-teal { background: linear-gradient(#d5dffd, #acbee8); color: #283b61; box-shadow: inset 0 1px #fff, 0 2px 0 #6c80aa; }
 .btn-teal:hover { background: #e2e9ff; color: #283b61; }
+/* An armed destructive button. Deleting a city has no undo, so the second
+   click is the one that does it and it does not look like the first. */
+.btn-warn { background: linear-gradient(#f6c6b4, #e39a80); color: #40200f; box-shadow: inset 0 1px #ffe6da, 0 2px 0 #a96a4c; }
+.btn-warn:hover { background: #ffd9c9; color: #40200f; }
 #title-screen { background: radial-gradient(ellipse at 90% 10%, #bbcaff30, transparent 60%), linear-gradient(90deg, #243653f7 0%, #354565e8 30%, #33496230 70%, #12333800); }
 .title-headline span { color: #cbd9ff; }
 @media (max-width: 1150px) {

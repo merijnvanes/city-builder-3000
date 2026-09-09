@@ -208,23 +208,73 @@ export function serialize(city) {
 
 const VALID_TYPES = new Set(["empty", ...ZONED_TYPES, ...Object.keys(BUILDINGS)]);
 
+// One step per version, applied in order. A city saved by any supported build
+// walks the same path to the current format that a running game walked, so
+// raising SAVE_VERSION means adding a step here rather than deciding which of
+// the previous ones a save happens to need.
+//
+// A step edits the parsed save in place and may leave a note. Notes are read
+// further down, where the city has been built and the fix needs the tiles.
+export const MIGRATIONS = [
+  {
+    from: 6, to: 7,
+    // Border sides were named for compass points. They became corner names when
+    // the map's diamond orientation was settled: north became northeast, and so
+    // on around the map.
+    apply(d) {
+      const sides = { north: 'northeast', east: 'southeast', south: 'southwest', west: 'northwest' };
+      const rename = value => value && ({ ...value, side: Object.hasOwn(sides, value.side) ? sides[value.side] : value.side });
+      if (Array.isArray(d.transportConnections)) d.transportConnections = d.transportConnections.map(rename);
+      if (d.deals && typeof d.deals === 'object') d.deals = Object.fromEntries(Object.entries(d.deals).map(([key, deal]) => [key, rename(deal)]));
+      if (Array.isArray(d.petitions)) d.petitions = d.petitions.map(p => p?.deal ? { ...p, deal: rename(p.deal) } : p);
+    },
+  },
+  {
+    from: 7, to: 8,
+    // Power and water crossed the border without a contract. Their endpoints
+    // are preserved once, so an old city keeps its deals instead of being
+    // charged retroactive connection fees for what it already had.
+    apply(d, notes) { notes.automaticUtilities = true; },
+  },
+  {
+    from: 8, to: 9,
+    // A port was one slab before it filled with modules.
+    apply(d, notes) { notes.slabPorts = true; },
+  },
+];
+
+export const OLDEST_SUPPORTED_SAVE = MIGRATIONS[0].from;
+
+// Walk a save up to the current version. Returns the notes the steps left for
+// the tile work further down.
+function migrate(d) {
+  const notes = {};
+  // A version has to be a plausible version number. Anything else is a broken
+  // file, and calling it old or new would send the player looking for a build
+  // that never existed.
+  if (!Number.isSafeInteger(d.version) || d.version < 1) throw new Error("Save file is corrupt.");
+  if (d.version > SAVE_VERSION) throw new Error("This save was written by a newer version of the game. Reload the page to update, then try again.");
+  if (d.version < OLDEST_SUPPORTED_SAVE) throw new Error(`This save is from version ${d.version}, which is older than this game can read.`);
+  while (d.version !== SAVE_VERSION) {
+    const step = MIGRATIONS.find((m) => m.from === d.version);
+    // Unreachable while the steps form an unbroken chain from the oldest
+    // supported version to the current one, which the tests assert they do.
+    if (!step) throw new Error(`No way to read a version ${d.version} save.`);
+    // A step that did not advance by exactly one would reintroduce the bug this
+    // list replaced: the versions it jumped over never run, and a step pointing
+    // at itself would spin here forever.
+    if (step.to !== step.from + 1) throw new Error(`Migration ${step.from} to ${step.to} skips a version.`);
+    step.apply(d, notes);
+    d.version = step.to;
+  }
+  return notes;
+}
+
 export function deserialize(raw) {
   let d;
   try { d = JSON.parse(raw); } catch { throw new Error("Save file is corrupt."); }
   if (!d || typeof d !== "object") throw new Error("Save file is corrupt.");
-  const automaticUtilities = d.version === 6 || d.version === 7;
-  if (d.version === 6) {
-    const sides = { north: 'northeast', east: 'southeast', south: 'southwest', west: 'northwest' };
-    const migrate = value => value && ({ ...value, side: Object.hasOwn(sides, value.side) ? sides[value.side] : value.side });
-    if (Array.isArray(d.transportConnections)) d.transportConnections = d.transportConnections.map(migrate);
-    if (d.deals && typeof d.deals === 'object') d.deals = Object.fromEntries(Object.entries(d.deals).map(([key, deal]) => [key, migrate(deal)]));
-    if (Array.isArray(d.petitions)) d.petitions = d.petitions.map(p => p?.deal ? { ...p, deal: migrate(p.deal) } : p);
-    d.version = SAVE_VERSION;
-  }
-  if (d.version === 7) d.version = 8;
-  const slabPorts = d.version === 8;
-  if (d.version === 8) d.version = SAVE_VERSION;
-  if (d.version !== SAVE_VERSION) throw new Error("This save is from an older version and cannot be loaded.");
+  const { automaticUtilities = false, slabPorts = false } = migrate(d);
   const size = d.size;
   if (!Number.isInteger(size) || size < 16 || size > MAX_SIZE) throw new Error("Invalid save: bad size.");
   if (!Array.isArray(d.tiles) || d.tiles.length !== size * size) throw new Error("Invalid save: tile count mismatch.");

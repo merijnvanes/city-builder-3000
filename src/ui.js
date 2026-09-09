@@ -619,6 +619,26 @@ export function mountUI(actions) {
   newsTicker.addEventListener('click',()=>{buildNews();newsDialog.showModal();});
   newsDialog.append(newsHeader,newsBody);app.appendChild(newsDialog);
 
+  // ── Unreadable save ───────────────────────────────────────────────────────
+  // A save this build cannot read is not a save that is gone. The city is
+  // offered back as a file before anything else can write over it.
+  const rescueDialog = el("dialog");
+  rescueDialog.setAttribute("aria-label", "This city could not be loaded");
+  const rescueHeader = el("div", "modal-header");
+  rescueHeader.append(el("span", "modal-title", "This city could not be loaded"));
+  const rescueBody = el("div", "modal-body");
+  const rescueReason = el("p");
+  const rescueAdvice = el("p", "", "The city is still stored. Download a copy now so it is not lost, and send it along if you report the problem.");
+  rescueBody.append(rescueReason, rescueAdvice);
+  const rescueFooter = el("div", "modal-footer");
+  let rescueText = "";
+  rescueFooter.append(
+    btn("btn btn-teal", "Download this city", "Download the city that could not be loaded", () => { actions.downloadRescue?.(rescueText); }),
+    btn("btn", "Close", null, () => rescueDialog.close()),
+  );
+  rescueDialog.append(rescueHeader, rescueBody, rescueFooter);
+  app.appendChild(rescueDialog);
+
   // Zoom buttons (right of bottom bar)
   const zoomGroup = el("div", "nav-row");
   zoomGroup.style.cssText = "margin-left:2px; flex-shrink:0";
@@ -1291,18 +1311,31 @@ export function mountUI(actions) {
           save.disabled = true;
           try { await actions.save?.(s.slot); } finally { buildFiles(); }
         });
+        // A city this build cannot read is still the player's only copy. Saving
+        // over it is offered once they have loaded it and taken the download.
+        if (s.damaged) { save.disabled = true; save.title = "Load this slot first and download the city, then it can be replaced."; }
         row.appendChild(save);
       }
       const load = btn("btn btn-sm btn-teal", "Load", `Load ${label.toLowerCase()}`, () => { filesDialog.close(); actions.load?.(s.slot); });
       if (s.empty) load.disabled = true;
       row.appendChild(load);
       // Clearing a slot is the only way back from a full disk, which is exactly
-      // what the storage-full message tells the player to do.
-      if (!s.empty) row.appendChild(btn("btn btn-sm", "Clear", `Clear ${label.toLowerCase()}`, async (event) => {
-        event.currentTarget.disabled = true;
-        await actions.clearSave?.(s.slot);
-        buildFiles();
-      }));
+      // what the storage-full message tells the player to do. It asks first:
+      // the city it deletes has no undo.
+      if (!s.empty) {
+        const clear = btn("btn btn-sm", "Clear", `Clear ${label.toLowerCase()}`, async () => {
+          if (clear.dataset.armed !== "1") {
+            clear.dataset.armed = "1";
+            clear.textContent = "Confirm clear";
+            clear.classList.add("btn-warn");
+            return;
+          }
+          clear.disabled = true;
+          await actions.clearSave?.(s.slot);
+          buildFiles();
+        });
+        row.appendChild(clear);
+      }
       slotList.appendChild(row);
     }
   }
@@ -1494,6 +1527,11 @@ export function mountUI(actions) {
 
   // ── Public API ─────────────────────────────────────────────────────────────
   return {
+    offerRescue(text, reason) {
+      rescueText = text;
+      rescueReason.textContent = reason;
+      if (!rescueDialog.open) rescueDialog.showModal();
+    },
     update(city, stats) {
       _lastStats = stats;
       if (_selectedTool === "dispatch" || _selectedTool === "patrol") writeHint();

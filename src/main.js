@@ -21,11 +21,15 @@ const metaOf = (c) => ({ name: c.name, population: c.population, money: c.money,
 // Set while a city is being read back, so nothing writes over the slot the
 // player is in the middle of loading from.
 let loading = false;
+// A slot whose city this build could not read. Its bytes are the player's only
+// copy until they download them, so nothing writes there by itself.
+let unreadableSlot = null;
 
 // One place that writes a city and says what happened. Every caller reports the
 // failure: a save that quietly did not happen is how a long game disappears.
-async function storeCity(slot, { quiet = false } = {}) {
+async function storeCity(slot, { quiet = false, force = false } = {}) {
   if (loading) return { ok: false, message: "A city is being loaded." };
+  if (slot === unreadableSlot && !force) return { ok: false, message: `${slotLabel(slot)} holds a city this version could not read. Download it first, or save over it from the save dialog.` };
   const result = await saveStore.write(slot, sim.serialize(city), metaOf(city));
   if (!result.ok) ui?.notify(result.message);
   else if (!quiet) ui?.notify(slot === AUTOSAVE_SLOT ? "City autosaved." : `City saved to ${slotLabel(slot).toLowerCase()}.`);
@@ -134,18 +138,35 @@ function advanceTips() {
   if (tipIndex === TIPS.length - 1) tipIndex = TIPS.length;
 }
 
-function loadFrom(raw, message) {
+// Hand the player a file. The only way out of the browser for a city, whether
+// it is being exported on purpose or rescued from a save that will not load.
+function downloadText(name, text) {
+  try {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([text], { type: "application/json" }));
+    a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    return true;
+  } catch { return false; }
+}
+
+function loadFrom(raw, message, slot = null) {
   try {
     city = sim.deserialize(raw);
     if (!city.scenario) startScenario(city, "sandbox");
     restore();
     lookAtCity();
     ui.notify(message);
+    if (slot === unreadableSlot) unreadableSlot = null;
     return { ok: true };
   } catch (err) {
-    const failure = `That save could not be loaded: ${err.message}`;
-    ui.notify(failure);
-    return { ok: false, message: failure };
+    // The city is still in there; this build just cannot read it. Offer the
+    // bytes back, and stop writing to that slot until the player has them: the
+    // next January would otherwise autosave over their only copy.
+    if (slot !== null) unreadableSlot = slot;
+    ui.offerRescue?.(raw, err.message);
+    return { ok: false, message: `That save could not be loaded: ${err.message}` };
   }
 }
 
@@ -223,7 +244,9 @@ const actions = {
   setTax: (n) => { for (const key of ["residential", "commercial", "industrial"]) sim.setPolicy(city, `tax.${key}`, Number(n)); refresh(); },
   setPolicy: policy,
   renameCity: (name) => policy("name", name),
-  save: (slot = 1) => storeCity(slot),
+  // Saving from the dialog is a deliberate act, so it may write over a slot the
+  // game refuses to autosave into.
+  save: (slot = 1) => storeCity(slot, { force: true }),
   load: async (slot = 1) => {
     // The clock stops before the read, not after it. Reading a city takes long
     // enough for a month to tick over, and a January tick during that gap would
@@ -233,11 +256,12 @@ const actions = {
     try {
       const result = await saveStore.read(slot);
       if (!result.ok) { ui.notify(result.message); return result; }
-      return loadFrom(result.text, "Saved city restored. Simulation paused.");
+      return loadFrom(result.text, "Saved city restored. Simulation paused.", slot);
     } finally { loading = false; }
   },
   clearSave: async (slot) => {
     const result = await saveStore.remove(slot);
+    if (result.ok && slot === unreadableSlot) unreadableSlot = null;
     ui.notify(result.ok ? `${slotLabel(slot)} cleared.` : result.message);
     return result;
   },
@@ -245,15 +269,14 @@ const actions = {
     s.empty || s.damaged ? s : { ...s, date: sim.dateOf(s.month, s.startYear) }
   )),
   exportSave: () => {
-    try {
-      const blob = new Blob([sim.serialize(city)], { type: "application/json" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `${city.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase() || "city"}-${sim.dateOf(city.month, city.startYear).replace(" ", "-")}.json`;
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-      ui.notify("City exported.");
-    } catch { ui.notify("Export failed in this browser."); }
+    const name = `${city.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase() || "city"}-${sim.dateOf(city.month, city.startYear).replace(" ", "-")}.json`;
+    if (downloadText(name, sim.serialize(city))) ui.notify("City exported.");
+    else ui.notify("Export failed in this browser.");
+  },
+  downloadRescue: (text) => {
+    const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+    if (downloadText(`city-unreadable-${stamp}.json`, text)) ui.notify("Saved city downloaded.");
+    else ui.notify("Download failed in this browser.");
   },
   importSave: (text) => loadFrom(text, "City imported. Simulation paused."),
   newCity: (options = {}) => {
