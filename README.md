@@ -72,6 +72,15 @@ pnpm test:deploy   # build, check the headers, then play the built site through 
 that the build produced a deployable site, then `pnpm test`. The build comes first because
 `tests/deploy-headers.test.js` inspects a finished build and skips itself when there is none.
 
+The same file carries the deploy, as a second job gated on `needs: test` and limited to a push
+to `main`. It is the same question asked once: the tests decide whether main is good, and there
+is no version of "good enough to keep" that differs from "good enough to serve". A separate
+workflow would have to either repeat the whole suite on every push to main or race it, and
+racing it means a push that breaks the simulation reaches the live site before anything notices.
+The job holds a `deploy-citybuilder` concurrency group with `cancel-in-progress: false`, because
+wrangler uploads the artwork before it moves the live version onto it and a run killed halfway
+leaves that upload half done.
+
 `.github/workflows/nightly.yml` runs the suites that need a real browser: `pnpm test:deploy`
 first, since it serves its own copy of `dist/`, then gameplay, the interface at nine window
 sizes, the scene and geometry checks, the rendering and building-family galleries, the zones,
