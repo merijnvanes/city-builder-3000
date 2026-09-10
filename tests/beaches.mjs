@@ -35,8 +35,8 @@ try {
   for(let rotation=0;rotation<4;rotation++) {
    const result=await page.evaluate(async ({focus,rotation})=>{
     const {waterGeometry,fanValueAt}=await import('/src/water-geometry.js');
-    const {sandField,sandFan,nearSand,beachPolygons,meshFan,SAND_THRESHOLD}=await import('/src/terrain-contours.js');
-    const c=civic.city,r=civic.renderer;
+    const {sandLattice,sandAt,nearSand,beachPolygons,meshFan,SAND_THRESHOLD}=await import('/src/terrain-contours.js');
+    const c=civic.city,r=civic.renderer,lattice=sandLattice(c);
     r.rotation=rotation;r.focusOn(focus.x+.5,focus.y+.5,2);r.dirty=true;r.render(c,1000);
     const ctx=r.ground.getContext('2d');
     const at=(x,y)=>x>=0 && y>=0 && x<c.size && y<c.size?c.tiles[y*c.size+x]:null;
@@ -45,15 +45,15 @@ try {
     const sandy=([R,G,B])=>G-R<=8 && R-B>=30;
     const project=(x,y,z)=>{const old=r.platform;r.platform=0;try{return r.project(x,y,z);}finally{r.platform=old;}};
     const fanOf=t=>{const g=waterGeometry(r,t);return {geometry:g,fan:g || meshFan(r,t),pieces:g?g.dry:meshFan(r,t).pieces};};
-    const sandAt=(t,x,y)=>{const field=nearSand(c,t)?sandField(c,t):null;if(!field)return 0;return fanValueAt(sandFan(field,fanOf(t).fan),x,y);};
+    const sandOf=(t,x,y)=>nearSand(c,t)?sandAt(c,lattice,x,y):0;
     const area=p=>Math.abs(p.reduce((s,a,i)=>{const b=p[(i+1)%p.length];return s+a[0]*b[1]-b[0]*a[1];},0))/2;
     let banks=0,seams=0;const failures=[];
     for(const t of c.tiles) {
      if(Math.abs(t.x-focus.x)>6 || Math.abs(t.y-focus.y)>6)continue;
      // Banks of water tiles beside a beach.
      if(t.terrain==='water' && [[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>at(t.x+dx,t.y+dy)?.terrain==='sand')) {
-      const {geometry,fan,pieces}=fanOf(t),field=sandField(c,t);
-      const {full,polygons}=beachPolygons(field,fan,pieces);
+      const {geometry,pieces}=fanOf(t);
+      const {full,polygons}=beachPolygons(c,lattice,t,pieces);
       for(const polygon of full?pieces:polygons) {
        if(area(polygon)<.03)continue;
        const x=polygon.reduce((s,p)=>s+p[0],0)/polygon.length,y=polygon.reduce((s,p)=>s+p[1],0)/polygon.length,z=fanValueAt(geometry,x,y);
@@ -70,7 +70,7 @@ try {
       const n=at(t.x+dx,t.y+dy);if(n?.terrain!=='sand')continue;
       for(const f of [.25,.5,.75]) {
        const x=dx?t.x+1:t.x+f,y=dy?t.y+1:t.y+f;
-       if(sandAt(t,x,y)<SAND_THRESHOLD+.15 || sandAt(n,x,y)<SAND_THRESHOLD+.15)continue;
+       if(sandOf(t,x,y)<SAND_THRESHOLD+.15 || sandOf(n,x,y)<SAND_THRESHOLD+.15)continue;
        // Well above the waterline on both sides: the water's own antialiased
        // edge blends with the sand there, and that is not a seam.
        if([t,n].some(tile=>{const g=fanOf(tile).geometry;return g && fanValueAt(g,x,y)<g.level+2;}))continue;

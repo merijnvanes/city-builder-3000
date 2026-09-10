@@ -1273,3 +1273,14 @@ the edges lying on the tile's own boundary are stroked in the same colour, so
 the neighbour's antialiased edge cannot let the ground show through while the
 contour and the waterline stay at their true width. `tests/beaches.mjs` reads
 the pixels back on a ringed lake and a natural coast in every rotation.
+
+The line was still angular: five samples per tile, linearly interpolated,
+give a polyline with a kink at every spoke and edge and a spike wherever a
+sample sits near one half. The field is now one continuous function of the
+map: the tile values blended between tile centres with the same smoothstep
+the map's value noise uses, plus the wander noise at each sample point. Each
+dry piece is cut along a four-by-four sub-grid before clipping, so the
+polyline follows the curve, and neighbours sample identical points along a
+shared edge. The polygons are cached per tile against the terrain mesh and
+the water geometry, so camera moves do not recompute them; a full ground
+rebuild of a 64-tile lake map costs about five milliseconds more than before.

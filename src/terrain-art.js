@@ -1,7 +1,7 @@
 import { waterSurface } from './sim/surface-water.js';
 import { waterGeometry, waterPath, clipAtLevel } from './water-geometry.js';
 import { shadeHex } from './art-colors.js';
-import { sandField, nearSand, beachPolygons, meshFan } from './terrain-contours.js';
+import { sandLattice, nearSand, beachPolygons, meshFan } from './terrain-contours.js';
 import { ELEV_PX } from './render-scale.js';
 // Broad, continuous color variation keeps natural terrain from reading as a
 // checkerboard. The simulation grid remains visible when a tool is selected.
@@ -30,13 +30,14 @@ export function surfaceColor(tile, city) {
   return mix([113, 138, 73], [139, 157, 88], broad * 0.6 + variation * 0.4);
 }
 
-// Per-tile colours and sand fields, recomputed only when the terrain itself
-// changes. Buildings and roads come and go without touching them.
+// Per-tile colours and the sand field, recomputed only when the terrain
+// itself changes. Buildings and roads come and go without touching them.
 //
 // `ground` is the colour of the tile's land: grass for a sand tile, whose
 // beach is painted over it, and for a water tile, whose bank above the
 // waterline is land like any other. `water` is the surface colour of a water
-// tile. `beach` is the sand field of every tile that can carry sand.
+// tile. `lattice` is the sand field's value at every tile and `beach` marks
+// the tiles that can carry any sand.
 const palettes = new WeakMap();
 export function terrainPalette(city) {
   let palette = palettes.get(city.tiles);
@@ -48,10 +49,28 @@ export function terrainPalette(city) {
     ground: city.tiles.map(t => surfaceColor(t.terrain === 'sand' || t.terrain === 'water' ? { ...t, terrain: 'grass' } : t, city)),
     water: city.tiles.map(t => t.terrain === 'water' ? surfaceColor(t, city) : null),
     sand: city.tiles.map(t => surfaceColor({ ...t, terrain: 'sand' }, city)),
-    beach: city.tiles.map(t => nearSand(city, t) ? sandField(city, t) : null),
+    lattice: sandLattice(city),
+    beach: city.tiles.map(t => nearSand(city, t)),
   };
   palettes.set(city.tiles, palette);
   return palette;
+}
+
+// The beach polygons of a tile are cut once for a given terrain (the
+// palette), terrain mesh (the renderer's corners) and shore (the water
+// geometry, which is itself cached against the same two), and reused across
+// camera moves.
+const NO_BEACH = { full: false, polygons: [] };
+const beaches = new WeakMap();
+function beachOf(r, city, palette, t, geometry, pieces) {
+  if (!palette.beach[t.y * city.size + t.x]) return NO_BEACH;
+  let tiles = beaches.get(palette);
+  if (!tiles) beaches.set(palette, tiles = new Map());
+  const prior = tiles.get(t);
+  if (prior && prior.corners === r.corners && prior.geometry === geometry) return prior.coverage;
+  const coverage = beachPolygons(city, palette.lattice, t, pieces);
+  tiles.set(t, { corners: r.corners, geometry, coverage });
+  return coverage;
 }
 
 const onTileEdge = (t, a, b) => [[0, t.x], [0, t.x + 1], [1, t.y], [1, t.y + 1]]
@@ -104,7 +123,7 @@ export function drawTerrainSurface(r, t, city, shade = 1) {
   const geometry = waterGeometry(r, t), fan = geometry || meshFan(r, t);
   const pieces = geometry ? geometry.dry : fan.pieces;
   const ground = shadeHex(palette.ground[index], shade), sand = shadeHex(palette.sand[index], shade);
-  const coverage = beachPolygons(palette.beach[index], fan, pieces);
+  const coverage = beachOf(r, city, palette, t, geometry, pieces);
   const old = r.platform; r.platform = 0;
   try {
     if (geometry) {

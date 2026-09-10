@@ -129,9 +129,7 @@ export function waterHeightAt(geometry,x,y) {
 
 // A value sampled at the vertices of a tile fan, read anywhere on the tile:
 // linear within each sector, so it is continuous across sectors and along
-// tile edges, where it depends only on the two edge vertices. Heights, the
-// sand field and anything else cut into contours use this one rule, so their
-// contours agree with one another and with the neighbouring tile's.
+// tile edges, where it depends only on the two edge vertices.
 export function fanValueAt(fan,x,y) {
  const u=x-fan.center[0],v=y-fan.center[1],c=fan.corners;
  const side=sideAt(fan,x,y);

@@ -1,64 +1,58 @@
 import { noise } from './sim/terrain.js';
 import { tileAt } from './sim/grid.js';
-import { fanValueAt } from './water-geometry.js';
 
 // Beaches meet grass along a contour, not along tile edges.
 //
 // Every tile carries a sand value: 1 for a sand tile, 0 for grass or rock,
 // and for water 1 wherever a beach touches it, so the sand always reaches the
-// waterline. The value is sampled at the tile's four corners (the mean of the
-// tiles around each vertex) and at its centre, with a little deterministic
-// noise so the line wanders. That is the tile's sand field.
+// waterline. Those values sit at the tile centres and are blended smoothly
+// between them (the same smoothstep the map's value noise uses), with a
+// little deterministic noise added so the line wanders: that is the sand
+// field, one continuous function over the whole map.
 //
 // The sand region is where the field is at least one half. It is cut from
-// the same fan of triangles the terrain is drawn with (water-geometry.js):
-// the caller hands over the fan and the pieces of ground it wants sand on,
-// which for a shore are the pieces above the waterline, and gets back the
-// sandy part of each piece. Because the field is read through the fan's own
-// interpolation, the contour is continuous across the map, agrees with the
-// waterline cut from the same fan, and a change of terrain anywhere only
-// moves the line within the tiles around it.
+// the same triangles the terrain is drawn with (water-geometry.js): the
+// caller hands over the pieces of ground it wants sand on, which for a shore
+// are the pieces above the waterline, and gets back the sandy part of each.
+// Each piece is first split along a fine grid so the polyline follows the
+// curve of the field. Neighbouring tiles sample the field at the same points
+// along their shared edge, so the contour is continuous across the map, and a
+// change of terrain anywhere only moves the line within the tiles around it.
 export const SAND_THRESHOLD = 0.5;
+export const SUBDIVISIONS = 4;
 const WANDER = 0.42;
 const CARDINAL = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 const EPS = 1e-9;
 
 function tileValue(city, t) {
-  if (!t) return null;
   if (t.terrain === 'sand') return 1;
   if (t.terrain !== 'water') return 0;
   return CARDINAL.some(([dx, dy]) => tileAt(city, t.x + dx, t.y + dy)?.terrain === 'sand') ? 1 : 0;
 }
 
-const wander = (city, x, y) => (noise(x, y, 2.3, city.seed + 77) - 0.5) * WANDER;
-
-// The field at a vertex of the tile grid.
-function vertexValue(city, vx, vy) {
-  let sum = 0, count = 0;
-  for (const [dx, dy] of [[-1, -1], [0, -1], [-1, 0], [0, 0]]) {
-    const value = tileValue(city, tileAt(city, vx + dx, vy + dy));
-    if (value === null) continue;
-    sum += value; count++;
-  }
-  if (!count) return 0;
-  return sum / count + wander(city, vx, vy);
+// The sand value of every tile, indexed like city.tiles.
+export function sandLattice(city) {
+  return Float32Array.from(city.tiles, t => tileValue(city, t));
 }
 
-// The sand field of one tile: { corners: [nw, ne, se, sw], center }. Rock
-// keeps its hard edges and carries no field of its own.
-export function sandField(city, t) {
-  if (t.terrain === 'rock') return null;
-  const { x, y } = t;
-  return {
-    corners: [[x, y], [x + 1, y], [x + 1, y + 1], [x, y + 1]].map(([vx, vy]) => vertexValue(city, vx, vy)),
-    center: tileValue(city, t) + wander(city, x + 0.5, y + 0.5),
-  };
+const smooth = t => t * t * (3 - 2 * t);
+
+// The sand field at map point (x, y). Beyond the map edge the nearest tile's
+// value continues, so a beach can run off the edge without thinning.
+export function sandAt(city, lattice, x, y) {
+  const n = city.size, fx = x - 0.5, fy = y - 0.5;
+  const ix = Math.floor(fx), iy = Math.floor(fy), u = smooth(fx - ix), v = smooth(fy - iy);
+  const clamp = i => Math.max(0, Math.min(n - 1, i));
+  const at = (i, j) => lattice[clamp(j) * n + clamp(i)];
+  const a = at(ix, iy), b = at(ix + 1, iy), c = at(ix, iy + 1), d = at(ix + 1, iy + 1);
+  return (a + (b - a) * u) * (1 - v) + (c + (d - c) * u) * v + (noise(x, y, 2.3, city.seed + 77) - 0.5) * WANDER;
 }
 
 // True when this tile can carry any sand at all: only such tiles need the
-// contour worked out. Anything two tiles or more from sand or a beach shore
-// is plain ground.
+// contour worked out. The field around any point of a tile two tiles or more
+// from sand or a beach shore is only the wander noise, well below one half.
 export function nearSand(city, t) {
+  if (t.terrain === 'rock') return false;
   for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
     const n = tileAt(city, t.x + dx, t.y + dy);
     if (n && tileValue(city, n) === 1) return true;
@@ -66,25 +60,42 @@ export function nearSand(city, t) {
   return false;
 }
 
-// The field spread over a fan: its four corners take the corner samples and
-// any edge midpoints (a water tile's fan has eight corners) the mean of the
-// two corners beside them, which is what linear interpolation along the edge
-// gives, so a four-corner neighbour reads the shared edge identically.
-export function sandFan(field, fan) {
-  const count = fan.corners.length, stride = count / 4;
-  const corners = fan.corners.map(([x, y], i) => {
-    const k = Math.floor(i / stride), f = (i % stride) / stride;
-    const a = field.corners[k], b = field.corners[(k + 1) % 4];
-    return [x, y, a + (b - a) * f];
-  });
-  return { center: [fan.center[0], fan.center[1], field.center], corners };
+const area = polygon => Math.abs(polygon.reduce((sum, [x, y], i) => { const [nx, ny] = polygon[(i + 1) % polygon.length]; return sum + x * ny - nx * y; }, 0)) / 2;
+const same = (a, b) => Math.abs(a[0] - b[0]) < EPS && Math.abs(a[1] - b[1]) < EPS;
+const clean = polygon => polygon.filter((p, i) => !same(p, polygon[(i + 1) % polygon.length]));
+
+// Split a convex [x, y, z, ...] polygon by the line `axis = value` into the
+// parts below and above it. Every coordinate is linear along an edge, so the
+// crossing point carries the right height.
+function split(polygon, axis, value) {
+  const below = [], above = [];
+  let a = polygon.at(-1);
+  for (const b of polygon) {
+    const da = a[axis] - value, db = b[axis] - value;
+    if ((da < 0) !== (db < 0)) {
+      const f = da / (da - db), p = a.map((v, k) => v + (b[k] - v) * f);
+      p[axis] = value; below.push(p); above.push(p);
+    }
+    (db < 0 ? below : above).push(b);
+    a = b;
+  }
+  return [below, above];
 }
 
-// Clip one convex piece to its sandy side. Points are [x, y, z, value]; the
-// result is the polygon (in x, y, z) where value >= SAND_THRESHOLD. Values
-// and heights are both linear along an edge, so the crossing point carries
-// the height of the ground at that spot.
-function clipPiece(points) {
+// A piece of a tile cut along the sub-grid, so the field can be sampled at
+// every cell corner.
+function cells(piece, t) {
+  let parts = [piece];
+  for (const axis of [0, 1]) for (let i = 1; i < SUBDIVISIONS; i++) {
+    const line = (axis ? t.y : t.x) + i / SUBDIVISIONS;
+    parts = parts.flatMap(part => part.length ? split(part, axis, line) : []);
+  }
+  return parts.map(clean).filter(part => part.length >= 3 && area(part) > EPS);
+}
+
+// Clip one convex cell to its sandy side. Points are [x, y, z, value]; the
+// result is the polygon (in x, y, z) where value >= SAND_THRESHOLD.
+function clipCell(points) {
   const out = [];
   let a = points.at(-1);
   for (const b of points) {
@@ -99,20 +110,16 @@ function clipPiece(points) {
   return out;
 }
 
-const area = polygon => Math.abs(polygon.reduce((sum, [x, y], i) => { const [nx, ny] = polygon[(i + 1) % polygon.length]; return sum + x * ny - nx * y; }, 0)) / 2;
-
-// The sandy part of each piece of ground. `fan` is the fan the pieces were
-// cut from ({ center: [x, y], corners: [[x, y], ...] }); each piece is a
-// convex [x, y, z] polygon inside one of its sectors. Returns { full, polygons }:
-// full when every piece is sand throughout, so the ground can simply be
-// painted sand; otherwise the polygons, in map coordinates with the ground
-// height at every vertex, that are to be painted over the ground.
-export function beachPolygons(field, fan, pieces) {
-  if (!field) return { full: false, polygons: [] };
-  const values = sandFan(field, fan);
-  const valued = pieces.map(piece => piece.map(([x, y, z]) => [x, y, z, fanValueAt(values, x, y)]));
-  if (valued.every(piece => piece.every(p => p[3] >= SAND_THRESHOLD))) return { full: true, polygons: pieces };
-  const polygons = valued.map(clipPiece).filter(polygon => polygon.length >= 3 && area(polygon) > EPS);
+// The sandy part of each piece of ground of tile `t`. Each piece is a convex
+// [x, y, z] polygon inside the tile. Returns { full, polygons }: full when
+// every piece is sand throughout, so the ground can simply be painted sand;
+// otherwise the polygons, in map coordinates with the ground height at every
+// vertex, that are to be painted over the ground. Rock keeps its hard edges.
+export function beachPolygons(city, lattice, t, pieces) {
+  if (t.terrain === 'rock' || !pieces.length) return { full: false, polygons: [] };
+  const valued = pieces.flatMap(piece => cells(piece, t)).map(cell => cell.map(([x, y, z]) => [x, y, z, sandAt(city, lattice, x, y)]));
+  if (valued.every(cell => cell.every(p => p[3] >= SAND_THRESHOLD))) return { full: true, polygons: pieces };
+  const polygons = valued.map(clipCell).map(clean).filter(polygon => polygon.length >= 3 && area(polygon) > EPS);
   return { full: false, polygons };
 }
 

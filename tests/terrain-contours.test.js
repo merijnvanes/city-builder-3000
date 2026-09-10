@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {sandField,sandFan,nearSand,beachPolygons,meshFan} from '../src/terrain-contours.js';
+import {sandLattice,sandAt,nearSand,beachPolygons,meshFan,SUBDIVISIONS,SAND_THRESHOLD} from '../src/terrain-contours.js';
 import {waterGeometry,fanValueAt} from '../src/water-geometry.js';
 import {terrainPalette,drawTerrainSurface} from '../src/terrain-art.js';
 import {shadeHex} from '../src/art-colors.js';
@@ -26,7 +26,7 @@ const areaOf=polygons=>polygons.reduce((sum,p)=>sum+area(p),0);
 // with, its dry pieces, and the sandy part of those.
 function beach(r,c,t) {
  const geometry=waterGeometry(r,t),fan=geometry || meshFan(r,t),pieces=geometry?geometry.dry:fan.pieces;
- return {geometry,fan,pieces,...beachPolygons(nearSand(c,t)?sandField(c,t):null,fan,pieces)};
+ return {geometry,fan,pieces,...(nearSand(c,t)?beachPolygons(c,sandLattice(c),t,pieces):{full:false,polygons:[]})};
 }
 const sandArea=b=>b.full?areaOf(b.pieces):areaOf(b.polygons);
 
@@ -72,27 +72,35 @@ test('the bank of a water tile is sand where a beach meets it and land elsewhere
  assert.equal(sandArea(away),0,'a bank far from any beach is plain land');
 });
 
-// Where two tiles share an edge, the points where sand starts and stops on
-// that edge agree, whether the neighbours are drawn with four-corner fans
-// (land) or eight-corner fans (water), and whether the edge is cut by the
-// waterline or not.
-function edgePoints(b,axis,line) {
- const own=(b.full?b.pieces:b.polygons).flat().filter(p=>Math.abs(p[axis]-line)<1e-7);
- return [...new Set(own.map(p=>String(+p[1-axis].toFixed(6))))].sort();
+// Where two tiles share an edge, the stretches of that edge covered by sand
+// agree, whether the neighbours are drawn with four-corner fans (land) or
+// eight-corner fans (water), and whether the edge is cut by the waterline or
+// not. The polygons may split the edge differently; the cover must not.
+function coveredOn(b,axis,line,s) {
+ return (b.full?b.pieces:b.polygons).some(polygon=>polygon.some((p,i)=>{
+  const q=polygon[(i+1)%polygon.length];
+  if(Math.abs(p[axis]-line)>1e-7 || Math.abs(q[axis]-line)>1e-7)return false;
+  const lo=Math.min(p[1-axis],q[1-axis]),hi=Math.max(p[1-axis],q[1-axis]);
+  return s>=lo-1e-7 && s<=hi+1e-7;
+ }));
 }
 test('the contour crosses every shared edge at the same point on both sides',()=>{
  const c=shore({sandRows:[1,2]}),r=renderer(c);
- let compared=0;
+ let compared=0,covered=0,bare=0;
  for(const t of c.tiles)for(const [dx,dy] of [[1,0],[0,1]]) {
   if(t.x+dx>=c.size || t.y+dy>=c.size)continue;
   const n=at(c,t.x+dx,t.y+dy);
   const a=beach(r,c,t),b=beach(r,c,n);
   if(!a.polygons.length && !a.full && !b.polygons.length && !b.full)continue;
-  const axis=dx?0:1,line=dx?t.x+1:t.y+1;
-  assert.deepEqual(edgePoints(a,axis,line),edgePoints(b,axis,line),`shared edge between ${t.x},${t.y} and ${n.x},${n.y}`);
+  const axis=dx?0:1,line=dx?t.x+1:t.y+1,from=dx?t.y:t.x;
+  for(let f=.0125;f<1;f+=.025) {
+   const mine=coveredOn(a,axis,line,from+f),theirs=coveredOn(b,axis,line,from+f);
+   assert.equal(mine,theirs,`shared edge between ${t.x},${t.y} and ${n.x},${n.y} at ${from+f}`);
+   if(mine)covered++;else bare++;
+  }
   compared++;
  }
- assert.ok(compared>10);
+ assert.ok(compared>10 && covered>0 && bare>0);
 });
 
 test('an isolated sand tile becomes a rounded patch rather than a square',()=>{
@@ -109,29 +117,35 @@ test('rock keeps hard edges and a deep beach is solid sand',()=>{
  const c=shore({sandRows:[1,2,3]}),r=renderer(c);
  assert.equal(beach(r,c,at(c,4,2)).full,true);
  at(c,4,5).terrain='rock';
- assert.equal(sandField(c,at(c,4,5)),null);
- assert.deepEqual(beachPolygons(null,meshFan(r,at(c,4,5)),meshFan(r,at(c,4,5)).pieces),{full:false,polygons:[]});
+ assert.equal(nearSand(c,at(c,4,5)),false);
+ assert.deepEqual(beachPolygons(c,sandLattice(c),at(c,4,5),meshFan(r,at(c,4,5)).pieces),{full:false,polygons:[]});
 });
 
 test('coverage is deterministic for a seed and changes with it',()=>{
  const a=shore({seed:5}),b=shore({seed:5}),d=shore({seed:9});
- assert.deepEqual(sandField(a,at(a,3,2)),sandField(b,at(b,3,2)));
- assert.notDeepEqual(sandField(a,at(a,3,2)),sandField(d,at(d,3,2)));
+ assert.deepEqual(sandLattice(a),sandLattice(b));
+ assert.notEqual(sandAt(a,sandLattice(a),3.3,2.4),sandAt(d,sandLattice(d),3.3,2.4));
  const ra=renderer(a),rb=renderer(b);
  assert.deepEqual(beach(ra,a,at(a,3,2)).polygons,beach(rb,b,at(b,3,2)).polygons);
 });
 
-test('the field is read through the fan, so an eight-corner water fan and a four-corner land fan agree along their edge',()=>{
- const c=shore(),r=renderer(c),water=at(c,3,0),land=at(c,3,1);
- const eight=sandFan(sandField(c,water),waterGeometry(r,water)),four=sandFan(sandField(c,land),meshFan(r,land));
- assert.equal(eight.corners.length,8);assert.equal(four.corners.length,4);
- for(const f of [0,.2,.5,.7,1]) {
-  const a=fanValueAt(eight,3+f,1),b=fanValueAt(four,3+f,1);
-  assert.ok(Math.abs(a-b)<1e-9,`edge value at ${3+f},1: ${a} vs ${b}`);
+test('the field is one smooth function of the map, and the contour follows it finer than the tile',()=>{
+ const c=shore({sandRows:[1,2]}),r=renderer(c),lattice=sandLattice(c);
+ // Continuous: tiny steps never jump, including across tile edges.
+ for(let x=1.5;x<6;x+=.05)for(const y of [2.5,3,3.5]) {
+  const step=Math.abs(sandAt(c,lattice,x+1e-4,y)-sandAt(c,lattice,x,y));
+  assert.ok(step<2e-3,`smooth at ${x},${y}: ${step}`);
  }
- // The two fields differ on their own side of the edge, so this is agreement
- // of the shared edge and not of identical inputs.
- assert.notEqual(fanValueAt(eight,3.5,.5),fanValueAt(four,3.5,1.5));
+ // A straight beach's contour runs near the tile edge between the last sand
+ // row and the grass, wandering a little, never near the row centres.
+ for(let x=1.5;x<6;x+=.25) {
+  assert.ok(sandAt(c,lattice,x,2.5)>SAND_THRESHOLD+.15,'the sand row is sand');
+  assert.ok(sandAt(c,lattice,x,3.5)<SAND_THRESHOLD-.15,'the grass row is grass');
+ }
+ // The polyline has vertices on the sub-grid, not only on tile edges and spokes.
+ const b=beach(r,c,at(c,3,3));
+ const fine=b.polygons.flat().filter(([x,y])=>{const fx=(x-3)*SUBDIVISIONS,fy=(y-3)*SUBDIVISIONS;return (Math.abs(fx-Math.round(fx))<1e-9 && fx%SUBDIVISIONS!==0) || (Math.abs(fy-Math.round(fy))<1e-9 && fy%SUBDIVISIONS!==0);});
+ assert.ok(fine.length>0,'sub-grid vertices');
 });
 
 // A recording canvas: every fill remembers its colour and how many points
