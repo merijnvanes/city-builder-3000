@@ -21,9 +21,9 @@
 # point v7 at different code. Only the Cloudflare step is handed
 # CLOUDFLARE_API_TOKEN, so a moved tag elsewhere does not receive it directly,
 # but every step in the deploy job shares one runner and an earlier one can
-# rewrite what a later one does. The token is account-scoped and can edit
-# Workers and Workers Routes on the zone that also serves mulletiq.com, so the
-# blast radius of that reaches well past this game.
+# rewrite what a later one does. Cloudflare has no way to scope a token to one
+# worker, so the token is account-wide and its blast radius reaches past this
+# game into everything else that account serves.
 #
 # `persist-credentials: false` on each checkout keeps the job's GITHUB_TOKEN out
 # of the repository's git config, where the install and build steps would be

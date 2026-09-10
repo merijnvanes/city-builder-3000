@@ -21,7 +21,7 @@ The game is served at <https://citybuilder.mulletiq.com> by Cloudflare Workers s
 and no `main`, because nothing here needs a server. Pushing to `main` deploys, through the
 `deploy` job in `.github/workflows/ci.yml`, which runs only after the tests in that file pass.
 It needs one repository secret, `CLOUDFLARE_API_TOKEN`, with the *Edit Cloudflare Workers*
-template on the account that owns the `mulletiq.com` zone.
+template on the Cloudflare account that owns this domain's zone.
 
 That worker publishes exactly one hostname. `workers_dev` and `preview_urls` are both off in
 `wrangler.jsonc`, because a second address serving the same game splits the saved cities:
