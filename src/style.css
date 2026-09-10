@@ -173,6 +173,7 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 #boot-failure h1 { margin: 0; font-size: 24px; }
 #boot-failure p { margin: 0; max-width: 60ch; color: #b9c6dd; font-family: ui-monospace, Menlo, monospace; font-size: 13px; overflow-wrap: anywhere; }
 #boot-failure a { padding: 10px 18px; color: #16232f; background: #d5dffd; border-radius: 8px; font-weight: 700; text-decoration: none; }
+#boot-failure pre { max-width: min(80ch, 100%); max-height: 40dvh; overflow: auto; margin: 0; padding: 12px; text-align: left; color: #9fb2c8; background: #0e1c25; border-radius: 8px; font-size: 11px; line-height: 1.5; user-select: all; }
 #title-screen.show { display: flex; }
 .title-card { width: min(470px, 100%); margin-block: auto; animation: welcome-in 700ms ease-out; }
 .title-logo { color: var(--text-bright); font-size: 15px; letter-spacing: 4px; font-weight: 850; margin-bottom: 40px; }

@@ -92,6 +92,19 @@ The bundle is still fetched — the module tag is in the HTML and nothing here c
 back — but `src/main.js` reads the mark `boot.js` leaves on the root element and stops before it
 does anything.
 
+**Reporting a problem**: the game menu and the crash dialog both offer **Copy diagnostics**,
+which puts a plain-text report on the clipboard — the exact build (the hashed bundle filename,
+so no version string has to be invented and kept true), the browser, the window and canvas, the
+state of the city, where saves were going and whether the last one landed, how much room the
+browser is giving the origin, the artwork cache, and the error with its name and stack when
+there is one. Nothing is sent anywhere: the game has no server and calls nothing, so the player
+decides what to share, and "it went wrong" stops being the whole bug report.
+
+Every part is gathered separately, because the report is written exactly when the game is least
+able to answer questions about itself: one source that throws costs its own section rather than
+the whole report. A refused clipboard shows the report in a dialog to select by hand, and a
+crash before the interface exists writes it into the page as text. See `src/diagnostics.js`.
+
 `boot.js` exists for the one failure the crash guard cannot reach: a bundle that never runs
 cannot report itself from inside the bundle. It notices a script or stylesheet that failed to
 download, and gives up after 25 seconds, so the screen stops claiming progress instead of

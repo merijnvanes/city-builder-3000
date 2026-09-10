@@ -13,6 +13,8 @@ import { createAgentAPI } from "./agent-api.js";
 import { saveStore, AUTOSAVE_SLOT, RESCUE_SLOT, slotLabel } from "./save-store.js";
 import { installCrashGuard } from "./crash-guard.js";
 import { registerServiceWorker } from "./service-worker-client.js";
+import { collectDiagnostics, formatDiagnostics, copyText } from "./diagnostics.js";
+import { civicSpriteStats } from "./building-art.js";
 
 // This browser cannot run the game, and public/boot.js has already said so on
 // the page, naming what is missing. Stopping here leaves that message up. The
@@ -61,7 +63,7 @@ installCrashGuard({
     try { text = sim.serialize(city); } catch { /* the city itself may be what broke */ }
     const stored = text ? rescue(text) : Promise.resolve({ ok: false });
     try {
-      if (ui?.showCrash) { ui.showCrash({ message, stack, source, text, stored }); return; }
+      if (ui?.showCrash) { ui.showCrash({ message, stack, source, text, stored, crash: { message, stack, source } }); return; }
     } catch { /* fall through to the plain message */ }
     bareCrashNotice(message, source, text);
   },
@@ -75,6 +77,54 @@ async function rescue(text) {
     if ((await saveStore.read(RESCUE_SLOT)).ok) return { ok: true, kept: true };
     return await saveStore.write(RESCUE_SLOT, text, (() => { try { return metaOf(city); } catch { return null; } })());
   } catch { return { ok: false }; }
+}
+
+// The report, gathered a piece at a time.
+//
+// It is written exactly when the game is least able to answer questions about
+// itself, so every source is tried on its own: one that throws costs its own
+// section rather than the whole report. sim.getStats in particular walks a city
+// that may be the thing that broke.
+async function diagnosticsReport(crash = null) {
+  const attempt = (read) => { try { return read(); } catch { return undefined; } };
+  try {
+    return formatDiagnostics(collectDiagnostics({
+      crash,
+      city: attempt(() => city),
+      stats: attempt(() => sim.getStats(city)),
+      renderer: attempt(() => renderer),
+      spriteStats: attempt(() => civicSpriteStats()),
+      canvas: attempt(() => canvas),
+      tool: attempt(() => tool),
+      speed: attempt(() => speed),
+      storage: lastStorageState,
+      quota: await storageQuota(),
+    }));
+  } catch (err) {
+    // Nothing about the game could be read at all. The browser and the error
+    // are still worth sending.
+    return [
+      "City Builder 3000 — diagnostics",
+      `Gathering the report failed: ${err.message}`,
+      `Agent: ${globalThis.navigator?.userAgent}`,
+      crash ? `Error: ${crash.message}\n${crash.stack || ""}` : "",
+    ].filter(Boolean).join("\n");
+  }
+}
+
+// How much room the browser is giving this origin, which is the first question
+// behind a save that would not write.
+async function storageQuota() {
+  try {
+    const estimate = await globalThis.navigator?.storage?.estimate?.();
+    if (!estimate) return null;
+    const mb = (bytes) => Math.round((bytes || 0) / 1048576);
+    return {
+      usage: mb(estimate.usage),
+      limit: mb(estimate.quota),
+      persisted: await globalThis.navigator?.storage?.persisted?.().catch(() => null) ?? null,
+    };
+  } catch { return null; }
 }
 
 // The interface never got built, or it is what broke. This owes the player two
@@ -93,6 +143,12 @@ function bareCrashNotice(message, source, text) {
       link.textContent = "Download this city";
       notice.append(link);
     }
+    // No interface to put a button in, so the report goes into the page as text
+    // the player can select. A failure this early is the one most worth having.
+    const details = document.createElement("pre");
+    details.textContent = "Gathering diagnostics…";
+    notice.append(details);
+    void diagnosticsReport({ message, source }).then((report) => { details.textContent = report; }, () => {});
     document.body.appendChild(notice);
   } catch { /* there is nothing left to tell the player with */ }
 }
@@ -103,6 +159,13 @@ let loading = false;
 // A slot whose city this build could not read. Its bytes are the player's only
 // copy until they download them, so nothing writes there by itself.
 let unreadableSlot = null;
+// What storage last did, kept for the diagnostics report. Whether saves are in
+// IndexedDB, in the localStorage fallback or refused outright is the first thing
+// worth knowing about a lost city, and so is whether the last write actually
+// landed: a report saying "indexeddb" while every save is being refused would
+// send somebody looking in the wrong place.
+let lastStorageState = { where: "not opened yet" };
+void saveStore.mode().then((where) => { lastStorageState = { ...lastStorageState, where }; }).catch(() => {});
 
 // One place that writes a city and says what happened. Every caller reports the
 // failure: a save that quietly did not happen is how a long game disappears.
@@ -145,6 +208,10 @@ async function storeCity(slot, { quiet = false, force = false } = {}) {
   if (loading) return { ok: false, message: "A city is being loaded." };
   if (slot === unreadableSlot && !force) return { ok: false, message: `${slotLabel(slot)} holds a city this version could not read. Download it first, or save over it from the save dialog.` };
   const result = await saveStore.write(slot, sim.serialize(city), metaOf(city));
+  lastStorageState = {
+    ...lastStorageState,
+    lastWrite: result.ok ? `${slotLabel(slot)}, ok` : `${slotLabel(slot)}, refused: ${result.message}`,
+  };
   if (!result.ok) ui?.notify(result.message);
   else if (!quiet) ui?.notify(slot === AUTOSAVE_SLOT ? "City autosaved." : `City saved to ${slotLabel(slot).toLowerCase()}.`);
   return result;
@@ -390,6 +457,14 @@ const actions = {
     const name = `${city.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase() || "city"}-${sim.dateOf(city.month, city.startYear).replace(" ", "-")}.json`;
     if (downloadText(name, sim.serialize(city))) ui.notify("City exported.");
     else ui.notify("Export failed in this browser.");
+  },
+  // Everything a bug report needs, onto the player's clipboard, decided by the
+  // player. There is nowhere else it could go: the game has no server and calls
+  // nothing, which is the point.
+  copyDiagnostics: async (crash = null) => {
+    const result = await copyText(await diagnosticsReport(crash));
+    ui?.reportCopy?.(result);
+    return result;
   },
   downloadRescue: (text) => {
     const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");

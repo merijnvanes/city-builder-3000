@@ -8,6 +8,10 @@ dialog::backdrop { background: #0b2229a8; backdrop-filter: blur(5px); }
 /* The technical half of a crash report: quieter than the sentence telling the
    player what to do, and readable enough to copy into a bug report. */
 .crash-detail { margin: 10px 0 0; color: var(--text-dim); font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; overflow-wrap: anywhere; }
+.crash-detail:empty { display: none; }
+/* The report itself, when the clipboard would not take it. Selectable, and big
+   enough to see that it is a report rather than a stray line of text. */
+#diagnostics-text { width: 100%; height: min(300px, 40dvh); margin-top: 10px; padding: 10px; color: var(--text); background: var(--panel-head); border: var(--edge); border-radius: 8px; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; resize: vertical; }
 .budget-tabs { display: flex; gap: 3px; padding: 10px 20px; border-bottom: var(--edge); overflow-x: auto; }
 .budget-tab { flex-shrink: 0; font-size: 11px; padding: 8px 12px; }
 .budget-tab[aria-selected="true"] { color: var(--beige); background: #e5c99116; border-color: #e5c99130; }

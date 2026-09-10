@@ -225,6 +225,9 @@ export function mountUI(actions) {
   soundBtn.textContent = 'Soundtrack';
   menuBody.appendChild(soundBtn);
   menuBody.appendChild(btn("btn", "How to play", "Help", () => helpDialog.showModal()));
+  // Reachable without a crash: most things worth reporting are not crashes, and
+  // "it went wrong" is not a bug report.
+  menuBody.appendChild(btn("btn", "Copy diagnostics", "Copy details about this browser and city for a bug report", () => actions.copyDiagnostics?.()));
   menuBody.addEventListener('click', e => { if (e.target.closest('button')) cityMenu.open = false; });
   document.addEventListener('pointerdown', e => { if (!cityMenu.contains(e.target)) cityMenu.open = false; });
 
@@ -639,6 +642,30 @@ export function mountUI(actions) {
   rescueDialog.append(rescueHeader, rescueBody, rescueFooter);
   app.appendChild(rescueDialog);
 
+  // ── Diagnostics the clipboard would not take ──────────────────────────────
+  // Told to select the text and copy it by hand, the player needs text to
+  // select. This is that text, in a dialog, already selected.
+  const diagDialog = el("dialog");
+  diagDialog.setAttribute("aria-label", "Diagnostics");
+  const diagHeader = el("div", "modal-header");
+  diagHeader.append(el("span", "modal-title", "Diagnostics"), btn("btn btn-icon", "✕", "Close", () => diagDialog.close()));
+  const diagBody = el("div", "modal-body");
+  const diagWhy = el("p", "dialog-note");
+  const diagField = document.createElement("textarea");
+  diagField.id = "diagnostics-text";
+  diagField.readOnly = true;
+  diagField.setAttribute("aria-label", "Diagnostics report");
+  diagBody.append(diagWhy, diagField);
+  const diagFooter = el("div", "modal-footer");
+  // A fresh click, which is a fresh gesture: the clipboard may take it now even
+  // though it refused the last one.
+  diagFooter.append(
+    btn("btn btn-teal", "Try copying again", "Copy the report to the clipboard", () => actions.copyDiagnostics?.()),
+    btn("btn", "Close", null, () => diagDialog.close()),
+  );
+  diagDialog.append(diagHeader, diagBody, diagFooter);
+  app.appendChild(diagDialog);
+
   // ── A newer version is ready ──────────────────────────────────────────────
   // The new code is downloaded and waiting. Taking it means reloading, which
   // ends the session, so the player decides when. Never a modal: nothing is
@@ -664,12 +691,19 @@ export function mountUI(actions) {
   const crashLead = el("p", "", "Something went wrong and the city is paused. Your city is still here. Download it, then reload the page and load it back.");
   const crashWhere = el("p", "crash-detail");
   const crashSaved = el("p", "crash-detail", "Saving a copy…");
-  crashBody.append(crashLead, crashWhere, crashSaved);
+  // The crash dialog is modal, and its backdrop covers the status strip the rest
+  // of the game reports through. Anything to say here has to be said here.
+  const crashCopied = el("p", "crash-detail");
+  crashBody.append(crashLead, crashWhere, crashSaved, crashCopied);
   const crashFooter = el("div", "modal-footer");
   let crashText = null;
   const crashDownload = btn("btn btn-teal", "Download this city", "Download the city as a file", () => { actions.downloadRescue?.(crashText); });
+  // The other half of a bug report. The city says what was lost; this says what
+  // the game was doing and which browser it was doing it in.
+  let crashDetails = null;
+  const crashCopy = btn("btn", "Copy diagnostics", "Copy the details of what went wrong", () => { actions.copyDiagnostics?.(crashDetails); });
   const crashReload = btn("btn", "Reload the game", "Reload the page", () => location.reload());
-  crashFooter.append(crashDownload, crashReload);
+  crashFooter.append(crashDownload, crashCopy, crashReload);
   // Escape must not dismiss this one. The render loop is dead behind it, and
   // these two buttons are the only way out of the page with the city in hand.
   crashDialog.addEventListener("cancel", (event) => event.preventDefault());
@@ -1557,6 +1591,21 @@ export function mountUI(actions) {
 
   // ── Public API ─────────────────────────────────────────────────────────────
   return {
+    // Where the result of a copy is reported. Inside the crash dialog when that
+    // is open, because a modal's backdrop covers the status strip and the
+    // player would otherwise get no answer at all.
+    reportCopy(result) {
+      if (crashDialog.open) { crashCopied.textContent = result.ok ? "Diagnostics copied to the clipboard." : result.message; return; }
+      if (!result.ok) {
+        diagWhy.textContent = `${result.message} Select the text below and copy it by hand.`;
+        diagField.value = result.text || "";
+        if (!diagDialog.open) diagDialog.showModal();
+        diagField.select();
+        return;
+      }
+      if (diagDialog.open) diagDialog.close();
+      showNotice("Diagnostics copied. Paste them into your bug report.");
+    },
     offerUpdate(accept) {
       updateNow.onclick = async () => {
         // The city is saved before the page goes. Say so, and do not let a
@@ -1567,8 +1616,9 @@ export function mountUI(actions) {
       };
       updateBar.hidden = false;
     },
-    showCrash({ message, source, text, stored }) {
+    showCrash({ message, source, text, stored, crash }) {
       crashText = text;
+      crashDetails = crash ?? { message, source };
       crashWhere.textContent = source ? `${message} (${source})` : message;
       crashDownload.disabled = !text;
       // Reloading while the copy is still being written can abort it. The

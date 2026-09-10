@@ -10,7 +10,11 @@ import assert from "node:assert/strict";
 
 const URL = process.env.CIVIC_TEST_URL || "http://127.0.0.1:4173";
 const browser = await chromium.launch({ channel: "chrome", headless: true });
-const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
+// The diagnostics button writes to the clipboard, and reading it back is the
+// only way to check what it wrote.
+await context.grantPermissions(["clipboard-read", "clipboard-write"]).catch(() => {});
+const page = await context.newPage();
 page.setDefaultTimeout(8000);
 
 const ready = async () => {
@@ -88,6 +92,20 @@ try {
   const file = await Promise.all([page.waitForEvent("download"), download.click()]).then(([d]) => d);
   assert.match(file.suggestedFilename(), /^city-unreadable-.*\.json$/, "the download is a city file");
 
+  // The other half of a bug report: what the game was doing, and where.
+  await page.getByRole("button", { name: "Copy the details of what went wrong", exact: true }).click();
+  // Gathering the report waits on the storage estimate, so the answer in the
+  // dialog is what says it has finished.
+  await page.waitForFunction(() => document.querySelector("dialog[open]")?.innerText.includes("copied to the clipboard"))
+    .catch(async () => { throw new Error(`the crash dialog never confirmed the copy: ${await dialog.innerText()}`); });
+  const copied = await page.evaluate(() => navigator.clipboard.readText());
+  assert.match(copied, /City Builder 3000 — diagnostics/, `diagnostics were not copied, got: ${copied.slice(0, 80)}`);
+  assert.match(copied, /Cannot read properties of undefined/, "the error is in the report");
+  assert.match(copied, /Name: /, "and so is the city");
+  assert.match(copied, /Agent: .*Chrome/, "and the browser");
+  assert.match(copied, /Storage/, "and where saves were going");
+  assert.match(copied, /Used: \d+ MB of \d+ MB/, "and how much room the browser is giving it");
+
   // It survives the reload the dialog tells the player to do.
   await reload.click();
   await ready();
@@ -113,6 +131,31 @@ try {
   await overTitle.waitFor({ state: "visible" });
   assert.match(await overTitle.innerText(), /broken before the game started/, "and the crash dialog is readable over it");
 
+  // A clipboard the browser will not give up shows the report instead, so the
+  // player is never told to select text that is not on screen.
+  const denied = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
+  const shy = await denied.newPage();
+  shy.on("pageerror", () => {});
+  await shy.addInitScript(() => {
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText: () => Promise.reject(new Error("not allowed")) }, configurable: true,
+    });
+  });
+  await shy.goto(URL);
+  await shy.waitForFunction(() => window.civic?.city?.tiles.length > 0);
+  const explore = shy.getByRole("button", { name: "Explore the sample town", exact: true });
+  if (await explore.isVisible().catch(() => false)) await explore.click();
+  await shy.locator(".city-menu summary").click();
+  await shy.getByRole("button", { name: "Copy details about this browser and city for a bug report", exact: true }).click();
+
+  const shown = shy.getByRole("dialog", { name: "Diagnostics", exact: true });
+  await shown.waitFor({ state: "visible" })
+    .catch(() => { throw new Error("a refused clipboard left the player with nothing to copy"); });
+  assert.match(await shy.locator("#diagnostics-text").inputValue(), /City Builder 3000 — diagnostics/,
+    "the report is on screen to select");
+  assert.match(await shown.innerText(), /copy it by hand/i, "and the player is told why");
+  await denied.close();
+
   // A sprite that will not load is not a crash.
   await page.goto(URL);
   await ready();
@@ -126,7 +169,7 @@ try {
   assert.equal(await page.getByRole("dialog", { name: "The game stopped", exact: true }).isVisible(), false,
     "artwork that will not decode does not claim the game has stopped");
 
-  console.log("crash.mjs: a broken render loop is reported over anything on screen, the clock stops, the city is rescued once and downloadable, and it survives the reload");
+  console.log("crash.mjs: a broken render loop is reported over anything on screen, the clock stops, the city is rescued once, downloadable with its diagnostics, and it survives the reload");
 } finally {
   await browser.close();
 }
