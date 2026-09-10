@@ -45,6 +45,13 @@ may match two rules that set the same header, because both hosts append rather t
 `wrangler` is pinned below the latest release. A global `min-release-age=7` npm policy refuses
 packages published in the last week, so bumping it fails the install until the version ages.
 
+**GitHub Actions are pinned to commit SHAs, not tags.** Do not "tidy" them back to `@v7`; the
+first step of the `test` job fails the build if you do. A tag can be moved by whoever owns the
+action, and that code shares a runner with the deploy token. When bumping one, dereference
+annotated tags to a real commit and pin only a release whose `action.yml` says `using: node24`.
+`.github/workflows/ci.yml` carries the commands, the Node 20 removal date, and the one action
+the annotated-tag trap bites on.
+
 ## Things that are failing on purpose
 
 `test:working-set`, `test:transport` and `test:art-production` are left out of the nightly

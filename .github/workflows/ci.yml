@@ -13,6 +13,35 @@
 # Split into its own workflow it would have to either re-run this whole suite or
 # race it, and racing it means a push that breaks the simulation reaches
 # citybuilder.mulletiq.com before anything notices.
+#
+# Every action is pinned to a commit SHA, with its version in the comment beside
+# it, and the first step of `test` fails the build if one ever goes back to a tag.
+#
+# A tag is a moving reference: whoever can push to the action's repository can
+# point v7 at different code. Only the Cloudflare step is handed
+# CLOUDFLARE_API_TOKEN, so a moved tag elsewhere does not receive it directly,
+# but every step in the deploy job shares one runner and an earlier one can
+# rewrite what a later one does. The token is account-scoped and can edit
+# Workers and Workers Routes on the zone that also serves mulletiq.com, so the
+# blast radius of that reaches well past this game.
+#
+# `persist-credentials: false` on each checkout keeps the job's GITHUB_TOKEN out
+# of the repository's git config, where the install and build steps would be
+# able to read it. Nothing here pushes, so nothing needs it.
+#
+# Two things to get right when bumping one.
+#
+# Resolve the tag to a commit rather than reading it off the tag ref.
+# `gh api repos/<owner>/<repo>/git/ref/tags/v7` answers with a tag object for an
+# annotated tag, and that object's SHA is not a commit: pnpm/action-setup is
+# annotated, and pinning its tag SHA fails the run. Dereference it with
+# `gh api repos/<owner>/<repo>/git/tags/<sha> --jq '.object.sha'`, which is the
+# commit, and check it with `gh api repos/<owner>/<repo>/commits/<sha>`.
+#
+# Pin a release whose `action.yml` says `using: node24`. GitHub removes the
+# Node 20 runtime from the runners on 23 September 2026, and an action still
+# declaring node20 has no runtime to start on. Pinning freezes that choice,
+# which a floating major tag would have quietly moved for us.
 name: CI
 
 on:
@@ -37,15 +66,36 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      - uses: pnpm/action-setup@v4
+      # First, and before anything is installed or run. The comment at the top of
+      # this file is the reasoning; a comment alone does not survive somebody
+      # tidying a SHA back to a readable tag, and the tidied version looks like an
+      # improvement in a diff. Local actions (./path) are exempt, since they are
+      # this repository's own code and already move with the commit.
+      - name: Actions are pinned to commit SHAs
+        run: |
+          loose=$(grep -rhE '^[[:space:]]*-?[[:space:]]*uses:' .github/workflows/ \
+            | sed 's/.*uses:[[:space:]]*//' \
+            | grep -v '^\./' \
+            | grep -vE '@[0-9a-f]{40}([[:space:]]|$)' || true)
+          if [ -n "$loose" ]; then
+            echo "not pinned to a commit SHA:"
+            echo "$loose"
+            echo "see the note at the top of .github/workflows/ci.yml"
+            exit 1
+          fi
+          echo "every action is pinned"
+
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
         with:
           # Pinned, not floating on 11.x: an install is not the place to find out
           # a patch release changed its mind about something.
           version: 11.8.0
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 22
           cache: pnpm
@@ -72,7 +122,7 @@ jobs:
 
       # No browser, half a second, and it guards the sprite manifest the whole
       # game reads. It belongs where a pull request can see it fail.
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
 
@@ -102,13 +152,15 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
         with:
           version: 11.8.0
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 22
           cache: pnpm
@@ -126,7 +178,7 @@ jobs:
       # this needs. wrangler is a devDependency here, which pins the version the
       # deploy runs on instead of letting the action pick one.
       - name: Deploy to citybuilder.mulletiq.com
-        uses: cloudflare/wrangler-action@v4
+        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           packageManager: pnpm
