@@ -228,6 +228,8 @@ export function mountUI(actions) {
   // Reachable without a crash: most things worth reporting are not crashes, and
   // "it went wrong" is not a bug report.
   menuBody.appendChild(btn("btn", "Copy diagnostics", "Copy details about this browser and city for a bug report", () => actions.copyDiagnostics?.()));
+  // Reachable before anything goes wrong, which is when it is worth reading.
+  menuBody.appendChild(btn("btn", "Where your city is kept", "Where your city is kept", () => openPrivacy()));
   menuBody.addEventListener('click', e => { if (e.target.closest('button')) cityMenu.open = false; });
   document.addEventListener('pointerdown', e => { if (!cityMenu.contains(e.target)) cityMenu.open = false; });
 
@@ -1500,12 +1502,61 @@ export function mountUI(actions) {
   if (toolRows.length) helpSection("Tool Shortcuts", toolRows);
 
   const hlpFooter = el("div", "modal-footer");
+  hlpFooter.appendChild(btn("btn", "Where your city is kept", "Where your city is kept", () => { helpDialog.close(); openPrivacy(); }));
   hlpFooter.appendChild(btn("btn btn-teal", "Got it", null, () => helpDialog.close()));
   helpDialog.appendChild(hlpFooter);
 
   helpDialog.addEventListener("click", (e) => {
     if (e.target === helpDialog) helpDialog.close();
   });
+
+  // ── Where your city is kept ───────────────────────────────────────────────
+  // Short, and honest about the part that can bite: nothing is sent anywhere,
+  // which also means nothing is backed up anywhere. A browser is allowed to
+  // throw away what a site stored, and a player who has not been told that
+  // finds out by losing a city.
+  const privacyDialog = el("dialog");
+  privacyDialog.setAttribute("aria-label", "Where your city is kept");
+  const privHdr = el("div", "modal-header");
+  privHdr.append(el("span", "modal-title", "Where your city is kept"), btn("btn btn-icon", "✕", "Close", () => privacyDialog.close()));
+  const privBody = el("div", "modal-body");
+  // Filled when the dialog opens, from what storage is actually doing. A note
+  // that says "your cities are stored here" while the browser is refusing to
+  // store anything is worse than no note.
+  const privWhere = el("p", "dialog-note spaced");
+  privBody.append(
+    el("p", "dialog-lead", "Your cities are kept in this browser, on this device, and nowhere else. "
+      + "There is no account and no server: the game never sends your city, or anything about you, "
+      + "to anybody. Nothing is uploaded, and there is no copy of your city anywhere but here."),
+    privWhere,
+    el("p", "dialog-note spaced", "That cuts both ways, because it also means nothing is backed up. "
+      + "A browser is allowed to clear what a site has stored — to free disk space, or when you clear "
+      + "site data — and your cities go with it. In a private window they last only as long as the "
+      + "window does. The game asks the browser to keep them the first time you save, where the "
+      + "browser offers that, but it is a request and not a guarantee. Playing in another browser, or "
+      + "on another device, starts again."),
+    el("p", "dialog-note spaced", "Nothing here is locked: anyone using this device and this browser "
+      + "can open your city. Export to a file for anything you would be sorry to lose — Saves & files, "
+      + "then Export to file. That copy is yours, on your disk, and imports back at any time."),
+    el("p", "dialog-note", "Copy diagnostics tries to put a description of this browser and city on "
+      + "your clipboard, and shows it to you if the browser refuses. It happens only when you press "
+      + "it, and it goes nowhere else: it is for you to paste into a bug report."),
+  );
+  const privFooter = el("div", "modal-footer");
+  privFooter.append(
+    btn("btn", "Saves & files", "Save slots and files", () => { privacyDialog.close(); buildFiles(); filesDialog.showModal(); }),
+    btn("btn btn-teal", "Close", null, () => privacyDialog.close()),
+  );
+  privacyDialog.append(privHdr, privBody, privFooter);
+  privacyDialog.addEventListener("click", (e) => { if (e.target === privacyDialog) privacyDialog.close(); });
+  app.appendChild(privacyDialog);
+
+  async function openPrivacy() {
+    privWhere.textContent = "Checking where this browser is keeping them…";
+    privacyDialog.showModal();
+    const where = await actions.storageState?.();
+    privWhere.textContent = where || "This browser has not said where it is keeping them.";
+  }
 
   // ── Confirm new city dialog ────────────────────────────────────────────────
   const confirmDialog = document.createElement("dialog");

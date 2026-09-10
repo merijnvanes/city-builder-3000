@@ -461,6 +461,18 @@ const actions = {
   // Everything a bug report needs, onto the player's clipboard, decided by the
   // player. There is nowhere else it could go: the game has no server and calls
   // nothing, which is the point.
+  // What the storage note says out loud, taken from what storage is actually
+  // doing rather than from what the game hopes it is doing.
+  storageState: async () => {
+    const where = await saveStore.mode().catch(() => "none");
+    if (where === "indexeddb") return "Right now: this browser is keeping them in its own database, which is the usual case and has room for large cities.";
+    if (where === "localstorage") {
+      return "Right now: this browser will not give the game a database, so cities are going into simpler storage that holds about five megabytes. "
+        + "A large city may not fit, and the game will say so rather than lose it. Export anything you want to keep.";
+    }
+    return "Right now: this browser is not letting the game store anything at all, so nothing you build here will survive closing the tab. "
+      + "Export to a file to keep a city.";
+  },
   copyDiagnostics: async (crash = null) => {
     const result = await copyText(await diagnosticsReport(crash));
     ui?.reportCopy?.(result);
