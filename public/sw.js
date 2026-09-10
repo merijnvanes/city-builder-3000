@@ -25,7 +25,11 @@
 // no version, because a hashed sprite is correct forever and throwing 90 MB
 // away on a worker update would be a cruel way to save nothing.
 
-const VERSION = "v1";
+// Raised whenever a cached shell must not be served again. A shell from before
+// the browser check in boot.js would let an old browser reach the game offline
+// and meet the blank canvas the check exists to prevent, so v1 is retired. The
+// sprite cache below is deliberately not versioned and survives this.
+const VERSION = "v2";
 const SHELL = `city-shell-${VERSION}`;
 const SPRITES = "city-sprites";
 const KEEP = new Set([SHELL, SPRITES]);

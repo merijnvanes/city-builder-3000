@@ -46,6 +46,9 @@
 #booting small { color: #9fb2c8; max-width: 46ch; }
 /* The game never started. boot.js says so; this stops it looking like progress. */
 #booting[data-failed] small { color: #ffb4a2; }
+/* This browser cannot run the game. Not an error to fix, so it reads as
+   information rather than a failure. */
+#booting[data-unsupported] small { color: #ffe0a8; }
 @keyframes booting-sweep {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(330%); }

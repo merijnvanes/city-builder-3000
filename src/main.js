@@ -14,6 +14,13 @@ import { saveStore, AUTOSAVE_SLOT, RESCUE_SLOT, slotLabel } from "./save-store.j
 import { installCrashGuard } from "./crash-guard.js";
 import { registerServiceWorker } from "./service-worker-client.js";
 
+// This browser cannot run the game, and public/boot.js has already said so on
+// the page, naming what is missing. Stopping here leaves that message up. The
+// alternative is a canvas that never draws and a stack trace nobody can act on.
+if (document.documentElement.hasAttribute("data-unsupported")) {
+  throw new Error("City Builder 3000 needs a newer browser; see the message on the page.");
+}
+
 const MONTH_MS = 2500;
 
 // The loading screen in index.html goes when there is a city behind it, not when

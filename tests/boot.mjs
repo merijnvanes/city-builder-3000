@@ -108,7 +108,64 @@ try {
   assert.doesNotMatch(said, /Laying out/, "and stops claiming progress");
   await context.close();
 
-  console.log(`boot.mjs: throttled, something on screen at ${slow.paint.toFixed(0)} ms and the game at ${slow.gone.toFixed(0)} ms, covering ${covered.toFixed(0)} ms of waiting (unthrottled the game takes ${fast.gone.toFixed(0)} ms); a bundle that never arrives is reported`);
+  // A browser that cannot run the game is told so, rather than being left with
+  // a canvas that never draws. Each capability is removed on its own, because a
+  // check that only fires when several are missing at once would pass here and
+  // fail on a real old browser.
+  for (const [name, remove] of [
+    ["WeakRef", () => { delete window.WeakRef; }],
+    ["structuredClone", () => { delete window.structuredClone; }],
+    ["ResizeObserver", () => { delete window.ResizeObserver; }],
+    ["Object.hasOwn", () => { delete Object.hasOwn; }],
+    ["String.replaceAll", () => { delete String.prototype.replaceAll; }],
+    ["Array.at", () => { delete Array.prototype.at; }],
+    ["dialog.showModal", () => { delete HTMLDialogElement.prototype.showModal; }],
+    ["dialog.showModal", () => { delete window.HTMLDialogElement; }],
+    ["CSS.supports", () => { delete window.CSS; }],
+    ["CSS.supports", () => { delete CSS.supports; }],
+    ["CSS :has()", () => {
+      const real = CSS.supports.bind(CSS);
+      CSS.supports = (...args) => (String(args[0]).includes(":has") ? false : real(...args));
+    }],
+    ["CSS dvh units", () => {
+      const real = CSS.supports.bind(CSS);
+      CSS.supports = (...args) => (args[0] === "height" && args[1] === "100dvh" ? false : real(...args));
+    }],
+  ]) {
+    const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    const page = await context.newPage();
+    page.on("pageerror", () => {});
+    await page.addInitScript(remove);
+    await page.goto(`${origin}/`);
+
+    const refused = page.locator("#booting[data-unsupported]");
+    await refused.waitFor({ state: "visible", timeout: 20000 })
+      .catch(() => { throw new Error(`a browser without ${name} was not turned away`); });
+    const said = await refused.innerText();
+    assert.match(said, /too old/i, `${name}: ${said}`);
+    assert.match(said, /Chrome or Edge 108, Firefox 121, Safari 16/, `${name} names the versions: ${said}`);
+    // The message has to name the capability that is actually missing. Without
+    // this, one check firing for the wrong reason would pass every case here
+    // and fail on a real browser.
+    assert.ok(said.includes(name), `${name} was removed but the page blamed: ${said}`);
+    assert.equal(await page.evaluate(() => !!window.civic), false,
+      `${name}: the game started anyway, which is what the check exists to prevent`);
+    await context.close();
+  }
+
+  // The refusal cannot wait for the bundle: a browser too old to run the game is
+  // also a browser that may be on a connection where the bundle never arrives.
+  const stalled = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const stuck = await stalled.newPage();
+  stuck.on("pageerror", () => {});
+  await stuck.addInitScript(() => { delete window.WeakRef; });
+  await stuck.route("**/assets/index-*.js", () => { /* never answered */ });
+  await stuck.goto(`${origin}/`, { waitUntil: "commit" });
+  await stuck.locator("#booting[data-unsupported]").waitFor({ state: "visible", timeout: 20000 })
+    .catch(() => { throw new Error("the refusal waited for a bundle that never came"); });
+  await stalled.close();
+
+  console.log(`boot.mjs: throttled, something on screen at ${slow.paint.toFixed(0)} ms and the game at ${slow.gone.toFixed(0)} ms, covering ${covered.toFixed(0)} ms of waiting (unthrottled the game takes ${fast.gone.toFixed(0)} ms); a bundle that never arrives is reported, twelve ways of missing a capability each turn the browser away, and the refusal does not wait for the bundle`);
 } finally {
   await browser.close();
   server.close();

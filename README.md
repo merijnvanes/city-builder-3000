@@ -80,6 +80,18 @@ window that used to be blank. The markup is static in `index.html`; its styleshe
 (`public/boot.css`) and `public/boot.js` are linked separately so both are in effect before the
 bundle has run, and `main.js` removes the screen on the first rendered frame.
 
+**Browsers**: Chrome and Edge 108, Firefox 121, Safari 16, or newer. Chrome and Safari are set
+by the JavaScript the game uses directly — `WeakRef`, `structuredClone`, `dialog.showModal`,
+`ResizeObserver`, `Object.hasOwn`, `String.replaceAll`, `Array.at` — and by `build.target` in
+`vite.config.js`, which is pinned rather than left to Vite's default so the floor is a decision
+and not something a Vite upgrade moves. Firefox is set by CSS `:has()`, which hides panels that
+would otherwise sit on top of each other; without it the interface is unusable rather than
+slightly wrong. `public/boot.js` checks each of those before the bundle runs and, when one is
+missing, names it on the page and stops the game rather than leaving a canvas that never draws.
+The bundle is still fetched — the module tag is in the HTML and nothing here can call it
+back — but `src/main.js` reads the mark `boot.js` leaves on the root element and stops before it
+does anything.
+
 `boot.js` exists for the one failure the crash guard cannot reach: a bundle that never runs
 cannot report itself from inside the bundle. It notices a script or stylesheet that failed to
 download, and gives up after 25 seconds, so the screen stops claiming progress instead of
