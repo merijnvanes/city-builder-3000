@@ -1,0 +1,58 @@
+{
+	// The deploy target: citybuilder.mulletiq.com, served by Cloudflare Workers
+	// static assets straight out of `dist/`.
+	//
+	// There is no `main`. A Worker may carry assets and no script at all, and
+	// this one has nothing to do on the server: every file in the build is
+	// static and `public/_headers` already says how each one is to be cached and
+	// secured. Adding an entrypoint would put a script in front of 5,600 files
+	// that only ever hands them straight back.
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "city-builder-3000",
+	"account_id": "6a29f8038d1b7996dab643e4118d207a",
+
+	// Pinned rather than floating, for the same reason vite.config.js spells out
+	// its browser targets: a date that moves on its own changes the runtime
+	// under a deploy that was not otherwise touched.
+	"compatibility_date": "2026-09-10",
+
+	"assets": {
+		"directory": "./dist"
+
+		// html_handling is left at its default, "auto-trailing-slash". That is
+		// what public/_headers was written against: it carries a rule for
+		// /civic-gallery and another for /civic-gallery.html, which is exactly
+		// the pair this setting serves. Changing it would leave one of them
+		// matching nothing.
+		//
+		// not_found_handling is left at its default too, which is a plain 404.
+		// The game is one page and does no client-side routing, so the
+		// single-page-app rewrite would turn every typo into a copy of the game
+		// at a new address.
+	},
+
+	// Attached as a Custom Domain, so Cloudflare creates and owns the DNS record
+	// for citybuilder.mulletiq.com and issues its certificate. The zone is
+	// already in this account, which is what makes that possible.
+	"routes": [
+		{
+			"pattern": "citybuilder.mulletiq.com",
+			"custom_domain": true
+		}
+	],
+
+	// One public hostname, deliberately.
+	//
+	// Both of these default to on, and each one publishes a second address that
+	// serves the identical game: city-builder-3000.<subdomain>.workers.dev, and
+	// a per-version preview URL beside it. Two live copies of a page is a
+	// duplicate Google has to pick between, and a link someone shares from the
+	// wrong one points away from mulletiq.com for good.
+	//
+	// The saved cities are the sharper reason. src/save-store.js keeps them in
+	// IndexedDB, which is scoped to the origin, so a player who arrives once on
+	// workers.dev and later on citybuilder.mulletiq.com finds an empty map and
+	// no way back to the city they built.
+	"workers_dev": false,
+	"preview_urls": false
+}

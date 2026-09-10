@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
+    "deploy": "vite build && wrangler deploy",
     "test:deploy": "vite build && node --test tests/deploy-headers.test.js && node tests/deploy-preview.mjs && node tests/offline.mjs && node tests/boot.mjs",
     "preview": "vite preview --host 127.0.0.1",
     "test": "node --test tests/*.test.js",
@@ -51,6 +52,7 @@
   },
   "devDependencies": {
     "vite": "^7.0.0",
-    "@playwright/test": "^1.55.0"
+    "@playwright/test": "^1.55.0",
+    "wrangler": "^4.128.0"
   }
 }

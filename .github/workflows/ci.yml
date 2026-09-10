@@ -6,6 +6,13 @@
 # minutes, and they answer a different question — how the game looks and
 # behaves — which is worth knowing every night rather than every commit. See
 # nightly.yml.
+#
+# The deploy lives here too, as a second job gated on the first. It is the same
+# question asked once: the tests below decide whether main is good, and there is
+# no version of "good enough to keep" that differs from "good enough to serve".
+# Split into its own workflow it would have to either re-run this whole suite or
+# race it, and racing it means a push that breaks the simulation reaches
+# citybuilder.mulletiq.com before anything notices.
 name: CI
 
 on:
@@ -73,3 +80,54 @@ jobs:
 
       - name: Art contract
         run: pnpm test:art-contract
+
+  # Only main, only a real push, and only behind a green `test`. A pull request
+  # reaches this job with the ref of a branch nobody has merged, so the event is
+  # checked as well as the ref.
+  deploy:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    # One deploy at a time, and never cancelled halfway. wrangler uploads the
+    # 5,588 files of artwork before it moves the live version onto them, so a
+    # run killed in the middle leaves the upload half done and the next one
+    # repeats the whole thing.
+    concurrency:
+      group: deploy-citybuilder
+      cancel-in-progress: false
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.8.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Built again rather than carried from `test` as an artifact. The build is
+      # two seconds and reproducible; uploading and downloading 91 MB of sprites
+      # to save it would cost more than it saves, and it would put a copy of the
+      # artwork through a second system that can go wrong on its own.
+      - name: Build
+        run: pnpm build
+
+      # The account is named in wrangler.jsonc, so the token is the only secret
+      # this needs. wrangler is a devDependency here, which pins the version the
+      # deploy runs on instead of letting the action pick one.
+      - name: Deploy to citybuilder.mulletiq.com
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          packageManager: pnpm
+          command: deploy

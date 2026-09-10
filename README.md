@@ -13,13 +13,26 @@ pnpm dev           # dev server at http://127.0.0.1:5173
 
 ```bash
 pnpm build         # outputs to dist/
+pnpm deploy        # builds, then ships it to citybuilder.mulletiq.com
 ```
 
-`dist/` is a self-contained static site. Drop it on any static host.
+The game is served at <https://citybuilder.mulletiq.com> by Cloudflare Workers static assets.
+`wrangler.jsonc` holds the whole deployment: `dist/` as the asset directory, the custom domain,
+and no `main`, because nothing here needs a server. Pushing to `main` deploys, through the
+`deploy` job in `.github/workflows/ci.yml`, which runs only after the tests in that file pass.
+It needs one repository secret, `CLOUDFLARE_API_TOKEN`, with the *Edit Cloudflare Workers*
+template on the account that owns the `mulletiq.com` zone.
 
-`public/_headers` travels with it and is read from the build root by Cloudflare Pages and by
-Netlify. Any other host needs the same two rules expressed its own way, and they are not
-optional. Everything under `/assets` carries a content hash in its name, from Vite for the code
+That worker publishes exactly one hostname. `workers_dev` and `preview_urls` are both off in
+`wrangler.jsonc`, because a second address serving the same game splits the saved cities:
+`src/save-store.js` keeps them in IndexedDB, which is scoped to the origin, so a player who
+arrives on the other address finds an empty map.
+
+`dist/` is otherwise a self-contained static site and will run on any static host.
+
+`public/_headers` travels with it and is read from the build root by Cloudflare Workers, by
+Cloudflare Pages and by Netlify. Any other host needs the same two rules expressed its own way,
+and they are not optional. Everything under `/assets` carries a content hash in its name, from Vite for the code
 and from `tools/civic_art/package.py` for the artwork, so its URL changes whenever its bytes do
 and it is cached for a year. The HTML keeps a fixed URL and names those hashed files, so it is
 revalidated on every load. Cache the HTML instead and a returning player gets a page pointing at

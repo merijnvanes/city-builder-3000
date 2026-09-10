@@ -1,2 +1,7 @@
 allowBuilds:
   esbuild: true
+  # wrangler's runtime. Its install script links the platform binary, and pnpm 11
+  # fails the whole install over an unapproved one rather than skipping it.
+  # `wrangler deploy` only uploads and never starts the runtime, so this is here
+  # for `wrangler dev` and to keep `pnpm install` from exiting non-zero.
+  workerd: true
