@@ -1,6 +1,13 @@
 {
   "name": "city-builder-3000",
   "version": "1.0.0",
+  "description": "An isometric city builder for the browser. Vanilla JS, Canvas 2D, no runtime dependencies, original artwork.",
+  "homepage": "https://citybuilder.mulletiq.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/merijnvanes/city-builder-3000.git"
+  },
+  "license": "MIT",
   "type": "module",
   "private": true,
   "scripts": {

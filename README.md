@@ -342,7 +342,8 @@ budget, welcome and mobile screenshots in `artifacts/`.
 - `src/service-worker-client.js`, `public/sw.js` — offline play, and a new build that waits to be accepted
 - `src/main.js` — game loop, saves, wiring
 
-City Builder 3000 is an original work. No copyrighted assets are used.
+City Builder 3000 is an original work. No copyrighted assets are used. See
+[License](#license).
 
 Ground shadows (trees, lots, aircraft and UFOs) and streetlight glow are clipped to the map's
 terrain boundary in every camera orientation. Raised artwork can overhang it.
@@ -504,3 +505,13 @@ light. Shadow volumes use simplified bodies and exact artwork alpha clipping,
 with cached intersections, bounded scratch canvases and a shared 16 MiB
 composite atlas for smooth panning. See [SHADOWS.md](SHADOWS.md)
 for the research, rendering contract, fidelity limits and validation.
+
+## License
+
+MIT. See [LICENSE](LICENSE). That covers the code and the artwork alike: the sprites under
+`public/assets/civic` are rendered from original Blender models, so there is nothing in them
+that somebody else owns.
+
+One exception, and it is not mine to relicense. The bundled typeface is Nunito Sans, under the
+SIL Open Font License, and `public/fonts/OFL.txt` travels with it in the build. Keep that file
+next to the font if you redistribute it.
