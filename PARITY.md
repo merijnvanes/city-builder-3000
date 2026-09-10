@@ -1284,3 +1284,14 @@ polyline follows the curve, and neighbours sample identical points along a
 shared edge. The polygons are cached per tile against the terrain mesh and
 the water geometry, so camera moves do not recompute them; a full ground
 rebuild of a 64-tile lake map costs about five milliseconds more than before.
+
+Blending between tile centres still bowed the line into every step of a
+diagonal staircase of sand tiles, a regular zigzag with a one-tile period.
+The lattice is now read through a quadratic B-spline over the three nearest
+tile centres on each axis, which crosses a step with one gentle S, so a
+staircase reads as a straight diagonal beach; the sub-grid is six per tile.
+The spline still reaches exactly one half on the edge between a sand tile
+and a grass tile, so a straight beach's line sits where it always has. A
+sand tile with no sand or beach shore beside it, which the spline alone
+would flatten below one half, carries a larger lattice value so it still
+shows as a patch.

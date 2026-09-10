@@ -19,7 +19,7 @@ import { tileAt } from './sim/grid.js';
 // along their shared edge, so the contour is continuous across the map, and a
 // change of terrain anywhere only moves the line within the tiles around it.
 export const SAND_THRESHOLD = 0.5;
-export const SUBDIVISIONS = 4;
+export const SUBDIVISIONS = 6;
 const WANDER = 0.42;
 const CARDINAL = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 const EPS = 1e-9;
@@ -30,22 +30,42 @@ function tileValue(city, t) {
   return CARDINAL.some(([dx, dy]) => tileAt(city, t.x + dx, t.y + dy)?.terrain === 'sand') ? 1 : 0;
 }
 
-// The sand value of every tile, indexed like city.tiles.
+// The sand value of every tile, indexed like city.tiles. A sand tile with no
+// sand or beach shore beside it (a drained one-tile pond) speaks louder, so
+// the spline's peak at it still clears one half and it shows as a patch.
+const LONE = 1.8;
 export function sandLattice(city) {
-  return Float32Array.from(city.tiles, t => tileValue(city, t));
+  const values = Float32Array.from(city.tiles, t => tileValue(city, t));
+  city.tiles.forEach((t, i) => {
+    if (t.terrain !== 'sand') return;
+    if (!CARDINAL.some(([dx, dy]) => { const n = tileAt(city, t.x + dx, t.y + dy); return n && values[n.y * city.size + n.x] === 1; })) values[i] = LONE;
+  });
+  return values;
 }
 
-const smooth = t => t * t * (3 - 2 * t);
+// Quadratic B-spline weights of the three tile centres nearest a coordinate:
+// the nearest centre and the ones either side. The spline blends across a
+// step in the lattice with a gentle S rather than bowing into every tile, so
+// a staircase of sand tiles reads as one straight diagonal beach. It reaches
+// exactly half way at the edge between a sand tile and a grass tile, the
+// same place a straight beach's contour has always run, and a lone sand
+// tile still peaks above one half at its centre.
+function weights(f) {
+  const i = Math.floor(f + 0.5), d = f - i;
+  return [i - 1, (0.5 - d) ** 2 / 2, i, 0.75 - d * d, i + 1, (0.5 + d) ** 2 / 2];
+}
 
 // The sand field at map point (x, y). Beyond the map edge the nearest tile's
 // value continues, so a beach can run off the edge without thinning.
 export function sandAt(city, lattice, x, y) {
-  const n = city.size, fx = x - 0.5, fy = y - 0.5;
-  const ix = Math.floor(fx), iy = Math.floor(fy), u = smooth(fx - ix), v = smooth(fy - iy);
+  const n = city.size, wx = weights(x - 0.5), wy = weights(y - 0.5);
   const clamp = i => Math.max(0, Math.min(n - 1, i));
-  const at = (i, j) => lattice[clamp(j) * n + clamp(i)];
-  const a = at(ix, iy), b = at(ix + 1, iy), c = at(ix, iy + 1), d = at(ix + 1, iy + 1);
-  return (a + (b - a) * u) * (1 - v) + (c + (d - c) * u) * v + (noise(x, y, 2.3, city.seed + 77) - 0.5) * WANDER;
+  let sum = 0;
+  for (let j = 0; j < 6; j += 2) {
+    const row = clamp(wy[j]) * n, weight = wy[j + 1];
+    for (let i = 0; i < 6; i += 2) sum += lattice[row + clamp(wx[i])] * weight * wx[i + 1];
+  }
+  return sum + (noise(x, y, 2.3, city.seed + 77) - 0.5) * WANDER;
 }
 
 // True when this tile can carry any sand at all: only such tiles need the
