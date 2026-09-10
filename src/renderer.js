@@ -21,7 +21,7 @@ import {hitUncachedArchitecture} from './architecture-cache.js';
 import {drawZoneMarker,heightOf,random} from './building-art.js';
 import {BUILDINGS,PORT_TYPES,ROAD_TYPES,ZONED_TYPES} from './sim/catalog.js';
 import {drawTree} from './foliage.js';
-import {terrainPalette,drawGroundTile,drawWaterTerrain} from './terrain-art.js';
+import {drawTerrainSurface} from './terrain-art.js';
 import {drawStreet,hasStreetLamp,drawStreetLamp,tunnelPortal,drawTunnelMouth} from './street-art.js';
 
 // Isometric Canvas 2D renderer. The static picture is two cached layers, see
@@ -368,14 +368,10 @@ export class CityRenderer {
   paintTerrain(t,city) {
     const {x,y}=t,water=t.terrain==='water';
     const coast=waterGeometry(this,t);
-    let color=terrainPalette(city).ground[y*city.size+x];
-    if(!water) {
-      const k=this.slopeShade(x,y);
-      if(k!==1)color=shade(color,k);
-      else if(t.elev>=5)color=shade(color,1+(t.elev-4)*0.03);
-    }
-    if(coast)drawWaterTerrain(this,t,city,water?null:color);
-    else drawGroundTile(this,t,city,color);
+    // Land is lit by its slope, or brightened a little on high ground.
+    let k=this.slopeShade(x,y);
+    if(k===1 && !water && t.elev>=5)k=1+(t.elev-4)*0.03;
+    drawTerrainSurface(this,t,city,k);
     // A graded site's pad covers this tile; see scene-items.js.
     if(t.lot && !water)return;
     if(!coast && !water && t.type==='empty' && !t.trees)for(let i=0;i<3;i++){const a=random(x,y,i+1),b=random(y,x,i+7);this.flat(x+a*0.85,y+b*0.85,0.1,0.045,0.05,'#a8ae642b');}

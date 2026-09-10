@@ -1249,5 +1249,27 @@ the Sims rebuild them.
 Sand tiles were painted as squares. The beach is now a contour: each tile's
 sand value (water beside a beach counts as sand) is sampled at the corners and
 centre with a little noise, and the sand region is where the field passes one
-half, clipped to the dry side of the shore. The line wanders, follows the
-hills and continues across tile edges; the water keeps its own edge.
+half. The line wanders, follows the hills and continues across tile edges;
+the water keeps its own edge.
+
+### Beaches and the waterline, September 10
+
+The first version cut the beach in two dimensions on the tile square and the
+waterline in three on the terrain fan, then reconciled them with a raster
+clip. Two things went wrong at once: the dry bank of a water tile took the
+water colour whenever the noisy contour did not cover the whole tile, so
+banks along a beach went blue at random, and the antialiased clip left about
+half the grass showing on every edge between two beach tiles that touch water,
+a green hairline grid. On raised shores the beach was also projected at sea
+level rather than at the height of the ground.
+
+Now one surface partition serves every tile: the terrain fan is split by the
+water level into wet and dry pieces, and the dry pieces are split by the sand
+field, both read through the fan's own interpolation (`fanValueAt`). Water,
+bank and beach are cut from the same triangles, so they meet exactly and no
+raster clip is needed. The bank of a water tile is land like any other, grass
+or beach as the field says. Beach pieces of a tile go into one fill, and only
+the edges lying on the tile's own boundary are stroked in the same colour, so
+the neighbour's antialiased edge cannot let the ground show through while the
+contour and the waterline stay at their true width. `tests/beaches.mjs` reads
+the pixels back on a ringed lake and a natural coast in every rotation.

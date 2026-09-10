@@ -127,14 +127,23 @@ export function waterHeightAt(geometry,x,y) {
  return level===null?bed:Math.max(bed,level);
 }
 
-export function waterBedHeight(geometry,x,y) {
- const u=x-geometry.center[0],v=y-geometry.center[1],c=geometry.corners;
- const side=sideAt(geometry,x,y);
+// A value sampled at the vertices of a tile fan, read anywhere on the tile:
+// linear within each sector, so it is continuous across sectors and along
+// tile edges, where it depends only on the two edge vertices. Heights, the
+// sand field and anything else cut into contours use this one rule, so their
+// contours agree with one another and with the neighbouring tile's.
+export function fanValueAt(fan,x,y) {
+ const u=x-fan.center[0],v=y-fan.center[1],c=fan.corners;
+ const side=sideAt(fan,x,y);
  const a=c[side],b=c[(side+1)%c.length],radius=2*Math.max(Math.abs(u),Math.abs(v));
- if(radius<EPS)return geometry.center[2];
- const edgeX=geometry.center[0]+u/radius,edgeY=geometry.center[1]+v/radius;
+ if(radius<EPS)return fan.center[2];
+ const edgeX=fan.center[0]+u/radius,edgeY=fan.center[1]+v/radius;
  const f=Math.abs(b[0]-a[0])>EPS?(edgeX-a[0])/(b[0]-a[0]):(edgeY-a[1])/(b[1]-a[1]);
- return geometry.center[2]*(1-radius)+(a[2]+(b[2]-a[2])*f)*radius;
+ return fan.center[2]*(1-radius)+(a[2]+(b[2]-a[2])*f)*radius;
+}
+
+export function waterBedHeight(geometry,x,y) {
+ return fanValueAt(geometry,x,y);
 }
 
 export function isWaterPoint(r,x,y) {

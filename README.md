@@ -344,8 +344,11 @@ The renderer keeps two cached layers. The ground cache holds only surfaces on
 the terrain mesh; everything raised (buildings with their graded sites, decks,
 ramps, tunnel mouths, trees, lamps, pylons) is a scene item painted afterwards
 in footprint order. `src/scene-items.js` states the rule; `pnpm test:foundations`
-and `pnpm test:bridges` check it in a real browser. Beaches meet the grass along
-a noisy contour (`src/terrain-contours.js`) rather than tile edges.
+and `pnpm test:bridges` check it in a real browser. Every tile's ground is one
+fan of triangles on the mesh, split by the water level into wet and dry pieces
+and the dry pieces by the sand field (`src/terrain-contours.js`), so the
+waterline, the bank and the beach contour are cut from the same surface and
+meet exactly; `pnpm test:coastlines` reads the pixels back.
 
 Rail bends draw continuous curves with aligned sleepers and train movement.
 Dead ends, T junctions and four-way junctions use only their connected arms;
