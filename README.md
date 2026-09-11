@@ -81,20 +81,14 @@ The job holds a `deploy-citybuilder` concurrency group with `cancel-in-progress:
 wrangler uploads the artwork before it moves the live version onto it and a run killed halfway
 leaves that upload half done.
 
-`.github/workflows/nightly.yml` runs the suites that need a real browser: `pnpm test:deploy`
-first, since it serves its own copy of `dist/`, then gameplay, the interface at nine window
-sizes, the scene and geometry checks, the rendering and building-family galleries, the zones,
-and the renderer benchmark against a dev server on 4173. Each step runs even if an earlier one
-failed, so one break does not hide the rest for a day, and `artifacts/` is uploaded either way.
-It runs at 03:00 UTC and on demand. GitHub disables a scheduled workflow after 60 days without
-repository activity; run it from the Actions tab to wake it up.
-
-Three browser suites are left out of nightly, named with their reasons at the top of the
-workflow, because they already fail: `test:working-set` and `test:transport` assert counts that
-the game has since grown past (50 building types against 65, 9 transport layouts against 20
-after the port modules), and `test:art-production` wants a built site served under `/nested/` on
-port 4217 that no script starts. Those numbers are meant to be looked at rather than raised
-blindly, so they are still failing on purpose. Add each suite back to nightly as it is fixed.
+No workflow runs the Chrome suites. `pnpm test:chrome` under **Tests** below is how they run,
+against a server you start. They need a browser and ten minutes, and two of them read the
+machine underneath rather than the code: `tests/browser.mjs` holds an arrow key for 180ms and
+expects the camera to have moved, and `tests/beaches.mjs` calls a pixel sandy at `R-B >= 30`. A
+hosted runner rasterizes Canvas in software, which pushed the p95 frame interval to 130ms and
+that pixel to 29, so both failed on the runner every night while both passed on a laptop. A
+suite that reports the hardware is worse than one nobody runs, because somebody has to read it
+every morning and learn to ignore it.
 
 The page shows a loading screen from the moment it is parsed. The game cannot draw until the
 bundle has run and a city has been laid out, which on a slow connection is about four seconds of
@@ -187,11 +181,41 @@ game and opens the gallery under them, and fails on the first violation.
 
 ```bash
 pnpm test          # node:test unit tests for the simulation, construction and camera
-pnpm test:performance # Chrome renderer benchmark against the running dev server
-pnpm test:ui       # responsive controls, keyboard navigation and UI screenshots
+pnpm test:deploy   # builds, serves dist/ under public/_headers, then plays it
+pnpm dev:test      # the server the Chrome suites expect, in its own terminal
+pnpm test:chrome   # all 24 Chrome suites against it, ten minutes or so
 ```
 
-With Chrome installed, run `pnpm dev --port 4173` in one terminal and `pnpm test:browser` in another for a scripted gameplay check. Screenshots land in `artifacts/`. Run `pnpm test:visuals` against the same server for Canvas pixel checks of courtyard occlusion and earthquake layering, in all camera orientations and day/night lighting. Set `CIVIC_TEST_URL` to use another server port.
+The suites ask Playwright for the `chrome` channel rather than bundled Chromium, so real Chrome
+has to be installed: `pnpm exec playwright install --with-deps chrome` on a machine that has
+none.
+
+`dev:test` is `dev` on port 4173 with `--strictPort`. The port is pinned because the suites
+connect to 4173 and nothing tells them otherwise, and `--strictPort` is there because Vite
+otherwise takes 4174 when 4173 is busy and leaves every suite talking to a server that is not
+the one you started. `CIVIC_TEST_URL` moves most of them elsewhere; `tests/ground-effects.mjs`
+and `tests/surface-water.mjs` hardcode 4173 and ignore it.
+
+`test:chrome` is that whole set in one command, and it stops at the first failure. The pieces
+run on their own under the same names, which is what you want while fixing one: `test:browser`
+for scripted gameplay, `test:ui` for the controls at nine window sizes, `test:visuals` for
+Canvas pixel checks of courtyard occlusion and earthquake layering in every orientation and
+light, `test:performance` for the renderer benchmark. Screenshots and galleries land in
+`artifacts/`.
+
+`test:deploy` is the twenty-fifth Chrome suite and stays outside `test:chrome`, because it asks
+a different question: it builds, serves its own copy of `dist/` under `public/_headers`, and
+plays that. It wants no `dev:test`, takes an ephemeral port and so collides with nothing, and
+it is the only Chrome check of the headers, the service worker and the boot screen.
+
+Three suites are outside `test:chrome` because they fail, and are meant to stay that way until
+somebody looks at them.
+`test:working-set` expects 50 gameplay building types and there are now 65. `test:transport`
+expects 9 transport layouts and the port modules in `e4b4382` brought the catalogue to 20. Both
+numbers are a
+question for a person rather than a number to raise, which is what the assertion is for.
+`test:art-production` wants a built site served under `/nested/` on port 4217, which no script
+sets up.
 
 Gameplay fidelity and remaining verified gaps are tracked in [PARITY.md](PARITY.md).
 

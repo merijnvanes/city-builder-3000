@@ -10,7 +10,7 @@
 // than it looks. A returning player who opens the game and switches away must
 // not have their autosave replaced by the untouched sample town.
 //
-// Run `pnpm dev --port 4173` first.
+// Run `pnpm dev:test` first.
 import { chromium } from "@playwright/test";
 import assert from "node:assert/strict";
 

@@ -10,7 +10,7 @@
 // just against the text: if the game ever gains a network call, the note is
 // wrong and this fails.
 //
-// Run `pnpm dev --port 4173` first.
+// Run `pnpm dev:test` first.
 import { chromium } from "@playwright/test";
 import assert from "node:assert/strict";
 

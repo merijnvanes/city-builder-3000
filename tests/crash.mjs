@@ -4,7 +4,7 @@
 // sees: the game stops, a dialog explains it, the city is written to a slot of
 // its own, and it is still there after the reload.
 //
-// Run `pnpm dev --port 4173` first.
+// Run `pnpm dev:test` first.
 import { chromium } from "@playwright/test";
 import assert from "node:assert/strict";
 

@@ -1,5 +1,5 @@
 import { openManagement, openCategory } from './ui-navigation.mjs';
-// Browser gameplay checks with Playwright. Run `pnpm dev --port 4173` first.
+// Browser gameplay checks with Playwright. Run `pnpm dev:test` first.
 import { chromium } from "@playwright/test";
 import assert from "node:assert/strict";
 import { mkdir } from "node:fs/promises";

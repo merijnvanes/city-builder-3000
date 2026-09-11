@@ -2,10 +2,10 @@
 # wrong and can be decided without a browser: the simulation, the art contract,
 # and a build that produces a deployable site.
 #
-# The Chrome suites are not here. They need a browser and a server and take
-# minutes, and they answer a different question — how the game looks and
-# behaves — which is worth knowing every night rather than every commit. See
-# nightly.yml.
+# The Chrome suites are not here and no workflow runs them. They need a browser
+# and a server, they take minutes, and two of them assert on the frame rate and
+# the rasterizer of the machine underneath, which a hosted runner does not hold
+# still. A person runs them against a dev server; README.md says how.
 #
 # The deploy lives here too, as a second job gated on the first. It is the same
 # question asked once: the tests below decide whether main is good, and there is

@@ -12,11 +12,13 @@
   "private": true,
   "scripts": {
     "dev": "vite --host 127.0.0.1",
+    "dev:test": "vite --host 127.0.0.1 --port 4173 --strictPort",
     "build": "vite build",
     "deploy": "vite build && wrangler deploy",
     "test:deploy": "vite build && node --test tests/deploy-headers.test.js && node tests/deploy-preview.mjs && node tests/offline.mjs && node tests/boot.mjs",
     "preview": "vite preview --host 127.0.0.1",
     "test": "node --test tests/*.test.js",
+    "test:chrome": "pnpm test:browser && pnpm test:ui && pnpm test:coastlines && pnpm test:shadows && pnpm test:foundations && pnpm test:bridges && pnpm test:powerlines && pnpm test:construction-art && pnpm test:directions && pnpm test:rotation && pnpm test:architecture && pnpm test:visuals && pnpm test:starter-art && pnpm test:civic && pnpm test:power && pnpm test:water && pnpm test:parks && pnpm test:rewards && pnpm test:deals && pnpm test:landmarks && pnpm test:residential && pnpm test:commercial && pnpm test:industrial && pnpm test:performance",
     "test:browser": "node tests/browser.mjs && node tests/year-rollover.mjs && node tests/zoom-stability.mjs && node tests/saves.mjs && node tests/autosave.mjs && node tests/crash.mjs && node tests/privacy.mjs",
     "test:ui": "node --test tests/ui-signals.test.js && node tests/ui-design.mjs && node tests/game-ui.mjs && node tests/periwinkle.mjs && node tests/ui-groups.mjs",
     "test:construction-art": "node tests/construction-art.mjs && node tests/zone-lifecycle.mjs",

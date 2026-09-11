@@ -17,8 +17,10 @@ pnpm test                # unit suites; run pnpm build first or the header test 
 pnpm deploy              # builds, then ships to citybuilder.mulletiq.com
 ```
 
-Browser suites need Chrome and a dev server on port 4173. `pnpm dev --port 4173` in one terminal,
-the suite in another. `CIVIC_TEST_URL` points them somewhere else.
+Browser suites need Chrome and a dev server on port 4173. `pnpm dev:test` in one terminal, the
+suite in another, or `pnpm test:chrome` for all of them. Use `dev:test` rather than `dev --port
+4173`: it carries `--strictPort`, without which Vite takes 4174 when 4173 is busy and every
+suite talks to a server you did not start. `CIVIC_TEST_URL` points them somewhere else.
 
 ## Deployment
 
@@ -54,10 +56,10 @@ the annotated-tag trap bites on.
 
 ## Things that are failing on purpose
 
-`test:working-set`, `test:transport` and `test:art-production` are left out of the nightly
-workflow and still fail. The first two assert counts the game has grown past; those numbers are
-for a human to look at rather than raise blindly. Reasons are at the top of
-`.github/workflows/nightly.yml`. Do not "fix" them by editing the expected number.
+`test:working-set`, `test:transport` and `test:art-production` fail, and no workflow runs them.
+The first two assert counts the game has grown past; those numbers are for a human to look at
+rather than raise blindly. Reasons are under **Tests** in `README.md`. Do not "fix" them by
+editing the expected number.
 
 ## Conventions
 

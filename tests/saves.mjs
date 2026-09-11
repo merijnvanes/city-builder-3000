@@ -5,7 +5,7 @@
 // untested, so this walks it end to end: save a city, reload the tab, load it
 // back, and check the two are the same city down to the byte.
 //
-// Run `pnpm dev --port 4173` first.
+// Run `pnpm dev:test` first.
 import { chromium } from "@playwright/test";
 import assert from "node:assert/strict";
 
