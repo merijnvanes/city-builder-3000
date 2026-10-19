@@ -135,7 +135,7 @@ or assume the existing square render padding fits skyscrapers.
    the simulation suite, browser smoke, visual comparisons, performance benchmark
    and a production build served under a nested path. Compare memory, download
    size and redraw costs with the baseline in `CIVIC-ART.md`.
-8. Get an independent review for non-trivial integration changes (the `consult`
+8. Get an independent review for non-trivial integration changes (the `delegate`
    skill is suitable), resolve findings, update coverage/validation documentation,
    then commit and push the completed slice. Continue autonomously with the next.
 
